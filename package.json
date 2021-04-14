@@ -40,7 +40,11 @@
   "engines": {
     "node": ">=10"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ajv": "^8.1.0",
+    "jsonpath": "^1.1.1",
+    "pe-models": "file:../pe-models/pe-models-1.0.0.tgz"
+  },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
