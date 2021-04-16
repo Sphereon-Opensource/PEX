@@ -1,8 +1,10 @@
 import test, { ExecutionContext } from 'ava';
-import { Field, FieldPredicateEnum } from 'pe-models';
+import { Field } from 'pe-models';
 
 import { ValidationError } from './errors/validationError';
 import { FieldObjectValidator } from './fieldObjectValidator';
+
+import PredicateEnum = Field.PredicateEnum;
 
 const fieldObjValidator: FieldObjectValidator = new FieldObjectValidator();
 const fieldObjExample: Field = {
@@ -67,7 +69,7 @@ test('Field object must include filter property if predicate property is present
   const fieldObjInvalid = {
     ...fieldObjExample,
     filter: undefined,
-    predicate: 'required' as FieldPredicateEnum,
+    predicate: PredicateEnum.Required,
   };
   t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
     instanceOf: ValidationError,
