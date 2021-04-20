@@ -1,21 +1,38 @@
 import Ajv from 'ajv';
 import jp from 'jsonpath';
-import { Field, Filter } from 'pe-models';
+import {
+  Field,
+  Filter,
+  InputDescriptors,
+  PresentationDefinition,
+} from 'pe-models';
 
 import { ValidationError } from './errors/validationError';
+import { isField } from './typeGuards';
+import { Validator } from './validator';
 
-interface ObjectValidator {
-  validate(obj: Field): void;
-}
-
-export class FieldObjectValidator implements ObjectValidator {
+export class FieldObjectValidator extends Validator<Field> {
   private schemaValidator: Ajv;
 
   constructor() {
+    super();
     this.schemaValidator = new Ajv();
   }
 
-  validate(fieldObj: Field): void {
+  protected filter(input: any): Field | Field[] {
+    if (isField(input)) {
+      return input as Field;
+    }
+
+    const pd = input as PresentationDefinition;
+    let fields = [];
+    pd.input_descriptors.map((input: InputDescriptors) => {
+      fields = [...fields, ...input.constraints.fields];
+    });
+    return fields;
+  }
+
+  _validate(fieldObj: Field): void {
     if (fieldObj.path == null) {
       throw new ValidationError('field object must contain non-null path');
     }

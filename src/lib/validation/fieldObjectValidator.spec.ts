@@ -1,12 +1,12 @@
 import test, { ExecutionContext } from 'ava';
 import { Field } from 'pe-models';
 
-import { ValidationError } from './errors/validationError';
 import { FieldObjectValidator } from './fieldObjectValidator';
+
+import ValidationEngine from './index';
 
 import PredicateEnum = Field.PredicateEnum;
 
-const fieldObjValidator: FieldObjectValidator = new FieldObjectValidator();
 const fieldObjExample: Field = {
   path: ['$.issuer', '$.vc.issuer', '$.iss'],
   purpose:
@@ -17,8 +17,11 @@ const fieldObjExample: Field = {
   },
 };
 
+const validationEngine: ValidationEngine = new ValidationEngine();
+validationEngine.add(new FieldObjectValidator()).target(fieldObjExample);
+
 test('Valid field object throws no errors', (t: ExecutionContext) => {
-  t.notThrows(() => fieldObjValidator.validate(fieldObjExample));
+  t.is(validationEngine.validate().length, 0);
 });
 
 test('Field object must include a path property', (t: ExecutionContext) => {
@@ -26,9 +29,7 @@ test('Field object must include a path property', (t: ExecutionContext) => {
     ...fieldObjExample,
     path: undefined,
   };
-  t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
-    instanceOf: ValidationError,
-  });
+  t.assert(validationEngine.target(fieldObjInvalid).validate().length > 0);
 });
 
 test('Field object path property must have length > 0', (t: ExecutionContext) => {
@@ -36,19 +37,15 @@ test('Field object path property must have length > 0', (t: ExecutionContext) =>
     ...fieldObjExample,
     path: [],
   };
-  t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
-    instanceOf: ValidationError,
-  });
+  t.assert(validationEngine.target(fieldObjInvalid).validate().length > 0);
 });
 
 test('Field object path property must be an array of JSON paths', (t: ExecutionContext) => {
   const fieldObjInvalid = {
-    ...fieldObjValidator,
+    ...fieldObjExample,
     path: ['$.issuer', 'foo invalid'],
   };
-  t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
-    instanceOf: ValidationError,
-  });
+  t.assert(validationEngine.target(fieldObjInvalid).validate().length > 0);
 });
 
 test('Field object filter property must be a JSON schema descriptor', (t: ExecutionContext) => {
@@ -59,10 +56,7 @@ test('Field object filter property must be a JSON schema descriptor', (t: Execut
       pattern: 'bar invalid',
     },
   };
-
-  t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
-    instanceOf: ValidationError,
-  });
+  t.assert(validationEngine.target(fieldObjInvalid).validate().length > 0);
 });
 
 test('Field object must include filter property if predicate property is present', (t: ExecutionContext) => {
@@ -71,7 +65,5 @@ test('Field object must include filter property if predicate property is present
     filter: undefined,
     predicate: PredicateEnum.Required,
   };
-  t.throws(() => fieldObjValidator.validate(fieldObjInvalid), {
-    instanceOf: ValidationError,
-  });
+  t.assert(validationEngine.target(fieldObjInvalid).validate().length > 0);
 });
