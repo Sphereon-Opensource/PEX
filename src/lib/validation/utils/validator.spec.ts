@@ -1,37 +1,43 @@
 import test from 'ava';
 
-import { Invalid, InvalidOr } from './errors';
-import { Validation, validate } from './validator';
+import { Invalid } from './errors';
+import { validate } from './validator';
 
 interface Person {
     name?: string
 }
 
-const personShouldBeNamed: Validation<Person> = (person): InvalidOr<Person> =>
-    person.name !== undefined ? person : new Invalid('Name not present');
-
-
 test('validate: for basic validation', t => {
     const john : Person = { name: 'john' };
-    const result = validate([personShouldBeNamed], john);
+
+    function personShouldBeNamed(person: Person) : boolean { // Predicate declared separately.
+        return person.name !== undefined;
+    }
+
+    const result = validate(john, [[personShouldBeNamed, 'Person should be named']]);
     t.deepEqual(result, john, "returns the original object when pass validation");
 });
 
 test('validate: for error case', t => {
-    const throwException = (): InvalidOr<Person> => { throw new Error('Something bad happened'); };
+    const throwException = (): boolean => { throw new Error();};
     const john : Person = {  };
-    const result = validate([throwException], john);
+    const result = validate(john, [[throwException, 'Something bad happened']] );
     t.deepEqual(
         result,
         [ new Invalid('Something bad happened')],
-        "handles exception thrown by validation function as Invalid"
+        "should have handled exception thrown by validation function as validation failuer i.e. result = Invalid"
     );
 });
 
 test('validate: for multiple validations', t => {
-    const throwException = (): InvalidOr<Person> => { throw new Error('This one failed'); };
+    const throwException = (): boolean => { throw new Error();}; // predicate throwing error
     const john : Person = { name: 'john' };
-    const result = validate([personShouldBeNamed, throwException], john);
+    const result = validate(
+        john,
+        [
+            [(person): boolean => person.name !== undefined, 'Person should be named'], // Inlined predicate
+            [throwException, 'This one failed']
+        ]);
     t.deepEqual(
         result,
         [ new Invalid('This one failed')],
@@ -39,10 +45,15 @@ test('validate: for multiple validations', t => {
 });
 
 test('validate: for validations with multiple errors', t => {
-    const throwExceptionForNoReason = (): InvalidOr<Person> => { throw new Error('This one failed first'); };
-    const throwExceptionForAgainNoReason = (): InvalidOr<Person> => { throw new Error('This one failed as well'); };
+    const throwExceptionForNoReason = (): boolean => { throw new Error('This one failed first'); };
+    const throwExceptionForAgainNoReason = (): boolean => { throw new Error('This one failed as well'); };
     const john : Person = { name: 'john' };
-    const result = validate([personShouldBeNamed, throwExceptionForNoReason, throwExceptionForAgainNoReason], john);
+    const result = validate(john,
+        [
+            [(person): boolean => person.name !== undefined, 'Person should be named'],
+            [throwExceptionForNoReason, 'This one failed first'],
+            [throwExceptionForAgainNoReason, 'This one failed as well']
+        ]);
 
     t.deepEqual(
         result,

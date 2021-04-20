@@ -1,1 +1,1 @@
-export * from './validation/index';
+export * from './validation';
