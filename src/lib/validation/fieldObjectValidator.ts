@@ -10,6 +10,7 @@ import {
 import { ValidationError } from './errors/validationError';
 import { isField } from './typeGuards';
 import { Validator } from './validator';
+import { validate } from './utils';
 
 export class FieldObjectValidator extends Validator<Field> {
   private schemaValidator: Ajv;
@@ -33,14 +34,12 @@ export class FieldObjectValidator extends Validator<Field> {
   }
 
   _validate(fieldObj: Field): void {
-    if (fieldObj.path == null) {
-      throw new ValidationError('field object must contain non-null path');
-    }
-    if (fieldObj.path.length < 1) {
-      throw new ValidationError(
-        'field object "path" property must have length > 0'
-      );
-    }
+    validate(
+      fieldObj,
+      [
+        [(fieldObj): boolean => fieldObj.path == null, 'field object must contain non-null path'],
+        [(fieldObj): boolean => fieldObj.path.length < 1, 'field object "path" property must have length > 0']
+      ]);
     this._validateJsonPaths(fieldObj.path);
     if (fieldObj.filter != null) {
       this._validateFilter(fieldObj.filter);

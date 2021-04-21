@@ -3257,10 +3257,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-pe-models@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/pe-models/-/pe-models-0.0.5.tgz#707481b29f7fbfc18eb9c70badffd51a9e19c642"
-  integrity sha512-9N63MLZtFe57EphaaRlv5qSzcylnbRjkQk2dDS7iM/rmbeXMb4iFKm0+kIqCoFfix7phm8if4KdgTFwMniQ4fw==
+pe-models@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/pe-models/-/pe-models-0.0.7.tgz#c7e1b683efbcd232b0385596c5e382724b962a0a"
+  integrity sha512-W4NqqKtQTTp0SVlnljlJePDJNYpjiUaEULvZ3rron7vo9QYVSxGVkO8/XWZJy7P5ZRErPLiYg49Cfd7lZj7M7w==
 
 peek-readable@^3.1.3:
   version "3.1.3"
@@ -3907,9 +3907,15 @@ supports-color@^7.1.0:
     has-flag "^4.0.0"
 
 table@^6.0.4:
+<<<<<<< HEAD
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/table/-/table-6.3.0.tgz#b88c2be1ae7d318638cc064b2c0604baffec79f1"
   integrity sha512-gM9kB7aNIuSagW89Fh+SdL49uhKnVSORxMcV72u/dfptFdqExInNn5M21wgq/Uf5UdJpsboFhNe/0SoNKjaxzg==
+=======
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/table/-/table-6.3.1.tgz#ff50199ca5de00bc695596d581f7550759889b35"
+  integrity sha512-kNpMVSN4fj9KY4G6tNDVIT59uaG8ZELGQ+cmFSqivmWkCXJLd00VfRmtyHa8X7AeM75PQ/6/TtEtWjTDs1jXJw==
+>>>>>>> feature/ESSIFI-20
   dependencies:
     ajv "^8.0.1"
     is-boolean-object "^1.1.0"
