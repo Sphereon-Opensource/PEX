@@ -8,7 +8,7 @@ export type ValidateAll = <T>(
   validations: Validation<T>[]
 ) => Validated<T>;
 
-export const validate: ValidateAll = <T>(
+export const executeValidations: ValidateAll = <T>(
   validatable,
   validations
 ): Validated<T> => {

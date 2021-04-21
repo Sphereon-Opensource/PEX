@@ -1,5 +1,5 @@
 import { Invalid } from '../../../lib/validation/core';
-import { validate } from '../../../lib/validation/core';
+import { executeValidations } from '../../../lib/validation/core';
 
 interface Person {
   name?: string;
@@ -14,7 +14,7 @@ describe('validator its', () => {
       return person.name !== undefined;
     }
 
-    const result = validate(john, [
+    const result = executeValidations(john, [
       [personShouldBeNamed, 'Person should be named'],
     ]);
     expect(result).toEqual(john);
@@ -25,7 +25,7 @@ describe('validator its', () => {
       throw new Error();
     };
     const john: Person = {};
-    const result = validate(john, [[throwException, 'Something bad happened']]);
+    const result = executeValidations(john, [[throwException, 'Something bad happened']]);
     expect(result).toEqual([new Invalid('Something bad happened')]);
   });
 
@@ -34,7 +34,7 @@ describe('validator its', () => {
       throw new Error();
     }; // predicate throwing error
     const john: Person = { name: 'john' };
-    const result = validate(john, [
+    const result = executeValidations(john, [
       [
         (person): boolean => person.name !== undefined,
         'Person should be named',
@@ -52,7 +52,7 @@ describe('validator its', () => {
       throw new Error('This one failed as well');
     };
     const john: Person = { name: 'john' };
-    const result = validate(john, [
+    const result = executeValidations(john, [
       [
         (person): boolean => person.name !== undefined,
         'Person should be named',

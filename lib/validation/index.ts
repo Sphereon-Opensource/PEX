@@ -1,14 +1,14 @@
-import { Validator } from './validator';
+import { BaseValidator } from './validators/baseValidator';
 
 export class ValidationEngine {
   private targetObject: any;
-  private validators: Validator<any>[];
+  private validators: BaseValidator<any>[];
 
   constructor() {
     this.validators = [];
   }
 
-  public add(validator: Validator<any>): ValidationEngine {
+  public add(validator: BaseValidator<any>): ValidationEngine {
     this.validators.push(validator);
     return this;
   }
@@ -20,7 +20,7 @@ export class ValidationEngine {
 
   public validate(): Error[] {
     const validationErrors: Error[] = [];
-    this.validators.forEach((validator: Validator<any>) => {
+    this.validators.forEach((validator: BaseValidator<any>) => {
       try {
         validator.validate(this.targetObject);
       } catch (err) {

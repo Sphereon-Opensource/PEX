@@ -7,12 +7,13 @@ import {
   PresentationDefinition,
 } from 'pe-models';
 
-import { validate } from '../core';
-import { ValidationError } from '../errors/validationError';
-import { isField } from '../typeGuards';
-import { Validator } from '../validator';
+import { executeValidations } from '../core';
+import { ValidationError } from '../core/errors/validationError';
+import { isField } from '../core/typeGuards';
 
-export class FieldObjectValidator extends Validator<Field> {
+import { BaseValidator } from './baseValidator';
+
+export class FieldObjectValidator extends BaseValidator<Field> {
   private schemaValidator: Ajv;
 
   constructor() {
@@ -34,7 +35,7 @@ export class FieldObjectValidator extends Validator<Field> {
   }
 
   _validate(fieldObj: Field): void {
-    validate(fieldObj, [
+    executeValidations(fieldObj, [
       [
         (fieldObj): boolean => fieldObj.path == null,
         'field object must contain non-null path',
@@ -43,19 +44,23 @@ export class FieldObjectValidator extends Validator<Field> {
         (fieldObj): boolean => fieldObj.path.length < 1,
         'field object "path" property must have length > 0',
       ],
+      [
+        (fieldObj: Field): boolean => this._validateJsonPaths(fieldObj.path),
+        'field object "path" property must contain array of valid json paths',
+      ],
+      [
+        (fieldObj: Field): boolean => this._validateFilter(fieldObj.filter),
+        'field object "filter" property must be valid json schema',
+      ],
+      [
+        (fieldObj: Field): boolean =>
+          fieldObj.predicate != null && fieldObj.filter == null,
+        'field object must have a "filter" property if "predicate" is present',
+      ],
     ]);
-    this._validateJsonPaths(fieldObj.path);
-    if (fieldObj.filter != null) {
-      this._validateFilter(fieldObj.filter);
-    }
-    if (fieldObj.predicate != null && fieldObj.filter == null) {
-      throw new ValidationError(
-        'field object must have a "filter" property if "predicate" is present'
-      );
-    }
   }
 
-  private _validateJsonPaths(jsonPath: string[]): void {
+  private _validateJsonPaths(jsonPath: string[]): boolean {
     const invalidPaths: string[] = [];
     jsonPath.forEach((path: string) => {
       try {
@@ -70,9 +75,13 @@ export class FieldObjectValidator extends Validator<Field> {
           JSON.stringify(invalidPaths)
       );
     }
+    return true;
   }
 
-  private _validateFilter(filter: Filter): void {
+  private _validateFilter(filter: Filter): boolean {
+    if (filter == null) {
+      return true;
+    }
     try {
       this.schemaValidator.compile(filter);
     } catch (err) {
@@ -81,5 +90,6 @@ export class FieldObjectValidator extends Validator<Field> {
           JSON.stringify(filter)
       );
     }
+    return true;
   }
 }

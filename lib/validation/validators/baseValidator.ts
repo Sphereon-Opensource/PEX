@@ -1,4 +1,4 @@
-export abstract class Validator<Type> {
+export abstract class BaseValidator<Type> {
   protected abstract filter(input: any): Type | Type[];
 
   protected abstract _validate(input: Type): void;
