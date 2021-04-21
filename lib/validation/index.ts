@@ -1,6 +1,6 @@
 import { Validator } from './validator';
 
-export default class ValidationEngine {
+export class ValidationEngine {
   private targetObject: any;
   private validators: Validator<any>[];
 

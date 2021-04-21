@@ -7,10 +7,10 @@ import {
   PresentationDefinition,
 } from 'pe-models';
 
-import { ValidationError } from './errors/validationError';
-import { isField } from './typeGuards';
-import { Validator } from './validator';
-import { validate } from './utils';
+import { validate } from '../core';
+import { ValidationError } from '../errors/validationError';
+import { isField } from '../typeGuards';
+import { Validator } from '../validator';
 
 export class FieldObjectValidator extends Validator<Field> {
   private schemaValidator: Ajv;
@@ -34,12 +34,16 @@ export class FieldObjectValidator extends Validator<Field> {
   }
 
   _validate(fieldObj: Field): void {
-    validate(
-      fieldObj,
+    validate(fieldObj, [
       [
-        [(fieldObj): boolean => fieldObj.path == null, 'field object must contain non-null path'],
-        [(fieldObj): boolean => fieldObj.path.length < 1, 'field object "path" property must have length > 0']
-      ]);
+        (fieldObj): boolean => fieldObj.path == null,
+        'field object must contain non-null path',
+      ],
+      [
+        (fieldObj): boolean => fieldObj.path.length < 1,
+        'field object "path" property must have length > 0',
+      ],
+    ]);
     this._validateJsonPaths(fieldObj.path);
     if (fieldObj.filter != null) {
       this._validateFilter(fieldObj.filter);
