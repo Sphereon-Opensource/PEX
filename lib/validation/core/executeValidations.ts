@@ -25,7 +25,7 @@ export const executeValidations: ValidateAll = <T>(
         result = new Invalid(validation[1]);
       }
     } catch (error) {
-      result = new Invalid(validation[1]);
+      result = new Invalid(validation[1], error);
     }
     return result;
   }
