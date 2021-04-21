@@ -7,7 +7,7 @@ import {
   PresentationDefinition,
 } from 'pe-models';
 
-import { executeValidations } from '../core';
+import {executeValidations, Validated} from '../core';
 import { ValidationError } from '../core/errors/validationError';
 import { isField } from '../core/typeGuards';
 
@@ -34,8 +34,8 @@ export class FieldObjectValidator extends BaseValidator<Field> {
     return fields;
   }
 
-  _validate(fieldObj: Field): void {
-    executeValidations(fieldObj, [
+  _validate(fieldObj: Field): Validated<Field> {
+    return executeValidations(fieldObj, [
       [
         (fieldObj): boolean => fieldObj.path == null,
         'field object must contain non-null path',

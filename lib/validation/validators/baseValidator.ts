@@ -1,14 +1,16 @@
+import {Validated} from '../core';
+
 export abstract class BaseValidator<Type> {
   protected abstract filter(input: any): Type | Type[];
 
-  protected abstract _validate(input: Type): void;
+  protected abstract _validate(input: Type): Validated<Type>;
 
-  validate(input: any): void {
+  validate(input: any): Validated<Type> | Validated<Type>[]{
     const objToValidate = this.filter(input);
     if (!Array.isArray(objToValidate)) {
-      this._validate(objToValidate);
+      return this._validate(objToValidate);
     } else {
-      objToValidate.map((o: Type) => this._validate(o));
+      return objToValidate.map((o: Type) => this._validate(o));
     }
   }
 }
