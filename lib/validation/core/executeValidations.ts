@@ -1,8 +1,8 @@
-import { Invalid, InvalidOr, Validated } from './validationResults';
-import { areInvalid } from './validationUtils';
+import {Invalid, InvalidOr, Validated} from './validationResults';
+import {areInvalid} from './validationUtils';
 
 export type Predicate<T> = (t: T) => boolean;
-export type Validation<T> = [Predicate<T>, string];// TODO Implement Error, Warning, Info & ItemCode
+export type Validation<T> = [Predicate<T>, string];
 export type ValidateAll = <T>(
   t: T,
   validations: Validation<T>[]

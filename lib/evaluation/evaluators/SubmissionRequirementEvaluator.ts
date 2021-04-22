@@ -1,8 +1,8 @@
-import {SubmissionRequirement} from 'pe-models';
+/*import {SubmissionRequirement} from 'pe-models';*/
 
 export class SubmissionRequirementEvaluator {
 
-    _evaluate<Validatable>(submissionRequirement: SubmissionRequirement) {
+    _evaluate/*<Validatable>*/(/*submissionRequirement: SubmissionRequirement*/) {
 
         // TODO Implement tuple creation: It would have a selector/filter mechanism, predicate function and a related error or info message.
         // TODO

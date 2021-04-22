@@ -1,9 +1,9 @@
-import { areInvalid, Invalid, Validated } from '../core';
+import {areInvalid, Invalid, Validated} from '../core';
 
 export abstract class BaseValidator<Type> {
   protected abstract filter(input: any): Type | Type[];
 
-  protected abstract _validate(input: Type): Validated<Type>;
+  protected abstract _validate(input: Type | Type[]): Validated<Type>;
 
   validate(input: any): Invalid[] {
     const objToValidate = this.filter(input);
