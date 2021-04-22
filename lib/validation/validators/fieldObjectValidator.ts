@@ -37,11 +37,11 @@ export class FieldObjectValidator extends BaseValidator<Field> {
   _validate(fieldObj: Field): Validated<Field> {
     return executeValidations(fieldObj, [
       [
-        (fieldObj): boolean => fieldObj.path == null,
+        (fieldObj): boolean => fieldObj.path != null,
         'field object must contain non-null path',
       ],
       [
-        (fieldObj): boolean => fieldObj.path.length < 1,
+        (fieldObj): boolean => fieldObj.path.length > 0,
         'field object "path" property must have length > 0',
       ],
       [
@@ -54,7 +54,7 @@ export class FieldObjectValidator extends BaseValidator<Field> {
       ],
       [
         (fieldObj: Field): boolean =>
-          fieldObj.predicate != null && fieldObj.filter == null,
+          !(fieldObj.predicate != null && fieldObj.filter == null),
         'field object must have a "filter" property if "predicate" is present',
       ],
     ]);

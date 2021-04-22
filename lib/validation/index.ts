@@ -1,3 +1,4 @@
+import { areInvalid, Invalid } from './core';
 import { BaseValidator } from './validators/baseValidator';
 
 export class ValidationEngine {
@@ -18,13 +19,12 @@ export class ValidationEngine {
     return this;
   }
 
-  public validate(): Error[] {
-    const validationErrors: Error[] = [];
+  public validate(): Invalid[] {
+    let validationErrors: Invalid[] = [];
     this.validators.forEach((validator: BaseValidator<any>) => {
-      try {
-        validator.validate(this.targetObject);
-      } catch (err) {
-        validationErrors.push(err);
+      const validated = validator.validate(this.targetObject);
+      if (areInvalid(validated)) {
+        validationErrors = [...validationErrors, ...(validated as Invalid[])];
       }
     });
     return validationErrors;

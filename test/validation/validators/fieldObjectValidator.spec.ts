@@ -14,7 +14,8 @@ const fieldObjExample: Field = {
 };
 
 const validationEngine: ValidationEngine = new ValidationEngine();
-validationEngine.add(new FieldObjectValidator()).target(fieldObjExample);
+validationEngine.add(new FieldObjectValidator())
+  .target(fieldObjExample);
 
 describe('fieldObjectValidator tests: ', () => {
   it('Valid field object throws no errors', () => {

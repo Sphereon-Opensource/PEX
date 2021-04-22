@@ -11,5 +11,8 @@ export const areInvalid: AreInvalid<any> = (
     return e.errorMessage !== null;
   }
 
+  if (!Array.isArray(validatedT)) {
+    return false;
+  }
   return (validatedT as Invalid[]).filter((e) => hasMessage(e)).length > 0;
 };

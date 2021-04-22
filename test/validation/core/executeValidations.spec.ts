@@ -26,7 +26,7 @@ describe('validator its', () => {
     };
     const john: Person = {};
     const result = executeValidations(john, [[throwException, 'Something bad happened']]);
-    expect(result).toEqual([new Invalid('Something bad happened')]);
+    expect(result).toEqual([new Invalid('Something bad happened', new Error())]);
   });
 
   it('handles a mix of successful validation and failed validation', () => {
@@ -41,7 +41,7 @@ describe('validator its', () => {
       ], // Inlined predicate
       [throwException, 'This one failed'],
     ]);
-    expect(result).toEqual([new Invalid('This one failed')]);
+    expect(result).toEqual([new Invalid('This one failed', new Error())]);
   });
 
   it('handles a mix of successful validation and failed validation', () => {
@@ -62,8 +62,8 @@ describe('validator its', () => {
     ]);
 
     expect(result).toEqual([
-      new Invalid('This one failed first'),
-      new Invalid('This one failed as well'),
+      new Invalid('This one failed first', new Error('This one failed first')),
+      new Invalid('This one failed as well', new Error('This one failed as well')),
     ]);
   });
 });
