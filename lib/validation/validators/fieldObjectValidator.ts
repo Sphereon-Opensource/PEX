@@ -7,7 +7,7 @@ import {
   PresentationDefinition,
 } from 'pe-models';
 
-import {executeValidations, Validated} from '../core';
+import { executeValidations, Validated } from '../core';
 import { ValidationError } from '../core/errors/validationError';
 import { isField } from '../core/typeGuards';
 
