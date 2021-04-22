@@ -1,6 +1,6 @@
 import {PresentationDefinition, SubmissionRequirement} from 'pe-models';
 
-import {executeValidations, Predicate, Validated} from '../core';
+import {executeValidations, Invalid, NonEmptyArray, Predicate, Validated} from '../core';
 
 import {BaseValidator} from './baseValidator';
 
@@ -20,7 +20,7 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
     const isMaxAPracticalPositiveInteger = '\'max\' must be a practical positive number';
     const ruleShouldBePickOrAll = '\'rule\' should be either \'pick\' or \'all\'';
 
-    let result = [];
+    let result: NonEmptyArray<Invalid>;
 
     for (const sr of submissionRequirements) {
       const validatedResults = executeValidations(
@@ -42,7 +42,7 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
       );
 
       if (Array.isArray(validatedResults)) {
-        result = [...result, ...validatedResults];
+        result = validatedResults;
       }
       if (sr.from_nested != null) {
         result = [...result, ...new SubmissionRequirementValidator().validate(sr.from_nested)];
