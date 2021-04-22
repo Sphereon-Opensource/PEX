@@ -1,12 +1,15 @@
 export interface Invalid {
-    errorMessage: string;
+  errorMessage: string;
 }
 
 export const Invalid = class implements Invalid {
-    public errorMessage: string;
-    public constructor(message: string) {
-        this.errorMessage = message;
-    }
+  errorMessage: string;
+  source: Error;
+
+  constructor(message: string, source?: Error) {
+    this.errorMessage = message;
+    this.source = source;
+  }
 };
 
 export type InvalidOr<T> = Invalid | T;
