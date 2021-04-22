@@ -25,7 +25,11 @@ export class SubmissionRequirementValidations {
                     [this.needsEitherFromOrFromNested(), needsEitherFromOrFromNested],// Validation 4.2.1.B.A
                     [this.fromOrFromNestedIsMandatory(), fromOrFromNestedIsMandatory],// Validation 4.2.1.B.B
                     [this.fromNestedShouldBeArray(), fromNestedShouldBeArray],// Validation 4.2.1.D
-                    // TODO Validation 4.2.1.E See if it can be implemented in pe-api yamls. currently in typescript type of this variable is 'any' i.e. from_nested?: Array<object>;
+
+                    // TODO Validation 4.2.1.E All objects in from_nested should be of type \'SubmissionRequirement\'
+                    //      See if it can be implemented in pe-api yamls. currently in typescript type of this variable is 'any'
+                    //      i.e. from_nested?: Array<object>;
+
                     [this.allNestedSubmissionRequirementsValidations(), areAllOfTypeSubmissionRequirement],// Validation 4.2.1.F
                     [this.isHumanFriendlyString(), isHumanFriendlyString],// Validation 4.2.1.G
                     [this.isCountAPracticlePositiveInteger(), isCountAPracticlePositiveInteger],// Validation 4.2.2.B.A.A
@@ -49,8 +53,8 @@ export class SubmissionRequirementValidations {
             sr.name === sr.name; // Just a place holder so that following can be implemented more easily if decided.
 
         // We can define
-        //      min length
-        //      max length
+        //      min length 3
+        //      max length 10000
         //      char encoding UTF-8
         //      char set
         //          0-1
@@ -64,7 +68,7 @@ export class SubmissionRequirementValidations {
             sr.rule === 'pick' &&
             typeof sr.count === "number" &&
             0 < sr.count &&
-            sr.count < 1000; // only this line is an assumption taken
+            sr.count < 1000; // only this line is an assumption taken. We should not keep it unbounded.
     }
 
     isMinAPracticlePositiveInteger(): Predicate<SubmissionRequirement> {
@@ -72,7 +76,7 @@ export class SubmissionRequirementValidations {
             sr.rule === 'pick' &&
             typeof sr.min === "number" &&
             0 < sr.min &&
-            sr.min < 1000; // only this line is an assumption taken
+            sr.min < 1000; // only this line is an assumption taken. We should not keep it unbounded.
     }
 
     isMaxAPracticlePositiveInteger(): Predicate<SubmissionRequirement> {
@@ -80,7 +84,7 @@ export class SubmissionRequirementValidations {
             sr.rule === 'pick' &&
             typeof sr.max === "number" &&
             0 < sr.max &&
-            sr.max < 1000; // only this line is an assumption taken
+            sr.max < 1000; // only this line is an assumption taken. We should not keep it unbounded.
     }
 
     private ruleIsMandatory() {

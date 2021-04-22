@@ -25,8 +25,7 @@ export class PresentationDefinitionValidator {
 
     allSrFromItemsShouldBeInInputDescGroups(): Predicate<PresentationDefinition> {
         return (pd: PresentationDefinition): boolean =>
-            pd !== pd; // TODO [FIXME] check from_nested recursively.
-
+            pd !== pd; // TODO check from_nested recursively.
             // return pd.input_descriptors.map(inDesc => inDesc.group).find((grp) => grp === sr.from) !== undefined
     }
 }
