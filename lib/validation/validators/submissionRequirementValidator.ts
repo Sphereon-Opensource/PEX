@@ -34,9 +34,9 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
           //      See if it can be implemented in pe-api yamls. currently in typescript type of this variable is 'any'
           //      i.e. from_nested?: Array<object>;
 
-          [this.isCountAPracticlePositiveInteger(), isCountAPracticalPositiveInteger],// Validation 4.2.2.B.A.A
-          [this.isMinAPracticlePositiveInteger(), isMinAPracticalPositiveInteger],// Validation 4.2.2.B.B.A
-          [this.isMaxAPracticlePositiveInteger(), isMaxAPracticalPositiveInteger],// Validation 4.2.2.B.C.A
+          [this.isCountAPracticalPositiveInteger(), isCountAPracticalPositiveInteger],// Validation 4.2.2.B.A.A
+          [this.isMinAPracticalPositiveInteger(), isMinAPracticalPositiveInteger],// Validation 4.2.2.B.B.A
+          [this.isMaxAPracticalPositiveInteger(), isMaxAPracticalPositiveInteger],// Validation 4.2.2.B.C.A
           [this.ruleShouldBePickOrAll(), ruleShouldBePickOrAll]// Validation 4.2.4
         ]
       );
@@ -51,7 +51,7 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
     return result;
   }
 
-  isCountAPracticlePositiveInteger(): Predicate<SubmissionRequirement> {
+  isCountAPracticalPositiveInteger(): Predicate<SubmissionRequirement> {
     return (sr: SubmissionRequirement) =>
       sr.rule !== 'pick' ||
       (
@@ -61,7 +61,7 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
       );
   }
 
-  isMinAPracticlePositiveInteger(): Predicate<SubmissionRequirement> {
+  isMinAPracticalPositiveInteger(): Predicate<SubmissionRequirement> {
     return (sr: SubmissionRequirement) =>
       sr.rule !== 'pick' ||
       (
@@ -71,7 +71,7 @@ export class SubmissionRequirementValidator extends BaseValidator<any> {
       );
   }
 
-  isMaxAPracticlePositiveInteger(): Predicate<SubmissionRequirement> {
+  isMaxAPracticalPositiveInteger(): Predicate<SubmissionRequirement> {
     return (sr: SubmissionRequirement) =>
       sr.rule !== 'pick' ||
       (
