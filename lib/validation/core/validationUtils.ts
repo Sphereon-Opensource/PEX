@@ -1,18 +1,11 @@
-import { Invalid, NonEmptyArray, Validated } from './validationResults';
+import { Checked, Status } from './validated';
 
-type AreInvalid<T> = (
-  validatedT: Validated<T>
-) => validatedT is NonEmptyArray<Invalid>;
+type AreInvalid = (checked: Checked[]) => boolean;
 
-export const areInvalid: AreInvalid<any> = (
-  validatedT
-): validatedT is NonEmptyArray<Invalid> => {
-  function hasMessage(e): boolean {
-    return e.errorMessage !== null;
+export const hasErrors: AreInvalid = (checked: Checked[]): boolean => {
+  function isError(chk: Checked): boolean {
+    return chk.status === Status.ERROR;
   }
 
-  if (!Array.isArray(validatedT)) {
-    return false;
-  }
-  return (validatedT as Invalid[]).filter((e) => hasMessage(e)).length > 0;
+  return (checked as Checked[]).filter((chk) => isError(chk)).length > 0;
 };

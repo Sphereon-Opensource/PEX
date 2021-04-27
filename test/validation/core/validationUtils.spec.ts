@@ -1,22 +1,25 @@
-import {
-  areInvalid,
-  Invalid,
-  NonEmptyArray,
-} from '../../../lib/validation/core';
+import {Checked, Status, Validated} from '../../../lib';
+import {hasErrors} from '../../../lib';
 
-describe('returns true for array of Invalids', () => {
-  it('AreErrors: for invalids', () => {
-    const myErrors: NonEmptyArray<Invalid> = [new Invalid('Oops')];
-    expect(areInvalid(myErrors)).toBe(true);
+describe('validation utils tests', () => {
+  it('should return false for array with infos', () => {
+    const checked: Validated = [new Checked('random', Status.INFO, 'Hmmm')];
+    expect(hasErrors(checked)).toBeFalsy();
   });
 
-  it('returns true for array of objects that has data structure matching Invalid class', () => {
-    const myErrors: NonEmptyArray<Invalid> = [{ errorMessage: 'Oops' }];
-    expect(areInvalid(myErrors)).toBe(true);
+  it('for warnings should return false', () => {
+    const checked: Validated = [new Checked('random', Status.WARN, 'Hmmm')];
+    expect(hasErrors(checked)).toBeFalsy();
   });
 
-  it('returns false for null message', () => {
-    const myErrors: NonEmptyArray<Invalid> = [{ errorMessage: null }];
-    expect(areInvalid(myErrors)).toBe(false);
+  it('for uninitialized message should return false for array with infos', () => {
+    const checked: Validated = [new Checked('random', Status.INFO)];
+    expect(hasErrors(checked)).toBeFalsy();
   });
+
+  it('should return true for array with errors', () => {
+    const errors: Validated = [new Checked('random', Status.ERROR, 'Oops')];
+    expect(hasErrors(errors)).toBeTruthy();
+  });
+
 });
