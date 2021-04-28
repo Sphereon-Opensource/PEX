@@ -66,7 +66,7 @@ describe('validate', () => {
       new Checked('pd.srs[0]', Status.ERROR, 'min must be a practical positive number'),
       new Checked('pd.srs[0]', Status.ERROR, 'max must be a practical positive number'),
       new Checked('pd.srs[0].from_nested.srs[0]', Status.ERROR, 'min must be a practical positive number'),
-      new Checked('pd.srs[1]', Status.ERROR, 'needs exactly one of from and from_nested'),
+      new Checked('pd.srs[1]', Status.ERROR, 'needs exactly one of from or from_nested'),
       new Checked('pd.srs[1]', Status.ERROR, 'max must be a practical positive number'),
     ]);
   });

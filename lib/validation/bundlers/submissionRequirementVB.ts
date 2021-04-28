@@ -7,7 +7,7 @@ import { ValidationBundler } from './validationBundler';
 export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequirement> {
   private readonly ruleIsMandatoryMsg = 'rule is a mandatory field';
   private readonly needsOneFromOrFromNestedMsg =
-    'needs exactly one of from and from_nested';
+    'needs exactly one of from or from_nested';
   private readonly fromNestedShouldBeArrayMsg =
     'The value of the from_nested property MUST be an array';
   private readonly isCountPositiveIntMsg =
@@ -23,12 +23,12 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     super(parentTag, 'srs');
   }
 
-  public getValidations(srs: SubmissionRequirement[]): Validation<any>[] {
+  public getValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     return this.myValidations(srs);
   }
 
-  private myValidations(srs: SubmissionRequirement[]): Validation<any>[] {
-    let validations: Validation<any>[] = [];
+  private myValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
+    let validations: Validation<SubmissionRequirement>[] = [];
     for (let srInd = 0; srInd < srs.length; srInd++) {
       validations = [
         ...validations,
@@ -42,7 +42,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   private getMyValidations(
     srInd: number,
     srs: SubmissionRequirement[]
-  ): Validation<any>[] {
+  ): Validation<SubmissionRequirement>[] {
     return [
       [
         this.getMyTag(srInd),
@@ -101,7 +101,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   private getSubValidations(
     srInd: number,
     srs: SubmissionRequirement[]
-  ): Validation<any>[] {
+  ): Validation<SubmissionRequirement>[] {
     const fromNested = srs[srInd].from_nested as SubmissionRequirement[];
     return fromNested != null
       ? new SubmissionRequirementVB(
