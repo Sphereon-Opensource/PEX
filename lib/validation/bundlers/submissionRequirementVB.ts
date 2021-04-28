@@ -134,7 +134,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   }
 
   private ruleIsMandatory() {
-    return (sr: SubmissionRequirement): boolean => sr.rule !== undefined;
+    return (sr: SubmissionRequirement): boolean => sr.rule != null;
   }
 
   private needsOneFromOrFromNested() {
