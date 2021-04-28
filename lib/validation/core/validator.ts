@@ -1,5 +1,5 @@
-import {Checked, Status, Validated} from './validated';
-import {hasErrors} from './validationUtils';
+import { Checked, Status, Validated } from './validated';
+import { hasErrors } from './validationUtils';
 
 export type Predicate<T> = (t: T) => boolean;
 export type Validation<T> = [

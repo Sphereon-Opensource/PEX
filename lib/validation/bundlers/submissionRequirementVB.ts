@@ -23,11 +23,15 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     super(parentTag, 'srs');
   }
 
-  public getValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
+  public getValidations(
+    srs: SubmissionRequirement[]
+  ): Validation<SubmissionRequirement>[] {
     return this.myValidations(srs);
   }
 
-  private myValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
+  private myValidations(
+    srs: SubmissionRequirement[]
+  ): Validation<SubmissionRequirement>[] {
     let validations: Validation<SubmissionRequirement>[] = [];
     for (let srInd = 0; srInd < srs.length; srInd++) {
       validations = [

@@ -10,13 +10,13 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     super(parentTag, 'pd');
   }
 
-  public getValidations(pd: PresentationDefinition): Validation<any>[] {
+  public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
     return this.myValidations(pd).concat(
       new InputDescriptorVB(this.myTag).getValidations(pd.input_descriptors)
     );
   }
 
-  private myValidations(pd: PresentationDefinition): Validation<any>[] {
+  private myValidations(pd: PresentationDefinition): Validation<unknown>[] {
     return [
       [
         this.getTag(),

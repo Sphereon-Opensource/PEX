@@ -9,7 +9,7 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
     super(parentTag, 'in_desc');
   }
 
-  public getValidations(inDesc: InputDescriptors[]): Validation<any>[] {
+  public getValidations(inDesc: InputDescriptors[]): Validation<unknown>[] {
     return [
       [
         this.getTag(),
@@ -21,6 +21,7 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   }
 
   private nonEmptyString() {
+    // TODO extract to generic utils or use something like lodash
     return (inDesc: InputDescriptors): boolean => inDesc.name != null;
   }
 }
