@@ -48,53 +48,53 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     srs: SubmissionRequirement[]
   ): Validation<SubmissionRequirement>[] {
     return [
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.ruleIsMandatory(),
-        this.ruleIsMandatoryMsg,
-      ], // Validation 4.2.1.A
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.needsOneFromOrFromNested(),
-        this.needsOneFromOrFromNestedMsg,
-      ], // Validation 4.2.1.B.A
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.fromNestedShouldBeArray(),
-        this.fromNestedShouldBeArrayMsg,
-      ], // Validation 4.2.1.D
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.ruleIsMandatory(),
+        message: this.ruleIsMandatoryMsg,
+      }, // Validation 4.2.1.A
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.needsOneFromOrFromNested(),
+        message: this.needsOneFromOrFromNestedMsg,
+      }, // Validation 4.2.1.B.A
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.fromNestedShouldBeArray(),
+        message: this.fromNestedShouldBeArrayMsg,
+      }, // Validation 4.2.1.D
 
       // TODO Validation 4.2.1.E All objects in from_nested should be of type SubmissionRequirement
       //      See if it can be implemented in pe-api yamls. currently in typescript type of this variable is 'any'
       //      i.e. from_nested?: Array<object>;
 
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.isCountPositiveInt(),
-        this.isCountPositiveIntMsg,
-      ], // Validation 4.2.2.B.A.A
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.isMinPositiveInt(),
-        this.isMinPositiveIntMsg,
-      ], // Validation 4.2.2.B.B.A
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.isMaxPositiveInt(),
-        this.isMaxPositiveIntMsg,
-      ], // Validation 4.2.2.B.C.A
-      [
-        this.getMyTag(srInd),
-        srs[srInd],
-        this.ruleShouldBePickOrAll(),
-        this.ruleShouldBePickOrAllMsg,
-      ], // Validation 4.2.4
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.isCountPositiveInt(),
+        message: this.isCountPositiveIntMsg,
+      }, // Validation 4.2.2.B.A.A
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.isMinPositiveInt(),
+        message: this.isMinPositiveIntMsg,
+      }, // Validation 4.2.2.B.B.A
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.isMaxPositiveInt(),
+        message: this.isMaxPositiveIntMsg,
+      }, // Validation 4.2.2.B.C.A
+      {
+        tag: this.getMyTag(srInd),
+        target: srs[srInd],
+        predicate: this.ruleShouldBePickOrAll(),
+        message: this.ruleShouldBePickOrAllMsg,
+      }, // Validation 4.2.4
     ];
   }
 

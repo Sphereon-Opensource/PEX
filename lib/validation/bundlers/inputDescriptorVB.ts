@@ -11,12 +11,12 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
 
   public getValidations(inDesc: InputDescriptors[]): Validation<unknown>[] {
     return [
-      [
-        this.getTag(),
-        inDesc[0],
-        this.nonEmptyString(),
-        'must contain non-null name',
-      ], // TODO check if it is to be done as per Spec
+      {
+        tag: this.getTag(),
+        target: inDesc[0],
+        predicate: this.nonEmptyString(),
+        message: 'must contain non-null name',
+      }, // TODO check if it is to be done as per Spec
     ];
   }
 

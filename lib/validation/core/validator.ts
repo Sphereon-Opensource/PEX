@@ -2,13 +2,13 @@ import { Checked, Status, Validated } from './validated';
 import { hasErrors } from './validationUtils';
 
 export type Predicate<T> = (t: T) => boolean;
-export type Validation<T> = [
-  tag: string,
-  target: T,
-  predicate: Predicate<T>,
-  message: string,
-  status?: Status
-];
+export class Validation<T> {
+  tag: string;
+  target: T;
+  predicate: Predicate<T>;
+  message: string;
+  status?: Status;
+}
 export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
 
 export const validate: ValidateAll = <T>(
@@ -19,7 +19,7 @@ export const validate: ValidateAll = <T>(
   );
 
   function toChecked(validation: Validation<T>) {
-    return new Checked(validation[0], Status.ERROR, validation[3]);
+    return new Checked(validation.tag, Status.ERROR, validation.message);
   }
 
   function toCheckedSuccess(tag: string) {
@@ -30,9 +30,8 @@ export const validate: ValidateAll = <T>(
     let result;
 
     try {
-      if (validation[2](validation[1])) {
-        const tag = validation[0];
-        result = toCheckedSuccess(tag);
+      if (validation.predicate(validation.target)) {
+        result = toCheckedSuccess(validation.tag);
       } else {
         result = toChecked(validation);
       }

@@ -23,7 +23,7 @@ describe('fieldObjectValidator tests', () => {
   it('There should be no error reported', () => {
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjExample]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjExample}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
@@ -35,7 +35,7 @@ describe('fieldObjectValidator tests', () => {
 
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjInvalid]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjInvalid}]);
     expect(result).toEqual([
       toChecked('field object "path" property must contain array of valid json paths')
     ]);
@@ -49,7 +49,7 @@ describe('fieldObjectValidator tests', () => {
 
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjInvalid]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjInvalid}]);
     expect(result).toEqual([
       toChecked('field object "path" property must contain array of valid json paths')
     ]);
@@ -63,7 +63,7 @@ describe('fieldObjectValidator tests', () => {
 
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjInvalid]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjInvalid}]);
     expect(result).toEqual([
       toChecked('field object "path" property must contain array of valid json paths')
     ]);
@@ -80,7 +80,7 @@ describe('fieldObjectValidator tests', () => {
 
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjInvalid]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjInvalid}]);
     expect(result).toEqual([toChecked('field object "filter" property must be valid json schema')]);
   });
 
@@ -93,7 +93,7 @@ describe('fieldObjectValidator tests', () => {
 
     const vb: ValidationBundler<Field> = new FieldObjectVB('root');
     const ve = new ValidationEngine();
-    const result = ve.validate([[vb, fieldObjInvalid]]);
+    const result = ve.validate([{bundler: vb, target: fieldObjInvalid}]);
     expect(result).toEqual(
       [toChecked('field object must have a "filter" property if "predicate" is present')]);
   });

@@ -17,7 +17,14 @@ describe('validation utils tests', () => {
       return person.name !== undefined;
     }
 
-    const results = validate([['person.name', john, personShouldBeNamed, 'Person should be named']]);
+    const results = validate([
+      {
+        tag: 'person.name',
+        target: john,
+        predicate: personShouldBeNamed,
+        message: 'Person should be named'
+      }
+      ]);
     expect(results).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
@@ -26,7 +33,14 @@ describe('validation utils tests', () => {
       throw new Error();
     };
     const john: Person = {};
-    const result = validate([['person.name', john, throwException, 'Something bad happened']]);
+    const result = validate([
+      {
+        tag: 'person.name',
+        target: john,
+        predicate: throwException,
+        message: 'Something bad happened'
+      }
+      ]);
     expect(result).toEqual([toChecked('Something bad happened')]);
   });
 
@@ -37,8 +51,18 @@ describe('validation utils tests', () => {
     const john: Person = {name: 'john'};
     const result = validate(
       [
-        ['person.name', john, (p): boolean => p.name !== undefined, 'Person should be named'], // Inlined predicate
-        ['person.name', john, throwException, 'This one failed']
+        {
+          tag: 'person.name',
+          target: john,
+          predicate: (p): boolean => p.name !== undefined,
+          message: 'Person should be named', // Inlined predicate
+        },
+        {
+          tag: 'person.name',
+          target: john,
+          predicate: throwException,
+          message: 'This one failed'
+        }
       ]);
     expect(result).toEqual([toChecked('This one failed')]);
   });
@@ -53,9 +77,9 @@ describe('validation utils tests', () => {
     const john: Person = {name: 'john'};
     const result = validate(
       [
-        ['person.name', john, (person): boolean => person.name !== undefined, 'Person should be named'],
-        ['person.name', john, throwExceptionForNoReason, 'This one failed first'],
-        ['person.name', john, throwExceptionForAgainNoReason, 'This one failed as well']
+        {tag: 'person.name', target: john, predicate: (person): boolean => person.name !== undefined, message: 'Person should be named'},
+        {tag: 'person.name', target: john, predicate: throwExceptionForNoReason, message: 'This one failed first'},
+        {tag: 'person.name', target: john, predicate: throwExceptionForAgainNoReason, message: 'This one failed as well'}
       ]);
 
     expect(result).toEqual(

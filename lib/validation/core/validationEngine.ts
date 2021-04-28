@@ -1,8 +1,11 @@
-import {ValidationBundler} from "../bundlers";
+import { ValidationBundler } from '../bundlers';
 
 import { validate, Validation } from './index';
 
-export type Validator = [bundlers: ValidationBundler<any>, target: any];
+export class Validator {
+  bundler: ValidationBundler<unknown>;
+  target: any;
+}
 
 export class ValidationEngine {
   validate(validators: Validator[]) {
@@ -10,7 +13,7 @@ export class ValidationEngine {
 
     for (const validator of validators) {
       validations = validations.concat(
-        validator[0].getValidations(validator[1])
+        validator.bundler.getValidations(validator.target)
       );
     }
 

@@ -18,12 +18,12 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
   private myValidations(pd: PresentationDefinition): Validation<unknown>[] {
     return [
-      [
-        this.getTag(),
-        pd,
-        this.shouldBeNonEmptyArray(),
-        'inputDescriptors should be a non-empty array',
-      ],
+      {
+        tag: this.getTag(),
+        target: pd,
+        predicate: this.shouldBeNonEmptyArray(),
+        message: 'inputDescriptors should be a non-empty array',
+      },
     ];
   }
 

@@ -27,24 +27,24 @@ export class FieldObjectVB extends ValidationBundler<Field> {
 
   public getValidations(fieldObj: Field): Validation<Field>[] {
     return [
-      [
-        this.getTag(),
-        fieldObj,
-        this.pathMustHaveValidJsonPaths(),
-        this.pathMustHaveValidJsonPathsMsg,
-      ],
-      [
-        this.getTag(),
-        fieldObj,
-        this.filterMustBeValidJsonSchema(),
-        this.filterMustBeValidJsonSchemaMsg,
-      ],
-      [
-        this.getTag(),
-        fieldObj,
-        this.filterIsMustInPresenceOfPredicate(),
-        this.filterIsMustInPresenceOfPredicateMsg,
-      ],
+      {
+        tag: this.getTag(),
+        target: fieldObj,
+        predicate: this.pathMustHaveValidJsonPaths(),
+        message: this.pathMustHaveValidJsonPathsMsg,
+      },
+      {
+        tag: this.getTag(),
+        target: fieldObj,
+        predicate: this.filterMustBeValidJsonSchema(),
+        message: this.filterMustBeValidJsonSchemaMsg,
+      },
+      {
+        tag: this.getTag(),
+        target: fieldObj,
+        predicate: this.filterIsMustInPresenceOfPredicate(),
+        message: this.filterIsMustInPresenceOfPredicateMsg,
+      },
     ];
   }
 
