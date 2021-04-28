@@ -43,7 +43,7 @@ describe('validation utils tests', () => {
     expect(result).toEqual([toChecked('This one failed')]);
   });
 
-  it('handles a mix of successful validation and failed validation', () => {
+  it('handles a mix of successful validation and failed validation for multiple errors', () => {
     const throwExceptionForNoReason = (): boolean => {
       throw new Error('This one failed first');
     };

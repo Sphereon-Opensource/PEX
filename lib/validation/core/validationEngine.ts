@@ -1,7 +1,6 @@
-import { ValidationBundler } from '../bundlers';
+import {ValidationBundler} from "../bundlers";
 
-import { validate } from './index';
-import { Validation } from './index';
+import { validate, Validation } from './index';
 
 export type Validator = [bundlers: ValidationBundler<any>, target: any];
 

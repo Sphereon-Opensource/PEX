@@ -20,7 +20,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     'rule should be either pick or all';
 
   constructor(parentTag: string) {
-    super(parentTag, 'srs');
+    super(parentTag, 'submission_requirements');
   }
 
   public getValidations(

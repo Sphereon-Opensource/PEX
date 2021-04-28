@@ -6,7 +6,7 @@ import { ValidationBundler } from './validationBundler';
 
 export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   constructor(parentTag: string) {
-    super(parentTag, 'in_desc');
+    super(parentTag, 'input_descriptor');
   }
 
   public getValidations(inDesc: InputDescriptors[]): Validation<unknown>[] {

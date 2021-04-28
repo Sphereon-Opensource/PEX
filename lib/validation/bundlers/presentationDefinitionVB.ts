@@ -7,7 +7,7 @@ import { ValidationBundler } from './validationBundler';
 
 export class PresentationDefinitionVB extends ValidationBundler<PresentationDefinition> {
   constructor(parentTag: string) {
-    super(parentTag, 'pd');
+    super(parentTag, 'presentation_definition');
   }
 
   public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
