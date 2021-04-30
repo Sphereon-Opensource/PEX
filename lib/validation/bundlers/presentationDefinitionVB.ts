@@ -21,15 +21,14 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       {
         tag: this.getTag(),
         target: pd,
-        predicate: this.shouldBeNonEmptyArray(),
+        predicate: PresentationDefinitionVB.shouldBeNonEmptyArray,
         message: 'inputDescriptors should be a non-empty array',
       },
     ];
   }
 
-  private shouldBeNonEmptyArray() {
+  private static shouldBeNonEmptyArray(pd: PresentationDefinition): boolean {
     // TODO extract to generic utils or use something like lodash
-    return (pd: PresentationDefinition): boolean =>
-      pd.input_descriptors != null && pd.input_descriptors.length > 0;
+    return pd.input_descriptors != null && pd.input_descriptors.length > 0;
   }
 }

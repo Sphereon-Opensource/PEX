@@ -6,7 +6,7 @@ import { Predicate, Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
-export class FieldObjectVB extends ValidationBundler<Field> {
+export class FieldsVB extends ValidationBundler<Field[]> {
   private schemaValidator: Ajv;
 
   private readonly pathMustHaveValidJsonPathsMsg =
@@ -25,27 +25,45 @@ export class FieldObjectVB extends ValidationBundler<Field> {
     this.schemaValidator = new Ajv();
   }
 
-  public getValidations(fieldObj: Field): Validation<Field>[] {
+  public getValidations(fields: Field[]): Validation<Field>[] {
+    let validations: Validation<Field>[] = [];
+    if (fields != null) {
+      for (let srInd = 0; srInd < fields.length; srInd++) {
+        validations = [
+          ...validations,
+          ...this.getObjValidations(srInd, fields[srInd]),
+        ];
+      }
+    }
+    return validations;
+  }
+
+  public getObjValidations(indx: number, field: Field): Validation<Field>[] {
     return [
       {
-        tag: this.getTag(),
-        target: fieldObj,
+        tag: this.getMyTag(indx),
+        target: field,
         predicate: this.pathMustHaveValidJsonPaths(),
         message: this.pathMustHaveValidJsonPathsMsg,
       },
       {
-        tag: this.getTag(),
-        target: fieldObj,
+        tag: this.getMyTag(indx),
+        target: field,
         predicate: this.filterMustBeValidJsonSchema(),
         message: this.filterMustBeValidJsonSchemaMsg,
       },
       {
-        tag: this.getTag(),
-        target: fieldObj,
+        tag: this.getMyTag(indx),
+        target: field,
         predicate: this.filterIsMustInPresenceOfPredicate(),
         message: this.filterIsMustInPresenceOfPredicateMsg,
       },
     ];
+  }
+
+  protected getMyTag(srInd: number) {
+    // TODO extract to make it generic
+    return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
   private pathMustHaveValidJsonPaths(): Predicate<Field> {

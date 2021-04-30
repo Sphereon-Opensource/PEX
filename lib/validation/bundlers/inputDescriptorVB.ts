@@ -14,14 +14,14 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
       {
         tag: this.getTag(),
         target: inDesc[0],
-        predicate: this.nonEmptyString(),
+        predicate: InputDescriptorVB.nonEmptyString,
         message: 'must contain non-null name',
       }, // TODO check if it is to be done as per Spec
     ];
   }
 
-  private nonEmptyString() {
+  private static nonEmptyString(inDesc: InputDescriptors): boolean {
     // TODO extract to generic utils or use something like lodash
-    return (inDesc: InputDescriptors): boolean => inDesc.name != null;
+    return inDesc.name != null;
   }
 }
