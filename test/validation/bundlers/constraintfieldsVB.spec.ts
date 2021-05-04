@@ -18,6 +18,7 @@ function getTestableConstraint(): Constraints {
     },
     "fields": [
       {
+        id: 'fieldID-2021-05-04 00',
         path: ['$.issuer', '$.vc.issuer', '$.iss'],
         purpose:
           'We can only verify bank accounts if they are attested by a trusted bank, auditor or regulatory authority.',
@@ -31,8 +32,7 @@ function getTestableConstraint(): Constraints {
     "is_holder": [
       {
         "field_id": [
-          "item1",
-          "item2"
+          "fieldID-2021-05-04 00"
         ],
         "directive": Optionality.Required
       }
@@ -40,8 +40,7 @@ function getTestableConstraint(): Constraints {
     "same_subject": [
       {
         "field_id": [
-          "item3",
-          "item4"
+          'fieldID-2021-05-04 00'
         ],
         "directive": Optionality.Required,
       }
@@ -51,7 +50,7 @@ function getTestableConstraint(): Constraints {
 
 describe('constraints tests', () => {
 
-  it('There should be no error reported', () => {
+  it('There should be no error reported for fully valid constraints object', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{bundler: vb, target: getTestableConstraint()}]);
@@ -144,7 +143,10 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.fields = undefined;
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
+    expect(result).toEqual([
+      new Checked('root.constraints', Status.ERROR, 'is_holder field_id must correspond to a present field object id property'),
+      new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')
+    ]);
   });
 
   it('There should be no error reported for empty fields', () => {
@@ -153,7 +155,10 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.fields = [];
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
+    expect(result).toEqual([
+      new Checked('root.constraints', Status.ERROR, 'is_holder field_id must correspond to a present field object id property'),
+      new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')
+    ]);
   });
 
   it('There should be no error reported for subject_is_issuer uninitialized', () => {
@@ -189,7 +194,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.is_holder[0].directive = undefined;
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
+    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain a directive property')],);
   });
 
   it('There should be no error reported for is_holder[0].field_id uninitialized', () => {
@@ -198,7 +203,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.is_holder[0].field_id = undefined;
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'is_holder should be of correct structure')],);
+    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain field_id property')],);
   });
 
   it('There should be no error reported for same_subject[0].directive uninitialized', () => {
@@ -207,7 +212,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.same_subject[0].directive = undefined;
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
+    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object must contain a directive property')],);
   });
 
   it('There should be no error reported for same_subject[0].field_id uninitialized', () => {
@@ -216,7 +221,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.same_subject[0].field_id = undefined;
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'subject should be of correct structure')],);
+    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object must contain field_id property')],);
   });
 
   it('There should be no error reported for same_subject[0].field_id empty', () => {
@@ -234,7 +239,16 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints.same_subject[0].field_id = [''];
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'subject should be of correct structure')],);
+    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object field_id property must be an array of strings')],);
+  });
+
+  it('There should be no error reported for same_subject[0].field_id empty', () => {
+    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const ve = new ValidationEngine();
+    const constraints = getTestableConstraint();
+    constraints.same_subject[0].field_id = ['missing_fieldID'];
+    const result = ve.validate([{bundler: vb, target: constraints}]);
+    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')],);
   });
 
 });

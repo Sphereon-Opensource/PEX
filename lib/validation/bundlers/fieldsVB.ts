@@ -31,14 +31,14 @@ export class FieldsVB extends ValidationBundler<Field[]> {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [
           ...validations,
-          ...this.getObjValidations(srInd, fields[srInd]),
+          ...this.getValidationsFor(srInd, fields[srInd]),
         ];
       }
     }
     return validations;
   }
 
-  public getObjValidations(indx: number, field: Field): Validation<Field>[] {
+  public getValidationsFor(indx: number, field: Field): Validation<Field>[] {
     return [
       {
         tag: this.getMyTag(indx),

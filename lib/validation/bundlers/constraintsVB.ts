@@ -10,16 +10,32 @@ import { ValidationBundler } from './validationBundler';
 export class ConstraintsVB extends ValidationBundler<Constraints> {
   private readonly disclosureLimitShouldHaveKnownValueMsg =
     'limit_disclosure should have known value';
-  private readonly statusShouldHaveKnownValueMsg =
-    'status should have known value';
+  private readonly statusShouldHaveKnownValueMsg = 'Unknown status property';
   private readonly statusDirectiveShouldHaveKnownValueMsg =
     'status directive should have known value';
   private readonly subjectIsIssuerShouldBeKnownValueMsg =
     'subject_is_issuer should be known value';
-  private readonly isHolderShouldBeOfCorrectStructureMsg =
-    'is_holder should be of correct structure';
-  private readonly subjectShouldBeOfCorrectStructureMsg =
-    'subject should be of correct structure';
+  private readonly fieldIdIsMandatoryMsg =
+    'is_holder object must contain field_id property';
+  private readonly fieldIdMustBeArrayOfStringsMsg =
+    'is_holder object field_id property must be an array of strings';
+  private readonly fieldIdInIsHolderMustCorrespondToFieldIdMsg =
+    'is_holder field_id must correspond to a present field object id property';
+  private readonly subjectMustContainDirectivePropertyMsg =
+    'is_holder object must contain a directive property';
+  private readonly directiveMustHaveOneOfTheKnownPropertiesMsg =
+    'is_holder directive property must be one of [required, preferred]';
+
+  private readonly sameSubjectFieldIdIsMandatoryMsg =
+    'same_subject object must contain field_id property';
+  private readonly sameSubjectFieldIdMustBeArrayOfStringsMsg =
+    'same_subject object field_id property must be an array of strings';
+  private readonly sameSubjectFieldIdMustCorrespondToFieldIdMsg =
+    'same_subject field_id must correspond to a present field object id property';
+  private readonly sameSubjectFieldMustContainDirectivePropertyMsg =
+    'same_subject object must contain a directive property';
+  private readonly sameSubjectDirectiveMustHaveOneOfTheKnownPropertiesMsg =
+    'same_subject directive property must be one of [required, preferred]';
 
   constructor(parentTag: string) {
     super(parentTag, 'constraints');
@@ -51,19 +67,19 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
         predicate: ConstraintsVB.shouldBeKnownOption,
         message: this.subjectIsIssuerShouldBeKnownValueMsg,
       },
-      {
-        tag: this.getTag(),
-        target: constraints?.is_holder,
-        predicate: ConstraintsVB.subjectShouldBeOfCorrectStructure(),
-        message: this.isHolderShouldBeOfCorrectStructureMsg,
-      },
-      {
-        tag: this.getTag(),
-        target: constraints?.same_subject,
-        predicate: ConstraintsVB.subjectShouldBeOfCorrectStructure(),
-        message: this.subjectShouldBeOfCorrectStructureMsg,
-      },
+      ...this.getIsHolderValidations(constraints?.is_holder),
+      ...this.getSameSubjectValidations(constraints?.same_subject),
       ...new FieldsVB(this.getTag()).getValidations(constraints?.fields),
+      ...this.fieldIdInSubjectMustCorrespondToFieldId(
+        constraints,
+        constraints?.is_holder,
+        this.fieldIdInIsHolderMustCorrespondToFieldIdMsg
+      ),
+      ...this.fieldIdInSubjectMustCorrespondToFieldId(
+        constraints,
+        constraints?.same_subject,
+        this.sameSubjectFieldIdMustCorrespondToFieldIdMsg
+      ),
     ];
   }
 
@@ -111,20 +127,155 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     );
   }
 
-  private static subjectShouldBeOfCorrectStructure(): Predicate<
-    HolderSubject[]
-  > {
-    return (subject: Array<HolderSubject>): boolean =>
-      subject == null ||
-      (Array.isArray(subject) &&
-        subject.filter(
-          (isHolder) =>
-            Array.isArray(isHolder.field_id) &&
-            isHolder.field_id.filter(
-              (field) =>
-                field != null && typeof field === 'string' && field.length > 0
-            ).length === isHolder.field_id.length &&
-            this.shouldBeKnownOption(isHolder.directive)
-        ).length === subject.length);
+  getIsHolderValidations(
+    subjects: Array<HolderSubject>
+  ): Validation<unknown>[] {
+    let validations: Validation<unknown>[] = [];
+    for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
+      validations = [
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd],
+          predicate: ConstraintsVB.fieldIdIsMandatory,
+          message: this.fieldIdIsMandatoryMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.field_id,
+          predicate: ConstraintsVB.fieldIdMustBeArray,
+          message: this.fieldIdMustBeArrayOfStringsMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.field_id,
+          predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
+          message: this.fieldIdMustBeArrayOfStringsMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.directive,
+          predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
+          message: this.subjectMustContainDirectivePropertyMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.directive,
+          predicate: ConstraintsVB.shouldBeKnownOption,
+          message: this.directiveMustHaveOneOfTheKnownPropertiesMsg,
+        },
+      ];
+    }
+    return validations;
+  }
+
+  getSameSubjectValidations(
+    subjects: Array<HolderSubject>
+  ): Validation<unknown>[] {
+    let validations: Validation<unknown>[] = [];
+    for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
+      validations = [
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd],
+          predicate: ConstraintsVB.fieldIdIsMandatory,
+          message: this.sameSubjectFieldIdIsMandatoryMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.field_id,
+          predicate: ConstraintsVB.fieldIdMustBeArray,
+          message: this.fieldIdMustBeArrayOfStringsMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.field_id,
+          predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
+          message: this.sameSubjectFieldIdMustBeArrayOfStringsMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.directive,
+          predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
+          message: this.sameSubjectFieldMustContainDirectivePropertyMsg,
+        },
+        {
+          tag: this.getMyTag(subjectInd),
+          target: subjects[subjectInd]?.directive,
+          predicate: ConstraintsVB.shouldBeKnownOption,
+          message: this.sameSubjectDirectiveMustHaveOneOfTheKnownPropertiesMsg,
+        },
+      ];
+    }
+    return validations;
+  }
+
+  protected getMyTag(srInd: number) {
+    // TODO extract to make it generic
+    return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
+  }
+
+  static fieldIdIsMandatory(subject: HolderSubject): boolean {
+    return subject.field_id != null;
+  }
+
+  static fieldIdMustBeArray(field: unknown): boolean {
+    return field == null || Array.isArray(field);
+  }
+
+  static fieldIdMustBeArrayOfStrings(fields: Array<string>): boolean {
+    return (
+      fields == null ||
+      fields
+        .filter((fieldId) => fieldId != null)
+        .filter((fieldId) => typeof fieldId === 'string')
+        .filter((fieldId) => fieldId.length > 0).length === fields.length
+    );
+  }
+
+  static subjectMustContainDirectiveProperty(directive: Optionality): boolean {
+    return typeof directive !== 'undefined';
+  }
+
+  fieldIdInSubjectMustCorrespondToFieldId(
+    constraints: Constraints,
+    subjects: Array<HolderSubject>,
+    message: string
+  ): Validation<unknown>[] {
+    const missingFieldIds: string[] = [];
+
+    if (subjects != null) {
+      for (const subject of subjects) {
+        if (subject?.field_id != null) {
+          for (const fieldId of subject?.field_id) {
+            if (!ConstraintsVB.isValidFieldId(constraints, fieldId)) {
+              missingFieldIds.push(fieldId);
+            }
+          }
+        }
+      }
+    }
+
+    return missingFieldIds.length > 0
+      ? [
+          {
+            tag: this.getTag(),
+            target: missingFieldIds,
+            predicate: (missingFieldIds: string[]) =>
+              missingFieldIds.length === 0,
+            message: message,
+          },
+        ]
+      : [];
+  }
+
+  private static isValidFieldId(
+    constraints: Constraints,
+    fieldId: string
+  ): boolean {
+    return (
+      fieldId == null ||
+      fieldId.length === 0 ||
+      constraints.fields?.map((field) => field.id).includes(fieldId)
+    );
   }
 }
