@@ -58,9 +58,6 @@ export class FieldsVB extends ValidationBundler<Field[]> {
         predicate: this.filterIsMustInPresenceOfPredicate(),
         message: this.filterIsMustInPresenceOfPredicateMsg,
       },
-      // purpose == null || non-empty
-      // If predicate not empty then filter non empty.
-      // predicate != null && (required || preferred)
     ];
   }
 
