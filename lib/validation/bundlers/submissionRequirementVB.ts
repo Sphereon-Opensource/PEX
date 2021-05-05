@@ -1,6 +1,6 @@
 import { SubmissionRequirement } from 'pe-models';
 
-import { Predicate, Validation } from '../core';
+import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
@@ -26,12 +26,6 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   public getValidations(
     srs: SubmissionRequirement[]
   ): Validation<SubmissionRequirement>[] {
-    return this.myValidations(srs);
-  }
-
-  private myValidations(
-    srs: SubmissionRequirement[]
-  ): Validation<SubmissionRequirement>[] {
     let validations: Validation<SubmissionRequirement>[] = [];
     for (let srInd = 0; srInd < srs.length; srInd++) {
       validations = [
@@ -51,19 +45,19 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.ruleIsMandatory(),
+        predicate: SubmissionRequirementVB.ruleIsMandatory,
         message: this.ruleIsMandatoryMsg,
       }, // Validation 4.2.1.A
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.needsOneFromOrFromNested(),
+        predicate: SubmissionRequirementVB.needsOneFromOrFromNested,
         message: this.needsOneFromOrFromNestedMsg,
       }, // Validation 4.2.1.B.A
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.fromNestedShouldBeArray(),
+        predicate: SubmissionRequirementVB.fromNestedShouldBeArray,
         message: this.fromNestedShouldBeArrayMsg,
       }, // Validation 4.2.1.D
 
@@ -74,31 +68,32 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.isCountPositiveInt(),
+        predicate: this.isCountPositiveInt,
         message: this.isCountPositiveIntMsg,
       }, // Validation 4.2.2.B.A.A
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.isMinPositiveInt(),
+        predicate: this.isMinPositiveInt,
         message: this.isMinPositiveIntMsg,
       }, // Validation 4.2.2.B.B.A
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.isMaxPositiveInt(),
+        predicate: this.isMaxPositiveInt,
         message: this.isMaxPositiveIntMsg,
       }, // Validation 4.2.2.B.C.A
       {
         tag: this.getMyTag(srInd),
         target: srs[srInd],
-        predicate: this.ruleShouldBePickOrAll(),
+        predicate: SubmissionRequirementVB.ruleShouldBePickOrAll,
         message: this.ruleShouldBePickOrAllMsg,
       }, // Validation 4.2.4
     ];
   }
 
   protected getMyTag(srInd: number) {
+    // TODO extract to make it generic
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
@@ -118,37 +113,31 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return this.getMyTag(srInd) + '.' + 'from_nested';
   }
 
-  isCountPositiveInt(): Predicate<SubmissionRequirement> {
-    return (sr: SubmissionRequirement) =>
-      sr.rule !== 'pick' || sr.count == null || 0 < sr.count;
+  isCountPositiveInt(sr: SubmissionRequirement): boolean {
+    return sr.rule !== 'pick' || sr.count == null || 0 < sr.count;
   }
 
-  isMinPositiveInt(): Predicate<SubmissionRequirement> {
-    return (sr: SubmissionRequirement) =>
-      sr.rule !== 'pick' || sr.min == null || 0 < sr.min;
+  isMinPositiveInt(sr: SubmissionRequirement): boolean {
+    return sr.rule !== 'pick' || sr.min == null || 0 < sr.min;
   }
 
-  isMaxPositiveInt(): Predicate<SubmissionRequirement> {
-    return (sr: SubmissionRequirement) =>
-      sr.rule !== 'pick' || sr.max == null || 0 < sr.max;
+  isMaxPositiveInt(sr: SubmissionRequirement): boolean {
+    return sr.rule !== 'pick' || sr.max == null || 0 < sr.max;
   }
 
-  private ruleIsMandatory() {
-    return (sr: SubmissionRequirement): boolean => sr.rule != null;
+  private static ruleIsMandatory(sr: SubmissionRequirement): boolean {
+    return sr.rule != null;
   }
 
-  private needsOneFromOrFromNested() {
-    return (sr: SubmissionRequirement): boolean =>
-      (sr.from == null) !== (sr.from_nested == null); // XOR
+  private static needsOneFromOrFromNested(sr: SubmissionRequirement): boolean {
+    return (sr.from == null) !== (sr.from_nested == null); // XOR
   }
 
-  private fromNestedShouldBeArray() {
-    return (sr: SubmissionRequirement): boolean =>
-      sr.from_nested == null || Array.isArray(sr.from_nested);
+  private static fromNestedShouldBeArray(sr: SubmissionRequirement): boolean {
+    return sr.from_nested == null || Array.isArray(sr.from_nested);
   }
 
-  private ruleShouldBePickOrAll() {
-    return (sr: SubmissionRequirement): boolean =>
-      sr.rule === 'pick' || sr.rule === 'all';
+  private static ruleShouldBePickOrAll(sr: SubmissionRequirement): boolean {
+    return sr.rule === 'pick' || sr.rule === 'all';
   }
 }
