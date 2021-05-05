@@ -233,7 +233,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('There should be error reported for same_subject[0].field_id empty', () => {
+  it('There should be error reported for same_subject[0].field_id object empty', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -242,7 +242,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object field_id property must be an array of strings')],);
   });
 
-  it('There should be error reported for same_subject[0].field_id empty', () => {
+  it('There should be error reported for same_subject[0].field_id missing', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
