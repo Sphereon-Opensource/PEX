@@ -110,7 +110,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('There should be no error reported for uninitialized active.directive', () => {
+  it('There should be error reported for uninitialized active.directive', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -119,7 +119,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'status directive should have known value')],);
   });
 
-  it('There should be no error reported for uninitialized suspended.directive', () => {
+  it('There should be error reported for uninitialized suspended.directive', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -128,7 +128,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'status directive should have known value')],);
   });
 
-  it('There should be no error reported for uninitialized revoked.directive', () => {
+  it('There should be error reported for uninitialized revoked.directive', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -137,7 +137,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'status directive should have known value')],);
   });
 
-  it('There should be no error reported for uninitialized fields', () => {
+  it('There should be error reported for uninitialized fields', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -149,7 +149,7 @@ describe('constraints tests', () => {
     ]);
   });
 
-  it('There should be no error reported for empty fields', () => {
+  it('There should be error reported for empty fields', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -161,7 +161,7 @@ describe('constraints tests', () => {
     ]);
   });
 
-  it('There should be no error reported for subject_is_issuer uninitialized', () => {
+  it('There should be error reported for subject_is_issuer uninitialized', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -188,7 +188,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('There should be no error reported for is_holder[0].directive uninitialized', () => {
+  it('There should be error reported for is_holder[0].directive uninitialized', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -197,7 +197,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain a directive property')],);
   });
 
-  it('There should be no error reported for is_holder[0].field_id uninitialized', () => {
+  it('There should be error reported for is_holder[0].field_id uninitialized', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -206,7 +206,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain field_id property')],);
   });
 
-  it('There should be no error reported for same_subject[0].directive uninitialized', () => {
+  it('There should be error reported for same_subject[0].directive uninitialized', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -215,7 +215,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object must contain a directive property')],);
   });
 
-  it('There should be no error reported for same_subject[0].field_id uninitialized', () => {
+  it('There should be error reported for same_subject[0].field_id uninitialized', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -233,7 +233,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('There should be no error reported for same_subject[0].field_id empty', () => {
+  it('There should be error reported for same_subject[0].field_id empty', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
@@ -242,7 +242,7 @@ describe('constraints tests', () => {
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object field_id property must be an array of strings')],);
   });
 
-  it('There should be no error reported for same_subject[0].field_id empty', () => {
+  it('There should be error reported for same_subject[0].field_id empty', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
