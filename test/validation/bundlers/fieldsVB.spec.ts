@@ -1,4 +1,4 @@
-import {Field, Optionality} from 'pe-models';
+import {Field, Optionality} from '@sphereon/pe-models';
 
 import {FieldsVB} from '../../../lib';
 import {ValidationBundler} from "../../../lib";
@@ -20,14 +20,14 @@ function toChecked(message: string) {
 }
 
 describe('fieldValidator tests', () => {
-  it('There should be no error reported', () => {
+  it('should report no errors for completely valid field object', () => {
     const vb: ValidationBundler<Field> = new FieldsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{bundler: vb, target: [fieldObjExample]}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('Field object must include a path property', () => {
+  it('should report error for field object without path property', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       path: undefined,
@@ -41,7 +41,7 @@ describe('fieldValidator tests', () => {
     ]);
   });
 
-  it('Field object must include a valid path property', () => {
+  it('should report error for field object without valid path array', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       path: '..',
@@ -55,7 +55,7 @@ describe('fieldValidator tests', () => {
     ]);
   });
 
-  it('Field object must include a valid path property', () => {
+  it('should report error for field object without valid path array object', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       path: ['..'],
@@ -69,7 +69,7 @@ describe('fieldValidator tests', () => {
     ]);
   });
 
-  it('Field object filter property must be a JSON schema descriptor', () => {
+  it('should report error when field object is not a JSON schema descriptor', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       filter: {
@@ -84,7 +84,7 @@ describe('fieldValidator tests', () => {
     expect(result).toEqual([toChecked('field object "filter" property must be valid json schema')]);
   });
 
-  it('Field object must include filter property if predicate property is present', () => {
+  it('should report error when filter is missing while predicate is present.', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       filter: undefined,
@@ -97,4 +97,31 @@ describe('fieldValidator tests', () => {
     expect(result).toEqual(
       [toChecked('field object must have a "filter" property if "predicate" is present')]);
   });
+
+  it('should report error when purpose is an empty string', () => {
+    const fieldObjInvalid = {
+      ...fieldObjExample,
+      purpose: '',
+    };
+
+    const vb: ValidationBundler<Field> = new FieldsVB('root');
+    const ve = new ValidationEngine();
+    const result = ve.validate([{bundler: vb, target: [fieldObjInvalid]}]);
+    expect(result).toEqual(
+      [toChecked('purpose should be a non empty string')]);
+  });
+
+  it('should report error when predicate value is unknown', () => {
+    const fieldObjInvalid = {
+      ...fieldObjExample,
+      predicate: 'a',
+    };
+
+    const vb: ValidationBundler<Field> = new FieldsVB('root');
+    const ve = new ValidationEngine();
+    const result = ve.validate([{bundler: vb, target: [fieldObjInvalid]}]);
+    expect(result).toEqual(
+      [toChecked('Unknown predicate property')]);
+  });
+
 });

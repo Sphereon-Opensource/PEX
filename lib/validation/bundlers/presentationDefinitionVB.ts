@@ -1,4 +1,4 @@
-import { PresentationDefinition } from 'pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Validation } from '../core';
 

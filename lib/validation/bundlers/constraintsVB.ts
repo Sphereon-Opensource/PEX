@@ -1,6 +1,11 @@
-import { Constraints, Directives, Optionality, Statuses } from 'pe-models';
-import { HolderSubject } from 'pe-models/model/holderSubject';
-import { PdStatus } from 'pe-models/model/pdStatus';
+import {
+  Constraints,
+  Directives,
+  Optionality,
+  Statuses,
+} from '@sphereon/pe-models';
+import { HolderSubject } from '@sphereon/pe-models/model/holderSubject';
+import { PdStatus } from '@sphereon/pe-models/model/pdStatus';
 
 import { Predicate, Validation } from '../core';
 

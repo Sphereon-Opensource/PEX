@@ -1,4 +1,4 @@
-import {InputDescriptors} from 'pe-models';
+import {InputDescriptors} from '@sphereon/pe-models';
 
 import {Checked, InputDescriptorVB, Status, ValidationEngine} from '../../../lib';
 

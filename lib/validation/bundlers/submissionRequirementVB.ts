@@ -1,4 +1,4 @@
-import { SubmissionRequirement } from 'pe-models';
+import { SubmissionRequirement } from '@sphereon/pe-models';
 
 import { Validation } from '../core';
 

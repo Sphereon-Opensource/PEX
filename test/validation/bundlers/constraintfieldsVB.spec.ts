@@ -1,4 +1,4 @@
-import {Constraints, Directives, Optionality} from 'pe-models';
+import {Constraints, Directives, Optionality} from '@sphereon/pe-models';
 
 import {Checked, ConstraintsVB, Status, ValidationBundler, ValidationEngine} from '../../../lib';
 

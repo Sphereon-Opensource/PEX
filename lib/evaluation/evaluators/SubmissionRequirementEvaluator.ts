@@ -1,4 +1,4 @@
-/*import {SubmissionRequirement} from 'pe-models';*/
+/*import {SubmissionRequirement} from '@sphereon/pe-models';*/
 
 export class SubmissionRequirementEvaluator {
   _evaluate /*<Validatable>*/(/*submissionRequirement: SubmissionRequirement*/) {

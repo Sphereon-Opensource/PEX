@@ -1,7 +1,6 @@
 import { URL } from 'url';
 
-import { InputDescriptors } from 'pe-models';
-import { Schema } from 'pe-models/model/schema';
+import { InputDescriptors, Schema } from '@sphereon/pe-models';
 
 import { Predicate, Validation } from '../core';
 
@@ -9,7 +8,7 @@ import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
 
 export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
-  private readonly nonEmptyString =
+  private readonly idMustBeNonEmptyString =
     'input descriptor id must be non-empty string';
   private readonly optionalNonEmptyString =
     'input descriptor field should be non-empty string';
@@ -21,53 +20,57 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
     super(parentTag, 'input_descriptor');
   }
 
-  public getValidations(inDesc: InputDescriptors[]): Validation<unknown>[] {
+  public getValidations(
+    inputDescriptors: InputDescriptors[]
+  ): Validation<unknown>[] {
     let validations: Validation<unknown>[] = [];
-    for (let inDescInd = 0; inDescInd < inDesc.length; inDescInd++) {
+
+    inputDescriptors.forEach((inputDescriptor, inDescInd) => {
       validations = [
         ...validations,
-        ...this.getMyValidations(inDescInd, inDesc[inDescInd]),
+        ...this.getValidationFor(inputDescriptor, inDescInd),
       ];
-    }
+    });
 
     validations = [
       ...validations,
-      this.shouldHaveUniqueIds(inDesc),
-      this.shouldHaveUniqueFieldsIds(inDesc),
+      this.shouldHaveUniqueIds(inputDescriptors),
+      this.shouldHaveUniqueFieldsIds(inputDescriptors),
     ];
+
     return validations;
   }
 
-  private getMyValidations(
-    inDescInd: number,
-    inDesc: InputDescriptors
+  private getValidationFor(
+    inputDescriptor: InputDescriptors,
+    inDescInd: number
   ): Validation<unknown>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
-        target: inDesc?.id,
+        target: inputDescriptor?.id,
         predicate: InputDescriptorVB.nonEmptyString,
-        message: this.nonEmptyString,
+        message: this.idMustBeNonEmptyString,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inDesc?.schema,
+        target: inputDescriptor?.schema,
         predicate: this.isValidSchema(),
         message: this.shouldHaveValidSchema,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inDesc?.name,
+        target: inputDescriptor?.name,
         predicate: InputDescriptorVB.optionalNonEmptyString,
         message: this.optionalNonEmptyString,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inDesc?.purpose,
+        target: inputDescriptor?.purpose,
         predicate: InputDescriptorVB.optionalNonEmptyString,
         message: this.optionalNonEmptyString,
       },
-      ...this.constraintsValidations(inDesc),
+      ...this.constraintsValidations(inputDescriptor),
     ];
   }
 

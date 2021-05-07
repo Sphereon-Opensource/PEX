@@ -1,6 +1,6 @@
+import { Field, Filter, Optionality } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp from 'jsonpath';
-import { Field, Filter } from 'pe-models';
 
 import { Predicate, Validation } from '../core';
 
@@ -19,6 +19,9 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     'field object must have a "filter" property if "predicate" is present';
   private readonly filterIsNotValidJsonSchemaDescriptorMsg =
     'could not parse "filter" object as a valid json schema descriptor.';
+  private readonly purposeShouldBeANonEmptyStringMsg =
+    'purpose should be a non empty string';
+  private readonly shouldBeKnownOptionMsg = 'Unknown predicate property';
 
   constructor(parentTag: string) {
     super(parentTag, 'field');
@@ -38,7 +41,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(indx: number, field: Field): Validation<Field>[] {
+  public getValidationsFor(indx: number, field: Field): Validation<unknown>[] {
     return [
       {
         tag: this.getMyTag(indx),
@@ -58,9 +61,18 @@ export class FieldsVB extends ValidationBundler<Field[]> {
         predicate: this.filterIsMustInPresenceOfPredicate(),
         message: this.filterIsMustInPresenceOfPredicateMsg,
       },
-      // purpose == null || non-empty
-      // If predicate not empty then filter non empty.
-      // predicate != null && (required || preferred)
+      {
+        tag: this.getMyTag(indx),
+        target: field?.purpose,
+        predicate: FieldsVB.optionalNonEmptyString,
+        message: this.purposeShouldBeANonEmptyStringMsg,
+      },
+      {
+        tag: this.getMyTag(indx),
+        target: field?.predicate,
+        predicate: FieldsVB.shouldBeKnownOption,
+        message: this.shouldBeKnownOptionMsg,
+      },
     ];
   }
 
@@ -118,5 +130,19 @@ export class FieldsVB extends ValidationBundler<Field[]> {
   private filterIsMustInPresenceOfPredicate() {
     return (fieldObj: Field): boolean =>
       !(fieldObj.predicate != null && fieldObj.filter == null);
+  }
+
+  private static optionalNonEmptyString(str: string): boolean {
+    // TODO extract to generic utils or use something like lodash
+    return str == null || str.length > 0;
+  }
+
+  private static shouldBeKnownOption(option: Optionality): boolean {
+    // TODO can be be extracted as a generic function
+    return (
+      option == null ||
+      option == Optionality.Required ||
+      option == Optionality.Preferred
+    );
   }
 }
