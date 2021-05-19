@@ -123,13 +123,17 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
 
     for (const inDesc of inputDescriptors) {
-      for (const field of inDesc.constraints.fields) {
-        const oldSize = uniqueInputDescriptorFieldsIds.size;
-        uniqueInputDescriptorFieldsIds.add(field.id);
-        const newSize = uniqueInputDescriptorFieldsIds.size;
+      if (inDesc.constraints != null) {
+        for (const field of inDesc.constraints.fields) {
+          if (field.id != null) {
+            const oldSize = uniqueInputDescriptorFieldsIds.size;
+            uniqueInputDescriptorFieldsIds.add(field.id);
+            const newSize = uniqueInputDescriptorFieldsIds.size;
 
-        if (oldSize === newSize) {
-          nonUniqueInputDescriptorFieldsIds.push(field.id);
+            if (oldSize === newSize) {
+              nonUniqueInputDescriptorFieldsIds.push(field.id);
+            }
+          }
         }
       }
     }
@@ -156,14 +160,37 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  isAValidURI(s) {
+  isAValidURI(url) {
     try {
-      new URL(s);
+      new URL(url);
     } catch (err) {
-      return false;
+      // console.log(err)
+      return this.isValidDIDURL(url);
     }
-
     return true;
+  }
+
+  private isValidDIDURL(url) {
+    const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
+    const didUrlFormat =
+      '^' +
+      'hub://' +
+      'did:' +
+      '([a-z0-9]+)' + // method_name
+      '(:' + // method-specific-id
+      '([a-zA-Z0-9\\.\\-_]|%[0-9a-fA-F]{2})+' +
+      ')+' +
+      '(/(' +
+      pchar +
+      ')*)?'; // + // path-abempty
+    '(\\?(' +
+      pchar +
+      '|/|\\?)+)?' + // [ "?" query ]
+      '(#(' +
+      pchar +
+      '|/|\\?)+)?'; // [ "#" fragment ]
+    ('$');
+    return new RegExp(didUrlFormat).test(url);
   }
 
   constraintsValidations(
