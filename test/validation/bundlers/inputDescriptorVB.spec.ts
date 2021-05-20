@@ -139,7 +139,7 @@ describe('inputDescriptorsVB tests', () => {
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[1].constraints.fields[0].id = 'uuid2021-05-04 00';
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'fields id must be unique')]);
+    expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
 
 });
