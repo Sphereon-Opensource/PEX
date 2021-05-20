@@ -8,13 +8,15 @@ import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
 
 export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
-  private readonly idMustBeNonEmptyString =
+  private readonly idMustBeNonEmptyStringMsg =
     'input descriptor id must be non-empty string';
-  private readonly fieldShouldBeNonEmptyString =
-    'input descriptor field should be non-empty string';
-  private readonly idMustBeUnique = 'input descriptor id must be unique';
-  private readonly fieldsIdMustBeUnique = 'fields id must be unique';
-  private readonly shouldHaveValidSchemaURI = 'schema should have valid URI';
+  private readonly nameShouldBeNonEmptyStringMsg =
+    'input descriptor name should be non-empty string';
+  private readonly purposeShouldBeNonEmptyStringMsg =
+    'input descriptor purpose should be non-empty string';
+  private readonly idMustBeUniqueMsg = 'input descriptor id must be unique';
+  private readonly fieldsIdMustBeUniqueMsg = 'fields id must be unique';
+  private readonly shouldHaveValidSchemaURIMsg = 'schema should have valid URI';
 
   constructor(parentTag: string) {
     super(parentTag, 'input_descriptor');
@@ -50,25 +52,25 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.id,
         predicate: InputDescriptorsVB.nonEmptyString,
-        message: this.idMustBeNonEmptyString,
+        message: this.idMustBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.schema,
         predicate: this.isValidSchema(),
-        message: this.shouldHaveValidSchemaURI,
+        message: this.shouldHaveValidSchemaURIMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.name,
         predicate: InputDescriptorsVB.optionalNonEmptyString,
-        message: this.fieldShouldBeNonEmptyString,
+        message: this.nameShouldBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.purpose,
         predicate: InputDescriptorsVB.optionalNonEmptyString,
-        message: this.fieldShouldBeNonEmptyString,
+        message: this.purposeShouldBeNonEmptyStringMsg,
       },
       ...this.constraintsValidations(inputDescriptor, inDescInd),
     ];
@@ -110,7 +112,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       target: nonUniqueInputDescriptorIds,
       predicate: (nonUniqueInputDescriptorIds: string[]) =>
         nonUniqueInputDescriptorIds.length === 0,
-      message: this.idMustBeUnique,
+      message: this.idMustBeUniqueMsg,
     };
   }
 
@@ -137,7 +139,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       target: nonUniqueInputDescriptorFieldsIds,
       predicate: (nonUniqueInputDescriptorFieldsIds: string[]) =>
         nonUniqueInputDescriptorFieldsIds.length === 0,
-      message: this.fieldsIdMustBeUnique,
+      message: this.fieldsIdMustBeUniqueMsg,
     };
   }
 

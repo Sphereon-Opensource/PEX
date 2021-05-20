@@ -56,58 +56,90 @@ function getTestableInputDescriptors(): InputDescriptor[] {
   ];
 }
 
-describe('input_descriptors tests', () => {
+function toChecked(message: string) {
+  return [new Checked('root.input_descriptor[0]', Status.ERROR, message)];
+}
 
-  it('There should be no error found', () => {
+describe('inputDescriptorsVB tests', () => {
+
+  it('should be no error found in a completely valid input descriptor', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{bundler: vb, target: getTestableInputDescriptors()}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('test for an empty id', () => {
+  it('should report error for undefined id', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
+
+    const testableInputDescriptors = getTestableInputDescriptors();
+    testableInputDescriptors[0].id = undefined;
+
+    const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
+    expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
+  });
+
+  it('should report error for a null id', () => {
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const ve = new ValidationEngine();
+
+    const testableInputDescriptors = getTestableInputDescriptors();
+    testableInputDescriptors[0].id = undefined;
+
+    const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
+    expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
+  });
+
+  it('should report error for an empty id', () => {
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const ve = new ValidationEngine();
+
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].id = '';
+
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'input descriptor id must be non-empty string')],);
+    expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
   });
 
-  it('test for an empty uri', () => {
+  it('should report error for an empty uri', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
+
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].schema = [{uri:''}];
+
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'schema should have valid URI')],);
+    expect(result).toEqual(toChecked('schema should have valid URI'));
   });
 
-  it('test for an empty name', () => {
+  it('should report error for an empty name', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
+
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].name = '';
+
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'input descriptor field should be non-empty string')],);
+    expect(result).toEqual(toChecked('input descriptor name should be non-empty string'));
   });
 
-  it('test for an empty purpose', () => {
+  it('should report error for an empty purpose', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].purpose = '';
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'input descriptor field should be non-empty string')],);
+    expect(result).toEqual(toChecked('input descriptor purpose should be non-empty string'));
   });
 
-  it('test for an empty purpose', () => {
+  it('should report error for duplicate id', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[1].constraints.fields[0].id = 'uuid2021-05-04 00';
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')],);
+    expect(result).toEqual([new Checked('root.input_descriptor[0]', Status.ERROR, 'fields id must be unique')]);
   });
 
 });
