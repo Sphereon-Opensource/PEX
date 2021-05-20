@@ -2,7 +2,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Validation } from '../core';
 
-import { InputDescriptorVB } from './inputDescriptorVB';
+import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { ValidationBundler } from './validationBundler';
 
 export class PresentationDefinitionVB extends ValidationBundler<PresentationDefinition> {
@@ -12,7 +12,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
   public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
     return this.myValidations(pd).concat(
-      new InputDescriptorVB(this.myTag).getValidations(pd.input_descriptors)
+      new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors)
     );
   }
 

@@ -1,8 +1,8 @@
-import {InputDescriptors} from '@sphereon/pe-models';
+import {InputDescriptor} from '@sphereon/pe-models';
 
-import {Checked, InputDescriptorVB, Status, ValidationEngine} from '../../../lib';
+import {Checked, InputDescriptorsVB, Status, ValidationEngine} from '../../../lib';
 
-function getTestableInputDescriptors(): InputDescriptors[] {
+function getTestableInputDescriptors(): InputDescriptor[] {
   return [
     {
       "id": "banking_input_1",
@@ -59,14 +59,14 @@ function getTestableInputDescriptors(): InputDescriptors[] {
 describe('input_descriptors tests', () => {
 
   it('There should be no error found', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{bundler: vb, target: getTestableInputDescriptors()}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
   it('test for an empty id', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].id = '';
@@ -75,7 +75,7 @@ describe('input_descriptors tests', () => {
   });
 
   it('test for an empty uri', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].schema = [{uri:''}];
@@ -84,7 +84,7 @@ describe('input_descriptors tests', () => {
   });
 
   it('test for an empty name', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].name = '';
@@ -93,7 +93,7 @@ describe('input_descriptors tests', () => {
   });
 
   it('test for an empty purpose', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].purpose = '';
@@ -102,7 +102,7 @@ describe('input_descriptors tests', () => {
   });
 
   it('test for an empty purpose', () => {
-    const vb: InputDescriptorVB = new InputDescriptorVB('root');
+    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[1].constraints.fields[0].id = 'uuid2021-05-04 00';

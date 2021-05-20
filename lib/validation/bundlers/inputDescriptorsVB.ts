@@ -1,27 +1,27 @@
 import { URL } from 'url';
 
-import { InputDescriptors, Schema } from '@sphereon/pe-models';
+import { InputDescriptor, Schema } from '@sphereon/pe-models';
 
 import { Predicate, Validation } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
 
-export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
+export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
   private readonly idMustBeNonEmptyString =
     'input descriptor id must be non-empty string';
-  private readonly optionalNonEmptyString =
+  private readonly fieldShouldBeNonEmptyString =
     'input descriptor field should be non-empty string';
-  private readonly idMustBeUnique = 'id must be unique';
+  private readonly idMustBeUnique = 'input descriptor id must be unique';
   private readonly fieldsIdMustBeUnique = 'fields id must be unique';
-  private readonly shouldHaveValidSchema = 'schema should have valid URI';
+  private readonly shouldHaveValidSchemaURI = 'schema should have valid URI';
 
   constructor(parentTag: string) {
     super(parentTag, 'input_descriptor');
   }
 
   public getValidations(
-    inputDescriptors: InputDescriptors[]
+    inputDescriptors: InputDescriptor[]
   ): Validation<unknown>[] {
     let validations: Validation<unknown>[] = [];
 
@@ -42,35 +42,35 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   }
 
   private getValidationFor(
-    inputDescriptor: InputDescriptors,
+    inputDescriptor: InputDescriptor,
     inDescInd: number
   ): Validation<unknown>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.id,
-        predicate: InputDescriptorVB.nonEmptyString,
+        predicate: InputDescriptorsVB.nonEmptyString,
         message: this.idMustBeNonEmptyString,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.schema,
         predicate: this.isValidSchema(),
-        message: this.shouldHaveValidSchema,
+        message: this.shouldHaveValidSchemaURI,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.name,
-        predicate: InputDescriptorVB.optionalNonEmptyString,
-        message: this.optionalNonEmptyString,
+        predicate: InputDescriptorsVB.optionalNonEmptyString,
+        message: this.fieldShouldBeNonEmptyString,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor?.purpose,
-        predicate: InputDescriptorVB.optionalNonEmptyString,
-        message: this.optionalNonEmptyString,
+        predicate: InputDescriptorsVB.optionalNonEmptyString,
+        message: this.fieldShouldBeNonEmptyString,
       },
-      ...this.constraintsValidations(inputDescriptor),
+      ...this.constraintsValidations(inputDescriptor, inDescInd),
     ];
   }
 
@@ -90,7 +90,7 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   }
 
   private shouldHaveUniqueIds(
-    inputDescriptors: InputDescriptors[]
+    inputDescriptors: InputDescriptor[]
   ): Validation<unknown> {
     const nonUniqueInputDescriptorIds: string[] = [];
     const uniqueInputDescriptorIds: Set<string> = new Set<string>();
@@ -115,7 +115,7 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   }
 
   private shouldHaveUniqueFieldsIds(
-    inputDescriptors: InputDescriptors[]
+    inputDescriptors: InputDescriptor[]
   ): Validation<unknown> {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
@@ -165,11 +165,12 @@ export class InputDescriptorVB extends ValidationBundler<InputDescriptors> {
   }
 
   constraintsValidations(
-    inputDescriptors: InputDescriptors
+    inputDescriptor: InputDescriptor,
+    inDescInd: number
   ): Validation<unknown>[] {
-    if (inputDescriptors !== null) {
-      return new ConstraintsVB(this.getTag()).getValidations(
-        inputDescriptors.constraints
+    if (inputDescriptor !== null) {
+      return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(
+        inputDescriptor.constraints
       );
     }
     return [];
