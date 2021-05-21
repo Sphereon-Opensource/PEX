@@ -1,5 +1,5 @@
 export * from './fieldsVB';
-export * from './inputDescriptorVB';
+export * from './inputDescriptorsVB';
 export * from './presentationDefinitionVB';
 export * from './submissionRequirementVB';
 export * from './validationBundler';

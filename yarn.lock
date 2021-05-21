@@ -726,6 +726,11 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@sphereon/pe-models@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@sphereon/pe-models/-/pe-models-0.0.2.tgz#363e9671b0ac225b7f2790aa9fc468c42eba69a2"
+  integrity sha512-IYn2ASNfEFrT31mFMWNMZ2HL90MeDH/T9DgiuDhRklmnzlj2fAXv/QY54Qwvvq/tPnEw5SuZHX2JwMFRlRV0bw==
+
 "@tokenizer/token@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@tokenizer/token/-/token-0.1.1.tgz#f0d92c12f87079ddfd1b29f614758b9696bc29e3"
@@ -4187,11 +4192,6 @@ path-type@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
-
-pe-models@0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/pe-models/-/pe-models-0.0.7.tgz#c7e1b683efbcd232b0385596c5e382724b962a0a"
-  integrity sha512-W4NqqKtQTTp0SVlnljlJePDJNYpjiUaEULvZ3rron7vo9QYVSxGVkO8/XWZJy7P5ZRErPLiYg49Cfd7lZj7M7w==
 
 peek-readable@^3.1.3:
   version "3.1.3"

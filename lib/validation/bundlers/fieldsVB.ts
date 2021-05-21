@@ -1,6 +1,6 @@
+import { Field, Filter, Optionality } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp from 'jsonpath';
-import { Field, Filter } from 'pe-models';
 
 import { Predicate, Validation } from '../core';
 
@@ -9,9 +9,9 @@ import { ValidationBundler } from './validationBundler';
 export class FieldsVB extends ValidationBundler<Field[]> {
   private schemaValidator: Ajv;
 
-  private readonly pathMustHaveValidJsonPathsMsg =
+  private readonly mustHaveValidJsonPathsMsg =
     'field object "path" property must contain array of valid json paths';
-  private readonly pathObjMustHaveValidJsonPathsMsg =
+  private readonly pathObjMustHaveValidJsonPathMsg =
     'field object "path" property must contain valid json paths.';
   private readonly filterMustBeValidJsonSchemaMsg =
     'field object "filter" property must be valid json schema';
@@ -19,32 +19,36 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     'field object must have a "filter" property if "predicate" is present';
   private readonly filterIsNotValidJsonSchemaDescriptorMsg =
     'could not parse "filter" object as a valid json schema descriptor.';
+  private readonly purposeShouldBeANonEmptyStringMsg =
+    'purpose should be a non empty string';
+  private readonly shouldBeKnownOptionMsg = 'Unknown predicate property';
 
   constructor(parentTag: string) {
-    super(parentTag, 'field');
+    super(parentTag, 'fields');
     this.schemaValidator = new Ajv();
   }
 
   public getValidations(fields: Field[]): Validation<Field>[] {
     let validations: Validation<Field>[] = [];
+
     if (fields != null) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [
           ...validations,
-          ...this.getValidationsFor(srInd, fields[srInd]),
+          ...this.getValidationsFor(fields[srInd], srInd),
         ];
       }
     }
     return validations;
   }
 
-  public getValidationsFor(indx: number, field: Field): Validation<Field>[] {
+  public getValidationsFor(field: Field, indx: number): Validation<unknown>[] {
     return [
       {
         tag: this.getMyTag(indx),
         target: field,
-        predicate: this.pathMustHaveValidJsonPaths(),
-        message: this.pathMustHaveValidJsonPathsMsg,
+        predicate: this.mustHaveValidJsonPaths(),
+        message: this.mustHaveValidJsonPathsMsg,
       },
       {
         tag: this.getMyTag(indx),
@@ -58,6 +62,18 @@ export class FieldsVB extends ValidationBundler<Field[]> {
         predicate: this.filterIsMustInPresenceOfPredicate(),
         message: this.filterIsMustInPresenceOfPredicateMsg,
       },
+      {
+        tag: this.getMyTag(indx),
+        target: field?.purpose,
+        predicate: FieldsVB.optionalNonEmptyString,
+        message: this.purposeShouldBeANonEmptyStringMsg,
+      },
+      {
+        tag: this.getMyTag(indx),
+        target: field?.predicate,
+        predicate: FieldsVB.shouldBeKnownOption,
+        message: this.shouldBeKnownOptionMsg,
+      },
     ];
   }
 
@@ -66,7 +82,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private pathMustHaveValidJsonPaths(): Predicate<Field> {
+  private mustHaveValidJsonPaths(): Predicate<Field> {
     return (fieldObj: Field): boolean =>
       fieldObj.path != null &&
       fieldObj.path.length > 0 &&
@@ -84,7 +100,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     });
     if (invalidPaths.length > 0) {
       throw this.toChecked(
-        this.pathObjMustHaveValidJsonPathsMsg +
+        this.pathObjMustHaveValidJsonPathMsg +
           ' Got: ' +
           JSON.stringify(invalidPaths)
       );
@@ -115,5 +131,19 @@ export class FieldsVB extends ValidationBundler<Field[]> {
   private filterIsMustInPresenceOfPredicate() {
     return (fieldObj: Field): boolean =>
       !(fieldObj.predicate != null && fieldObj.filter == null);
+  }
+
+  private static optionalNonEmptyString(str: string): boolean {
+    // TODO extract to generic utils or use something like lodash
+    return str == null || str.length > 0;
+  }
+
+  private static shouldBeKnownOption(option: Optionality): boolean {
+    // TODO can be be extracted as a generic function
+    return (
+      option == null ||
+      option == Optionality.Required ||
+      option == Optionality.Preferred
+    );
   }
 }
