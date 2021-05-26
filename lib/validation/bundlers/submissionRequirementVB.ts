@@ -27,12 +27,14 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     srs: SubmissionRequirement[]
   ): Validation<SubmissionRequirement>[] {
     let validations: Validation<SubmissionRequirement>[] = [];
-    for (let srInd = 0; srInd < srs.length; srInd++) {
-      validations = [
-        ...validations,
-        ...this.getMyValidations(srInd, srs),
-        ...this.getSubValidations(srInd, srs),
-      ];
+    if (srs != null && srs.length > 0) {
+      for (let srInd = 0; srInd < srs.length; srInd++) {
+        validations = [
+          ...validations,
+          ...this.getMyValidations(srInd, srs),
+          ...this.getSubValidations(srInd, srs),
+        ];
+      }
     }
     return validations;
   }

@@ -1,15 +1,17 @@
 import fs from 'fs';
 
 import {
+  Format,
+  JwtObject,
   LdpObject,
   PresentationDefinition,
   SubmissionRequirement,
 } from '@sphereon/pe-models';
-import { JwtObject } from '@sphereon/pe-models/model/jwtObject';
 import Ajv from 'ajv';
 
 import { Predicate, Validation } from '../core';
 
+import { SubmissionRequirementVB } from './SubmissionRequirementVB';
 import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { ValidationBundler } from './validationBundler';
 
@@ -22,9 +24,15 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
   }
 
   public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
-    return this.myValidations(pd).concat(
-      new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors)
-    );
+    return [
+      ...this.myValidations(pd),
+      ...new InputDescriptorsVB(this.myTag).getValidations(
+        pd.input_descriptors
+      ),
+      ...new SubmissionRequirementVB(this.myTag).getValidations(
+        pd.submission_requirements
+      ),
+    ];
   }
 
   private myValidations(pd: PresentationDefinition): Validation<unknown>[] {
@@ -69,16 +77,24 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       {
         tag: this.getTag(),
         target: pd?.format,
-        predicate: PresentationDefinitionVB.shouldBeNonEmptyStrings,
-        message: 'formats should not have empty strings in alg or proof_type',
+        predicate: PresentationDefinitionVB.formatValuesShouldNotBeEmpty,
+        message: 'formats values should not empty',
+      },
+      {
+        tag: this.getTag(),
+        target: pd?.format,
+        predicate:
+          PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues,
+        message:
+          'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
         predicate:
-          PresentationDefinitionVB.groupShouldMatchSubscriptionRequirements,
+          PresentationDefinitionVB.groupShouldMatchSubmissionRequirements,
         message:
-          'input descriptor group should match the from in subscription requirements.',
+          'input descriptor group should match the from in submission requirements.',
       },
     ];
   }
@@ -96,9 +112,9 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return true;
   }
 
-  private static optionalNonEmptyString(name: string): boolean {
+  private static optionalNonEmptyString(str: string): boolean {
     // TODO extract to generic utils or use something like lodash
-    return name == null || name.length > 0;
+    return str == null || str.length > 0;
   }
 
   private static nonEmptyString(id: string): boolean {
@@ -106,52 +122,86 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return id != null && id.length > 0;
   }
 
-  private static reducer() {
-    return (accumulator: boolean, currentValue: boolean): boolean =>
-      accumulator && currentValue;
-  }
+  private static formatValuesShouldNotBeEmpty(format: Format): boolean {
+    let areExpectedValuesPresent = true;
 
-  private static shouldBeNonEmptyStrings(pd: PresentationDefinition): boolean {
-    let hasAnEmptyString = true;
-    if (pd?.format != null) {
-      const format = pd.format;
-
-      hasAnEmptyString = PresentationDefinitionVB.jwtAlgosShouldBeNonEmpty(
-        format?.jwt
-      );
-      hasAnEmptyString &&= PresentationDefinitionVB.jwtAlgosShouldBeNonEmpty(
-        format?.jwt_vc
-      );
-      hasAnEmptyString &&= PresentationDefinitionVB.jwtAlgosShouldBeNonEmpty(
-        format?.jwt_vp
-      );
-
-      hasAnEmptyString &&= PresentationDefinitionVB.ldpAlgosShouldBeNonEmpty(
-        format?.ldp
-      );
-      hasAnEmptyString &&= PresentationDefinitionVB.ldpAlgosShouldBeNonEmpty(
-        format?.ldp_vc
-      );
-      hasAnEmptyString &&= PresentationDefinitionVB.ldpAlgosShouldBeNonEmpty(
-        format?.ldp_vp
-      );
+    if (format?.jwt != null) {
+      areExpectedValuesPresent &&= format.jwt.alg?.length > 0;
     }
-    return hasAnEmptyString;
+    if (format?.jwt_vc != null) {
+      areExpectedValuesPresent &&= format.jwt_vc.alg?.length > 0;
+    }
+    if (format?.jwt_vp != null) {
+      areExpectedValuesPresent &&= format.jwt_vp.alg?.length > 0;
+    }
+    if (format?.ldp != null) {
+      areExpectedValuesPresent &&= format.ldp.proof_type?.length > 0;
+    }
+    if (format?.ldp_vc != null) {
+      areExpectedValuesPresent &&= format.ldp_vc.proof_type?.length > 0;
+    }
+    if (format?.ldp_vp != null) {
+      areExpectedValuesPresent &&= format.ldp_vp.proof_type?.length > 0;
+    }
+
+    return areExpectedValuesPresent;
   }
 
-  private static jwtAlgosShouldBeNonEmpty(jwtObj: JwtObject) {
-    return jwtObj?.alg
-      ?.map((str) => str?.length > 0)
-      .reduce(PresentationDefinitionVB.reducer());
+  private static formatValuesShouldBeAmongKnownValues(format: Format): boolean {
+    let unknownProofsAndAlgorithms: string[] = [];
+
+    if (format != null) {
+      const jwtAlgos: string[] = PresentationDefinitionVB.getFile(
+        './resources/jwt_algos.json'
+      ).alg;
+      const ldpTypes: string[] = PresentationDefinitionVB.getFile(
+        './resources/ldp_types.json'
+      ).proof_types;
+
+      unknownProofsAndAlgorithms = [
+        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt, jwtAlgos),
+        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt_vc, jwtAlgos),
+        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt_vp, jwtAlgos),
+
+        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp, ldpTypes),
+        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp_vc, ldpTypes),
+        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp_vp, ldpTypes),
+      ];
+    }
+    return unknownProofsAndAlgorithms.length === 0;
   }
 
-  private static ldpAlgosShouldBeNonEmpty(ldpObj: LdpObject) {
-    return ldpObj?.proof_type
-      ?.map((str) => str?.length > 0)
-      .reduce(PresentationDefinitionVB.reducer());
+  private static isJWTAlgoKnown(
+    jwtObject: JwtObject,
+    jwtAlgos: string[]
+  ): string[] {
+    const unknownAlgorithms: string[] = [];
+    if (jwtObject != null && jwtObject.alg != null) {
+      for (const jwtAlgo of jwtObject.alg) {
+        if (!jwtAlgos.includes(jwtAlgo)) {
+          unknownAlgorithms.push(jwtAlgo);
+        }
+      }
+    }
+    return unknownAlgorithms;
   }
 
-  private static groupShouldMatchSubscriptionRequirements(
+  private static isLDPProofKnown(
+    ldpObject: LdpObject,
+    ldpTypes: string[]
+  ): string[] {
+    const unknownProofType: string[] = [];
+    if (ldpObject != null && ldpObject.proof_type != null) {
+      for (const ldpProof of ldpObject.proof_type) {
+        if (!ldpTypes.includes(ldpProof)) {
+          unknownProofType.push(ldpProof);
+        }
+      }
+    }
+    return unknownProofType;
+  }
+
+  private static groupShouldMatchSubmissionRequirements(
     pd: PresentationDefinition
   ): boolean {
     if (
@@ -177,7 +227,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
       const difference = new Set(
         [...fromValueStrings].filter(
-          x => x != null && x.length > 0 && !groupStrings.has(x)
+          (x) => x != null && x.length > 0 && !groupStrings.has(x)
         )
       );
 
@@ -220,5 +270,10 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
       return true;
     };
+  }
+
+  private static getFile(path: string) {
+    // TODO extract to generic utils or use something like lodash
+    return JSON.parse(fs.readFileSync(path, 'utf-8'));
   }
 }

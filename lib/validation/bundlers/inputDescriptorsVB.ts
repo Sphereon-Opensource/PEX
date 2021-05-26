@@ -165,12 +165,12 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       new URL(url);
     } catch (err) {
       // console.log(err)
-      return this.isValidDIDURL(url);
+      return InputDescriptorsVB.isValidDIDURL(url);
     }
     return true;
   }
 
-  private isValidDIDURL(url) {
+  private static isValidDIDURL(url) {
     const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
     const didUrlFormat =
       '^' +
