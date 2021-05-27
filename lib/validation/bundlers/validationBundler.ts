@@ -12,7 +12,9 @@ export abstract class ValidationBundler<T> {
   public abstract getValidations(t: T | T[]): Validation<any>[];
 
   protected getTag() {
-    return this.parentTag + '.' + this.myTag;
+    return this.parentTag != null
+      ? this.parentTag + '.' + this.myTag
+      : this.myTag;
   }
 
   protected toChecked(message: string) {

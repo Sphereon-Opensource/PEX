@@ -1,5 +1,6 @@
 import { Field, Filter, Optionality } from '@sphereon/pe-models';
 import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
 import { Predicate, Validation } from '../core';
@@ -26,6 +27,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
   constructor(parentTag: string) {
     super(parentTag, 'fields');
     this.schemaValidator = new Ajv();
+    addFormats(this.schemaValidator);
   }
 
   public getValidations(fields: Field[]): Validation<Field>[] {

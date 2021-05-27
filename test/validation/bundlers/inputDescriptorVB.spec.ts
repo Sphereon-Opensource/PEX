@@ -50,7 +50,11 @@ function getTestableInputDescriptors(): InputDescriptor[] {
               "$.iss"
             ]
           },
-        ]
+          {
+            // id is undefined
+            "path": ['a']
+          }
+        ],
       }
     }
   ];
