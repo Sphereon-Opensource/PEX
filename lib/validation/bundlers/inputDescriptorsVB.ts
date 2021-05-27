@@ -8,12 +8,9 @@ import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
 
 export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
-  private readonly idMustBeNonEmptyStringMsg =
-    'input descriptor id must be non-empty string';
-  private readonly nameShouldBeNonEmptyStringMsg =
-    'input descriptor name should be non-empty string';
-  private readonly purposeShouldBeNonEmptyStringMsg =
-    'input descriptor purpose should be non-empty string';
+  private readonly idMustBeNonEmptyStringMsg = 'input descriptor id must be non-empty string';
+  private readonly nameShouldBeNonEmptyStringMsg = 'input descriptor name should be non-empty string';
+  private readonly purposeShouldBeNonEmptyStringMsg = 'input descriptor purpose should be non-empty string';
   private readonly idMustBeUniqueMsg = 'input descriptor id must be unique';
   private readonly fieldsIdMustBeUniqueMsg = 'fields id must be unique';
   private readonly shouldHaveValidSchemaURIMsg = 'schema should have valid URI';
@@ -22,16 +19,11 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     super(parentTag, 'input_descriptor');
   }
 
-  public getValidations(
-    inputDescriptors: InputDescriptor[]
-  ): Validation<unknown>[] {
+  public getValidations(inputDescriptors: InputDescriptor[]): Validation<unknown>[] {
     let validations: Validation<unknown>[] = [];
 
     inputDescriptors.forEach((inputDescriptor, inDescInd) => {
-      validations = [
-        ...validations,
-        ...this.getValidationFor(inputDescriptor, inDescInd),
-      ];
+      validations = [...validations, ...this.getValidationFor(inputDescriptor, inDescInd)];
     });
 
     validations = [
@@ -43,10 +35,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return validations;
   }
 
-  private getValidationFor(
-    inputDescriptor: InputDescriptor,
-    inDescInd: number
-  ): Validation<unknown>[] {
+  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
@@ -91,9 +80,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return name == null || name.length > 0;
   }
 
-  private shouldHaveUniqueIds(
-    inputDescriptors: InputDescriptor[]
-  ): Validation<unknown> {
+  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
     const nonUniqueInputDescriptorIds: string[] = [];
     const uniqueInputDescriptorIds: Set<string> = new Set<string>();
 
@@ -110,15 +97,12 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return {
       tag: this.getTag(),
       target: nonUniqueInputDescriptorIds,
-      predicate: (nonUniqueInputDescriptorIds: string[]) =>
-        nonUniqueInputDescriptorIds.length === 0,
+      predicate: (nonUniqueInputDescriptorIds: string[]) => nonUniqueInputDescriptorIds.length === 0,
       message: this.idMustBeUniqueMsg,
     };
   }
 
-  private shouldHaveUniqueFieldsIds(
-    inputDescriptors: InputDescriptor[]
-  ): Validation<unknown> {
+  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
 
@@ -141,8 +125,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return {
       tag: this.getTag(),
       target: nonUniqueInputDescriptorFieldsIds,
-      predicate: (nonUniqueInputDescriptorFieldsIds: string[]) =>
-        nonUniqueInputDescriptorFieldsIds.length === 0,
+      predicate: (nonUniqueInputDescriptorFieldsIds: string[]) => nonUniqueInputDescriptorFieldsIds.length === 0,
       message: this.fieldsIdMustBeUniqueMsg,
     };
   }
@@ -152,9 +135,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return (schemas: Array<Schema>): boolean => {
       return (
         schemas.filter(
-          (schema) =>
-            this.isAValidURI(schema.uri) &&
-            (schema.required == null || typeof schema.required == 'boolean')
+          (schema) => this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
         ).length > 0
       );
     };
@@ -192,14 +173,9 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return new RegExp(format).test(uri);
   }
 
-  constraintsValidations(
-    inputDescriptor: InputDescriptor,
-    inDescInd: number
-  ): Validation<unknown>[] {
+  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
     if (inputDescriptor !== null) {
-      return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(
-        inputDescriptor.constraints
-      );
+      return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }
     return [];
   }

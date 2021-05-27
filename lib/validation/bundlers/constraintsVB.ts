@@ -1,11 +1,4 @@
-import {
-  Constraints,
-  Directives,
-  HolderSubject,
-  Optionality,
-  PdStatus,
-  Statuses,
-} from '@sphereon/pe-models';
+import { Constraints, Directives, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
 
 import { Predicate, Validation } from '../core';
 
@@ -13,26 +6,19 @@ import { FieldsVB } from './fieldsVB';
 import { ValidationBundler } from './validationBundler';
 
 export class ConstraintsVB extends ValidationBundler<Constraints> {
-  private readonly disclosureLimitShouldHaveKnownValueMsg =
-    'limit_disclosure should have known value';
+  private readonly disclosureLimitShouldHaveKnownValueMsg = 'limit_disclosure should have known value';
   private readonly statusShouldHaveKnownValueMsg = 'Unknown status property';
-  private readonly statusDirectiveShouldHaveKnownValueMsg =
-    'status directive should have known value';
-  private readonly subjectIsIssuerShouldBeKnownValueMsg =
-    'subject_is_issuer should be known value';
-  private readonly fieldIdIsMandatoryMsg =
-    'is_holder object must contain field_id property';
-  private readonly fieldIdMustBeArrayOfStringsMsg =
-    'is_holder object field_id property must be an array of strings';
+  private readonly statusDirectiveShouldHaveKnownValueMsg = 'status directive should have known value';
+  private readonly subjectIsIssuerShouldBeKnownValueMsg = 'subject_is_issuer should be known value';
+  private readonly fieldIdIsMandatoryMsg = 'is_holder object must contain field_id property';
+  private readonly fieldIdMustBeArrayOfStringsMsg = 'is_holder object field_id property must be an array of strings';
   private readonly fieldIdInIsHolderMustCorrespondToFieldIdMsg =
     'is_holder field_id must correspond to a present field object id property';
-  private readonly subjectMustContainDirectivePropertyMsg =
-    'is_holder object must contain a directive property';
+  private readonly subjectMustContainDirectivePropertyMsg = 'is_holder object must contain a directive property';
   private readonly directiveMustHaveOneOfTheKnownPropertiesMsg =
     'is_holder directive property must be one of [required, preferred]';
 
-  private readonly sameSubjectFieldIdIsMandatoryMsg =
-    'same_subject object must contain field_id property';
+  private readonly sameSubjectFieldIdIsMandatoryMsg = 'same_subject object must contain field_id property';
   private readonly sameSubjectFieldIdMustBeArrayOfStringsMsg =
     'same_subject object field_id property must be an array of strings';
   private readonly sameSubjectFieldIdMustCorrespondToFieldIdMsg =
@@ -88,9 +74,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     ];
   }
 
-  private static disclosureLimitShouldHaveKnownValue(
-    limit_disclosure: Optionality
-  ): boolean {
+  private static disclosureLimitShouldHaveKnownValue(limit_disclosure: Optionality): boolean {
     return (
       limit_disclosure == null ||
       limit_disclosure === Optionality.Preferred ||
@@ -99,12 +83,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
   }
 
   private static statusShouldHaveKnownValue(statuses: Statuses): boolean {
-    return (
-      statuses == null ||
-      statuses.active != null ||
-      statuses.revoked != null ||
-      statuses.suspended != null
-    );
+    return statuses == null || statuses.active != null || statuses.revoked != null || statuses.suspended != null;
   }
 
   private static statusDirectiveShouldHaveKnownValue(): Predicate<Statuses> {
@@ -132,9 +111,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     );
   }
 
-  getIsHolderValidations(
-    subjects: Array<HolderSubject>
-  ): Validation<unknown>[] {
+  getIsHolderValidations(subjects: Array<HolderSubject>): Validation<unknown>[] {
     let validations: Validation<unknown>[] = [];
     for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
       validations = [
@@ -173,9 +150,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     return validations;
   }
 
-  getSameSubjectValidations(
-    subjects: Array<HolderSubject>
-  ): Validation<unknown>[] {
+  getSameSubjectValidations(subjects: Array<HolderSubject>): Validation<unknown>[] {
     let validations: Validation<unknown>[] = [];
     for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
       validations = [
@@ -265,22 +240,14 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
           {
             tag: this.getTag(),
             target: missingFieldIds,
-            predicate: (missingFieldIds: string[]) =>
-              missingFieldIds.length === 0,
+            predicate: (missingFieldIds: string[]) => missingFieldIds.length === 0,
             message: message,
           },
         ]
       : [];
   }
 
-  private static isValidFieldId(
-    constraints: Constraints,
-    fieldId: string
-  ): boolean {
-    return (
-      fieldId == null ||
-      fieldId.length === 0 ||
-      constraints.fields?.map((field) => field.id).includes(fieldId)
-    );
+  private static isValidFieldId(constraints: Constraints, fieldId: string): boolean {
+    return fieldId == null || fieldId.length === 0 || constraints.fields?.map((field) => field.id).includes(fieldId);
   }
 }

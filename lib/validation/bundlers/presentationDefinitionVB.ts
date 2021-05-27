@@ -1,12 +1,6 @@
 import fs from 'fs';
 
-import {
-  Format,
-  JwtObject,
-  LdpObject,
-  PresentationDefinition,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import { Format, JwtObject, LdpObject, PresentationDefinition, SubmissionRequirement } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
 import { Predicate, Validation } from '../core';
@@ -26,12 +20,8 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
   public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
     return [
       ...this.myValidations(pd),
-      ...new InputDescriptorsVB(this.myTag).getValidations(
-        pd.input_descriptors
-      ),
-      ...new SubmissionRequirementVB(this.myTag).getValidations(
-        pd.submission_requirements
-      ),
+      ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors),
+      ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
     ];
   }
 
@@ -77,18 +67,14 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       {
         tag: this.getTag(),
         target: pd?.format,
-        predicate:
-          PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues,
-        message:
-          'formats should only have known identifiers for alg or proof_type',
+        predicate: PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues,
+        message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate:
-          PresentationDefinitionVB.groupShouldMatchSubmissionRequirements,
-        message:
-          'input descriptor group should match the from in submission requirements.',
+        predicate: PresentationDefinitionVB.groupShouldMatchSubmissionRequirements,
+        message: 'input descriptor group should match the from in submission requirements.',
       },
     ];
   }
@@ -132,12 +118,8 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     let unknownProofsAndAlgorithms: string[] = [];
 
     if (format != null) {
-      const jwtAlgos: string[] = PresentationDefinitionVB.getFile(
-        './resources/jwt_algos.json'
-      ).alg;
-      const ldpTypes: string[] = PresentationDefinitionVB.getFile(
-        './resources/ldp_types.json'
-      ).proof_types;
+      const jwtAlgos: string[] = PresentationDefinitionVB.getFile('./resources/jwt_algos.json').alg;
+      const ldpTypes: string[] = PresentationDefinitionVB.getFile('./resources/ldp_types.json').proof_types;
 
       unknownProofsAndAlgorithms = [
         ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt, jwtAlgos),
@@ -152,10 +134,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return unknownProofsAndAlgorithms.length === 0;
   }
 
-  private static isJWTAlgoKnown(
-    jwtObject: JwtObject,
-    jwtAlgos: string[]
-  ): string[] {
+  private static isJWTAlgoKnown(jwtObject: JwtObject, jwtAlgos: string[]): string[] {
     const unknownAlgorithms: string[] = [];
     if (jwtObject != null && jwtObject.alg != null) {
       for (const jwtAlgo of jwtObject.alg) {
@@ -167,10 +146,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return unknownAlgorithms;
   }
 
-  private static isLDPProofKnown(
-    ldpObject: LdpObject,
-    ldpTypes: string[]
-  ): string[] {
+  private static isLDPProofKnown(ldpObject: LdpObject, ldpTypes: string[]): string[] {
     const unknownProofType: string[] = [];
     if (ldpObject != null && ldpObject.proof_type != null) {
       for (const ldpProof of ldpObject.proof_type) {
@@ -182,34 +158,23 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return unknownProofType;
   }
 
-  private static groupShouldMatchSubmissionRequirements(
-    pd: PresentationDefinition
-  ): boolean {
-    if (
-      pd.submission_requirements != null &&
-      pd.submission_requirements.length > 0
-    ) {
+  private static groupShouldMatchSubmissionRequirements(pd: PresentationDefinition): boolean {
+    if (pd.submission_requirements != null && pd.submission_requirements.length > 0) {
       const groups = pd.input_descriptors
         .map((inDesc) => inDesc?.group)
         .filter((groups, index) => groups != null && groups[index] != null)
         .map((groups, index) => groups[index]);
       const groupStrings: Set<string> = new Set<string>(groups);
 
-      const fromValues = PresentationDefinitionVB.flatten(
-        pd.submission_requirements
-      )
+      const fromValues = PresentationDefinitionVB.flatten(pd.submission_requirements)
         .map((srs) => srs?.from)
-        .filter(
-          (fromValues, index) => fromValues != null && fromValues[index] != null
-        )
+        .filter((fromValues, index) => fromValues != null && fromValues[index] != null)
         .map((fromValues, index) => fromValues[index]);
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 
       const difference = new Set(
-        [...fromValueStrings].filter(
-          (x) => x != null && x.length > 0 && !groupStrings.has(x)
-        )
+        [...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x))
       );
 
       return difference.size === 0;
@@ -223,9 +188,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       (accumulator, submissionRequirement) =>
         accumulator.concat(
           Array.isArray(submissionRequirement.from_nested)
-            ? this.flatten(
-                submissionRequirement.from_nested as SubmissionRequirement[]
-              )
+            ? this.flatten(submissionRequirement.from_nested as SubmissionRequirement[])
             : submissionRequirement
         ),
       []
@@ -236,10 +199,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = JSON.parse(
-        fs.readFileSync(
-          'json_schemas/presentation_definition.schema.json',
-          'utf-8'
-        )
+        fs.readFileSync('json_schemas/presentation_definition.schema.json', 'utf-8')
       );
 
       const validate = this.ajv.compile(presentationDefinitionSchema);

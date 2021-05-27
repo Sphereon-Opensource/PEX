@@ -11,12 +11,8 @@ export class Validation<T> {
 }
 export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
 
-export const validate: ValidateAll = <T>(
-  validations: Validation<T>[]
-): Validated => {
-  const validateResults: Checked[] = validations.map((validation) =>
-    mapper(validation)
-  );
+export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validated => {
+  const validateResults: Checked[] = validations.map((validation) => mapper(validation));
 
   function toChecked(validation: Validation<T>) {
     return new Checked(validation.tag, Status.ERROR, validation.message);
@@ -42,10 +38,7 @@ export const validate: ValidateAll = <T>(
     return result;
   }
 
-  const accumulateErrors = (
-    accumulator: Checked[],
-    checked: Checked
-  ): Checked[] => {
+  const accumulateErrors = (accumulator: Checked[], checked: Checked): Checked[] => {
     if (checked.status !== Status.INFO) {
       accumulator.push(checked);
     }
