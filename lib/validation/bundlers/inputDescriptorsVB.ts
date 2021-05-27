@@ -165,14 +165,14 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       new URL(uri);
     } catch (err) {
       // console.log(err)
-      return InputDescriptorsVB.isValidDIDURL(uri);
+      return InputDescriptorsVB.isValidDIDURI(uri);
     }
     return true;
   }
 
-  private static isValidDIDURL(uri) {
+  private static isValidDIDURI(uri) {
     const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
-    const didUrlFormat =
+    const format =
       '^' +
       'did:' +
       '([a-z0-9]+)' + // method_name
@@ -189,7 +189,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       pchar +
       '|/|\\?)+)?'; // [ "#" fragment ]
     ('$');
-    return new RegExp(didUrlFormat).test(uri);
+    return new RegExp(format).test(uri);
   }
 
   constraintsValidations(
