@@ -58,12 +58,6 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       },
       {
         tag: this.getTag(),
-        target: pd?.id,
-        predicate: PresentationDefinitionVB.isUUID,
-        message: 'id should preferably be UUID',
-      },
-      {
-        tag: this.getTag(),
         target: pd?.name,
         predicate: PresentationDefinitionVB.optionalNonEmptyString,
         message: 'name should be a non-empty string',
@@ -97,19 +91,6 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
           'input descriptor group should match the from in submission requirements.',
       },
     ];
-  }
-
-  private static isUUID(uuid) {
-    // TODO extract to generic utils or use something like lodash
-    const s = '' + uuid;
-
-    const testedID = s.match(
-      '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
-    );
-    if (testedID === null) {
-      return true; // TODO This should result in a warning. Currently it is allowing it.
-    }
-    return true;
   }
 
   private static optionalNonEmptyString(str: string): boolean {
@@ -252,6 +233,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
   }
 
   private shouldBeAsPerJsonSchema(): Predicate<unknown> {
+    // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = JSON.parse(
         fs.readFileSync(
@@ -265,10 +247,9 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
       if (!valid) {
         console.log(validate.errors);
-        return false;
       }
 
-      return true;
+      return valid;
     };
   }
 

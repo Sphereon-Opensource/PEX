@@ -59,7 +59,7 @@
         ],
         "schema": [
           {
-            "uri": "hub://did:foo:123/Collections/schema.us.gov/passport.json"
+            "uri": "did:foo:123/Collections/schema.us.gov/passport.json"
           }
         ],
         "constraints": {

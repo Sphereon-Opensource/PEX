@@ -216,7 +216,7 @@
         ],
         "schema": [
           {
-            "uri": "hub://did:foo:123/Collections/schema.us.gov/american_drivers_license.json"
+            "uri": "did:foo:123/Collections/schema.us.gov/american_drivers_license.json"
           }
         ],
         "constraints": {

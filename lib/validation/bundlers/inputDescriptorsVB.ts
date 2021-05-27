@@ -160,21 +160,20 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  isAValidURI(url) {
+  isAValidURI(uri) {
     try {
-      new URL(url);
+      new URL(uri);
     } catch (err) {
       // console.log(err)
-      return InputDescriptorsVB.isValidDIDURL(url);
+      return InputDescriptorsVB.isValidDIDURL(uri);
     }
     return true;
   }
 
-  private static isValidDIDURL(url) {
+  private static isValidDIDURL(uri) {
     const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
     const didUrlFormat =
       '^' +
-      'hub://' +
       'did:' +
       '([a-z0-9]+)' + // method_name
       '(:' + // method-specific-id
@@ -190,7 +189,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       pchar +
       '|/|\\?)+)?'; // [ "#" fragment ]
     ('$');
-    return new RegExp(didUrlFormat).test(url);
+    return new RegExp(didUrlFormat).test(uri);
   }
 
   constraintsValidations(
