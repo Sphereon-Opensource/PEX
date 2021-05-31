@@ -199,14 +199,14 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = JSON.parse(
-        fs.readFileSync('json_schemas/presentation_definition.schema.json', 'utf-8')
+        fs.readFileSync('resources/presentation_definition.schema.json', 'utf-8')
       );
 
       const validate = this.ajv.compile(presentationDefinitionSchema);
       const valid = validate(presentationDefinition);
 
       if (!valid) {
-        console.log(validate.errors);
+        //console.log(validate.errors);
       }
 
       return valid;
