@@ -53,7 +53,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
         tag: this.getTag(),
         target: ps?.descriptor_map,
         predicate: PresentationSubmissionVB.pathsShouldBeValidJsonPaths,
-        message: 'Each path should be a valid jsonPath',
+        message: 'each path should be a valid jsonPath',
       },
     ];
   }
@@ -68,14 +68,14 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
   }
 
   private static eachDescriptorMustHaveOneId(descriptor_map: Array<Descriptor>): boolean {
-    let isSame = true;
+    let isEachSame = true;
     if (descriptor_map != null) {
       for (let i = 0; i < descriptor_map.length; i++) {
-        isSame = PresentationSubmissionVB.hasSameId(descriptor_map[i], descriptor_map[i].id);
+        isEachSame &&= PresentationSubmissionVB.hasSameId(descriptor_map[i], descriptor_map[i].id);
       }
     }
 
-    return isSame;
+    return isEachSame;
   }
 
   private static hasSameId(descriptor: Descriptor, id: string): boolean {

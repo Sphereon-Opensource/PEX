@@ -43,7 +43,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return {
       tag: this.getMyTag(index),
       target: { presentation_submission: ps },
-      predicate: PresentationSubmissionWrapperVB.shouldBeAsPerJsonSchema(),
+      predicate: PresentationSubmissionWrapperVB.shouldConformToSchema(),
       message: 'presentation_submission should be as per json schema.',
     };
   }
@@ -53,7 +53,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private static shouldBeAsPerJsonSchema(): Predicate<unknown> {
+  private static shouldConformToSchema(): Predicate<unknown> {
     // TODO can be be extracted as a generic function
     return (presentationSubmission: PresentationSubmission): boolean => {
       let isValid = true;
@@ -83,17 +83,21 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
   }
 
   private getPS(psWrapper) {
-    const target = [];
+    const targets = [];
     if (psWrapper != null) {
       if (psWrapper.presentation_submission != null) {
-        target.push(psWrapper.presentation_submission);
-      } else if (psWrapper['presentations~attach'] != null) {
-        target.push(...this.getFromDidComLocation(psWrapper));
-      } else if (psWrapper.data != null) {
-        target.push(PresentationSubmissionWrapperVB.getFromChapiLocation(psWrapper));
+        targets.push(psWrapper.presentation_submission);
+      }
+
+      if (psWrapper['presentations~attach'] != null) {
+        targets.push(...this.getFromDidComLocation(psWrapper));
+      }
+
+      if (psWrapper.data != null) {
+        targets.push(PresentationSubmissionWrapperVB.getFromChapiLocation(psWrapper));
       }
     }
-    return target;
+    return targets;
   }
 
   private static getFromChapiLocation(psWrapper) {
@@ -104,12 +108,12 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
   }
 
   private getFromDidComLocation(psWrapper) {
-    const target = [];
+    const targets = [];
     psWrapper['presentations~attach'].forEach((attachment) => {
       if (attachment.data?.json?.presentation_submission != null) {
-        target.push(attachment.data?.json?.presentation_submission);
+        targets.push(attachment.data?.json?.presentation_submission);
       }
     });
-    return target;
+    return targets;
   }
 }
