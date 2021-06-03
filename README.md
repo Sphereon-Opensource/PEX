@@ -13,20 +13,12 @@ The presentation exchange will ensure that the model used by the verifier, can b
 
 The PE Library supports the following actions:
 
-[Created by us:]
-
-    - Validation of the structure of provided presentation definition
-    - Deconstruction of presentation submission from available verifiable credentials
-    - Verification of presentation submissions as per defined presentation definition
-    - Utilities: to build and use different models compliant with the DIF specs.
-
-[Made by Scott/ following the specification]
-
-    - Creating a presentation definition / request
-    - Validating a presentation defenition / request
-    - Creating a presentation submission
-    - Validating a presentation submission
-    - Input evaluations
+ * Creating a presentation definition / request
+ * Validating a presentation definition / request to be as per specification
+ * Creating a presentation submission
+ * Validating a presentation submission when received
+ * Input evaluations: Verification of presentation submissions to be as per presentation definition
+ * Utilities: to build and use different models compliant with the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/).
 
 Stateful storage or credential management should be implemented in separate libraries/ modules that make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay platform agnostic. 
 
