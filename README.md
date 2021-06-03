@@ -1,9 +1,34 @@
 # PE-JS
 
-The Presentation Exchange Library is a general use library that implements the functionality described in
-the [DIF Presentation Exchange](https://identity.foundation/presentation-exchange/) specification. It is written in
-Typescript and can be compiled to any target Javascript version. It has been built to be compatible with browsers,
-mobile and NodeJS environments.
+## Background
+
+The Presentation Exchange Library is a general use library that implements the functionality described in the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/). It is written in
+Typescript and can be compiled to any target Javascript version. 
+
+Sphereon's PE Library is useful for both verifier systems and holders (e.g. wallets) and can be used in client side browsers and mobile applications as well as on server side technology such as REST APIs (e.g. built with NodeJS). It allows anyone to add DIF Presentation Exchange logic to their existing wallets, or verifiers, without making any further assumptions about the technologies used in their products.
+
+The presentation exchange operates generaly as follows; The verifier creates a Presentation Definition asking for credentials from the holder. The definition for the credentials is sent to the holder, who returns a presentation as a response. Now the verifier will verify the presentation by checking the signature and other accompanying proofs. 
+
+The presentation exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then ensures that the correct parts from the holders credentials are used to create the presentation. The PE contains all the logic to interpret the models, therefore removing the need for the verifier and holder to align their specific models.
+
+The PE Library supports the following actions:
+
+[Created by us:]
+
+    - Validation of the structure of provided presentation definition
+    - Deconstruction of presentation submission from available verifiable credentials
+    - Verification of presentation submissions as per defined presentation definition
+    - Utilities: to build and use different models compliant with the DIF specs.
+
+[Made by Scott/ following the specification]
+
+    - Creating a presentation definition / request
+    - Validating a presentation defenition / request
+    - Creating a presentation submission
+    - Validating a presentation submission
+    - Input evaluations
+
+Stateful storage or credential management should be implemented in separate libraries/ modules that make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay platform agnostic. 
 
 ## For PE-JS developers
 
