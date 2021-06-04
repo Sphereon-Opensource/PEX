@@ -95,8 +95,8 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.statuses.active = undefined;
-    constraints.statuses.revoked = undefined;
+    delete constraints.statuses.active;
+    delete constraints.statuses.revoked;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
@@ -141,7 +141,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.fields = undefined;
+    delete constraints.fields;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([
       new Checked('root.constraints', Status.ERROR, 'is_holder field_id must correspond to a present field object id property'),
@@ -165,7 +165,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.subject_is_issuer = undefined;
+    delete constraints.subject_is_issuer;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
@@ -183,7 +183,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.is_holder = undefined;
+    delete constraints.is_holder;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
@@ -192,7 +192,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.is_holder[0].directive = undefined;
+    delete constraints.is_holder[0].directive;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain a directive property')],);
   });
@@ -201,7 +201,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.is_holder[0].field_id = undefined;
+    delete constraints.is_holder[0].field_id;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'is_holder object must contain field_id property')],);
   });
@@ -210,7 +210,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.same_subject[0].directive = undefined;
+    delete constraints.same_subject[0].directive;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object must contain a directive property')],);
   });
@@ -219,7 +219,7 @@ describe('constraints tests', () => {
     const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
-    constraints.same_subject[0].field_id = undefined;
+    delete constraints.same_subject[0].field_id;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object must contain field_id property')],);
   });

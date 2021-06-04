@@ -12,9 +12,7 @@ export class ValidationEngine {
     let validations: Validation<any>[] = [];
 
     for (const validator of validators) {
-      validations = validations.concat(
-        validator.bundler.getValidations(validator.target)
-      );
+      validations = validations.concat(validator.bundler.getValidations(validator.target));
     }
 
     return validate(validations);

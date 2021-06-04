@@ -10,18 +10,14 @@ import { ValidationBundler } from './validationBundler';
 export class FieldsVB extends ValidationBundler<Field[]> {
   private schemaValidator: Ajv;
 
-  private readonly mustHaveValidJsonPathsMsg =
-    'field object "path" property must contain array of valid json paths';
-  private readonly pathObjMustHaveValidJsonPathMsg =
-    'field object "path" property must contain valid json paths.';
-  private readonly filterMustBeValidJsonSchemaMsg =
-    'field object "filter" property must be valid json schema';
+  private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
+  private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
+  private readonly filterMustBeValidJsonSchemaMsg = 'field object "filter" property must be valid json schema';
   private readonly filterIsMustInPresenceOfPredicateMsg =
     'field object must have a "filter" property if "predicate" is present';
   private readonly filterIsNotValidJsonSchemaDescriptorMsg =
     'could not parse "filter" object as a valid json schema descriptor.';
-  private readonly purposeShouldBeANonEmptyStringMsg =
-    'purpose should be a non empty string';
+  private readonly purposeShouldBeANonEmptyStringMsg = 'purpose should be a non empty string';
   private readonly shouldBeKnownOptionMsg = 'Unknown predicate property';
 
   constructor(parentTag: string) {
@@ -35,10 +31,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
 
     if (fields != null) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
-        validations = [
-          ...validations,
-          ...this.getValidationsFor(fields[srInd], srInd),
-        ];
+        validations = [...validations, ...this.getValidationsFor(fields[srInd], srInd)];
       }
     }
     return validations;
@@ -86,9 +79,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
 
   private mustHaveValidJsonPaths(): Predicate<Field> {
     return (fieldObj: Field): boolean =>
-      fieldObj.path != null &&
-      fieldObj.path.length > 0 &&
-      this._validateJsonPaths(fieldObj.path);
+      fieldObj.path != null && fieldObj.path.length > 0 && this._validateJsonPaths(fieldObj.path);
   }
 
   private _validateJsonPaths(jsonPath: string[]): boolean {
@@ -101,11 +92,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
       }
     });
     if (invalidPaths.length > 0) {
-      throw this.toChecked(
-        this.pathObjMustHaveValidJsonPathMsg +
-          ' Got: ' +
-          JSON.stringify(invalidPaths)
-      );
+      throw this.toChecked(this.pathObjMustHaveValidJsonPathMsg + ' Got: ' + JSON.stringify(invalidPaths));
     }
     return true;
   }
@@ -121,18 +108,13 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     try {
       this.schemaValidator.compile(filter);
     } catch (err) {
-      throw this.toChecked(
-        this.filterIsNotValidJsonSchemaDescriptorMsg +
-          ' Got ' +
-          JSON.stringify(filter)
-      );
+      throw this.toChecked(this.filterIsNotValidJsonSchemaDescriptorMsg + ' Got ' + JSON.stringify(filter));
     }
     return true;
   }
 
   private filterIsMustInPresenceOfPredicate() {
-    return (fieldObj: Field): boolean =>
-      !(fieldObj.predicate != null && fieldObj.filter == null);
+    return (fieldObj: Field): boolean => !(fieldObj.predicate != null && fieldObj.filter == null);
   }
 
   private static optionalNonEmptyString(str: string): boolean {
@@ -142,10 +124,6 @@ export class FieldsVB extends ValidationBundler<Field[]> {
 
   private static shouldBeKnownOption(option: Optionality): boolean {
     // TODO can be be extracted as a generic function
-    return (
-      option == null ||
-      option == Optionality.Required ||
-      option == Optionality.Preferred
-    );
+    return option == null || option == Optionality.Required || option == Optionality.Preferred;
   }
 }

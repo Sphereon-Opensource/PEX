@@ -6,43 +6,28 @@ import { ValidationBundler } from './validationBundler';
 
 export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequirement> {
   private readonly ruleIsMandatoryMsg = 'rule is a mandatory field';
-  private readonly needsOneFromOrFromNestedMsg =
-    'needs exactly one of from or from_nested';
-  private readonly fromNestedShouldBeArrayMsg =
-    'The value of the from_nested property MUST be an array';
-  private readonly isCountPositiveIntMsg =
-    'count must be a practical positive number';
-  private readonly isMinPositiveIntMsg =
-    'min must be a practical positive number';
-  private readonly isMaxPositiveIntMsg =
-    'max must be a practical positive number';
-  private readonly ruleShouldBePickOrAllMsg =
-    'rule should be either pick or all';
+  private readonly needsOneFromOrFromNestedMsg = 'needs exactly one of from or from_nested';
+  private readonly fromNestedShouldBeArrayMsg = 'The value of the from_nested property MUST be an array';
+  private readonly isCountPositiveIntMsg = 'count must be a practical positive number';
+  private readonly isMinPositiveIntMsg = 'min must be a practical positive number';
+  private readonly isMaxPositiveIntMsg = 'max must be a practical positive number';
+  private readonly ruleShouldBePickOrAllMsg = 'rule should be either pick or all';
 
   constructor(parentTag: string) {
     super(parentTag, 'submission_requirements');
   }
 
-  public getValidations(
-    srs: SubmissionRequirement[]
-  ): Validation<SubmissionRequirement>[] {
+  public getValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     let validations: Validation<SubmissionRequirement>[] = [];
     if (srs != null && srs.length > 0) {
       for (let srInd = 0; srInd < srs.length; srInd++) {
-        validations = [
-          ...validations,
-          ...this.getMyValidations(srInd, srs),
-          ...this.getSubValidations(srInd, srs),
-        ];
+        validations = [...validations, ...this.getMyValidations(srInd, srs), ...this.getSubValidations(srInd, srs)];
       }
     }
     return validations;
   }
 
-  private getMyValidations(
-    srInd: number,
-    srs: SubmissionRequirement[]
-  ): Validation<SubmissionRequirement>[] {
+  private getMyValidations(srInd: number, srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     return [
       {
         tag: this.getMyTag(srInd),
@@ -99,15 +84,10 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private getSubValidations(
-    srInd: number,
-    srs: SubmissionRequirement[]
-  ): Validation<SubmissionRequirement>[] {
+  private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     const fromNested = srs[srInd].from_nested as SubmissionRequirement[];
     return fromNested != null
-      ? new SubmissionRequirementVB(
-          this.getFromNestedTag(srInd)
-        ).getValidations(fromNested)
+      ? new SubmissionRequirementVB(this.getFromNestedTag(srInd)).getValidations(fromNested)
       : [];
   }
 

@@ -78,7 +78,7 @@ describe('inputDescriptorsVB tests', () => {
     const ve = new ValidationEngine();
 
     const testableInputDescriptors = getTestableInputDescriptors();
-    testableInputDescriptors[0].id = undefined;
+    delete testableInputDescriptors[0].id;
 
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
     expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
@@ -89,7 +89,7 @@ describe('inputDescriptorsVB tests', () => {
     const ve = new ValidationEngine();
 
     const testableInputDescriptors = getTestableInputDescriptors();
-    testableInputDescriptors[0].id = undefined;
+    delete testableInputDescriptors[0].id;
 
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
     expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
