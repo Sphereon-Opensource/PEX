@@ -40,7 +40,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
       {
         tag: this.getTag(),
         target: ps?.descriptor_map,
-        predicate: PresentationSubmissionVB.eachDescriptorMustHaveOneId,
+        predicate: PresentationSubmissionVB.idMustBeSameForEachLevelOfNesting,
         message: 'each descriptor should have a one id in it, on all levels',
       },
       {
@@ -67,22 +67,25 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     return descriptor_map != null && descriptor_map.length > 0;
   }
 
-  private static eachDescriptorMustHaveOneId(descriptor_map: Array<Descriptor>): boolean {
-    let isEachSame = true;
+  private static idMustBeSameForEachLevelOfNesting(descriptor_map: Array<Descriptor>): boolean {
+    let doesEachDescriptorHasOneIdOnAllLevelsOfNesting = true;
     if (descriptor_map != null) {
       for (let i = 0; i < descriptor_map.length; i++) {
-        isEachSame &&= PresentationSubmissionVB.hasSameId(descriptor_map[i], descriptor_map[i].id);
+        doesEachDescriptorHasOneIdOnAllLevelsOfNesting &&= PresentationSubmissionVB.isIdSameForEachLevelOfNesting(
+          descriptor_map[i],
+          descriptor_map[i].id
+        );
       }
     }
 
-    return isEachSame;
+    return doesEachDescriptorHasOneIdOnAllLevelsOfNesting;
   }
 
-  private static hasSameId(descriptor: Descriptor, id: string): boolean {
+  private static isIdSameForEachLevelOfNesting(descriptor: Descriptor, id: string): boolean {
     let isSame = true;
     if (descriptor != null && descriptor.path_nested != null) {
       if (descriptor.path_nested.id == id) {
-        isSame &&= PresentationSubmissionVB.hasSameId(descriptor.path_nested, id); // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+        isSame &&= PresentationSubmissionVB.isIdSameForEachLevelOfNesting(descriptor.path_nested, id); // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
       } else {
         isSame = false;
       }

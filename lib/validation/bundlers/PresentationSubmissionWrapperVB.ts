@@ -24,7 +24,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
       {
         tag: this.getTag(),
         target: psWrapper,
-        predicate: (psWrapper) => psWrapper == null || this.getPS(psWrapper).length > 0,
+        predicate: (psWrapper) => !(psWrapper != null && this.getPS(psWrapper).length == 0),
         message: 'presentation submission root object should be one of the known locations',
       },
       ...this.getSchemaValidations(psWrapper),
