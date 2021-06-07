@@ -1,9 +1,14 @@
-# PE-JS
+<h1 align="center">
+  <br>
+  <a href="https://www.sphereon.com"><img src="https://sphereon.com/content/themes/sphereon/assets/img/logo.svg" alt="Sphereon" width="400"></a>
+  <br> PE-JS - DIF Presentation Exchange JavaScript Library 
+  <br>
+</h1>
+
 
 ## Background
 
-The Presentation Exchange Library is a general use library that implements the functionality described in the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/). It is written in
-Typescript and can be compiled to any target Javascript version. 
+The PE-JS Library is a general use presentation exchange library that implements the functionality described in the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/). It is written in Typescript and can be compiled to any target JavaScript version. 
 
 Sphereon's PE Library is useful for both verifier systems and holders (e.g. wallets) and can be used in client side browsers and mobile applications as well as on server side technology such as REST APIs (e.g. built with NodeJS). It allows anyone to add DIF Presentation Exchange logic to their existing wallets, or verifiers, without making any further assumptions about the technologies used in their products.
 
@@ -11,7 +16,7 @@ The presentation exchange operates generaly as follows; The verifier creates a P
 
 The presentation exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then ensures that the correct parts from the holders credentials are used to create the presentation. The PE contains all the logic to interpret the models, therefore removing the need for the verifier and holder to align their specific models.
 
-The PE Library supports the following actions:
+### The PE Library supports the following actions:
 
  * Creating a presentation definition / request
  * Validating a presentation definition / request to be as per specification
