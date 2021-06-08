@@ -67,7 +67,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
         isValid = validate(presentationSubmission);
 
         if (!isValid) {
-          console.log(validate.errors);
+          // console.log(validate.errors);
         }
       }
       return isValid;
