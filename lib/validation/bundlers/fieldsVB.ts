@@ -3,7 +3,8 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
-import { Predicate, Validation } from '../core';
+import { Validation } from '../core';
+import { Predicate } from '../../ConstraintUtils';
 
 import { ValidationBundler } from './validationBundler';
 

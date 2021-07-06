@@ -1,5 +1,5 @@
-import {Checked, Status} from '../../../lib';
-import {validate} from '../../../lib';
+import { Checked, Status } from '../../../lib/ConstraintUtils';
+import { validate } from '../../../lib';
 
 interface Person {
   name?: string

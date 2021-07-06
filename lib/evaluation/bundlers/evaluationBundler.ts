@@ -1,7 +1,7 @@
 import { Checked, Status } from '../../ConstraintUtils';
-import { Validation } from '../core';
+import { Evaluation } from '../core';
 
-export abstract class ValidationBundler<T> {
+export abstract class EvaluationBundler<T> {
   parentTag: string;
   myTag: string;
 
@@ -10,7 +10,7 @@ export abstract class ValidationBundler<T> {
     this.myTag = myTag;
   }
 
-  public abstract getValidations(t: T | T[]): Validation<any>[];
+  public abstract getEvaluations(t: T | T[]): Evaluation<any>[];
 
   protected getTag() {
     return this.parentTag != null ? this.parentTag + '.' + this.myTag : this.myTag;

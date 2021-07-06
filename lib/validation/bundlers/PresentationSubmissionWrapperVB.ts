@@ -3,7 +3,8 @@ import fs from 'fs';
 import { PresentationSubmission } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
-import { Predicate, Validation } from '../core';
+import { Validation } from '../core';
+import { Predicate } from '../../ConstraintUtils';
 
 import { PresentationSubmissionVB } from './presentationSubmissionVB';
 import { ValidationBundler } from './validationBundler';

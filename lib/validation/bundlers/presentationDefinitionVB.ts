@@ -3,7 +3,8 @@ import fs from 'fs';
 import { Format, JwtObject, LdpObject, PresentationDefinition, SubmissionRequirement } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
-import { Predicate, Validation } from '../core';
+import { Validation } from '../core';
+import { Predicate } from '../../ConstraintUtils';
 
 import { SubmissionRequirementVB } from './SubmissionRequirementVB';
 import { InputDescriptorsVB } from './inputDescriptorsVB';
