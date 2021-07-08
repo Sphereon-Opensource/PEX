@@ -1,5 +1,6 @@
+import { Checked, hasErrors, Predicate, Status } from '../../ConstraintUtils';
+
 import { Validated } from './validated';
-import { Checked, Status, Predicate, hasErrors} from "../../ConstraintUtils";
 
 export class Validation<T> {
   tag: string;

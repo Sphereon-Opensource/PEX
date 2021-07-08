@@ -2,8 +2,8 @@ import { SubmissionRequirement } from '@sphereon/pe-models';
 
 import { SubmissionRequirementVB } from "../../../lib";
 import { ValidationBundler } from "../../../lib";
-import { Checked, Status } from '../../../lib/ConstraintUtils';
 import { ValidationEngine } from "../../../lib";
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 describe('validate', () => {
 

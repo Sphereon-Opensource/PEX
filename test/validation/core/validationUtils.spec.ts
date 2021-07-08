@@ -1,5 +1,5 @@
 import { Validated } from '../../../lib';
-import { Checked, Status, hasErrors } from '../../../lib/ConstraintUtils';
+import { Checked, hasErrors, Status } from '../../../lib/ConstraintUtils';
 
 describe('validation utils tests', () => {
   it('should return false for array with infos', () => {

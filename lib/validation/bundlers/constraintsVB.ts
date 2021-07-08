@@ -1,7 +1,7 @@
 import { Constraints, Directives, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
 
-import { Validation } from '../core';
 import { Predicate } from '../../ConstraintUtils';
+import { Validation } from '../core';
 
 import { FieldsVB } from './fieldsVB';
 import { ValidationBundler } from './validationBundler';

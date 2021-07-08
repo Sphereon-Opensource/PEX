@@ -1,5 +1,6 @@
+import { Checked, hasErrors, Predicate, Status } from '../../ConstraintUtils';
+
 import { Evaluated } from './evaluated';
-import { Checked, Status, Predicate, hasErrors} from "../../ConstraintUtils";
 
 export class Evaluation<T> {
   tag: string;

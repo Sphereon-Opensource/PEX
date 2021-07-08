@@ -4,8 +4,8 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { PresentationDefinitionVB } from "../../../lib";
 import { ValidationBundler } from "../../../lib";
-import { Checked, Status } from '../../../lib/ConstraintUtils';
 import { ValidationEngine } from "../../../lib";
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 
 function getFile(path: string) {

@@ -3,9 +3,9 @@ import fs from 'fs';
 import {PresentationDefinition, PresentationSubmission} from '@sphereon/pe-models';
 
 import { PresentationDefinitionEB } from "../../../lib";
+import { EvaluationBundler } from "../../../lib";
 import { Checked, Status } from '../../../lib/ConstraintUtils';
 import { EvaluationEngine } from "../../../lib/evaluation/evaluationEngine";
-import { EvaluationBundler } from "../../../lib";
 
 
 function getFile(path: string) {

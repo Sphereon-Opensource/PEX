@@ -2,8 +2,8 @@ import { URL } from 'url';
 
 import { InputDescriptor, Schema } from '@sphereon/pe-models';
 
-import { Validation } from '../core';
 import { Predicate } from '../../ConstraintUtils';
+import { Validation } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
