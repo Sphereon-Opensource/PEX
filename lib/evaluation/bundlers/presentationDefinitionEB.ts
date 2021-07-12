@@ -1,28 +1,30 @@
+import { PresentationDefinition } from '@sphereon/pe-models';
+
 import { Evaluation } from '../core';
 
 import { EvaluationBundler } from './evaluationBundler';
 
-export class PresentationDefinitionEB extends EvaluationBundler<any[]> {
+export class PresentationDefinitionEB extends EvaluationBundler<unknown, PresentationDefinition> {
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
   }
 
-  public getEvaluations(params: any[]): Evaluation<unknown>[] {
-    return [...this.myEvaluations(params)];
+  public getEvaluations(d: any, p: PresentationDefinition): Evaluation<any, any>[] {
+    return [...this.myEvaluations(d, p)];
   }
 
-  private myEvaluations(params: any[]): Evaluation<unknown>[] {
+  private myEvaluations(d: any, p: PresentationDefinition): Evaluation<any, any>[] {
     return [
       // E Section 4.3.1   : The URI for the schema of the candidate input MUST match one of the Input Descriptor schema object uri values exactly.
       {
         tag: this.getTag(),
-        target: params,
-        predicate: (params) => params != null,
+        target: { d, p },
+        predicate: () => d != null && p != null,
         message: 'presentation_definition should be non null.',
       },
       {
         tag: this.getTag(),
-        target: params,
+        target: { d, p },
         predicate: PresentationDefinitionEB.evaluateUri,
         message:
           'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
@@ -30,10 +32,13 @@ export class PresentationDefinitionEB extends EvaluationBundler<any[]> {
     ];
   }
 
-  private static evaluateUri(params: any[]): boolean {
-    const uris: string[] = params[1].input_descriptors.map((id) => id.schema.map((so) => so.uri)).flat();
-    for (let i = 0; i < params[0].verifiableCredential.length; i++) {
-      const vc = params[0].verifiableCredential[i];
+  private static evaluateUri(psw: any, pd: PresentationDefinition): boolean {
+    const uriArrays: string[][] = pd.input_descriptors.map((id) => id.schema.map((so) => so.uri));
+    const uris = [].concat.apply([], uriArrays);
+    // @ts-ignore
+    for (let i = 0; i < psw.verifiableCredential.length; i++) {
+      // @ts-ignore
+      const vc = psw.verifiableCredential[i];
       if (vc.vc) {
         if (!PresentationDefinitionEB.stringIsPresentInList(vc.vc['@context'], uris)) {
           return false;

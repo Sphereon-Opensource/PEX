@@ -1,7 +1,6 @@
 import { Constraints, Directives, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
 
-import { Predicate } from '../../ConstraintUtils';
-import { Validation } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { FieldsVB } from './fieldsVB';
 import { ValidationBundler } from './validationBundler';
@@ -87,7 +86,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     return statuses == null || statuses.active != null || statuses.revoked != null || statuses.suspended != null;
   }
 
-  private static statusDirectiveShouldHaveKnownValue(): Predicate<Statuses> {
+  private static statusDirectiveShouldHaveKnownValue(): ValidationPredicate<Statuses> {
     return (statuses: Statuses): boolean =>
       this.pdStatusShouldBeKnown(statuses?.active) &&
       this.pdStatusShouldBeKnown(statuses?.revoked) &&

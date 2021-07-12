@@ -3,8 +3,7 @@ import fs from 'fs';
 import { PresentationSubmission } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
-import { Predicate } from '../../ConstraintUtils';
-import { Validation } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { PresentationSubmissionVB } from './presentationSubmissionVB';
 import { ValidationBundler } from './validationBundler';
@@ -54,7 +53,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private static shouldConformToSchema(): Predicate<unknown> {
+  private static shouldConformToSchema(): ValidationPredicate<unknown> {
     // TODO can be be extracted as a generic function
     return (presentationSubmission: PresentationSubmission): boolean => {
       let isValid = true;

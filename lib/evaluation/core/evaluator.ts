@@ -1,20 +1,23 @@
-import { Checked, hasErrors, Predicate, Status } from '../../ConstraintUtils';
+import { Checked, hasErrors, Status } from '../../ConstraintUtils';
 
 import { Evaluated } from './evaluated';
 
-export class Evaluation<T> {
+export type EvaluationPredicate<D, P> = (d: D, p: P) => boolean;
+
+export class Evaluation<D, P> {
   tag: string;
-  target: T;
-  predicate: Predicate<T>;
+  target: { d: D; p: P };
+  predicate: EvaluationPredicate<D, P>;
   message: string;
   status?: Status;
 }
-export type EvaluateAll = <T>(evaluations: Evaluation<T>[]) => Evaluated;
 
-export const evaluate: EvaluateAll = <T>(evaluations: Evaluation<T>[]): Evaluated => {
+export type EvaluateAll = <D, P>(evaluations: Evaluation<D, P>[]) => Evaluated;
+
+export const evaluate: EvaluateAll = <D, P>(evaluations: Evaluation<D, P>[]): Evaluated => {
   const evaluateResults: Checked[] = evaluations.map((evaluation) => mapper(evaluation));
 
-  function toChecked(evaluation: Evaluation<T>) {
+  function toChecked(evaluation: Evaluation<D, P>) {
     return new Checked(evaluation.tag, Status.ERROR, evaluation.message);
   }
 
@@ -22,11 +25,11 @@ export const evaluate: EvaluateAll = <T>(evaluations: Evaluation<T>[]): Evaluate
     return new Checked(tag, Status.INFO, 'ok');
   }
 
-  function mapper(evaluation: Evaluation<T>): Checked {
+  function mapper(evaluation: Evaluation<D, P>): Checked {
     let result;
 
     try {
-      if (evaluation.predicate(evaluation.target)) {
+      if (evaluation.predicate(evaluation.target.d, evaluation.target.p)) {
         result = toCheckedSuccess(evaluation.tag);
       } else {
         result = toChecked(evaluation);

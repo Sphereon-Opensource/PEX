@@ -24,8 +24,6 @@ export const Checked = class implements Checked {
   }
 };
 
-export type Predicate<T> = (t: T) => boolean;
-
 export type NonEmptyArray<T> = [T, ...T[]];
 
 type AreInvalid = (checked: Checked[]) => boolean;

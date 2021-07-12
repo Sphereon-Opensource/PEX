@@ -1,7 +1,7 @@
 import { Checked, Status } from '../../ConstraintUtils';
 import { Evaluation } from '../core';
 
-export abstract class EvaluationBundler<T> {
+export abstract class EvaluationBundler<D, P> {
   parentTag: string;
   myTag: string;
 
@@ -10,7 +10,7 @@ export abstract class EvaluationBundler<T> {
     this.myTag = myTag;
   }
 
-  public abstract getEvaluations(t: T | T[]): Evaluation<any>[];
+  public abstract getEvaluations(d: D, p: P): Evaluation<any, any>[];
 
   protected getTag() {
     return this.parentTag != null ? this.parentTag + '.' + this.myTag : this.myTag;
