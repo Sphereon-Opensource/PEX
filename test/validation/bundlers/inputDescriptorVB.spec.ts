@@ -1,4 +1,8 @@
+import fs from 'fs';
+
 import {InputDescriptor} from '@sphereon/pe-models';
+import jp from 'jsonpath';
+
 
 import {Checked, InputDescriptorsVB, Status, ValidationEngine} from '../../../lib';
 
@@ -29,7 +33,11 @@ function getTestableInputDescriptors(): InputDescriptor[] {
             "$.issuer",
             "$.vc.issuer",
             "$.iss"
-          ]
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:example:123|did:example:456"
+          }
         }]
       }
     },
@@ -55,6 +63,37 @@ function getTestableInputDescriptors(): InputDescriptor[] {
             "path": ['a']
           }
         ],
+      }
+    },
+    {
+      "id": "banking_input_3",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": [{
+          "id": "uuid2021-07-12 00",
+          "path": [
+            "$.issuer",
+            "$.vc.issuer",
+            "$.iss"
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:example:123|did:example:456"
+          },
+          "predicate": "required"
+        }]
       }
     }
   ];
@@ -146,4 +185,24 @@ describe('inputDescriptorsVB tests', () => {
     expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
 
+  it('Evaluate input candidate with path', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[1], jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[1]);
+    expect(result).toEqual(["did:foo:123"]);
+  });
+
+  it('Evaluate input candidate with path and filter', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[0], jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[0]);
+    expect(result).toEqual(["did:example:123"]);
+  });
+  
+  it('Evaluate input candidate with path and filter and predicate', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[2], jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toBe(true);
+  });
 });

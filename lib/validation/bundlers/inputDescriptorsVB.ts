@@ -1,6 +1,9 @@
+import fs from 'fs';
 import { URL } from 'url';
 
 import { InputDescriptor, Schema } from '@sphereon/pe-models';
+import Ajv from 'ajv';
+import jp from 'jsonpath';
 
 import { Predicate, Validation } from '../core';
 
@@ -78,6 +81,28 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
   private static optionalNonEmptyString(name: string): boolean {
     // TODO extract to generic utils or use something like lodash
     return name == null || name.length > 0;
+  }
+
+  public evaluateInput(inputDescriptor: InputDescriptor, inputCandidate: string): any {
+    if (inputDescriptor.constraints) {
+      for (const field of inputDescriptor.constraints.fields) {
+        for (const path of field.path) {
+          const result = jp.query(inputCandidate, path);
+          if (result.length) {
+            if (field.filter) {
+              const schema = fs.readFileSync('./resources/presentation_definition.schema.json', 'utf-8');
+              const ajv = new Ajv();
+              const validate = ajv.compile(JSON.parse(schema));
+              const valid = validate(inputCandidate);
+              if (field.predicate) {
+                return valid;
+              }
+            }
+            return result;
+          }
+        }
+      }
+    }
   }
 
   private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
