@@ -1,4 +1,8 @@
+import fs from 'fs';
+
 import {InputDescriptor} from '@sphereon/pe-models';
+import jp from 'jsonpath';
+
 
 import {Checked, InputDescriptorsVB, Status, ValidationEngine} from '../../../lib';
 
@@ -29,7 +33,11 @@ function getTestableInputDescriptors(): InputDescriptor[] {
             "$.issuer",
             "$.vc.issuer",
             "$.iss"
-          ]
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:example:123|did:example:456"
+          }
         }]
       }
     },
@@ -56,7 +64,144 @@ function getTestableInputDescriptors(): InputDescriptor[] {
           }
         ],
       }
-    }
+    },
+    {
+      "id": "banking_input_3",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": [{
+          "id": "uuid2021-07-12 00",
+          "path": [
+            "$.issuer",
+            "$.vc.issuer",
+            "$.iss"
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:foo:"
+          },
+          "predicate": "required"
+        }]
+      }
+    },
+    {
+      "id": "banking_input_4",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": [{
+          "id": "uuid2021-07-13 00",
+          "path": [
+            "$.issuer",
+            "$.vc.issuer",
+            "$.iss"
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:unexistent|did:unexistent:test"
+          },
+          "predicate": "required"
+        }]
+      }
+    },
+    {
+      "id": "banking_input_5",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": [{
+          "id": "uuid2021-07-14 00",
+          "path": [
+            "$.issuer",
+            "$.vc.issuer",
+            "$.iss"
+          ],
+          "filter": {
+            "type": "string",
+            "pattern": "did:unexistent|did:unexistent:test"
+          }
+        }]
+      }
+    },
+    {
+      "id": "banking_input_6",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": []
+      }
+    },
+    {
+      "id": "banking_input_7",
+      "schema": [
+        {
+          "uri": "https://bank-standards.example.com#accounts",
+          "required": true
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+          "required": false
+        },
+        {
+          "uri": "https://bank-standards.example.com#investments",
+        }
+      ],
+      "constraints": {
+        "fields": [{
+          "id": "uuid2021-07-18 00",
+          "path": [
+            "$.test",
+            "$.vc.test",
+            "$.test"
+          ],
+        }]
+      }
+    },
   ];
 }
 
@@ -146,4 +291,69 @@ describe('inputDescriptorsVB tests', () => {
     expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
 
+  it('Evaluate input candidate with valid path', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[1], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[1]);
+    expect(result).toEqual("did:foo:123");
+  });
+
+  it('Evaluate input candidate with valid path and filter', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[0], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[0]);
+    expect(result).toEqual("did:example:123");
+  });
+  
+  it('Evaluate input candidate with valid path, filter and predicate is present', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[2], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toBe(true);
+  });
+
+  it('Evaluate input candidate with valid path, invalid filter and predicate is present', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[3], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toEqual(false);
+  });
+
+  it('Evaluate input candidate with valid path, invalid filter and predicate is absent', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[4], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toEqual("false");
+  });
+
+  it('Evaluate input candidate with no fields', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[5], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toEqual(undefined);
+  });
+
+  it('Evaluate input candidate with invalid path', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const result = new InputDescriptorsVB('root').evaluateInput(testableInputDescriptors[6], 
+                      jp.query(JSON.parse(inputCandidate), '$.verifiableCredential[*]')[2]);
+    expect(result).toEqual(undefined);
+  });
+
+  it('Evaluate all input candidate with path and filter and predicate', () => {
+    const testableInputDescriptors = getTestableInputDescriptors();
+    const inputCandidate = fs.readFileSync('./test/dif_pe_examples/vp/vp_general.json', 'utf-8');
+    const expected =  [ "did:example:123", "did:example:123", true, true, "did:example:123", "false",
+                        "did:foo:123", true, false, "false", "false", 
+                        "did:foo:123", true, false, "false" ]
+    const result = new InputDescriptorsVB('root').evaluateCandidates(testableInputDescriptors, JSON.parse(inputCandidate));
+    expect(result).toEqual(expected);
+  });
 });

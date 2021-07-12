@@ -1,6 +1,8 @@
 import { URL } from 'url';
 
 import { InputDescriptor, Schema } from '@sphereon/pe-models';
+import Ajv from 'ajv';
+import jp from 'jsonpath';
 
 import { Predicate, Validation } from '../core';
 
@@ -79,6 +81,70 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     // TODO extract to generic utils or use something like lodash
     return name == null || name.length > 0;
   }
+
+  public evaluateCandidates(inputDescriptors: InputDescriptor[], inputCandidates: string) {
+    const matchingCandidates = [];
+    for (let inputCandidate of jp.query(inputCandidates, '$.verifiableCredential[*]')) {
+      for (let inputDescriptor of inputDescriptors) {
+        let evaluation = this.evaluateInput(inputDescriptor, inputCandidate);
+        if (evaluation !== undefined) {
+          matchingCandidates.push(evaluation);
+        }
+      }
+    }
+    return matchingCandidates;
+  }
+
+  public evaluateInput(inputDescriptor: InputDescriptor, inputCandidate: string): any {
+    if (inputDescriptor.constraints) {
+      for (const field of inputDescriptor.constraints.fields) {
+        for (const path of field.path) {
+          const result = jp.query(inputCandidate, path);
+          if (result.length) {
+            if (field.filter) {
+              const candidate = this.searchProperty(inputCandidate, result[0]);
+              const schema = {
+                type: 'object',
+                properties: {
+                  [candidate.key]: {
+                    ...field.filter
+                  }
+                }
+              }
+              const ajv = new Ajv();
+              const validate = ajv.compile(schema);
+              const valid = validate(inputCandidate);
+              if (field.predicate) {
+                return valid;
+              } else {
+                if (!valid) {
+                  return valid.toString();
+                }
+              }
+            }
+            return result[0];
+          }
+        }
+      }
+    }
+  }
+
+  private searchProperty (obj, query) {
+    for (let key in obj) {
+        var value = obj[key];
+
+        if (typeof value === 'object') {
+          const result = this.searchProperty(value, query);
+          if (result) {
+            return result;
+          }
+        }
+
+        if (value === query) {
+            return { 'key': key, 'value': value };
+        }
+      }
+    }
 
   private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
     const nonUniqueInputDescriptorIds: string[] = [];
