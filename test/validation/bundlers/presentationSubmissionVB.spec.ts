@@ -1,11 +1,11 @@
 import fs from 'fs';
 
-import {PresentationSubmission} from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pe-models';
 
-import {PresentationSubmissionVB} from "../../../lib";
-import {ValidationBundler} from "../../../lib";
-import {Checked, Status} from '../../../lib';
-import {ValidationEngine} from "../../../lib";
+import { PresentationSubmissionVB } from "../../../lib";
+import { ValidationBundler } from "../../../lib";
+import { ValidationEngine } from "../../../lib";
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

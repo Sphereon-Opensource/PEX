@@ -4,7 +4,7 @@ import { InputDescriptor, Schema } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp from 'jsonpath';
 
-import { Predicate, Validation } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
@@ -196,7 +196,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  isValidSchema(): Predicate<Array<Schema>> {
+  isValidSchema(): ValidationPredicate<Array<Schema>> {
     // TODO extract to generic util or use built-in method
     return (schemas: Array<Schema>): boolean => {
       return (

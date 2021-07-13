@@ -1,9 +1,9 @@
-import {SubmissionRequirement} from '@sphereon/pe-models';
+import { SubmissionRequirement } from '@sphereon/pe-models';
 
-import {SubmissionRequirementVB} from "../../../lib";
-import {ValidationBundler} from "../../../lib";
-import {Checked, Status} from '../../../lib';
-import {ValidationEngine} from "../../../lib";
+import { SubmissionRequirementVB } from "../../../lib";
+import { ValidationBundler } from "../../../lib";
+import { ValidationEngine } from "../../../lib";
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 describe('validate', () => {
 

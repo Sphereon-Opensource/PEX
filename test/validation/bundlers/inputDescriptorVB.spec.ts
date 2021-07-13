@@ -4,7 +4,8 @@ import {InputDescriptor} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 
-import {Checked, InputDescriptorsVB, Status, ValidationEngine} from '../../../lib';
+import { InputDescriptorsVB, ValidationEngine } from '../../../lib';
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 function getTestableInputDescriptors(): InputDescriptor[] {
   return [

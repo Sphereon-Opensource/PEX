@@ -1,11 +1,13 @@
-import { Checked, Status, Validated } from './validated';
-import { hasErrors } from './validationUtils';
+import { Checked, hasErrors, Status } from '../../ConstraintUtils';
 
-export type Predicate<T> = (t: T) => boolean;
+import { Validated } from './validated';
+
+export type ValidationPredicate<T> = (t: T) => boolean;
+
 export class Validation<T> {
   tag: string;
   target: T;
-  predicate: Predicate<T>;
+  predicate: ValidationPredicate<T>;
   message: string;
   status?: Status;
 }

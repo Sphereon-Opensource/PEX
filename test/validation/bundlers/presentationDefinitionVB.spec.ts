@@ -1,11 +1,11 @@
 import fs from 'fs';
 
-import {PresentationDefinition} from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
-import {PresentationDefinitionVB} from "../../../lib";
-import {ValidationBundler} from "../../../lib";
-import {Checked, Status} from '../../../lib';
-import {ValidationEngine} from "../../../lib";
+import { PresentationDefinitionVB } from "../../../lib";
+import { ValidationBundler } from "../../../lib";
+import { ValidationEngine } from "../../../lib";
+import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 
 function getFile(path: string) {

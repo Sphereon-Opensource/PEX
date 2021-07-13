@@ -3,7 +3,7 @@ import fs from 'fs';
 import { Format, JwtObject, LdpObject, PresentationDefinition, SubmissionRequirement } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
-import { Predicate, Validation } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
@@ -195,7 +195,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     );
   }
 
-  private shouldBeAsPerJsonSchema(): Predicate<unknown> {
+  private shouldBeAsPerJsonSchema(): ValidationPredicate<unknown> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = JSON.parse(
