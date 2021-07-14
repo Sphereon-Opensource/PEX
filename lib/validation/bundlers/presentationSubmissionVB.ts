@@ -2,7 +2,8 @@ import { PresentationSubmission } from '@sphereon/pe-models';
 import { Descriptor } from '@sphereon/pe-models/model/descriptor';
 import jp from 'jsonpath';
 
-import { Checked, Status, Validation } from '../core';
+import { Checked, Status } from '../../ConstraintUtils';
+import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 

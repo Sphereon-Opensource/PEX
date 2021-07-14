@@ -3,7 +3,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
-import { Predicate, Validation } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
@@ -77,7 +77,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private mustHaveValidJsonPaths(): Predicate<Field> {
+  private mustHaveValidJsonPaths(): ValidationPredicate<Field> {
     return (fieldObj: Field): boolean =>
       fieldObj.path != null && fieldObj.path.length > 0 && this._validateJsonPaths(fieldObj.path);
   }
