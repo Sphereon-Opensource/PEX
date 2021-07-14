@@ -11,7 +11,6 @@ export class PresentationDefinitionEB extends EvaluationBundler<PresentationDefi
 
   public getEvaluations(d: PresentationDefinition, p: unknown): Evaluation<PresentationDefinition, unknown>[] {
     return [
-      // E Section 4.3.1   : The URI for the schema of the candidate input MUST match one of the Input Descriptor schema object uri values exactly.
       {
         tag: this.getTag(),
         target: { d, p },
