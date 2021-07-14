@@ -4,22 +4,18 @@ import { Evaluation } from '../core';
 
 import { EvaluationBundler } from './evaluationBundler';
 
-export class PresentationDefinitionEB extends EvaluationBundler<unknown, PresentationDefinition> {
+export class PresentationDefinitionEB extends EvaluationBundler<PresentationDefinition, unknown> {
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
   }
 
-  public getEvaluations(d: any, p: PresentationDefinition): Evaluation<any, any>[] {
-    return [...this.myEvaluations(d, p)];
-  }
-
-  private myEvaluations(d: any, p: PresentationDefinition): Evaluation<any, any>[] {
+  public getEvaluations(d: PresentationDefinition, p: unknown): Evaluation<PresentationDefinition, unknown>[] {
     return [
       // E Section 4.3.1   : The URI for the schema of the candidate input MUST match one of the Input Descriptor schema object uri values exactly.
       {
         tag: this.getTag(),
         target: { d, p },
-        predicate: () => d != null && p != null,
+        predicate: (d, p) => p != null && d != null,
         message: 'presentation_definition should be non null.',
       },
       {
@@ -32,33 +28,38 @@ export class PresentationDefinitionEB extends EvaluationBundler<unknown, Present
     ];
   }
 
-  private static evaluateUri(psw: any, pd: PresentationDefinition): boolean {
-    const uriArrays: string[][] = pd.input_descriptors.map((id) => id.schema.map((so) => so.uri));
-    const uris = [].concat.apply([], uriArrays);
-    // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static evaluateUri(pd: PresentationDefinition, psw: any): boolean {
+    const uriArrays: string[][] = pd.input_descriptors.map((inDesc) => inDesc.schema.map((so) => so.uri));
+    let uris = [];
+    uris = uris.concat.apply([], uriArrays);
+
     for (let i = 0; i < psw.verifiableCredential.length; i++) {
-      // @ts-ignore
       const vc = psw.verifiableCredential[i];
-      if (vc.vc) {
-        if (!PresentationDefinitionEB.stringIsPresentInList(vc.vc['@context'], uris)) {
-          return false;
-        }
-      } else if (vc['@context']) {
-        if (!PresentationDefinitionEB.stringIsPresentInList(vc['@context'], uris)) {
-          return false;
-        }
-      } else {
+      if (!PresentationDefinitionEB.stringIsPresentInList(PresentationDefinitionEB.getPDUri(vc), uris)) {
         return false;
       }
     }
+
     return true;
   }
 
-  private static stringIsPresentInList(presentation_definition_uri: string, input_descriptors_uri: string[]): boolean {
+  private static getPDUri(vc) {
+    let presentationDefinitionUri = '';
+    if (vc.vc) {
+      presentationDefinitionUri = vc.vc['@context'];
+    } else if (vc['@context']) {
+      presentationDefinitionUri = vc['@context'];
+    }
+    return presentationDefinitionUri;
+  }
+
+  private static stringIsPresentInList(presentationDefinitionUri: string, input_descriptors_uri: string[]): boolean {
     // TODO extract to generic utils or use something like lodash
     return (
-      presentation_definition_uri != null &&
-      input_descriptors_uri.find((el) => el === presentation_definition_uri) != undefined
+      presentationDefinitionUri != null &&
+      presentationDefinitionUri != '' &&
+      input_descriptors_uri.find((el) => el === presentationDefinitionUri) != undefined
     );
   }
 }
