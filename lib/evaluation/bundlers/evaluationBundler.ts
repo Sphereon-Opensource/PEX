@@ -10,7 +10,7 @@ export abstract class EvaluationBundler<D, P> {
     this.myTag = myTag;
   }
 
-  public abstract getEvaluations(d: D, p: P): Evaluation<any, any>[];
+  public abstract getEvaluations(d: D, p: P): Evaluation<unknown, unknown>[];
 
   protected getTag() {
     return this.parentTag != null ? this.parentTag + '.' + this.myTag : this.myTag;
