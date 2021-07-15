@@ -4,7 +4,7 @@ import { Evaluation } from '../core';
 
 import { EvaluationBundler } from './evaluationBundler';
 
-export class PresentationDefinitionEB extends EvaluationBundler<PresentationDefinition, unknown> {
+export class CandidateInputFitsInputDescriptorEB extends EvaluationBundler<PresentationDefinition, unknown> {
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
   }
@@ -20,7 +20,7 @@ export class PresentationDefinitionEB extends EvaluationBundler<PresentationDefi
       {
         tag: this.getTag(),
         target: { d, p },
-        predicate: PresentationDefinitionEB.evaluateUri,
+        predicate: CandidateInputFitsInputDescriptorEB.evaluateUri,
         message:
           'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
       },
@@ -35,15 +35,23 @@ export class PresentationDefinitionEB extends EvaluationBundler<PresentationDefi
 
     for (let i = 0; i < psw.verifiableCredential.length; i++) {
       const vc = psw.verifiableCredential[i];
-      if (!PresentationDefinitionEB.stringIsPresentInList(PresentationDefinitionEB.getPDUri(vc), uris)) {
+      const vcInContext = CandidateInputFitsInputDescriptorEB.getVC(vc);
+      if (!CandidateInputFitsInputDescriptorEB.stringIsPresentInList(vcInContext, uris)) {
+        /**
+         * TODO we need to collect all the inputs/credentials present in presentation which fit the presentation definition.
+         * Because when PE-JS is working on Holder side it will tell holder which credentials the Holder can send to Verifier.
+         * And when PE-JS is working on Verifier side it will be able to tell the verifier if the presentation is as verifier's desired presentation definition.
+         */
         return false;
       }
+
+      // TOOD returning true keep track of what matched.
     }
 
     return true;
   }
 
-  private static getPDUri(vc) {
+  private static getVC(vc) {
     let presentationDefinitionUri = '';
     if (vc.vc) {
       presentationDefinitionUri = vc.vc['@context'];
