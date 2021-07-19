@@ -13,9 +13,9 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler
         return handler;
     }
 
-    public handle(d: PresentationDefinition, p: any): Checked {
+    public handle(d: PresentationDefinition, p: any, result: Map<any, Checked>): void {
         if (this.nextHandler) {
-            return this.nextHandler.handle(d, p);
+            return this.nextHandler.handle(d, p, result);
         }
 
         return null;
