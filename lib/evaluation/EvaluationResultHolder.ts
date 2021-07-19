@@ -1,20 +1,26 @@
+import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+
 import { Checked } from '../ConstraintUtils';
 
 export class EvaluationResultHolder {
 
-  vcMap: Map<any, Checked>;
+  inputDescriptorMap: Map<InputDescriptor, Map<any, Checked>>;
 
-  public initializeVCMap(vp: any): Map<any, Checked> {
-    this.vcMap = new Map();
-    if (vp.verifiableCredential) {
-      for (let i = 0; i < vp.verifiableCredential.length; i++) {
-        this.vcMap.set(vp.verifiableCredential[i], null);
+  public initializeVCMap(pd: PresentationDefinition, vp: any): Map<InputDescriptor, Map<any, Checked>> {
+    this.inputDescriptorMap = new Map();
+    if (pd.input_descriptors && vp.verifiableCredential) {
+      for (let i = 0; i < pd.input_descriptors.length; i++) {
+        const vcMap = new Map();
+        for (let j = 0; j < vp.verifiableCredential.length; j++) {
+          vcMap.set(vp.verifiableCredential[j], null);
+        }
+        this.inputDescriptorMap.set(pd.input_descriptors[i], vcMap);
       }
     }
-    return this.vcMap;
+    return this.inputDescriptorMap;
   }
 
   public getVcMap() {
-    return this.vcMap;
+    return this.inputDescriptorMap;
   }
 }

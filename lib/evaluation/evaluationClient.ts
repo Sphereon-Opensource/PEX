@@ -9,7 +9,7 @@ export class EvaluationClient {
 
   public runEvaluations(pd: PresentationDefinition, vp: any) {
     const evaluationResult = new EvaluationResultHolder();
-    const vcMap = evaluationResult.initializeVCMap(vp);
+    const vcMap = evaluationResult.initializeVCMap(pd, vp);
     const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateEvaluationHandler();
     const predicateEvaluationHandler = new PredicateRelatedFieldShouldBeBooleanEvaluationHandler();
     const uriEvaluation = new UriEvaluationHandler();

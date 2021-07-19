@@ -1,11 +1,10 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked } from "../ConstraintUtils";
 
 import { EvaluationHandler } from "./evaluationHandler";
 
-export abstract class AbstractEvaluationHandler implements EvaluationHandler
-{
+export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     private nextHandler: EvaluationHandler;
 
     public setNext(handler: EvaluationHandler): EvaluationHandler {
@@ -13,7 +12,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler
         return handler;
     }
 
-    public handle(d: PresentationDefinition, p: any, result: Map<any, Checked>): void {
+    public handle(d: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
         if (this.nextHandler) {
             return this.nextHandler.handle(d, p, result);
         }

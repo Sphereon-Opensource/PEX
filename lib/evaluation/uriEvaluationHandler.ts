@@ -1,4 +1,4 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
 
@@ -6,21 +6,24 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
-  failed_checked: Checked  = {
+  failed_checked: Checked = {
     tag: 'root.input_descriptors',
     status: Status.ERROR,
     message: 'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.'
   };
 
-  public handle(d: PresentationDefinition, p: any, result: Map<any, Checked>): void {
-    const uriArrays: string[][] = d.input_descriptors.map((inDesc) => inDesc.schema.map((so) => so.uri));
-    let uris = [];
-    uris = uris.concat.apply([], uriArrays);
-
-    for (let i = 0; i < p.verifiableCredential.length; i++) {
-      const vc = p.verifiableCredential[i];
-      if (!UriEvaluationHandler.stringIsPresentInList(UriEvaluationHandler.getPDUri(vc), uris)) {
-        result.set(vc, this.failed_checked);
+  public handle(d: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
+    for (let i = 0; i < d.input_descriptors.length; i++) {
+      const inputDescriptor : InputDescriptor = d.input_descriptors[i];
+      const uris: string[] = inputDescriptor.schema.map(so=>so.uri);
+      for (let j = 0; j < p.verifiableCredential.length; j++) {
+        const vc = p.verifiableCredential[j];
+        if(result.get(inputDescriptor).get(vc).status === Status.ERROR) {
+          continue;
+        }
+        if (!UriEvaluationHandler.stringIsPresentInList(UriEvaluationHandler.getPDUri(vc), uris)) {
+          result.get(inputDescriptor).set(vc, this.failed_checked);
+        }
       }
     }
   }
