@@ -13,7 +13,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   };
 
   public handle(d: PresentationDefinition, p: any, result: Map<any, Checked>): void {
-    const uriArrays: string[][] = p.input_descriptors.map((inDesc) => inDesc.schema.map((so) => so.uri));
+    const uriArrays: string[][] = d.input_descriptors.map((inDesc) => inDesc.schema.map((so) => so.uri));
     let uris = [];
     uris = uris.concat.apply([], uriArrays);
 
@@ -23,23 +23,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         result.set(vc, this.failed_checked);
       }
     }
-    if (UriEvaluationHandler.evaluateUri(d, p)) {
-      return super.handle(d,p);
-    } else {
-      return this.failed_checked;
-
-    }
-  }
-
-  private static evaluateUri(pd: PresentationDefinition, psw: any) {
-
-    for (let i = 0; i < psw.verifiableCredential.length; i++) {
-      const vc = psw.verifiableCredential[i];
-      if (!UriEvaluationHandler.stringIsPresentInList(UriEvaluationHandler.getPDUri(vc), uris)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   private static getPDUri(vc) {
