@@ -6,7 +6,7 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
   failed_checked: Checked = {
-    tag: 'root.input_descriptors',
+    tag: 'root.input_descriptor',
     status: Status.ERROR,
     message:
       'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
