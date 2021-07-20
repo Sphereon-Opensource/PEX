@@ -5,7 +5,7 @@ import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
 
-import { SubmissionRequirementVB } from './SubmissionRequirementVB';
+import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { ValidationBundler } from './validationBundler';
 
