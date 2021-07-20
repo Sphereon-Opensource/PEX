@@ -1,4 +1,6 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+
+import { Checked } from '../ConstraintUtils';
 
 import { EvaluationResultHolder } from './EvaluationResultHolder';
 import { FilterShouldExistIfPredicateEvaluationHandler } from './filterShouldExistIfPredicateEvaluationHandler';
@@ -6,8 +8,7 @@ import { PredicateRelatedFieldShouldBeBooleanEvaluationHandler } from './predica
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
-
-  public runEvaluations(pd: PresentationDefinition, vp: any) {
+  public runEvaluations(pd: PresentationDefinition, vp: any): Map<InputDescriptor, Map<any, Checked>> {
     const evaluationResult = new EvaluationResultHolder();
     const vcMap = evaluationResult.initializeVCMap(pd, vp);
     const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateEvaluationHandler();
@@ -17,5 +18,6 @@ export class EvaluationClient {
     uriEvaluation.setNext(filterShouldExistIfPredicateEvaluationHandler).setNext(predicateEvaluationHandler);
 
     uriEvaluation.handle(pd, vp, vcMap);
+    return vcMap;
   }
 }

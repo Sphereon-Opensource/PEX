@@ -3,7 +3,6 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import { Checked } from '../ConstraintUtils';
 
 export class EvaluationResultHolder {
-
   inputDescriptorMap: Map<InputDescriptor, Map<any, Checked>>;
 
   public initializeVCMap(pd: PresentationDefinition, vp: any): Map<InputDescriptor, Map<any, Checked>> {

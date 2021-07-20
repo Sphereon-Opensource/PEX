@@ -6,8 +6,8 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class FilterShouldExistIfPredicateEvaluationHandler extends AbstractEvaluationHandler {
 
+  // This incorrect format of input_descriptor is a deal-breaker for us, and therefore we throw exception for it
   public handle(pd: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
-
     // HERE we process the predicate part of the PD
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = pd.input_descriptors[i];
