@@ -34,7 +34,7 @@ describe('evaluate', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
         vpSimple.verifiableCredential["0"].age = 18;
         const evaluationClient: EvaluationClient = new EvaluationClient();
-        const result: Map<InputDescriptor, Map<any, Checked>> = evaluationClient.runEvaluations(pdSchema, vpSimple);
+        const result: Map<InputDescriptor, Map<unknown, Checked>> = evaluationClient.runEvaluations(pdSchema, vpSimple);
         expect(result.get(pdSchema.input_descriptors[0]).get(vpSimple.verifiableCredential[0])).toEqual(new Checked('root.input_descriptor', Status.ERROR, "verifiableCredential's matching predicate property should be boolean."));
     });
 });

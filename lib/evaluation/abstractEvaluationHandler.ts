@@ -12,7 +12,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return handler;
   }
 
-  public handle(d: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
+  public handle(d: PresentationDefinition, p: unknown, result: Map<InputDescriptor, Map<unknown, Checked>>): void {
     if (this.nextHandler) {
       return this.nextHandler.handle(d, p, result);
     }

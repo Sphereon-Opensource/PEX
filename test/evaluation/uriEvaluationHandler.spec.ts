@@ -16,7 +16,7 @@ describe('evaluate', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
         vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.test.org/mock"
         const evaluationClient: EvaluationClient = new EvaluationClient();
-        const result: Map<InputDescriptor, Map<any, Checked>> = evaluationClient.runEvaluations(pdSchema, vpSimple);
+        const result: Map<InputDescriptor, Map<unknown, Checked>> = evaluationClient.runEvaluations(pdSchema, vpSimple);
         expect(result.get(pdSchema.input_descriptors[0]).get(vpSimple.verifiableCredential[0])).toEqual(new Checked('root.input_descriptor', Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
     });
 });

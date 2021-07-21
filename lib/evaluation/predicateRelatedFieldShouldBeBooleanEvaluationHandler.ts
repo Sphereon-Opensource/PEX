@@ -11,7 +11,7 @@ export class PredicateRelatedFieldShouldBeBooleanEvaluationHandler extends Abstr
     message: "verifiableCredential's matching predicate property should be boolean.",
   };
 
-  public handle(pd: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
+  public handle(pd: PresentationDefinition, p: unknown, result: Map<InputDescriptor, Map<unknown, Checked>>): void {
     // HERE we process the predicate part of the PD
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const constraints: Constraints = pd.input_descriptors[i].constraints;
@@ -25,7 +25,7 @@ export class PredicateRelatedFieldShouldBeBooleanEvaluationHandler extends Abstr
   private predicateRelatedFieldShouldBeBoolean(
     constraints: Constraints,
     verifiablePresentation: any,
-    verifiableCredentialChecked: Map<any, Checked>
+    verifiableCredentialChecked: Map<unknown, Checked>
   ): void {
     const predicateFields = [];
     constraints.fields.forEach((f) => {

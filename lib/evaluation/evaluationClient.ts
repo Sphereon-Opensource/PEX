@@ -8,7 +8,7 @@ import { PredicateRelatedFieldShouldBeBooleanEvaluationHandler } from './predica
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
-  public runEvaluations(pd: PresentationDefinition, vp: any): Map<InputDescriptor, Map<any, Checked>> {
+  public runEvaluations(pd: PresentationDefinition, vp: unknown): Map<InputDescriptor, Map<unknown, Checked>> {
     const evaluationResult = new EvaluationResultHolder();
     const vcMap = evaluationResult.initializeVCMap(pd, vp);
     const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateEvaluationHandler();
