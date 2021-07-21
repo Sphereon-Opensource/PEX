@@ -1,8 +1,7 @@
 import fs from 'fs';
 
-import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Checked, Status } from '../../lib';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 
 function getFile(path: string) {

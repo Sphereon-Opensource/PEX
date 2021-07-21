@@ -5,33 +5,40 @@ import { Checked, Status } from '../ConstraintUtils';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
-    failed_checked: Checked = {
+
+    private path_checked: Checked = {
         tag: 'root.input_descriptors',
         status: Status.ERROR,
-        message: 'The input candidate does not satisfy any filters of the input descriptors'
-    };
-
-    public handle(pd: PresentationDefinition, p: any): Checked {
-        if (this.ifInputCandidateMatchesFilter(pd, p)) {
-            return super.handle(pd, p);
-        } else {
-            return this.failed_checked;
-        }
+        message: `The path property didn't match`
     }
 
-    private ifInputCandidateMatchesFilter(presentationDefinition: PresentationDefinition, inputCandidate: any): boolean {
+    private filter_checked: Checked = {
+        tag: 'root.input_descriptors',
+        status: Status.ERROR,
+        message: `The filter property didn't match`
+    }
+
+    public handle(pd: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
+        this.ifInputCandidateMatchesFilter(pd, p, result)
+        super.handle(pd, p, result);
+    }
+
+    private ifInputCandidateMatchesFilter(presentationDefinition: PresentationDefinition, inputCandidates: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
         const inputDescriptors: InputDescriptor[] = presentationDefinition.input_descriptors;
-        for (const inputDescriptor of inputDescriptors) {
-            if (inputDescriptor.constraints && inputDescriptor.constraints.fields) {
-                for (const field of inputDescriptor.constraints.fields) {
-                    const result = this.evaluatePath(inputCandidate, field);
-                    if (!result.length || !this.evaluateFilter(result[0], field)) {
-                        return false;
+        inputCandidates.verifiableCredential.forEach(vc => {
+            for (const inputDescriptor of inputDescriptors) {
+                if (inputDescriptor.constraints && inputDescriptor.constraints.fields) {
+                    for (const field of inputDescriptor.constraints.fields) {
+                        const pathResult = this.evaluatePath(vc, field);
+                        if (!pathResult.length) {
+                            result.get(inputDescriptor).set(vc, this.path_checked)
+                        } else if (!this.evaluateFilter(pathResult[0], field)) {
+                            result.get(inputDescriptor).set(vc, this.filter_checked)
+                        }
                     }
                 }
             }
-        }
-        return true;
+        });
     }
 
     private evaluatePath(inputCandidate: any, field: Field): any {
