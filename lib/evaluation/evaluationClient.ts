@@ -2,7 +2,7 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked } from '../ConstraintUtils';
 
-import { EvaluationResultHolder } from './EvaluationResultHolder';
+import { EvaluationResultHolder } from './evaluationResultHolder';
 import { FilterShouldExistIfPredicateEvaluationHandler } from './filterShouldExistIfPredicateEvaluationHandler';
 import { PredicateRelatedFieldShouldBeBooleanEvaluationHandler } from './predicateRelatedFieldShouldBeBooleanEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
