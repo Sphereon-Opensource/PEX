@@ -58,7 +58,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
         : "It's preferred to have the predicate related field is present in the verifiableCredential.";
 
       const input_descriptor_path =
-        'root.input_descriptors[' + input_descriptor_idx + ']' + 'constraints.fields[' + constraint_field_idx + ']';
+        'root.input_descriptors[' + input_descriptor_idx + ']' + '.constraints.fields[' + constraint_field_idx + ']';
       const verifiable_credential_path = 'root.verifiableCredential[' + i + ']';
       results.push({
         input_descriptor_path,
