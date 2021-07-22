@@ -1,6 +1,6 @@
-import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Checked } from '../ConstraintUtils';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 import { EvaluationHandler } from './evaluationHandler';
 
@@ -12,9 +12,20 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return handler;
   }
 
-  public handle(d: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
+  public abstract getName(): string;
+
+  public getNext(): EvaluationHandler {
+    return this.nextHandler;
+  }
+
+  public hasNext(): boolean {
+    return this.nextHandler != undefined;
+  }
+
+  public handle(d: PresentationDefinition, p: unknown): HandlerCheckResult[] {
     if (this.nextHandler) {
-      return this.nextHandler.handle(d, p, result);
+      return this.nextHandler.handle(d, p);
     }
+    return [];
   }
 }

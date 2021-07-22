@@ -1,44 +1,73 @@
 import jp from 'jsonpath';
 import Ajv from 'ajv';
 import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
-import { Checked, Status } from '../ConstraintUtils';
+import { Status } from '../ConstraintUtils';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
-
-    private path_checked: Checked = {
-        tag: 'root.input_descriptors',
-        status: Status.ERROR,
-        message: `The path property didn't match`
+    
+    public getName(): string {
+        return 'FilterEvaluation';
     }
 
-    private filter_checked: Checked = {
-        tag: 'root.input_descriptors',
-        status: Status.ERROR,
-        message: `The filter property didn't match`
+    public handle(pd: PresentationDefinition, p: any): HandlerCheckResult [] {
+        const result: HandlerCheckResult[] = [];
+        const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
+        for (const [vcIndex, vc] of p.verifiableCredential.entries()) {
+            result.push(...this.iterateOverInputDescriptors(inputDescriptors, vcIndex, vc));
+        }
+        return result;
     }
 
-    public handle(pd: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
-        this.ifInputCandidateMatchesFilter(pd, p, result)
-        super.handle(pd, p, result);
-    }
-
-    private ifInputCandidateMatchesFilter(presentationDefinition: PresentationDefinition, inputCandidates: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
-        const inputDescriptors: InputDescriptor[] = presentationDefinition.input_descriptors;
-        inputCandidates.verifiableCredential.forEach(vc => {
-            for (const inputDescriptor of inputDescriptors) {
-                if (inputDescriptor.constraints && inputDescriptor.constraints.fields) {
-                    for (const field of inputDescriptor.constraints.fields) {
-                        const pathResult = this.evaluatePath(vc, field);
-                        if (!pathResult.length) {
-                            result.get(inputDescriptor).set(vc, this.path_checked)
-                        } else if (!this.evaluateFilter(pathResult[0], field)) {
-                            result.get(inputDescriptor).set(vc, this.filter_checked)
-                        }
-                    }
-                }
+    private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vcIndex: number, vc: any): HandlerCheckResult[] {
+        const result: HandlerCheckResult[] = [];
+        for (const [idIndex, inputDescriptor] of inputDescriptors.entries()) {
+            if (inputDescriptor.constraints && inputDescriptor.constraints.fields && inputDescriptor.constraints.fields.length > 0) {
+                result.push(...this.iterateOverFields(inputDescriptor, vc, idIndex, vcIndex));
+            } else {
+                result.push({
+                    ...this.createResultObject(idIndex, vcIndex)
+                })
             }
-        });
+        }
+        return result;
+    }
+
+    private iterateOverFields(inputDescriptor: InputDescriptor, vc: any, idIndex: number, vcIndex: number): HandlerCheckResult[] {
+        const
+         result: HandlerCheckResult[] = [];
+        for (const field of inputDescriptor.constraints.fields) {
+            const pathResult = this.evaluatePath(vc, field);
+            if (!pathResult.length) {
+                result.push({ 
+                    ...this.createResultObject(idIndex, vcIndex), 
+                    ['status']: Status.ERROR,
+                    ['message']: 'Input candidate failed to find jsonpath property'
+                })
+            } else if (!this.evaluateFilter(pathResult[0], field)) {
+                result.push({
+                    ...this.createResultObject(idIndex, vcIndex),
+                    ['status']: Status.ERROR,
+                    ['message']: 'Input candidate failed filter evaluation'
+                })
+            } else {
+                result.push({
+                    ...this.createResultObject(idIndex, vcIndex)
+                })
+            }
+        }
+        return result;
+    }
+
+    private createResultObject(idIndex: number, vcIndex: number): HandlerCheckResult {
+        return {
+            input_descriptor_path: `$.input_descriptors[${idIndex}]`,
+            verifiable_credential_path: `$.verifiableCredential[${vcIndex}]`,
+            evaluator: this.getName(),
+            status: Status.INFO,
+            message: 'Input candidate valid for presentation submission'
+        }
     }
 
     private evaluatePath(inputCandidate: any, field: Field): any {

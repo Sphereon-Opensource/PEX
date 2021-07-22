@@ -1,23 +1,45 @@
 import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
-import { Checked } from '../ConstraintUtils';
+import { Status } from '../ConstraintUtils';
 
+import { HandlerCheckResult } from './handlerCheckResult';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class FilterShouldExistIfPredicateEvaluationHandler extends AbstractEvaluationHandler {
+  public getName(): string {
+    return 'FilterShouldExistIfPredicate';
+  }
 
-  // This incorrect format of input_descriptor is a deal-breaker for us, and therefore we throw exception for it
-  public handle(pd: PresentationDefinition, p: any, result: Map<InputDescriptor, Map<any, Checked>>): void {
-    // HERE we process the predicate part of the PD
+  public handle(pd: PresentationDefinition): HandlerCheckResult[] {
+    const results: HandlerCheckResult[] = [];
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = pd.input_descriptors[i];
-      for (let j = 0; j < inputDescriptor.constraints.fields.length; j++) {
-        const field: Field = inputDescriptor.constraints.fields[j];
-        if (field.predicate && !field.filter) {
-          throw new Error('if in the field we have predicate value, the filter value should be present as well.');
+      if (inputDescriptor.constraints && inputDescriptor.constraints.fields) {
+        for (let j = 0; j < inputDescriptor.constraints.fields.length; j++) {
+          const field: Field = inputDescriptor.constraints.fields[j];
+          if (field.predicate) {
+            const input_descriptor_path = 'root.input_descriptors[' + i + '].constraints.fields[' + j + ']';
+            if (field.filter) {
+              results.push({
+                input_descriptor_path,
+                verifiable_credential_path: '',
+                evaluator: this.getName(),
+                status: Status.INFO,
+                message: 'predicate value and the filter value are both present.',
+              });
+            } else {
+              results.push({
+                input_descriptor_path,
+                verifiable_credential_path: '',
+                evaluator: this.getName(),
+                status: Status.ERROR,
+                message: 'if in the field we have predicate value, the filter value should be present as well.',
+              });
+            }
+          }
         }
       }
     }
-    super.handle(pd, p, result);
+    return results;
   }
 }
