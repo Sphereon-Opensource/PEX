@@ -2,6 +2,8 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked } from '../ConstraintUtils';
 
+import { SubmissionMarked } from './submissionMarked';
+
 export class EvaluationResultHolder {
   inputDescriptorMap: Map<InputDescriptor, Map<any, Checked>>;
 
@@ -21,5 +23,21 @@ export class EvaluationResultHolder {
 
   public getVcMap() {
     return this.inputDescriptorMap;
+  }
+
+  public markForPresentationSubmission(): Array<SubmissionMarked> {
+    const presentationSubmissionMarked: Array<SubmissionMarked> = []
+    this.inputDescriptorMap.forEach((vcMap, inputDescriptor) => {
+      vcMap.forEach((checked, vc) => {
+        if (!checked) {
+          presentationSubmissionMarked.push({
+            inputDescriptor: inputDescriptor,
+            group: inputDescriptor.group,
+            inputCandidate: vc
+          })
+        }
+      });
+    });
+    return presentationSubmissionMarked;
   }
 }
