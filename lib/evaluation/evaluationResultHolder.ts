@@ -5,6 +5,7 @@ import { Checked } from '../ConstraintUtils';
 export class EvaluationResultHolder {
   inputDescriptorMap: Map<InputDescriptor, Map<unknown, Checked>>;
 
+  //TODO: change any to VerifiablePresentationWrapper or something like this
   public initializeVCMap(pd: PresentationDefinition, vp: any): Map<InputDescriptor, Map<unknown, Checked>> {
     this.inputDescriptorMap = new Map();
     if (pd.input_descriptors && vp.verifiableCredential) {

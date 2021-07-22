@@ -1,9 +1,11 @@
-import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Checked } from '../ConstraintUtils';
+import { HandlerCheckResult } from './HandlerCheckResult';
 
 export interface EvaluationHandler {
   setNext(handler: EvaluationHandler): EvaluationHandler;
-
-  handle(pd: PresentationDefinition, p: unknown, result: Map<InputDescriptor, Map<unknown, Checked>>): void;
+  getNext(): EvaluationHandler;
+  hasNext(): boolean;
+  getName(): string;
+  handle(pd: PresentationDefinition, p: unknown): HandlerCheckResult[];
 }
