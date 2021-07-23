@@ -8,6 +8,7 @@ import { EvaluationResultHolder } from './evaluationResultHolder';
 import { FilterShouldExistIfPredicateEvaluationHandler } from './filterShouldExistIfPredicateEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
+import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
 
 export class EvaluationClient {
   private failed_catched: Checked = {
@@ -39,8 +40,12 @@ export class EvaluationClient {
     const uriEvaluation = new UriEvaluationHandler();
     const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateEvaluationHandler();
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
+    const filterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
 
-    uriEvaluation.setNext(filterShouldExistIfPredicateEvaluationHandler).setNext(predicateEvaluationHandler);
+    uriEvaluation
+    .setNext(filterShouldExistIfPredicateEvaluationHandler)
+    .setNext(predicateEvaluationHandler)
+    .setNext(filterEvaluationHandler);
 
     return uriEvaluation;
   }
