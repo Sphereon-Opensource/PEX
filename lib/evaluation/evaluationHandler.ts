@@ -7,5 +7,5 @@ export interface EvaluationHandler {
   getNext(): EvaluationHandler;
   hasNext(): boolean;
   getName(): string;
-  handle(pd: PresentationDefinition, p: unknown): HandlerCheckResult[];
+  handle(pd: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void;
 }

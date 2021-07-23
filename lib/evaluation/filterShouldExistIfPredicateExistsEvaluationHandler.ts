@@ -2,16 +2,15 @@ import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-mod
 
 import { Status } from '../ConstraintUtils';
 
-import { HandlerCheckResult } from './handlerCheckResult';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { HandlerCheckResult } from './handlerCheckResult';
 
-export class FilterShouldExistIfPredicateEvaluationHandler extends AbstractEvaluationHandler {
+export class FilterShouldExistIfPredicateExistsEvaluationHandler extends AbstractEvaluationHandler {
   public getName(): string {
-    return 'FilterShouldExistIfPredicate';
+    return 'FilterShouldExistIfPredicateExists';
   }
 
-  public handle(pd: PresentationDefinition): HandlerCheckResult[] {
-    const results: HandlerCheckResult[] = [];
+  public handle(pd: PresentationDefinition, _vp: any, results: HandlerCheckResult[]): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = pd.input_descriptors[i];
       if (inputDescriptor.constraints && inputDescriptor.constraints.fields) {
@@ -40,6 +39,5 @@ export class FilterShouldExistIfPredicateEvaluationHandler extends AbstractEvalu
         }
       }
     }
-    return results;
   }
 }

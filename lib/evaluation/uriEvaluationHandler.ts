@@ -2,16 +2,15 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
 
-import { HandlerCheckResult } from './handlerCheckResult';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
   public getName(): string {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: any): HandlerCheckResult[] {
-    const results: HandlerCheckResult[] = [];
+  public handle(d: PresentationDefinition, p: any, results: HandlerCheckResult[]): void {
     for (let i = 0; i < d.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = d.input_descriptors[i];
       const uris: string[] = inputDescriptor.schema.map((so) => so.uri);
@@ -40,7 +39,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         }
       }
     }
-    return results;
   }
 
   private static getPDUri(vc) {
@@ -61,7 +59,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     input_descriptors_uri: string[]
   ): boolean {
     for (let i = 0; i < presentationDefinitionUris.length; i++) {
-      //input_descriptors_uri.find((el) => el === presentationDefinitionUri) != undefined
       if (input_descriptors_uri.find((el) => el === presentationDefinitionUris[i]) == undefined) {
         return false;
       }
