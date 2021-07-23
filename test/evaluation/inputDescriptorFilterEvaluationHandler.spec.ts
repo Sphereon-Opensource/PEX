@@ -11,6 +11,7 @@ const message: HandlerCheckResult = {
     verifiable_credential_path: `$.verifiableCredential[0]`,
     evaluator: `FilterEvaluation`,
     status: Status.INFO,
+    payload: {"result": [{ "path": [ "$", "vc", "issuer" ], "value": "did:example:123" },], "valid": true },
     message: 'Input candidate valid for presentation submission'
 }
 
@@ -24,33 +25,45 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
+        const message0 = { ...message };
+        message0.payload = { "result": [], "valid": true };
         const message1 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = { "result": [], "valid": true };
         const message2 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = { "result": [], "valid": true };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
-        expect(actual).toEqual([message, message1, message2]);
+        expect(actual).toEqual([message0, message1, message2]);
     });
 
     it(`input descriptor's constraints.fields property missing`, () => {
         const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[1]];
+        const message0 = { ...message };
+        message0.payload = { "result": [], "valid": true };
         const message1 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = { "result": [], "valid": true };
         const message2 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = { "result": [], "valid": true };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
-        expect(actual).toEqual([message, message1, message2]);
+        expect(actual).toEqual([message0, message1, message2]);
     });
 
     it(`input descriptor's constraints.fields.length is equal to 0`, () => {
         const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[2]];
+        const message0 = { ...message };
+        message0.payload = { "result": [], "valid": true };
         const message1 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = { "result": [], "valid": true };
         const message2 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = { "result": [], "valid": true };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
-        expect(actual).toEqual([message, message1, message2]);
+        expect(actual).toEqual([message0, message1, message2]);
     });
 
     it(`input descriptor's constraints.fields.path does not match`, () => {
@@ -58,8 +71,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[3]];
         const message0 = { ...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed to find jsonpath property' };
+        message0.payload = { "result": [], "valid": false }; 
         const message1 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = { "result": [], "valid": false };
         const message2 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = { "result": [], "valid": false };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
         expect(actual).toEqual([message0, message1, message2]);
@@ -70,8 +86,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
         const message0 = { ...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed filter evaluation' };
+        message0.payload = {"result": [{ "path": [ "$", "vc", "issuer" ], "value": "did:example:123" },], "valid": false };
         const message1 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": false };
         const message2 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": false };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
         expect(actual).toEqual([message0, message1, message2]);
@@ -82,7 +101,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
         const message1 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
+        message1.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": true };
         const message2 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
+        message2.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": true };
         new EvaluationResultHolder().initializeVCMap(presentationDefinition, inputCandidates);
         const actual = new InputDescriptorFilterEvaluationHandler().handle(presentationDefinition, inputCandidates);
         expect(actual).toEqual([message, message1, message2]);

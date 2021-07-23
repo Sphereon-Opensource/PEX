@@ -21,12 +21,12 @@ export class EvaluationClient {
     const vcMap = evaluationResult.initializeVCMap(pd, vp);
 
     const results: HandlerCheckResult[] = [];
-    let rootHandler: EvaluationHandler = this.initEvaluationHandlers();
-    results.push(...rootHandler.handle(pd, vp));
-    while (rootHandler.hasNext()) {
-      rootHandler = rootHandler.getNext();
+    let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
+    results.push(...currentHandler.handle(pd, vp));
+    while (currentHandler.hasNext()) {
+      currentHandler = currentHandler.getNext();
       try {
-        results.push(...rootHandler.handle(pd, vp));
+        results.push(...currentHandler.handle(pd, vp));
       } catch (e) {
         this.failed_catched.message += e.message;
         throw this.failed_catched;

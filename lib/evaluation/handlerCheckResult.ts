@@ -6,4 +6,5 @@ export interface HandlerCheckResult {
     evaluator: string;
     status: Status;
     message?: string;
+    payload?: any;
 }
