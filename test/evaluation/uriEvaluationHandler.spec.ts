@@ -3,8 +3,8 @@ import fs from 'fs';
 import {PresentationDefinition} from '@sphereon/pe-models';
 
 import {Status} from '../../lib';
-import {HandlerCheckResult} from "../../lib/evaluation/HandlerCheckResult";
 import {EvaluationHandler} from "../../lib/evaluation/evaluationHandler";
+import {HandlerCheckResult} from "../../lib/evaluation/handlerCheckResult";
 import {UriEvaluationHandler} from "../../lib/evaluation/uriEvaluationHandler";
 
 function getFile(path: string) {
@@ -18,7 +18,8 @@ describe('evaluate', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
         vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.test.org/mock"
         const evaluationHandler: EvaluationHandler = new UriEvaluationHandler();
-        const result: HandlerCheckResult[] = evaluationHandler.handle(pdSchema, vpSimple);
-        expect(result[0]).toEqual(new HandlerCheckResult('root.input_descriptors[0]', "root.verifiableCredential[0].constraints.fields[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
+        const results: HandlerCheckResult[] = [];
+        evaluationHandler.handle(pdSchema, vpSimple, results);
+        expect(results[0]).toEqual(new HandlerCheckResult('root.input_descriptors[0]', "root.verifiableCredential[0].constraints.fields[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
     });
 });

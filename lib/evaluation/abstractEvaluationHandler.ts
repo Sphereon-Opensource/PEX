@@ -1,7 +1,7 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { HandlerCheckResult } from './HandlerCheckResult';
 import { EvaluationHandler } from './evaluationHandler';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   private nextHandler: EvaluationHandler;
@@ -21,10 +21,9 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this.nextHandler != undefined;
   }
 
-  public handle(d: PresentationDefinition, p: unknown): HandlerCheckResult[] {
+  public handle(d: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void {
     if (this.nextHandler) {
-      return this.nextHandler.handle(d, p);
+      this.nextHandler.handle(d, p, results);
     }
-    return [];
   }
 }
