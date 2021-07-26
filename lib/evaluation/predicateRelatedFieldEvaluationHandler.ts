@@ -12,7 +12,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
 
   public handle(pd: PresentationDefinition, _p: unknown, results: HandlerCheckResult[]): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
-      if (pd.input_descriptors[i].constraints) {
+      if (pd.input_descriptors[i].constraints && pd.input_descriptors[i].constraints.fields) {
         this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints, results);
       }
     }
