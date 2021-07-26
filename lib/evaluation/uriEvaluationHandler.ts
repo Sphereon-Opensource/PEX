@@ -17,25 +17,11 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       for (let j = 0; j < p.verifiableCredential.length; j++) {
         const vc = p.verifiableCredential[j];
         const input_descriptor_path = '$.input_descriptors[' + i + ']';
-        const verifiable_credential_path = '$.verifiableCredential[' + j + '].constraints.fields[' + j + ']';
+        const verifiable_credential_path = '$.verifiableCredential[' + j + ']';
         if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPresentationURI(vc), uris)) {
-          results.push({
-            input_descriptor_path,
-            verifiable_credential_path,
-            evaluator: this.getName(),
-            status: Status.INFO,
-            message:
-              'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
-          });
+          results.push(this.createInfoResultObject(input_descriptor_path, verifiable_credential_path));
         } else {
-          results.push({
-            input_descriptor_path,
-            verifiable_credential_path,
-            evaluator: this.getName(),
-            status: Status.ERROR,
-            message:
-              'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
-          });
+          results.push(this.createErrorResultObject(input_descriptor_path, verifiable_credential_path));
         }
       }
     }
@@ -61,5 +47,31 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       }
     }
     return true;
+  }
+
+  private createInfoResultObject(input_descriptor_path: string, verifiable_credential_path: string) {
+    const result = this.createResult(input_descriptor_path, verifiable_credential_path);
+    result.status = Status.INFO;
+    result.message =
+      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
+    return result;
+  }
+
+  private createErrorResultObject(input_descriptor_path: string, verifiable_credential_path: string) {
+    const result = this.createResult(input_descriptor_path, verifiable_credential_path);
+    result.status = Status.ERROR;
+    result.message =
+      'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
+    return result;
+  }
+
+  private createResult(input_descriptor_path: string, verifiable_credential_path: string) {
+    return {
+      input_descriptor_path,
+      verifiable_credential_path,
+      evaluator: this.getName(),
+      status: undefined,
+      message: undefined,
+    };
   }
 }

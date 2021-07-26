@@ -48,25 +48,12 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       constraints.fields[fieldIdx].path.includes(this.concatenatePath(results[resultIdx].payload.result.path))
     ) {
       const evaluationResult = { ...results[resultIdx].payload.result };
+      const resultObject = this.createResultObject(input_descriptor_idx, resultIdx, evaluationResult, results);
       if (constraints.fields[fieldIdx].predicate === Optionality.Required) {
-        results.push({
-          input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-          verifiable_credential_path: results[resultIdx].verifiable_credential_path,
-          evaluator: this.getName(),
-          status: Status.INFO,
-          message: 'Input candidate valid for presentation submission',
-          payload: evaluationResult,
-        });
+        results.push(resultObject);
       } else {
-        evaluationResult.value = true;
-        results.push({
-          input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-          verifiable_credential_path: results[resultIdx].verifiable_credential_path,
-          evaluator: this.getName(),
-          status: Status.INFO,
-          message: 'Input candidate valid for presentation submission',
-          payload: evaluationResult,
-        });
+        resultObject.payload.value = true;
+        results.push(resultObject);
       }
     }
   }
@@ -86,5 +73,21 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       completePath += path[i] + '.';
     }
     return completePath.substring(0, completePath.length - 1);
+  }
+
+  private createResultObject(
+    input_descriptor_idx: number,
+    resultIdx: number,
+    evaluationResult: any,
+    results: HandlerCheckResult[]
+  ) {
+    return {
+      input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
+      verifiable_credential_path: results[resultIdx].verifiable_credential_path,
+      evaluator: this.getName(),
+      status: Status.INFO,
+      message: 'Input candidate valid for presentation submission',
+      payload: evaluationResult,
+    };
   }
 }
