@@ -20,6 +20,6 @@ describe('evaluate', () => {
         const evaluationHandler: EvaluationHandler = new UriEvaluationHandler();
         const results: HandlerCheckResult[] = [];
         evaluationHandler.handle(pdSchema, vpSimple, results);
-        expect(results[0]).toEqual(new HandlerCheckResult('root.input_descriptors[0]', "root.verifiableCredential[0].constraints.fields[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
+        expect(results[0]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', "$.verifiableCredential[0].constraints.fields[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
     });
 });

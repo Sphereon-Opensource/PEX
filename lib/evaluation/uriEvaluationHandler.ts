@@ -16,8 +16,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       const uris: string[] = inputDescriptor.schema.map((so) => so.uri);
       for (let j = 0; j < p.verifiableCredential.length; j++) {
         const vc = p.verifiableCredential[j];
-        const input_descriptor_path = 'root.input_descriptors[' + i + ']';
-        const verifiable_credential_path = 'root.verifiableCredential[' + j + '].constraints.fields[' + j + ']';
+        const input_descriptor_path = '$.input_descriptors[' + i + ']';
+        const verifiable_credential_path = '$.verifiableCredential[' + j + '].constraints.fields[' + j + ']';
         if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPDUri(vc), uris)) {
           results.push({
             input_descriptor_path,
