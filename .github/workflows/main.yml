@@ -23,5 +23,5 @@ jobs:
       uses: icrawl/action-tsc@v1
     - name: yarn build
       run: yarn build
-   - name: yarn test
+    - name: yarn test
       run: yarn test
