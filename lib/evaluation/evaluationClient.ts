@@ -5,9 +5,9 @@ import { Checked, Status } from '../ConstraintUtils';
 import { EvaluationHandler } from './evaluationHandler';
 import { FilterShouldExistIfPredicateExistsEvaluationHandler } from './filterShouldExistIfPredicateExistsEvaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
-import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandlerEvaluationHandler';
-import { UriEvaluationHandler } from './uriEvaluationHandler';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
+import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
+import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
   private failed_catched: Checked = {
@@ -39,9 +39,9 @@ export class EvaluationClient {
     const filterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
 
     uriEvaluation
-    .setNext(filterShouldExistIfPredicateEvaluationHandler)
-    .setNext(predicateEvaluationHandler)
-    .setNext(filterEvaluationHandler);
+      .setNext(filterShouldExistIfPredicateEvaluationHandler)
+      .setNext(predicateEvaluationHandler)
+      .setNext(filterEvaluationHandler);
 
     return uriEvaluation;
   }

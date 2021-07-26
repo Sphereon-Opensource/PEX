@@ -5,7 +5,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Checked, Status } from '../../lib';
 import { EvaluationHandler } from "../../lib/evaluation/evaluationHandler";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
-import { PredicateRelatedFieldEvaluationHandler } from "../../lib/evaluation/predicateRelatedFieldEvaluationHandlerEvaluationHandler";
+import { PredicateRelatedFieldEvaluationHandler } from "../../lib/evaluation/predicateRelatedFieldEvaluationHandler";
 
 function getFile(path: string) {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -38,6 +38,6 @@ describe('evaluate', () => {
         const evaluationHandler: EvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
         const results: HandlerCheckResult[] = [];
         evaluationHandler.handle(pdSchema, vpSimple, results);
-        expect(results[0]).toEqual(new HandlerCheckResult('root.input_descriptors[0].constraints.fields[0]', 'root.verifiableCredential[0]', 'PredicateRelatedField', Status.ERROR, "It's required to have the predicate related field is present in the verifiableCredential."));
+        expect(results[0]).toEqual(new HandlerCheckResult('$.input_descriptors[0].constraints.fields[0]', '$.verifiableCredential[0]', 'PredicateRelatedField', Status.ERROR, "It's required to have the predicate related field is present in the verifiableCredential."));
     });
 });
