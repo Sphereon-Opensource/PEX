@@ -6,7 +6,7 @@ export interface HandlerCheckResult {
   evaluator: string;
   status: Status;
   message?: string;
-  payload?: unknown;
+  payload?: any;
 }
 
 export const HandlerCheckResult = class implements HandlerCheckResult {

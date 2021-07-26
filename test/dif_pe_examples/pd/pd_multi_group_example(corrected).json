@@ -160,8 +160,7 @@
                 "$.jobs[*].active"
               ],
               "filter": {
-                "type": "boolean",
-                "pattern": "true"
+                "type": "boolean"
               }
             }
           ]

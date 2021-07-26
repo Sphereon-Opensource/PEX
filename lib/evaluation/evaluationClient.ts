@@ -3,10 +3,9 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Checked, Status } from '../ConstraintUtils';
 
 import { EvaluationHandler } from './evaluationHandler';
-import { FilterShouldExistIfPredicateExistsEvaluationHandler } from './filterShouldExistIfPredicateExistsEvaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
-import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandlerEvaluationHandler';
+import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
@@ -34,14 +33,9 @@ export class EvaluationClient {
 
   private initEvaluationHandlers() {
     const uriEvaluation = new UriEvaluationHandler();
-    const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateExistsEvaluationHandler();
+    const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
-    const filterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-
-    uriEvaluation
-      .setNext(filterShouldExistIfPredicateEvaluationHandler)
-      .setNext(predicateEvaluationHandler)
-      .setNext(filterEvaluationHandler);
+    uriEvaluation.setNext(inputDescriptorFilterEvaluationHandler).setNext(predicateEvaluationHandler);
 
     return uriEvaluation;
   }

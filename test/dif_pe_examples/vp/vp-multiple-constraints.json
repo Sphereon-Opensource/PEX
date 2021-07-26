@@ -24,6 +24,10 @@
         "https://www.w3.org/2018/credentials/v1"
       ],
       "age": 19,
+      "details": {
+        "citizenship": "eu"
+      },
+      "birthPlace": "Maarssen",
       "credentialSchema": [
         {
           "id": "https://www.w3.org/TR/vc-data-model/#types"
