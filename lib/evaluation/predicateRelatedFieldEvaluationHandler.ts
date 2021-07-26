@@ -47,7 +47,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       constraints.fields[fieldIdx].predicate &&
       constraints.fields[fieldIdx].path.includes(this.concatenatePath(results[resultIdx].payload.result.path))
     ) {
-      const evaluationResult = {...results[resultIdx].payload.result};
+      const evaluationResult = { ...results[resultIdx].payload.result };
       if (constraints.fields[fieldIdx].predicate === Optionality.Required) {
         results.push({
           input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
@@ -81,10 +81,10 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   }
 
   private concatenatePath(path) {
-    let completePath = ""
+    let completePath = '';
     for (let i = 0; i < path.length; i++) {
-      completePath +=path[i]+".";
+      completePath += path[i] + '.';
     }
-    return completePath.substring(0, completePath.length-1);
+    return completePath.substring(0, completePath.length - 1);
   }
 }
