@@ -12,24 +12,6 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
 
-    it('should return error if value of predicate is not one of [required, preferred]', function () {
-        const pdSchema = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-        pdSchema.input_descriptors[0].constraints.fields[0].predicate = "necessary";
-        const validPredicates = ['required', 'preferred'];
-        const exceptionResults = [];
-        pdSchema.input_descriptors.forEach(id => {
-            if (id.constraints) {
-                id.constraints.fields.forEach(f => {
-                    if (!validPredicates.includes(f.predicate)) {
-                        exceptionResults.push(new Checked('root.input_descriptor', Status.ERROR, 'predicate value should be one of these values: [\'required\', \'preferred\']'));
-                    }
-                })
-            }
-        })
-        expect(exceptionResults.length).toEqual(1);
-        expect(exceptionResults[0]).toEqual(new Checked('root.input_descriptor', Status.ERROR, 'predicate value should be one of these values: [\'required\', \'preferred\']'));
-    });
-
     it('should return error ok if verifiableCredential\'s age value is matching the specification in the input descriptor', function () {
         const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
