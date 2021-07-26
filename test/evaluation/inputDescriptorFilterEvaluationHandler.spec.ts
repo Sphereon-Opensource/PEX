@@ -12,7 +12,7 @@ const message: HandlerCheckResult = {
     verifiable_credential_path: `$.verifiableCredential[0]`,
     evaluator: `FilterEvaluation`,
     status: Status.INFO,
-    payload: {"result": [{ "path": [ "$", "vc", "issuer" ], "value": "did:example:123" },], "valid": true },
+    payload: {"result": { "path": [ "$", "vc", "issuer" ], "value": "did:example:123" }, "valid": true },
     message: 'Input candidate valid for presentation submission'
 }
 
@@ -91,11 +91,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
         const message0 = { ...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed filter evaluation' };
-        message0.payload = {"result": [{ "path": [ "$", "vc", "issuer" ], "value": "did:example:123" },], "valid": false };
+        message0.payload = {"result": { "path": [ "$", "vc", "issuer" ], "value": "did:example:123" }, "valid": false };
         const message1 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
-        message1.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": false };
+        message1.payload = {"result": { "path": [ "$", "issuer" ], "value": "did:foo:123" }, "valid": false };
         const message2 = { ...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
-        message2.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": false };
+        message2.payload = {"result": { "path": [ "$", "issuer" ], "value": "did:foo:123" }, "valid": false };
         const results: HandlerCheckResult[] = [];
         const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
         evaluationHandler.handle(presentationDefinition, inputCandidates, results);
@@ -107,9 +107,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
         const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
         presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
         const message1 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[1]' };
-        message1.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": true };
+        message1.payload = {"result": { "path": [ "$", "issuer" ], "value": "did:foo:123" }, "valid": true };
         const message2 = { ...message, ['verifiable_credential_path']: '$.verifiableCredential[2]' };
-        message2.payload = {"result": [{ "path": [ "$", "issuer" ], "value": "did:foo:123" },], "valid": true };
+        message2.payload = {"result": { "path": [ "$", "issuer" ], "value": "did:foo:123" }, "valid": true };
         const results: HandlerCheckResult[] = [];
         const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
         evaluationHandler.handle(presentationDefinition, inputCandidates, results);
