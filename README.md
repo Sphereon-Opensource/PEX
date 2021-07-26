@@ -5,6 +5,7 @@
   <br>
 </h1>
 
+[![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml)
 
 ## Background
 
