@@ -12,9 +12,8 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
 
   public handle(pd: PresentationDefinition, _p: unknown, results: HandlerCheckResult[]): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
-      const constraints: Constraints = pd.input_descriptors[i].constraints;
-      if (constraints) {
-        this.examinePredicateRelatedField(i, constraints, results);
+      if (pd.input_descriptors[i].constraints) {
+        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints, results);
       }
     }
   }
@@ -31,26 +30,42 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     }
   }
 
-  private examinePredicateForFilterEvaluationResult(results: HandlerCheckResult[], j: number, input_descriptor_idx: number, constraints: Constraints, i: number) {
-    const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[j].input_descriptor_path);
-    if (results[j].evaluator === 'FilterEvaluation' && input_descriptor_idx === resultInputDescriptorIdx && constraints.fields[i].predicate) {
-      if (constraints.fields[i].predicate === Optionality.Required) {
+  private examinePredicateForFilterEvaluationResult(
+    results: HandlerCheckResult[],
+    resultIdx: number,
+    input_descriptor_idx: number,
+    constraints: Constraints,
+    fieldIdx: number
+  ) {
+    const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[resultIdx].input_descriptor_path);
+    if (
+      results[resultIdx].payload &&
+      results[resultIdx].payload.result &&
+      results[resultIdx].payload.result.path &&
+      results[resultIdx].evaluator === 'FilterEvaluation' &&
+      input_descriptor_idx === resultInputDescriptorIdx &&
+      constraints.fields[fieldIdx].predicate &&
+      constraints.fields[fieldIdx].path.includes(this.concatenatePath(results[resultIdx].payload.result.path))
+    ) {
+      const evaluationResult = {...results[resultIdx].payload.result};
+      if (constraints.fields[fieldIdx].predicate === Optionality.Required) {
         results.push({
           input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-          verifiable_credential_path: results[j].verifiable_credential_path,
+          verifiable_credential_path: results[resultIdx].verifiable_credential_path,
           evaluator: this.getName(),
           status: Status.INFO,
           message: 'Input candidate valid for presentation submission',
-          payload: results[j].payload.result.value,
+          payload: evaluationResult,
         });
       } else {
+        evaluationResult.value = true;
         results.push({
           input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-          verifiable_credential_path: results[j].verifiable_credential_path,
+          verifiable_credential_path: results[resultIdx].verifiable_credential_path,
           evaluator: this.getName(),
           status: Status.INFO,
           message: 'Input candidate valid for presentation submission',
-          payload: true,
+          payload: evaluationResult,
         });
       }
     }
@@ -63,5 +78,13 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     const endIdx = startWithIdx.indexOf(']');
     const idx = startWithIdx.substring(0, endIdx);
     return parseInt(idx);
+  }
+
+  private concatenatePath(path) {
+    let completePath = ""
+    for (let i = 0; i < path.length; i++) {
+      completePath +=path[i]+".";
+    }
+    return completePath.substring(0, completePath.length-1);
   }
 }
