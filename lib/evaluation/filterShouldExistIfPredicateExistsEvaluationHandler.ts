@@ -17,7 +17,7 @@ export class FilterShouldExistIfPredicateExistsEvaluationHandler extends Abstrac
         for (let j = 0; j < inputDescriptor.constraints.fields.length; j++) {
           const field: Field = inputDescriptor.constraints.fields[j];
           if (field.predicate) {
-            const input_descriptor_path = 'root.input_descriptors[' + i + '].constraints.fields[' + j + ']';
+            const input_descriptor_path = '$.input_descriptors[' + i + '].constraints.fields[' + j + ']';
             if (field.filter) {
               results.push({
                 input_descriptor_path,
