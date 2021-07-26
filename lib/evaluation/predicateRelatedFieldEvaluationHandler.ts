@@ -26,31 +26,32 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   ): void {
     for (let i = 0; i < constraints.fields.length; i++) {
       for (let j = 0; j < results.length; j++) {
-        const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[j].input_descriptor_path);
-        if (results[j].evaluator !== 'FilterEvaluation' || input_descriptor_idx !== resultInputDescriptorIdx) {
-          continue;
-        }
-        if (constraints.fields[i].predicate) {
-          if (constraints.fields[i].predicate === Optionality.Required) {
-            results.push({
-              input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-              verifiable_credential_path: results[j].verifiable_credential_path,
-              evaluator: this.getName(),
-              status: Status.INFO,
-              message: 'Input candidate valid for presentation submission',
-              payload: results[j].payload.result.value,
-            });
-          } else {
-            results.push({
-              input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
-              verifiable_credential_path: results[j].verifiable_credential_path,
-              evaluator: this.getName(),
-              status: Status.INFO,
-              message: 'Input candidate valid for presentation submission',
-              payload: true,
-            });
-          }
-        }
+        this.examinePredicateForFilterEvaluationResult(results, j, input_descriptor_idx, constraints, i);
+      }
+    }
+  }
+
+  private examinePredicateForFilterEvaluationResult(results: HandlerCheckResult[], j: number, input_descriptor_idx: number, constraints: Constraints, i: number) {
+    const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[j].input_descriptor_path);
+    if (results[j].evaluator === 'FilterEvaluation' && input_descriptor_idx === resultInputDescriptorIdx && constraints.fields[i].predicate) {
+      if (constraints.fields[i].predicate === Optionality.Required) {
+        results.push({
+          input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
+          verifiable_credential_path: results[j].verifiable_credential_path,
+          evaluator: this.getName(),
+          status: Status.INFO,
+          message: 'Input candidate valid for presentation submission',
+          payload: results[j].payload.result.value,
+        });
+      } else {
+        results.push({
+          input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
+          verifiable_credential_path: results[j].verifiable_credential_path,
+          evaluator: this.getName(),
+          status: Status.INFO,
+          message: 'Input candidate valid for presentation submission',
+          payload: true,
+        });
       }
     }
   }
