@@ -18,7 +18,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         const vc = p.verifiableCredential[j];
         const input_descriptor_path = '$.input_descriptors[' + i + ']';
         const verifiable_credential_path = '$.verifiableCredential[' + j + '].constraints.fields[' + j + ']';
-        if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPDUri(vc), uris)) {
+        if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPresentationURI(vc), uris)) {
           results.push({
             input_descriptor_path,
             verifiable_credential_path,
@@ -41,25 +41,22 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static getPDUri(vc) {
-    const presentationDefinitionUris: string[] = [];
+  private static getPresentationURI(vc) {
+    const presentationURIs: string[] = [];
     if (vc.vc) {
-      presentationDefinitionUris.push(vc.vc['credentialSchema']);
+      presentationURIs.push(vc.vc['credentialSchema']);
     } else if (vc['credentialSchema'] && vc['credentialSchema']) {
       for (let i = 0; i < vc['credentialSchema'].length; i++) {
-        presentationDefinitionUris.push(vc['credentialSchema'][i].id);
+        presentationURIs.push(vc['credentialSchema'][i].id);
       }
     }
-    return presentationDefinitionUris;
+    return presentationURIs;
   }
 
   //TODO: move it to a utility class
-  private static stringsArePresentInList(
-    presentationDefinitionUris: string[],
-    input_descriptors_uri: string[]
-  ): boolean {
+  private static stringsArePresentInList(presentationDefinitionUris: string[], inputDescriptorsUri: string[]): boolean {
     for (let i = 0; i < presentationDefinitionUris.length; i++) {
-      if (input_descriptors_uri.find((el) => el === presentationDefinitionUris[i]) == undefined) {
+      if (inputDescriptorsUri.find((el) => el === presentationDefinitionUris[i]) == undefined) {
         return false;
       }
     }
