@@ -55,10 +55,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         const payload = { result: [], valid: false };
         this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed to find jsonpath property');
       } else if (!this.evaluateFilter(inputField[0], field)) {
-        const payload = { ['result']: { ...inputField[0] }, ['valid']: false };
+        const payload = { ['result']: [...inputField], ['valid']: false };
         this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
       } else {
-        const payload = { ['result']: { ...inputField[0] }, ['valid']: true };
+        const payload = { ['result']: [...inputField], ['valid']: true };
         results.push({
           ...this.createResultObject(inputDescriptor[0], vc[0], payload),
         });

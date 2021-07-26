@@ -37,12 +37,10 @@ export class EvaluationClient {
     const filterShouldExistIfPredicateEvaluationHandler = new FilterShouldExistIfPredicateExistsEvaluationHandler();
     const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
-    const filterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     uriEvaluation
       .setNext(filterShouldExistIfPredicateEvaluationHandler)
       .setNext(inputDescriptorFilterEvaluationHandler)
-      .setNext(predicateEvaluationHandler)
-      .setNext(filterEvaluationHandler);
+      .setNext(predicateEvaluationHandler);
 
     return uriEvaluation;
   }
