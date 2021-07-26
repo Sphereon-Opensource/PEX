@@ -6,7 +6,7 @@ import { EvaluationHandler } from './evaluationHandler';
 import { FilterShouldExistIfPredicateExistsEvaluationHandler } from './filterShouldExistIfPredicateExistsEvaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
-import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandlerEvaluationHandler';
+import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {

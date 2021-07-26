@@ -27,6 +27,37 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     results: HandlerCheckResult[]
   ): void {
     for (let i = 0; i < constraints.fields.length; i++) {
+      for (let j = 0; j < results.length; j++) {
+        const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[j].input_descriptor_path);
+        if (
+          results[j].evaluator !== 'FilterEvaluation' ||
+          !input_descriptor_idx ||
+          input_descriptor_idx !== resultInputDescriptorIdx
+        ) {
+          continue;
+        }
+        if (constraints.fields[i].predicate) {
+          if (constraints.fields[i].predicate === Optionality.Required) {
+            results.push({
+              input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
+              verifiable_credential_path: results[j].verifiable_credential_path,
+              evaluator: this.getName(),
+              status: Status.INFO,
+              message: 'Input candidate valid for presentation submission',
+              payload: results[j].payload.value,
+            });
+          } else {
+            results.push({
+              input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
+              verifiable_credential_path: results[j].verifiable_credential_path,
+              evaluator: this.getName(),
+              status: Status.INFO,
+              message: 'Input candidate valid for presentation submission',
+              payload: true,
+            });
+          }
+        }
+      }
       const field = constraints.fields[i];
       if (field.predicate) {
         this.checkPaths(input_descriptor_idx, i, field.predicate, field.path, verifiablePresentation, results);
@@ -55,8 +86,8 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
         : "It's preferred to have the predicate related field is present in the verifiableCredential.";
 
       const input_descriptor_path =
-        'root.input_descriptors[' + input_descriptor_idx + ']' + '.constraints.fields[' + constraint_field_idx + ']';
-      const verifiable_credential_path = 'root.verifiableCredential[' + i + ']';
+        '$.input_descriptors[' + input_descriptor_idx + ']' + '.constraints.fields[' + constraint_field_idx + ']';
+      const verifiable_credential_path = '$.verifiableCredential[' + i + ']';
       results.push({
         input_descriptor_path,
         verifiable_credential_path,
@@ -65,5 +96,16 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
         message: message,
       });
     }
+  }
+
+  private retrieveResultInputDescriptorIdx(input_descriptor_path: string): number {
+    const startIdx = input_descriptor_path.search('$.input_descriptors[');
+    if (startIdx) {
+      const startWithIdx = input_descriptor_path.substring(startIdx);
+      const endIdx = startWithIdx.search(']');
+      const idx = startWithIdx.substring(0, endIdx);
+      return parseInt(idx);
+    }
+    return null;
   }
 }
