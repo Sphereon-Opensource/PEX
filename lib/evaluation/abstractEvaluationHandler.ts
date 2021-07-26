@@ -21,9 +21,5 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this.nextHandler != undefined;
   }
 
-  public handle(d: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void {
-    if (this.nextHandler) {
-      this.nextHandler.handle(d, p, results);
-    }
-  }
+  public abstract handle(d: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void;
 }
