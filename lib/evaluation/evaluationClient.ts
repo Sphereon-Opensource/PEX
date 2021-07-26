@@ -18,12 +18,12 @@ export class EvaluationClient {
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
     const results: HandlerCheckResult[] = [];
-    let rootHandler: EvaluationHandler = this.initEvaluationHandlers();
-    rootHandler.handle(pd, vp, results);
-    while (rootHandler.hasNext()) {
-      rootHandler = rootHandler.getNext();
+    let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
+    currentHandler.handle(pd, vp, results);
+    while (currentHandler.hasNext()) {
+      currentHandler = currentHandler.getNext();
       try {
-        rootHandler.handle(pd, vp, results);
+        currentHandler.handle(pd, vp, results);
       } catch (e) {
         this.failed_catched.message += e.message;
         throw this.failed_catched;
