@@ -1,10 +1,11 @@
 import fs from 'fs';
+
 import { PresentationDefinition } from "@sphereon/pe-models";
 
 import { Status } from '../../lib';
-import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/inputDescriptorFilterEvaluationHandler';
-import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
+import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
+import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/inputDescriptorFilterEvaluationHandler';
 
 const message: HandlerCheckResult = {
     input_descriptor_path: `$.input_descriptors[0]`,
