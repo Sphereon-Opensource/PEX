@@ -16,7 +16,7 @@ const message: HandlerCheckResult = {
   message: 'Input candidate valid for presentation submission'
 }
 
-function getFile(path: string): any {
+function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
@@ -32,9 +32,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
 
@@ -48,9 +51,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
 
@@ -64,9 +70,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
 
@@ -84,9 +93,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": false};
     const message2 = {...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": false};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
 
@@ -100,9 +112,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
     const message2 = {...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
 
@@ -114,9 +129,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
-    const results: HandlerCheckResult[] = [];
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    evaluationHandler.handle(presentationDefinition, inputCandidates, results);
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission = {};
+    evaluationHandler.setPresentationSubmission(presentationSubmission);
+    evaluationHandler.setResults(results);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message, message1, message2]);
   });
 });

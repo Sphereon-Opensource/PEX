@@ -5,9 +5,17 @@ import { HandlerCheckResult } from './handlerCheckResult';
 
 export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   private nextHandler: EvaluationHandler;
+  protected results: HandlerCheckResult[];
+  protected presentationSubmission: unknown;
 
   public setNext(handler: EvaluationHandler): EvaluationHandler {
+    if (!this.results || !this.presentationSubmission) {
+      this.results = [];
+      this.presentationSubmission = {};
+    }
     this.nextHandler = handler;
+    handler.setResults(this.results);
+    handler.setPresentationSubmission(this.presentationSubmission);
     return handler;
   }
 
@@ -21,5 +29,17 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this.nextHandler != undefined;
   }
 
-  public abstract handle(d: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void;
+  getResults(): HandlerCheckResult[] {
+    return this.results;
+  }
+
+  public setResults(results: HandlerCheckResult[]): void {
+    this.results = results;
+  }
+
+  public setPresentationSubmission(presentationSubmission: unknown): void {
+    this.presentationSubmission = presentationSubmission;
+  }
+
+  public abstract handle(d: PresentationDefinition, p: unknown): void;
 }

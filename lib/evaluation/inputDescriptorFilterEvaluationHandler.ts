@@ -12,24 +12,20 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: any, results: HandlerCheckResult[]): void {
+  public handle(pd: PresentationDefinition, p: any): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
     for (const vc of p.verifiableCredential.entries()) {
-      this.iterateOverInputDescriptors(inputDescriptors, vc, results);
+      this.iterateOverInputDescriptors(inputDescriptors, vc);
     }
   }
 
-  private iterateOverInputDescriptors(
-    inputDescriptors: InputDescriptor[],
-    vc: [number, any],
-    results: HandlerCheckResult[]
-  ): void {
+  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, unknown]): void {
     for (const inputDescriptor of inputDescriptors.entries()) {
       if (this.hasFields(inputDescriptor)) {
-        this.iterateOverFields(inputDescriptor, vc, results);
+        this.iterateOverFields(inputDescriptor, vc);
       } else {
         const payload = { result: [], valid: true };
-        results.push({
+        this.results.push({
           ...this.createResultObject(inputDescriptor[0], vc[0], payload),
         });
       }
@@ -44,22 +40,18 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     );
   }
 
-  private iterateOverFields(
-    inputDescriptor: [number, InputDescriptor],
-    vc: [number, any],
-    results: HandlerCheckResult[]
-  ): void {
+  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, unknown]): void {
     for (const field of inputDescriptor[1].constraints.fields) {
       const inputField = this.extractInputField(vc[1], field);
       if (!inputField.length) {
         const payload = { result: [], valid: false };
-        this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed to find jsonpath property');
+        this.createResponse(inputDescriptor, vc, payload, 'Input candidate failed to find jsonpath property');
       } else if (!this.evaluateFilter(inputField[0], field)) {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: false };
-        this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
+        this.createResponse(inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
       } else {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: true };
-        results.push({
+        this.results.push({
           ...this.createResultObject(inputDescriptor[0], vc[0], payload),
         });
       }
@@ -67,20 +59,19 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private createResponse(
-    results: HandlerCheckResult[],
     inputDescriptor: [number, InputDescriptor],
-    vc: [number, any],
-    payload: { result: any[]; valid: boolean },
+    vc: [number, unknown],
+    payload: { result: unknown[]; valid: boolean },
     message: string
   ) {
-    results.push({
+    this.results.push({
       ...this.createResultObject(inputDescriptor[0], vc[0], payload),
       ['status']: Status.ERROR,
       ['message']: message,
     });
   }
 
-  private createResultObject(idIndex: number, vcIndex: number, payload: any): HandlerCheckResult {
+  private createResultObject(idIndex: number, vcIndex: number, payload: unknown): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIndex}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIndex}]`,
@@ -91,7 +82,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private extractInputField(inputCandidate: any, field: Field): any {
+  private extractInputField(inputCandidate: unknown, field: Field): any {
     let result = [];
     for (const path of field.path) {
       result = jp.nodes(inputCandidate, path);

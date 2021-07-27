@@ -16,19 +16,18 @@ export class EvaluationClient {
   };
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
-    const results: HandlerCheckResult[] = [];
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp, results);
+    currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler.handle(pd, vp, results);
+        currentHandler.handle(pd, vp);
       } catch (e) {
         this.failed_catched.message += e.message;
         throw this.failed_catched;
       }
     }
-    return results;
+    return currentHandler.getResults();
   }
 
   private initEvaluationHandlers() {

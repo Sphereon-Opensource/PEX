@@ -7,5 +7,8 @@ export interface EvaluationHandler {
   getNext(): EvaluationHandler;
   hasNext(): boolean;
   getName(): string;
-  handle(pd: PresentationDefinition, p: unknown, results: HandlerCheckResult[]): void;
+  setResults(results: HandlerCheckResult[]): void;
+  getResults(): HandlerCheckResult[];
+  setPresentationSubmission(presentationSubmission: unknown): void;
+  handle(pd: PresentationDefinition, p: unknown): void;
 }

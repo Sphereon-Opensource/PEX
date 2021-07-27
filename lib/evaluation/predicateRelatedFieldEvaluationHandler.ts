@@ -10,22 +10,18 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     return 'PredicateRelatedField';
   }
 
-  public handle(pd: PresentationDefinition, _p: unknown, results: HandlerCheckResult[]): void {
+  public handle(pd: PresentationDefinition): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       if (pd.input_descriptors[i].constraints && pd.input_descriptors[i].constraints.fields) {
-        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints, results);
+        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints);
       }
     }
   }
 
-  private examinePredicateRelatedField(
-    input_descriptor_idx: number,
-    constraints: Constraints,
-    results: HandlerCheckResult[]
-  ): void {
+  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {
     for (let i = 0; i < constraints.fields.length; i++) {
-      for (let j = 0; j < results.length; j++) {
-        this.examinePredicateForFilterEvaluationResult(results, j, input_descriptor_idx, constraints, i);
+      for (let j = 0; j < this.results.length; j++) {
+        this.examinePredicateForFilterEvaluationResult(this.results, j, input_descriptor_idx, constraints, i);
       }
     }
   }
