@@ -28,7 +28,8 @@
     "@sphereon/pe-models": "0.0.4",
     "ajv": "^8.1.0",
     "ajv-formats": "^2.1.0",
-    "jsonpath": "^1.1.1"
+    "jsonpath": "^1.1.1",
+    "nanoid": "^3.1.23"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

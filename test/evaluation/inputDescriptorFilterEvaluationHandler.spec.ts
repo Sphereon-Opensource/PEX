@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from "@sphereon/pe-models";
+import { PresentationDefinition, PresentationSubmission } from "@sphereon/pe-models";
 
 import { Status } from '../../lib';
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
@@ -34,9 +34,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
@@ -53,9 +53,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
@@ -72,9 +72,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
@@ -95,9 +95,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": false};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
@@ -114,9 +114,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message0, message1, message2]);
   });
@@ -131,9 +131,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const results: HandlerCheckResult[] = [];
-    const presentationSubmission = {};
-    evaluationHandler.setPresentationSubmission(presentationSubmission);
-    evaluationHandler.setResults(results);
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message, message1, message2]);
   });

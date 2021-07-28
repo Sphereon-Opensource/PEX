@@ -5,6 +5,7 @@ import { Checked, Status } from '../ConstraintUtils';
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
+import { MarkForSubmissionEvaluationHandler } from './markForSumissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
@@ -27,14 +28,18 @@ export class EvaluationClient {
         throw this.failed_catched;
       }
     }
-    return currentHandler.getResults();
+    return currentHandler.results;
   }
 
   private initEvaluationHandlers() {
     const uriEvaluation = new UriEvaluationHandler();
     const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
-    uriEvaluation.setNext(inputDescriptorFilterEvaluationHandler).setNext(predicateEvaluationHandler);
+    const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler();
+    uriEvaluation
+      .setNext(inputDescriptorFilterEvaluationHandler)
+      .setNext(predicateEvaluationHandler)
+      .setNext(markForSubmissionEvaluation);
 
     return uriEvaluation;
   }
