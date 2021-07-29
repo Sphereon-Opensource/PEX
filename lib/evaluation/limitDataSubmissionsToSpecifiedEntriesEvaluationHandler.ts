@@ -16,7 +16,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
   }
 
   //TODO: what is the necessary field? "@context", "credentialSchema", "credentialSubject", "type"
-  static mandatoryFields: string[] = [ '@context', 'credentialSchema', 'credentialSubject', 'type' ];
+  static mandatoryFields: string[] = ['@context', 'credentialSchema', 'credentialSubject', 'type'];
 
   public handle(pd: PresentationDefinition, p: unknown): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
@@ -90,11 +90,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
     }
   }
 
-  private createMandatoryFieldNotFoundResult(
-    idIdx: number,
-    vcIdx: number,
-    path: Array<string>
-  ) {
+  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
     return this.results.push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,

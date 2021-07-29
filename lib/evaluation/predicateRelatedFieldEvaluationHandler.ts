@@ -12,7 +12,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   }
 
   public getName(): string {
-    return 'PredicateRelatedField';
+    return 'PredicateRelatedFieldEvaluation';
   }
 
   public handle(pd: PresentationDefinition): void {
