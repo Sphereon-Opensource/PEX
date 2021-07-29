@@ -128,16 +128,15 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   //TODO: change it according to Maikel's changes
   private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any) {
-    if(this.verifiablePresentation.verifiableCredential) {
+    if (this.verifiablePresentation.verifiableCredential) {
       for (let i = 0; i < this.verifiablePresentation.verifiableCredential.length; i++) {
         if (this.verifiablePresentation.verifiableCredential[i].id === verifiableCredentialToSend.id) {
-          this.verifiablePresentation.verifiableCredential[i] = {...verifiableCredentialToSend};
+          this.verifiablePresentation.verifiableCredential[i] = { ...verifiableCredentialToSend };
         }
       }
     } else {
       this.verifiablePresentation.verifiableCredential = [];
       this.verifiablePresentation.verifiableCredential.push(verifiableCredentialToSend);
     }
-
   }
 }
