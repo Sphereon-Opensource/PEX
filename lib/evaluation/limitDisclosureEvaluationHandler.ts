@@ -6,13 +6,13 @@ import { JsonPathUtils } from '../utils/jsonPathUtils';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
 
-export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends AbstractEvaluationHandler {
+export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
     super(client);
   }
 
   public getName(): string {
-    return 'LimitDataSubmissionsEvaluation';
+    return 'LimitDisclosureEvaluation';
   }
 
   //TODO: what is the necessary field? "@context", "credentialSchema", "credentialSubject", "type"
@@ -49,7 +49,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
         inputDescriptorIdx,
         i
       );
-      //this.presentationSubmission =
+      this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend);
     }
   }
 
@@ -58,10 +58,10 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
     verifiableCredentialToSend: unknown,
     keys: string[]
   ): string[] {
-    for (let i = 0; i < LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler.mandatoryFields.length; i++) {
-      verifiableCredentialToSend[LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler.mandatoryFields[i]] =
-        verifiableCredential[LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler.mandatoryFields[i]];
-      const index = keys.indexOf(LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler.mandatoryFields[i]);
+    for (let i = 0; i < LimitDisclosureEvaluationHandler.mandatoryFields.length; i++) {
+      verifiableCredentialToSend[LimitDisclosureEvaluationHandler.mandatoryFields[i]] =
+        verifiableCredential[LimitDisclosureEvaluationHandler.mandatoryFields[i]];
+      const index = keys.indexOf(LimitDisclosureEvaluationHandler.mandatoryFields[i]);
       if (index > -1) {
         keys.splice(index, 1);
       }
@@ -80,7 +80,6 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
       const result = JsonPathUtils.extractInputField(vc, field.path);
-      console.log(result);
       if (result.length > 0) {
         //TODO: do we need to consider other paths here?
         this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx);
@@ -125,5 +124,20 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
         currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
       }
     }
+  }
+
+  //TODO: change it according to Maikel's changes
+  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any) {
+    if(this.verifiablePresentation.verifiableCredential) {
+      for (let i = 0; i < this.verifiablePresentation.verifiableCredential.length; i++) {
+        if (this.verifiablePresentation.verifiableCredential[i].id === verifiableCredentialToSend.id) {
+          this.verifiablePresentation.verifiableCredential[i] = {...verifiableCredentialToSend};
+        }
+      }
+    } else {
+      this.verifiablePresentation.verifiableCredential = [];
+      this.verifiablePresentation.verifiableCredential.push(verifiableCredentialToSend);
+    }
+
   }
 }

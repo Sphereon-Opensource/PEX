@@ -5,7 +5,7 @@ import { Checked, Status } from '../ConstraintUtils';
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
-import { LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler } from './limitDataSubmissionsToSpecifiedEntriesEvaluationHandler';
+import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSumissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
@@ -44,7 +44,7 @@ export class EvaluationClient {
     return this._results;
   }
 
-  get verifiablePresentation(): unknown {
+  get verifiablePresentation(): any {
     return this._verifiablePresentation;
   }
 
@@ -53,14 +53,12 @@ export class EvaluationClient {
     const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler(this);
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler(this);
     const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler(this);
-    const limitDataSubmissionsToSpecifiedEntriesEvaluationHandler = new LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler(
-      this
-    );
+    const limitDisclosureEvaluationHandler = new LimitDisclosureEvaluationHandler(this);
     uriEvaluation
       .setNext(inputDescriptorFilterEvaluationHandler)
       .setNext(predicateEvaluationHandler)
       .setNext(markForSubmissionEvaluation)
-      .setNext(limitDataSubmissionsToSpecifiedEntriesEvaluationHandler);
+      .setNext(limitDisclosureEvaluationHandler);
 
     return uriEvaluation;
   }
