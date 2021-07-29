@@ -12,18 +12,18 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
   }
 
   public getName(): string {
-    return 'LimitDataSubmissions';
+    return 'LimitDataSubmissionsEvaluation';
   }
 
   //TODO: what is the necessary field? "@context", "credentialSchema", "credentialSubject", "type"
-  static mandatoryFields: string[] = ['@context', 'credentialSchema', 'credentialSubject', 'type'];
+  static mandatoryFields: string[] = [ '@context', 'credentialSchema', 'credentialSubject', 'type' ];
 
   public handle(pd: PresentationDefinition, p: unknown): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const constraints: Constraints = pd.input_descriptors[i].constraints;
       //TODO: write the impl for "limitDisclosureShouldBeEnforced" as well. Should it generate WARNING?
-      if (constraints && constraints.limit_disclosure) {
-        this.limitDisclosureShouldBeEnforced(p, constraints.fields, i, constraints.limit_disclosure);
+      if (constraints && constraints.limit_disclosure && constraints.limit_disclosure === Optionality.Required) {
+        this.limitDisclosureShouldBeEnforced(p, constraints.fields, i);
       }
     }
   }
@@ -31,8 +31,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
   private limitDisclosureShouldBeEnforced(
     verifiablePresentation: any,
     fields: Field[],
-    inputDescriptorIdx: number,
-    enforcingPolicy: Optionality
+    inputDescriptorIdx: number
   ): void {
     for (let i = 0; i < verifiablePresentation.verifiableCredential.length; i++) {
       const verifiableCredentialToSend = {};
@@ -48,8 +47,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
         keys,
         fields,
         inputDescriptorIdx,
-        i,
-        enforcingPolicy
+        i
       );
       //this.presentationSubmission =
     }
@@ -77,8 +75,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
     _keys: string[],
     fields: Field[],
     idIdx: number,
-    vcIdx: number,
-    enforcingPolicy: Optionality
+    vcIdx: number
   ) {
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
@@ -86,7 +83,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
       console.log(result);
       if (result.length > 0) {
         //TODO: do we need to consider other paths here?
-        this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx, enforcingPolicy);
+        this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx);
       } else {
         this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
       }
@@ -94,13 +91,13 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
   }
 
   private createMandatoryFieldNotFoundResult(
-    inputDescriptorIdx: number,
-    verifiableCredentialIdx: number,
+    idIdx: number,
+    vcIdx: number,
     path: Array<string>
   ) {
     return this.results.push({
-      input_descriptor_path: `$.input_descriptors[${inputDescriptorIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${verifiableCredentialIdx}]`,
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
       message: 'mandatory field not present in the verifiableCredential',
@@ -113,8 +110,7 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
     verifiableCredential: unknown,
     verifiableCredentialToSend: unknown,
     _idIdx: number,
-    _vcIdx: number,
-    _enforcingPolicy: Optionality
+    _vcIdx: number
   ) {
     let objectCursor = verifiableCredential;
     let currentCursorInToSendObj = verifiableCredentialToSend;
@@ -133,8 +129,5 @@ export class LimitDataSubmissionsToSpecifiedEntriesEvaluationHandler extends Abs
         currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
       }
     }
-    currentCursorInToSendObj = objectCursor;
-    console.log('verifiableCredentialToSend:', verifiableCredentialToSend);
-    console.log('currentCursorInToSendObj:', currentCursorInToSendObj);
   }
 }
