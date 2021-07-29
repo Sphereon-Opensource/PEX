@@ -1,4 +1,4 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationHandler } from './evaluationHandler';
@@ -38,8 +38,8 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
 
   public abstract handle(d: PresentationDefinition, p: unknown): void;
 
-  get presentationSubmission(): PresentationSubmission {
-    return this.client.presentationSubmission;
+  get verifiablePresentation(): any {
+    return this.client.verifiablePresentation;
   }
   get results(): HandlerCheckResult[] {
     return this.client.results;

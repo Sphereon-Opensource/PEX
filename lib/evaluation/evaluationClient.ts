@@ -1,4 +1,4 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
 
@@ -13,7 +13,7 @@ import { UriEvaluationHandler } from './uriEvaluationHandler';
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._presentationSubmission = { id: '', definition_id: '', descriptor_map: [] };
+    this._verifiablePresentation = {};
   }
 
   private failed_catched: Checked = {
@@ -23,7 +23,7 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _presentationSubmission: PresentationSubmission;
+  private _verifiablePresentation: unknown;
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
@@ -44,8 +44,8 @@ export class EvaluationClient {
     return this._results;
   }
 
-  get presentationSubmission(): PresentationSubmission {
-    return this._presentationSubmission;
+  get verifiablePresentation(): unknown {
+    return this._verifiablePresentation;
   }
 
   private initEvaluationHandlers() {
