@@ -42,7 +42,7 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const results: HandlerCheckResult[] = evaluationClient.evaluate(pdSchema, vpSimple);
-    expect(results[1]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'FilterEvaluation', Status.ERROR, "Input candidate failed to find jsonpath property", {
+    expect(results[1]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'FilterEvaluation', Status.ERROR, "Input candidate does not contain property", {
       "result": [],
       "valid": false
     }));

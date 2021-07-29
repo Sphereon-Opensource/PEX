@@ -86,7 +86,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message0 = {
       ...message,
       ['status']: Status.ERROR,
-      ['message']: 'Input candidate failed to find jsonpath property'
+      ['message']: 'Input candidate does not contain property'
     };
     message0.payload = {"result": [], "valid": false};
     const message1 = {...message0, ['verifiable_credential_path']: '$.verifiableCredential[1]'};
@@ -136,5 +136,28 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     expect(results).toEqual([message, message1, message2]);
+  });
+
+  it(`input descriptor's constraint.fields.filter match and nested_path`, () => {
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
+    presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[6]];
+    const message0 = {...message, ['verifiable_credential_path']: '$.outerClaim[0]' };
+    const message1 = {...message0, ['payload']: { "result": { "path": ["$", "vc", "credentialSubject", "accounts", 0, "id"], "value": "1234567890" }, "valid": true } }
+    const message2 = {...message1, ['payload']: { "result": { "path": ["$", "vc", "credentialSubject", "accounts", 0, "route"], "value": "876543210" }, "valid": true } }
+    const message3 = {...message0, ['verifiable_credential_path']: '$.innerClaim[0]' };
+    const message4 = {...message1, ['verifiable_credential_path']: '$.innerClaim[0]' };
+    const message5 = {...message2, ['verifiable_credential_path']: '$.innerClaim[0]' };
+    const message6 = {...message0, ['verifiable_credential_path']: '$.mostInnerClaim[0]' };
+    const message7 = {...message1, ['verifiable_credential_path']: '$.mostInnerClaim[0]' };
+    const message8 = {...message2, ['verifiable_credential_path']: '$.mostInnerClaim[0]' };
+    const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler();
+    const results: HandlerCheckResult[] = [];
+    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
+    evaluationHandler.presentationSubmission = presentationSubmission;
+    evaluationHandler.results = results;
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    const t = results.filter(result => result.status === Status.INFO);
+    expect(t).toEqual([message0, message1, message2, message3, message4, message5, message6, message7, message8]);
   });
 });

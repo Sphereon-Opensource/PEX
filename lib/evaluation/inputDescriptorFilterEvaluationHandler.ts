@@ -14,20 +14,27 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
 
   public handle(pd: PresentationDefinition, p: any): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
-    for (const vc of p.verifiableCredential.entries()) {
-      this.iterateOverInputDescriptors(inputDescriptors, vc);
+    this.iterateOverInputCandidates(inputDescriptors, p);
+  }
+
+  private iterateOverInputCandidates(inputDescriptors: InputDescriptor[], inputCandidates: any): void {
+    const props = Object.entries(inputCandidates).filter(x => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object') as Array<[string, Array<object>]>;
+    for (const [key, value] of props) {
+      for (const vc of value.entries()) {
+        this.iterateOverInputDescriptors(inputDescriptors, vc, key);
+      }
     }
   }
 
-  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, unknown]): void {
-    for (const inputDescriptor of inputDescriptors.entries()) {
-      if (this.hasFields(inputDescriptor)) {
-        this.iterateOverFields(inputDescriptor, vc);
-      } else {
-        const payload = { result: [], valid: true };
-        this.results.push({
-          ...this.createResultObject(inputDescriptor[0], vc[0], payload),
-        });
+  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, object], path: string): void {
+        for (const inputDescriptor of inputDescriptors.entries()) {
+          if (this.hasFields(inputDescriptor)) {
+            this.iterateOverFields(inputDescriptor, vc, path);
+          } else {
+            const payload = { result: [], valid: true };
+            this.results.push({
+              ...this.createResultObject(path, inputDescriptor[0], vc[0], payload)
+            });
       }
     }
   }
@@ -40,41 +47,42 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     );
   }
 
-  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, unknown]): void {
+  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, any], path: string): void {
     for (const field of inputDescriptor[1].constraints.fields) {
       const inputField = this.extractInputField(vc[1], field);
       if (!inputField.length) {
         const payload = { result: [], valid: false };
-        this.createResponse(inputDescriptor, vc, payload, 'Input candidate failed to find jsonpath property');
+        this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate does not contain property');
       } else if (!this.evaluateFilter(inputField[0], field)) {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: false };
-        this.createResponse(inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
+        this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
       } else {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: true };
         this.results.push({
-          ...this.createResultObject(inputDescriptor[0], vc[0], payload),
+          ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
         });
       }
     }
   }
 
   private createResponse(
+    path: string,
     inputDescriptor: [number, InputDescriptor],
     vc: [number, unknown],
     payload: { result: unknown[]; valid: boolean },
     message: string
   ) {
     this.results.push({
-      ...this.createResultObject(inputDescriptor[0], vc[0], payload),
+      ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
       ['status']: Status.ERROR,
       ['message']: message,
     });
   }
 
-  private createResultObject(idIndex: number, vcIndex: number, payload: unknown): HandlerCheckResult {
+  private createResultObject(path: string, idIndex: number, vcIndex: number, payload: unknown): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIndex}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIndex}]`,
+      verifiable_credential_path: `$.${path}[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: 'Input candidate valid for presentation submission',
