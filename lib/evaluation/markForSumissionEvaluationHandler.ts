@@ -4,9 +4,14 @@ import { nanoid } from 'nanoid';
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'MarkForSubmissionEvaluation';
   }

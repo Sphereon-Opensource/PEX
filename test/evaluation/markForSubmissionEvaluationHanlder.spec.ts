@@ -1,7 +1,8 @@
 import fs from 'fs';
 
-import { PresentationDefinition, PresentationSubmission } from "@sphereon/pe-models";
+import { PresentationDefinition } from "@sphereon/pe-models";
 
+import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { EvaluationHandler } from "../../lib/evaluation/evaluationHandler";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
 import { MarkForSubmissionEvaluationHandler } from "../../lib/evaluation/markForSumissionEvaluationHandler";
@@ -32,7 +33,7 @@ const results: HandlerCheckResult[] = [
   }
 ]
 
-function getFile(path: string): any {
+function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
@@ -42,10 +43,9 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationHandler: EvaluationHandler = new MarkForSubmissionEvaluationHandler();
-    const presentationSubmission: PresentationSubmission = { id: "", definition_id: "", descriptor_map: []};
-    evaluationHandler.presentationSubmission = presentationSubmission;
-    evaluationHandler.results =[...results];
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.results.push(...results)
+    const evaluationHandler: EvaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     const length = evaluationHandler.results.length;
     expect(evaluationHandler.results[length - 1]).toEqual({ 

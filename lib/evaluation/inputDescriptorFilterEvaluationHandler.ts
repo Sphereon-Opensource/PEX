@@ -5,9 +5,14 @@ import { Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils/jsonPathUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'FilterEvaluation';
   }

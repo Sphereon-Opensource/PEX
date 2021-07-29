@@ -1,21 +1,20 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
+import { EvaluationClient } from './evaluationClient';
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   private nextHandler: EvaluationHandler;
-  private _results: HandlerCheckResult[];
-  private _presentationSubmission: PresentationSubmission;
+
+  private _client: EvaluationClient;
+
+  constructor(client: EvaluationClient) {
+    this._client = client;
+  }
 
   public setNext(handler: EvaluationHandler): EvaluationHandler {
-    if (!this.results || !this.presentationSubmission) {
-      this._results = [];
-      this.presentationSubmission = { id: '', definition_id: '', descriptor_map: [] };
-    }
     this.nextHandler = handler;
-    handler.results = this.results;
-    handler.presentationSubmission = this.presentationSubmission;
     return handler;
   }
 
@@ -29,21 +28,20 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this.nextHandler != undefined;
   }
 
-  public get results(): HandlerCheckResult[] {
-    return this._results;
+  get client(): EvaluationClient {
+    return this._client;
   }
 
-  public set results(results: HandlerCheckResult[]) {
-    this._results = results;
-  }
-
-  public get presentationSubmission() {
-    return this._presentationSubmission;
-  }
-
-  public set presentationSubmission(presentationSubmission: PresentationSubmission) {
-    this._presentationSubmission = presentationSubmission;
+  set client(client: EvaluationClient) {
+    this._client = client;
   }
 
   public abstract handle(d: PresentationDefinition, p: unknown): void;
+
+  get presentationSubmission(): PresentationSubmission {
+    return this.client.presentationSubmission;
+  }
+  get results(): HandlerCheckResult[] {
+    return this.client.results;
+  }
 }
