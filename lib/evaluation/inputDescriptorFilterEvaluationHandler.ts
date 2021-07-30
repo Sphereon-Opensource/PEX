@@ -18,7 +18,9 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private iterateOverInputCandidates(inputDescriptors: InputDescriptor[], inputCandidates: any): void {
-    const props = Object.entries(inputCandidates).filter(x => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object') as Array<[string, Array<object>]>;
+    const props = Object.entries(inputCandidates).filter(
+      (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
+    ) as Array<[string, Array<unknown>]>;
     for (const [key, value] of props) {
       for (const vc of value.entries()) {
         this.iterateOverInputDescriptors(inputDescriptors, vc, key);
@@ -26,15 +28,15 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     }
   }
 
-  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, object], path: string): void {
-        for (const inputDescriptor of inputDescriptors.entries()) {
-          if (this.hasFields(inputDescriptor)) {
-            this.iterateOverFields(inputDescriptor, vc, path);
-          } else {
-            const payload = { result: [], valid: true };
-            this.results.push({
-              ...this.createResultObject(path, inputDescriptor[0], vc[0], payload)
-            });
+  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, unknown], path: string): void {
+    for (const inputDescriptor of inputDescriptors.entries()) {
+      if (this.hasFields(inputDescriptor)) {
+        this.iterateOverFields(inputDescriptor, vc, path);
+      } else {
+        const payload = { result: [], valid: true };
+        this.results.push({
+          ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
+        });
       }
     }
   }
