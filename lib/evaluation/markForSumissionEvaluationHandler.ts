@@ -4,9 +4,14 @@ import { nanoid } from 'nanoid';
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'MarkForSubmissionEvaluation';
   }
@@ -30,8 +35,10 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, inputDescriptors: InputDescriptor[]) {
-    this.presentationSubmission.id = nanoid();
-    this.presentationSubmission.definition_id = pd.id;
+    this.verifiablePresentation.presentationSubmission = {};
+    this.verifiablePresentation.presentationSubmission.descriptor_map = [];
+    this.verifiablePresentation.presentationSubmission.id = nanoid();
+    this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
     const info = this.results.filter(
       (result) => result.verifiable_credential_path === `$.verifiableCredential[${vc[0]}]`
     );
@@ -63,11 +70,11 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
 
   private pushToDescriptorsMap(descriptor: Descriptor) {
     if (
-      !this.presentationSubmission.descriptor_map.find(
+      !this.verifiablePresentation.presentationSubmission.descriptor_map.find(
         (d) => d.id === descriptor.id && d.path === descriptor.path && d.format === descriptor.format
       )
     ) {
-      this.presentationSubmission.descriptor_map.push(descriptor);
+      this.verifiablePresentation.presentationSubmission.descriptor_map.push(descriptor);
     }
   }
 }

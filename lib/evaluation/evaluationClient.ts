@@ -5,16 +5,25 @@ import { Checked, Status } from '../ConstraintUtils';
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
+import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSumissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
+  constructor() {
+    this._results = [];
+    this._verifiablePresentation = {};
+  }
+
   private failed_catched: Checked = {
     tag: 'root',
     status: Status.ERROR,
     message: 'unknown exception occurred: ',
   };
+
+  private _results: HandlerCheckResult[];
+  private _verifiablePresentation: unknown;
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
@@ -28,18 +37,28 @@ export class EvaluationClient {
         throw this.failed_catched;
       }
     }
-    return currentHandler.results;
+    return this._results;
+  }
+
+  get results(): HandlerCheckResult[] {
+    return this._results;
+  }
+
+  get verifiablePresentation(): any {
+    return this._verifiablePresentation;
   }
 
   private initEvaluationHandlers() {
-    const uriEvaluation = new UriEvaluationHandler();
-    const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler();
-    const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler();
-    const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler();
+    const uriEvaluation = new UriEvaluationHandler(this);
+    const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler(this);
+    const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler(this);
+    const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler(this);
+    const limitDisclosureEvaluationHandler = new LimitDisclosureEvaluationHandler(this);
     uriEvaluation
       .setNext(inputDescriptorFilterEvaluationHandler)
       .setNext(predicateEvaluationHandler)
-      .setNext(markForSubmissionEvaluation);
+      .setNext(markForSubmissionEvaluation)
+      .setNext(limitDisclosureEvaluationHandler);
 
     return uriEvaluation;
   }

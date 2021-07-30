@@ -1,13 +1,18 @@
 import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import Ajv from 'ajv';
-import jp from 'jsonpath';
 
 import { Status } from '../ConstraintUtils';
+import { JsonPathUtils } from '../utils/jsonPathUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'FilterEvaluation';
   }
@@ -51,7 +56,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
 
   private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, any], path: string): void {
     for (const field of inputDescriptor[1].constraints.fields) {
-      const inputField = this.extractInputField(vc[1], field);
+      const inputField = JsonPathUtils.extractInputField(vc[1], field.path);
       if (!inputField.length) {
         const payload = { result: [], valid: false };
         this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate does not contain property');
@@ -90,17 +95,6 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       message: 'Input candidate valid for presentation submission',
       payload,
     };
-  }
-
-  private extractInputField(inputCandidate: unknown, field: Field): any {
-    let result = [];
-    for (const path of field.path) {
-      result = jp.nodes(inputCandidate, path);
-      if (result.length) {
-        break;
-      }
-    }
-    return result;
   }
 
   private evaluateFilter(result: any, field: Field) {

@@ -1,10 +1,12 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export interface EvaluationHandler {
-  results: HandlerCheckResult[];
-  presentationSubmission: PresentationSubmission;
+  client: EvaluationClient;
+  readonly results: HandlerCheckResult[];
+  readonly verifiablePresentation: any;
   setNext(handler: EvaluationHandler): EvaluationHandler;
   getNext(): EvaluationHandler;
   hasNext(): boolean;

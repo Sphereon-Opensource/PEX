@@ -3,9 +3,14 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'UriEvaluation';
   }

@@ -3,11 +3,16 @@ import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-m
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
-    return 'PredicateRelatedField';
+    return 'PredicateRelatedFieldEvaluation';
   }
 
   public handle(pd: PresentationDefinition): void {
