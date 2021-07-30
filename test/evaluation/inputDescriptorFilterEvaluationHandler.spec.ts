@@ -157,7 +157,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     evaluationHandler.presentationSubmission = presentationSubmission;
     evaluationHandler.results = results;
     evaluationHandler.handle(presentationDefinition, inputCandidates);
-    const t = results.filter(result => result.status === Status.INFO);
-    expect(t).toEqual([message0, message1, message2, message3, message4, message5, message6, message7, message8]);
+    expect(results.filter(result => result.status === Status.INFO))
+    .toEqual([message0, message1, message2, message3, message4, message5, message6, message7, message8]);
   });
 });
