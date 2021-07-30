@@ -56,8 +56,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: "info",
       verifiable_credential_path: "$.verifiableCredential[0]"
     });
-    //TODO: Add this back
-    /*expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
       expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: [{
@@ -65,6 +64,6 @@ describe('markForSubmissionEvaluationHandler tests', () => {
         id: "banking_input_1",
         path: "$.verifiableCredential[0]",
       }]
-    }));*/
+    }));
   });
 });

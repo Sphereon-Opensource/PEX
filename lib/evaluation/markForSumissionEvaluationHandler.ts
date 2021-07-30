@@ -10,6 +10,9 @@ import { HandlerCheckResult } from './handlerCheckResult';
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
     super(client);
+    this.verifiablePresentation.presentationSubmission = {};
+    this.verifiablePresentation.presentationSubmission.descriptor_map = [];
+    this.verifiablePresentation.presentationSubmission.id = nanoid();
   }
 
   public getName(): string {
@@ -35,9 +38,6 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, inputDescriptors: InputDescriptor[]) {
-    this.verifiablePresentation.presentationSubmission = {};
-    this.verifiablePresentation.presentationSubmission.descriptor_map = [];
-    this.verifiablePresentation.presentationSubmission.id = nanoid();
     this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
     const info = this.results.filter(
       (result) => result.verifiable_credential_path === `$.verifiableCredential[${vc[0]}]`
