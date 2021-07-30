@@ -6,7 +6,7 @@ import { HandlerCheckResult } from './handlerCheckResult';
 export interface EvaluationHandler {
   client: EvaluationClient;
   readonly results: HandlerCheckResult[];
-  readonly verifiablePresentation: any;
+  readonly verifiablePresentation: unknown;
   setNext(handler: EvaluationHandler): EvaluationHandler;
   getNext(): EvaluationHandler;
   hasNext(): boolean;
