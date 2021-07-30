@@ -136,9 +136,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message8 = {...message2, ['verifiable_credential_path']: '$.mostInnerClaim[0]' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    const results: HandlerCheckResult[] = [];
     evaluationHandler.handle(presentationDefinition, inputCandidates);
-    expect(results.filter(result => result.status === Status.INFO))
+    expect(evaluationClient.results.filter(result => result.status === Status.INFO))
     .toEqual([message0, message1, message2, message3, message4, message5, message6, message7, message8]);
   });
 });
