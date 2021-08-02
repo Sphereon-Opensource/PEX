@@ -17,7 +17,8 @@
           "fields": [
             {
               "path": [
-                "$.age"
+                "$.age",
+                "$.details.age"
               ],
               "filter": {
                 "type": "integer",

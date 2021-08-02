@@ -78,7 +78,6 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       const field: Field = fields[i];
       const result = JsonPathUtils.extractInputField(vc, field.path);
       if (result.length > 0) {
-        //TODO: do we need to consider other paths here?
         this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx);
       } else {
         this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
