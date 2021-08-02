@@ -21,7 +21,6 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   public handle(pd: PresentationDefinition, p: unknown): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const constraints: Constraints = pd.input_descriptors[i].constraints;
-      //TODO: write the impl for "limitDisclosureShouldBeEnforced" as well. Should it generate WARNING?
       if (constraints && constraints.limit_disclosure && constraints.limit_disclosure === Optionality.Required) {
         this.limitDisclosureShouldBeEnforced(p, constraints.fields, i, pd.input_descriptors[i].id);
       }
@@ -45,7 +44,6 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       this.determineNecessaryPaths(
         verifiablePresentation.verifiableCredential[i],
         verifiableCredentialToSend,
-        keys,
         fields,
         idIdx,
         i
@@ -75,14 +73,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return keys;
   }
 
-  private determineNecessaryPaths(
-    vc: unknown,
-    vcToSend: unknown,
-    _keys: string[],
-    fields: Field[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private determineNecessaryPaths(vc: unknown, vcToSend: unknown, fields: Field[], idIdx: number, vcIdx: number) {
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
       const result = JsonPathUtils.extractInputField(vc, field.path);
