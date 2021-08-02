@@ -30,11 +30,11 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     for (let i = 0; i < this.verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
       const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, currentDescriptor.path);
-        if (vc.issuer.id === vc.credentialSubject.i) {
-          this.generateSuccessResult(idIdx, vp, vc.id);
+        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
+        if (vc[0].issuer.id === vc[0].credentialSubject.i) {
+          this.generateSuccessResult(idIdx, vp, vc[0].id);
         } else {
-          this.generateErrorResult(idIdx, vp, vc.id);
+          this.generateErrorResult(idIdx, vp, vc[0].id);
         }
       }
     }
