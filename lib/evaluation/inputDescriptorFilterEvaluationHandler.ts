@@ -22,6 +22,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.iterateOverInputCandidates(inputDescriptors, p);
   }
 
+  //TODO move to utils
   private iterateOverInputCandidates(inputDescriptors: InputDescriptor[], inputCandidates: any): void {
     const props = Object.entries(inputCandidates).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
