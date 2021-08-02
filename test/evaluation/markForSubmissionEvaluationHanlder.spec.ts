@@ -66,4 +66,62 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       }]
     }));
   });
+
+  it(`Mark input candidates with nested paths for presentation submission`, () => {
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
+    presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    results[0].verifiable_credential_path = "$.outerClaim[0]"
+    results[1].verifiable_credential_path = "$.innerClaim[1]"
+    results[2].verifiable_credential_path = "$.mostInnerClaim[2]"
+    evaluationClient.results.push(...results)
+    const evaluationHandler: EvaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
+    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    const length = evaluationHandler.results.length;
+    const actual = [evaluationHandler.results[length - 3], evaluationHandler.results[length - 2],evaluationHandler.results[length - 1]]
+    expect(actual).toEqual([{ 
+      evaluator: "MarkForSubmissionEvaluation",
+      input_descriptor_path: "$.input_descriptors[0]",
+      message: "The input candidate is eligible for submission",
+      payload: { group: ["A"] },
+      status: "info",
+      verifiable_credential_path: "$.outerClaim[0]"
+    },
+    { 
+      evaluator: "MarkForSubmissionEvaluation",
+      input_descriptor_path: "$.input_descriptors[0]",
+      message: "The input candidate is eligible for submission",
+      payload: { group: ["A"] },
+      status: "info",
+      verifiable_credential_path: "$.innerClaim[1]"
+    },
+    { 
+      evaluator: "MarkForSubmissionEvaluation",
+      input_descriptor_path: "$.input_descriptors[0]",
+      message: "The input candidate is eligible for submission",
+      payload: { group: ["A"] },
+      status: "info",
+      verifiable_credential_path: "$.mostInnerClaim[2]"
+    }]);
+    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+      expect.objectContaining({
+      definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+      descriptor_map: [
+        {"format": "ldp_vc",
+         "id": "banking_input_1",
+         "path": "$.outerClaim[0]", 
+         "path_nested": {
+           "format": "ldp_vc",
+           "id": "banking_input_1", 
+           "path": "$.innerClaim[1]",
+           "path_nested": {
+             "format": "ldp_vc",
+             "id": "banking_input_1", 
+             "path": "$.mostInnerClaim[2]"}
+            }
+          }
+        ]
+    }));
+  });
 });

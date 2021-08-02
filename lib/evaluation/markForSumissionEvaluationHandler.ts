@@ -20,29 +20,39 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   public handle(pd: PresentationDefinition, p: any): void {
-    const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
-    for (const vc of p.verifiableCredential.entries()) {
-      const error = this.results.find(
-        (result) =>
-          result.status === Status.ERROR && result.verifiable_credential_path === `$.verifiableCredential[${vc[0]}]`
-      );
-      if (error) {
-        this.results.push({
-          ...error,
-          message: 'The input candidate is not eligible for submission',
-        });
-      } else {
-        this.createPresentationSubmission(pd, vc, inputDescriptors);
+    this.iterateOverInputCandidates(pd, p);
+  }
+
+  //TODO move to utils
+  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: any): void {
+    const props = Object.entries(inputCandidates).filter(
+      (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
+    ) as Array<[string, Array<unknown>]>;
+    for (const [key, value] of props) {
+      for (const vc of value.entries()) {
+        this.iterateOverInputDescriptors(pd, vc, key);
       }
     }
   }
 
-  private createPresentationSubmission(pd: PresentationDefinition, vc: any, inputDescriptors: InputDescriptor[]) {
-    this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
-    const info = this.results.filter(
-      (result) => result.verifiable_credential_path === `$.verifiableCredential[${vc[0]}]`
+  private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, unknown], path: string): void {
+    const error = this.results.find(
+      (result) => result.status === Status.ERROR && result.verifiable_credential_path === `$.${path}[${vc[0]}]`
     );
-    this.handleInputDescriptors(inputDescriptors, info);
+    if (error) {
+      this.results.push({
+        ...error,
+        message: 'The input candidate is not eligible for submission',
+      });
+    } else {
+      this.createPresentationSubmission(pd, vc, path);
+    }
+  }
+
+  private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
+    this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
+    const info = this.results.filter((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
+    this.handleInputDescriptors(pd.input_descriptors, info);
   }
 
   private handleInputDescriptors(inputDescriptors: InputDescriptor[], info: HandlerCheckResult[]) {
@@ -68,13 +78,27 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     });
   }
 
-  private pushToDescriptorsMap(descriptor: Descriptor) {
-    if (
-      !this.verifiablePresentation.presentationSubmission.descriptor_map.find(
-        (d) => d.id === descriptor.id && d.path === descriptor.path && d.format === descriptor.format
+  private pushToDescriptorsMap(newDescriptor: Descriptor) {
+    const descriptorMap: Descriptor[] = this.verifiablePresentation.presentationSubmission.descriptor_map;
+    if (descriptorMap.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
+      this.verifiablePresentation.presentationSubmission.descriptor_map.forEach((d: Descriptor) =>
+        this.addPathNested(d, newDescriptor)
+      );
+    } else if (
+      !descriptorMap.find(
+        (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
-      this.verifiablePresentation.presentationSubmission.descriptor_map.push(descriptor);
+      this.verifiablePresentation.presentationSubmission.descriptor_map.push(newDescriptor);
     }
+  }
+
+  private addPathNested(descriptor: Descriptor, nestedDescriptor: Descriptor): Descriptor {
+    if (descriptor.path_nested) {
+      this.addPathNested(descriptor.path_nested, nestedDescriptor);
+    } else {
+      descriptor.path_nested = nestedDescriptor;
+    }
+    return descriptor;
   }
 }
