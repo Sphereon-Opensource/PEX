@@ -8,6 +8,7 @@ import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterE
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
+import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
@@ -54,11 +55,13 @@ export class EvaluationClient {
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler(this);
     const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler(this);
     const limitDisclosureEvaluationHandler = new LimitDisclosureEvaluationHandler(this);
+    const subjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(this);
     uriEvaluation
       .setNext(inputDescriptorFilterEvaluationHandler)
       .setNext(predicateEvaluationHandler)
       .setNext(markForSubmissionEvaluation)
-      .setNext(limitDisclosureEvaluationHandler);
+      .setNext(limitDisclosureEvaluationHandler)
+      .setNext(subjectIsIssuerEvaluationHandler);
 
     return uriEvaluation;
   }
