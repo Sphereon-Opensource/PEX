@@ -52,13 +52,22 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
     this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
     const info = this.results.filter((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
-    this.handleInputDescriptors(pd.input_descriptors, info);
+    if (!this.verifiablePresentation[`${path}`]) {
+      this.verifiablePresentation[`${path}`] = [];
+    }
+    this.handleInputDescriptors(pd.input_descriptors, vc, info, path);
   }
 
-  private handleInputDescriptors(inputDescriptors: InputDescriptor[], info: HandlerCheckResult[]) {
+  private handleInputDescriptors(
+    inputDescriptors: InputDescriptor[],
+    vc: [number, any],
+    info: HandlerCheckResult[],
+    path: string
+  ) {
     for (const id of inputDescriptors.entries()) {
       for (const r of info) {
         if (r.input_descriptor_path === `$.input_descriptors[${id[0]}]`) {
+          this.verifiablePresentation[`${path}`].push(vc[1]);
           const descriptor: Descriptor = { id: id[1].id, format: 'ldp_vc', path: r.verifiable_credential_path };
           this.pushToDescriptorsMap(descriptor);
           this.pushToResults(r, id);
