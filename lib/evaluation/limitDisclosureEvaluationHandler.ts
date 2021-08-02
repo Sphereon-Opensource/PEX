@@ -35,12 +35,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   ): void {
     for (let i = 0; i < verifiablePresentation.verifiableCredential.length; i++) {
       const verifiableCredentialToSend = {};
-      let keys = Object.keys(verifiablePresentation.verifiableCredential[i]);
-      keys = this.copyMandatoryFieldsAndDeletePredefinedKeys(
-        verifiablePresentation.verifiableCredential[i],
-        verifiableCredentialToSend,
-        keys
-      );
+      this.copyMandatoryFields(verifiablePresentation.verifiableCredential[i], verifiableCredentialToSend);
       this.determineNecessaryPaths(
         verifiablePresentation.verifiableCredential[i],
         verifiableCredentialToSend,
@@ -57,20 +52,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private copyMandatoryFieldsAndDeletePredefinedKeys(
-    verifiableCredential: unknown,
-    verifiableCredentialToSend: unknown,
-    keys: string[]
-  ): string[] {
+  private copyMandatoryFields(verifiableCredential: unknown, verifiableCredentialToSend: unknown): void {
     for (let i = 0; i < LimitDisclosureEvaluationHandler.mandatoryFields.length; i++) {
       verifiableCredentialToSend[LimitDisclosureEvaluationHandler.mandatoryFields[i]] =
         verifiableCredential[LimitDisclosureEvaluationHandler.mandatoryFields[i]];
-      const index = keys.indexOf(LimitDisclosureEvaluationHandler.mandatoryFields[i]);
-      if (index > -1) {
-        keys.splice(index, 1);
-      }
     }
-    return keys;
   }
 
   private determineNecessaryPaths(vc: unknown, vcToSend: unknown, fields: Field[], idIdx: number, vcIdx: number) {
