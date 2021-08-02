@@ -123,5 +123,80 @@ describe('markForSubmissionEvaluationHandler tests', () => {
           }
         ]
     }));
+    expect(evaluationHandler.verifiablePresentation.outerClaim).toEqual([{
+      comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+      vc: {
+        "@context": "https://www.w3.org/2018/credentials/v1",
+        id: "https://eu.com/claims/DriversLicense",
+        type: [
+          "EUDriversLicense",
+        ],
+        issuer: "did:example:123",
+        issuanceDate: "2010-01-01T19:73:24Z",
+        credentialSubject: {
+          id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
+          accounts: [
+            {
+              id: "1234567890",
+              route: "876543210",
+            },
+            {
+              id: "2457913570",
+              route: "DE-0753197542",
+            },
+          ],
+        },
+      },
+    }]);
+    expect(evaluationHandler.verifiablePresentation.innerClaim).toEqual([{
+      comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+      vc: {
+        "@context": "https://www.w3.org/2018/credentials/v1",
+        id: "https://eu.com/claims/DriversLicense",
+        type: [
+          "EUDriversLicense",
+        ],
+        issuer: "did:example:123",
+        issuanceDate: "2010-01-01T19:73:24Z",
+        credentialSubject: {
+          id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
+          accounts: [
+            {
+              id: "1234567890",
+              route: "876543210",
+            },
+            {
+              id: "2457913570",
+              route: "DE-0753197542",
+            },
+          ],
+        },
+      },
+    }]);
+    expect(evaluationHandler.verifiablePresentation.mostInnerClaim).toEqual([{
+      comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+      vc: {
+        "@context": "https://www.w3.org/2018/credentials/v1",
+        id: "https://eu.com/claims/DriversLicense",
+        type: [
+          "EUDriversLicense",
+        ],
+        issuer: "did:example:123",
+        issuanceDate: "2010-01-01T19:73:24Z",
+        credentialSubject: {
+          id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
+          accounts: [
+            {
+              id: "1234567890",
+              route: "876543210",
+            },
+            {
+              id: "2457913570",
+              route: "DE-0753197542",
+            },
+          ],
+        },
+      },
+    }]);
   });
 });
