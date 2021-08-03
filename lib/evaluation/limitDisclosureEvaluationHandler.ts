@@ -7,6 +7,8 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
 
 export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
+  static mandatoryFields: string[] = ['@context', 'id', 'credentialSchema', 'credentialSubject', 'type'];
+
   constructor(client: EvaluationClient) {
     super(client);
   }
@@ -14,8 +16,6 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   public getName(): string {
     return 'LimitDisclosureEvaluation';
   }
-
-  static mandatoryFields: string[] = ['@context', 'id', 'credentialSchema', 'credentialSubject', 'type'];
 
   public handle(pd: PresentationDefinition, p: unknown): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
