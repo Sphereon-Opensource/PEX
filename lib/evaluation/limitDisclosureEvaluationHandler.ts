@@ -15,7 +15,6 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  //TODO: what is the necessary field? "@context", "credentialSchema", "credentialSubject", "type"
   static mandatoryFields: string[] = ['@context', 'id', 'credentialSchema', 'credentialSubject', 'type'];
 
   public handle(pd: PresentationDefinition, p: unknown): void {
@@ -62,9 +61,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private determineNecessaryPaths(vc: unknown, vcToSend: unknown, fields: Field[], idIdx: number, vcIdx: number) {
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
-      const result = JsonPathUtils.extractInputField(vc, field.path);
-      if (result.length > 0) {
-        this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx);
+      const inputField = JsonPathUtils.extractInputField(vc, field.path);
+      if (inputField.length > 0) {
+        this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend, idIdx, vcIdx);
       } else {
         this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
       }
@@ -110,7 +109,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private createSuccessResult(idIdx: number, vcIdx: number, pathDetails: any[]) {
+  private createSuccessResult(idIdx: number, vcIdx: number, pathDetails: unknown[]) {
     return this.results.push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
@@ -136,7 +135,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
    * @param path example: "$.verifiableCredential[0]"
    */
-  private updateVcForPath(verifiableCredentialToSend: any, path: string) {
+  private updateVcForPath(verifiableCredentialToSend: unknown, path: string) {
     let innerObj = this.verifiablePresentation;
     const pathResult = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = pathResult[0].path;
