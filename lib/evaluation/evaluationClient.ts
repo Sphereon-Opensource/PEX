@@ -6,7 +6,7 @@ import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
-import { MarkForSubmissionEvaluationHandler } from './markForSumissionEvaluationHandler';
+import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 

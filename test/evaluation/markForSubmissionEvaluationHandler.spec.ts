@@ -3,9 +3,8 @@ import fs from 'fs';
 import { PresentationDefinition } from "@sphereon/pe-models";
 
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
-import { EvaluationHandler } from "../../lib/evaluation/evaluationHandler";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
-import { MarkForSubmissionEvaluationHandler } from "../../lib/evaluation/markForSumissionEvaluationHandler";
+import { MarkForSubmissionEvaluationHandler } from "../../lib/evaluation/markForSubmissionEvaluationHandler";
 
 const results: HandlerCheckResult[] = [
   {
@@ -45,7 +44,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results)
-    const evaluationHandler: EvaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
+    const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     const length = evaluationHandler.results.length;
     expect(evaluationHandler.results[length - 1]).toEqual({ 
@@ -76,7 +75,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     results[1].verifiable_credential_path = "$.innerClaim[1]"
     results[2].verifiable_credential_path = "$.mostInnerClaim[2]"
     evaluationClient.results.push(...results)
-    const evaluationHandler: EvaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
+    const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, inputCandidates);
     const length = evaluationHandler.results.length;
     const actual = [evaluationHandler.results[length - 3], evaluationHandler.results[length - 2],evaluationHandler.results[length - 1]]
