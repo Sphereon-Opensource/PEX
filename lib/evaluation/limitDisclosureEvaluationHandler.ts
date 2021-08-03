@@ -105,7 +105,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     for (let i = 0; i < this.verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
       const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        this.verifiablePresentation.verifiableCredential.push(verifiableCredentialToSend);
+        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path);
       }
     }
   }
@@ -130,5 +130,21 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       message: 'mandatory field not present in the verifiableCredential',
       payload: path,
     });
+  }
+
+  /**
+   * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
+   * @param path example: "$.verifiableCredential[0]"
+   */
+  private updateVcForPath(verifiableCredentialToSend: any, path: string) {
+    let innerObj = this.verifiablePresentation;
+    const pathResult = JsonPathUtils.extractInputField(innerObj, [path]);
+    const pathDetails: string[] = pathResult[0].path;
+    for (let i = 1; i < pathDetails.length; i++) {
+      innerObj = innerObj[pathDetails[i]];
+      if (i===pathDetails.length-1) {
+        innerObj = verifiableCredentialToSend;
+      }
+    }
   }
 }
