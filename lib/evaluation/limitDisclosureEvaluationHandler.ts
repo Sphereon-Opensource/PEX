@@ -141,9 +141,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const pathResult = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = pathResult[0].path;
     for (let i = 1; i < pathDetails.length; i++) {
-      innerObj = innerObj[pathDetails[i]];
-      if (i===pathDetails.length-1) {
-        innerObj = verifiableCredentialToSend;
+      if (i === pathDetails.length - 1) {
+        innerObj[pathDetails[i]] = verifiableCredentialToSend;
+      } else {
+        innerObj = innerObj[pathDetails[i]];
       }
     }
   }
