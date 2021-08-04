@@ -40,7 +40,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         this.iterateOverFields(inputDescriptor, vc, path);
       } else {
         const payload = { result: [], valid: true };
-        this.getResults().push({
+        this.results.push({
           ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
         });
       }
@@ -66,7 +66,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
       } else {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: true };
-        this.getResults().push({
+        this.results.push({
           ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
         });
       }
@@ -80,7 +80,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     payload: { result: unknown[]; valid: boolean },
     message: string
   ) {
-    this.getResults().push({
+    this.results.push({
       ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
       ['status']: Status.ERROR,
       ['message']: message,

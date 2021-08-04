@@ -43,8 +43,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         i
       );
       if (
-        this.getVerifiablePresentation().presentationSubmission &&
-        this.getVerifiablePresentation().presentationSubmission.descriptor_map
+        this.verifiablePresentation.presentationSubmission &&
+        this.verifiablePresentation.presentationSubmission.descriptor_map
       ) {
         this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId, i);
       }
@@ -99,7 +99,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorId: string,
     vcIdx: number
   ) {
-    const verifiablePresentation = this.getVerifiablePresentation();
+    const verifiablePresentation = this.verifiablePresentation;
     if (!verifiablePresentation.verifiableCredential) {
       verifiablePresentation.verifiableCredential = [];
     }
@@ -112,7 +112,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createSuccessResult(idIdx: number, vcIdx: number, path: string) {
-    return this.getResults().push({
+    return this.results.push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.${path}[${vcIdx}]`,
       evaluator: this.getName(),
@@ -123,7 +123,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
-    return this.getResults().push({
+    return this.results.push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
       evaluator: this.getName(),
@@ -140,7 +140,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    */
   private updateVcForPath(verifiableCredentialToSend: unknown, path: string, idIdx: number, vcIdx: number) {
     this.createSuccessResult(idIdx, vcIdx, path);
-    let innerObj = this.getVerifiablePresentation();
+    let innerObj = this.verifiablePresentation;
     const inputField = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = inputField[0].path;
     for (let i = 1; i < pathDetails.length; i++) {

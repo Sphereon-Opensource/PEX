@@ -34,10 +34,10 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
 
   public abstract handle(d: PresentationDefinition, p: unknown): void;
 
-  public getVerifiablePresentation(): any {
+  public get verifiablePresentation(): any {
     return this.client.verifiablePresentation;
   }
-  public getResults(): HandlerCheckResult[] {
+  public get results(): HandlerCheckResult[] {
     return this.client.results;
   }
 }

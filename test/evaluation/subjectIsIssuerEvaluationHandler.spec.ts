@@ -17,7 +17,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     // evaluationClient.evaluate(pdSchema, vpSimple);
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().presentationSubmission = {
+    subjectIsIssuerEvaluationHandler.verifiablePresentation.presentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
       'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
       'descriptor_map': [
@@ -28,7 +28,7 @@ describe('evaluate', () => {
         }
       ]
     };
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().verifiableCredential = [{
+    subjectIsIssuerEvaluationHandler.verifiablePresentation.verifiableCredential = [{
       '@context': [
         'https://www.w3.org/2018/credentials/v1'
       ],
@@ -46,7 +46,7 @@ describe('evaluate', () => {
       'type': 'VerifiableCredential'
     }];
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
-    expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
+    expect(subjectIsIssuerEvaluationHandler.results[0]).toEqual({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",
       "evaluator": "SubjectIsIssuerEvaluation",
