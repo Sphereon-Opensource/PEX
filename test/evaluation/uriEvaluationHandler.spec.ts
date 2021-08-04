@@ -4,7 +4,6 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../lib';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
-import { EvaluationHandler } from "../../lib/evaluation/evaluationHandler";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
 import { UriEvaluationHandler } from "../../lib/evaluation/uriEvaluationHandler";
 
@@ -19,7 +18,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.test.org/mock"
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const evaluationHandler: EvaluationHandler = new UriEvaluationHandler(evaluationClient);
+    const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple);
     expect(evaluationHandler.results[0]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', "$.verifiableCredential[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly."));
   });

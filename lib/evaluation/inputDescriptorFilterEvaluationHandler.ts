@@ -17,7 +17,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: any): void {
+  public handle(pd: PresentationDefinition, p: unknown): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
     this.iterateOverInputCandidates(inputDescriptors, p);
   }
@@ -55,7 +55,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     );
   }
 
-  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, any], path: string): void {
+  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, unknown], path: string): void {
     for (const field of inputDescriptor[1].constraints.fields) {
       const inputField = JsonPathUtils.extractInputField(vc[1], field.path);
       if (!inputField.length) {
