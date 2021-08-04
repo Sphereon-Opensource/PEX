@@ -46,7 +46,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         this.getVerifiablePresentation().presentationSubmission &&
         this.getVerifiablePresentation().presentationSubmission.descriptor_map
       ) {
-        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
+        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId, i);
       }
     }
   }
@@ -63,7 +63,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       const field: Field = fields[i];
       const inputField = JsonPathUtils.extractInputField(vc, field.path);
       if (inputField.length > 0) {
-        this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend, idIdx, vcIdx);
+        this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend);
       } else {
         this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
       }
@@ -73,13 +73,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private copyResultPathToDestinationCredential(
     pathDetails: any[],
     verifiableCredential: unknown,
-    verifiableCredentialToSend: unknown,
-    idIdx: number,
-    vcIdx: number
+    verifiableCredentialToSend: unknown
   ) {
     let objectCursor = verifiableCredential;
     let currentCursorInToSendObj = verifiableCredentialToSend;
-    this.createSuccessResult(idIdx, vcIdx, pathDetails);
     for (let i = 1; i < pathDetails.length; i++) {
       objectCursor = objectCursor[pathDetails[i]];
       if (pathDetails.length == i + 1) {
@@ -97,7 +94,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any, inputDescriptorId: string) {
+  private copyModifiedVerifiableCredentialToExisting(
+    verifiableCredentialToSend: any,
+    inputDescriptorId: string,
+    vcIdx: number
+  ) {
     const verifiablePresentation = this.getVerifiablePresentation();
     if (!verifiablePresentation.verifiableCredential) {
       verifiablePresentation.verifiableCredential = [];
@@ -105,19 +106,19 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
       const currentDescriptor: Descriptor = verifiablePresentation.presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path);
+        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i, vcIdx);
       }
     }
   }
 
-  private createSuccessResult(idIdx: number, vcIdx: number, pathDetails: unknown[]) {
+  private createSuccessResult(idIdx: number, vcIdx: number, path: string) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      verifiable_credential_path: `$.${path}[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: 'added variable in the limit_disclosure to the verifiableCredential',
-      payload: pathDetails,
+      payload: undefined,
     });
   }
 
@@ -137,7 +138,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
    * @param path example: "$.verifiableCredential[0]"
    */
-  private updateVcForPath(verifiableCredentialToSend: unknown, path: string) {
+  private updateVcForPath(verifiableCredentialToSend: unknown, path: string, idIdx: number, vcIdx: number) {
+    this.createSuccessResult(idIdx, vcIdx, path);
     let innerObj = this.getVerifiablePresentation();
     const inputField = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = inputField[0].path;
