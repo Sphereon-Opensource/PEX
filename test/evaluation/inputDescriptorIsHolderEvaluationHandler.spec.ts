@@ -1,5 +1,7 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
 import fs from 'fs';
+
+import { PresentationDefinition } from '@sphereon/pe-models';
+
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
 import { InputDescriptorIsHolderEvaluationHandler } from '../../lib/evaluation/inputDescriptorIsHolderEvaluationHandler';
