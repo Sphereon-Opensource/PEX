@@ -1,4 +1,4 @@
-import { Constraints, Field, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Descriptor, Field, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils/jsonPathUtils';
@@ -7,6 +7,8 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
 
 export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
+  static mandatoryFields: string[] = ['@context', 'id', 'credentialSchema', 'credentialSubject', 'type'];
+
   constructor(client: EvaluationClient) {
     super(client);
   }
@@ -15,15 +17,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  //TODO: what is the necessary field? "@context", "credentialSchema", "credentialSubject", "type"
-  static mandatoryFields: string[] = ['@context', 'credentialSchema', 'credentialSubject', 'type'];
-
   public handle(pd: PresentationDefinition, p: unknown): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const constraints: Constraints = pd.input_descriptors[i].constraints;
-      //TODO: write the impl for "limitDisclosureShouldBeEnforced" as well. Should it generate WARNING?
       if (constraints && constraints.limit_disclosure && constraints.limit_disclosure === Optionality.Required) {
-        this.limitDisclosureShouldBeEnforced(p, constraints.fields, i);
+        this.limitDisclosureShouldBeEnforced(p, constraints.fields, i, pd.input_descriptors[i].id);
       }
     }
   }
@@ -31,84 +29,57 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private limitDisclosureShouldBeEnforced(
     verifiablePresentation: any,
     fields: Field[],
-    inputDescriptorIdx: number
+    idIdx: number,
+    inputDescriptorId: string
   ): void {
     for (let i = 0; i < verifiablePresentation.verifiableCredential.length; i++) {
       const verifiableCredentialToSend = {};
-      let keys = Object.keys(verifiablePresentation.verifiableCredential[i]);
-      keys = this.copyMandatoryFieldsAndDeletePredefinedKeys(
-        verifiablePresentation.verifiableCredential[i],
-        verifiableCredentialToSend,
-        keys
-      );
+      this.copyMandatoryFields(verifiablePresentation.verifiableCredential[i], verifiableCredentialToSend);
       this.determineNecessaryPaths(
         verifiablePresentation.verifiableCredential[i],
         verifiableCredentialToSend,
-        keys,
         fields,
-        inputDescriptorIdx,
+        idIdx,
         i
       );
-      this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend);
+      if (
+        this.verifiablePresentation.presentationSubmission &&
+        this.verifiablePresentation.presentationSubmission.descriptor_map
+      ) {
+        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
+      }
     }
   }
 
-  private copyMandatoryFieldsAndDeletePredefinedKeys(
-    verifiableCredential: unknown,
-    verifiableCredentialToSend: unknown,
-    keys: string[]
-  ): string[] {
+  private copyMandatoryFields(verifiableCredential: unknown, verifiableCredentialToSend: unknown): void {
     for (let i = 0; i < LimitDisclosureEvaluationHandler.mandatoryFields.length; i++) {
       verifiableCredentialToSend[LimitDisclosureEvaluationHandler.mandatoryFields[i]] =
         verifiableCredential[LimitDisclosureEvaluationHandler.mandatoryFields[i]];
-      const index = keys.indexOf(LimitDisclosureEvaluationHandler.mandatoryFields[i]);
-      if (index > -1) {
-        keys.splice(index, 1);
-      }
     }
-    return keys;
   }
 
-  private determineNecessaryPaths(
-    vc: unknown,
-    vcToSend: unknown,
-    _keys: string[],
-    fields: Field[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private determineNecessaryPaths(vc: unknown, vcToSend: unknown, fields: Field[], idIdx: number, vcIdx: number) {
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
-      const result = JsonPathUtils.extractInputField(vc, field.path);
-      if (result.length > 0) {
-        //TODO: do we need to consider other paths here?
-        this.copyResultPathToDestinationCredential(result[0].path, vc, vcToSend, idIdx, vcIdx);
+      const inputField = JsonPathUtils.extractInputField(vc, field.path);
+      if (inputField.length > 0) {
+        this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend, idIdx, vcIdx);
       } else {
         this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
       }
     }
   }
 
-  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
-    return this.results.push({
-      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
-      evaluator: this.getName(),
-      status: Status.ERROR,
-      message: 'mandatory field not present in the verifiableCredential',
-      payload: path,
-    });
-  }
-
   private copyResultPathToDestinationCredential(
     pathDetails: any[],
     verifiableCredential: unknown,
     verifiableCredentialToSend: unknown,
-    _idIdx: number,
-    _vcIdx: number
+    idIdx: number,
+    vcIdx: number
   ) {
     let objectCursor = verifiableCredential;
     let currentCursorInToSendObj = verifiableCredentialToSend;
+    this.createSuccessResult(idIdx, vcIdx, pathDetails);
     for (let i = 1; i < pathDetails.length; i++) {
       objectCursor = objectCursor[pathDetails[i]];
       if (pathDetails.length == i + 1) {
@@ -126,17 +97,54 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  //TODO: change it according to Maikel's changes
-  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any) {
-    if (this.verifiablePresentation.verifiableCredential) {
-      for (let i = 0; i < this.verifiablePresentation.verifiableCredential.length; i++) {
-        if (this.verifiablePresentation.verifiableCredential[i].id === verifiableCredentialToSend.id) {
-          this.verifiablePresentation.verifiableCredential[i] = { ...verifiableCredentialToSend };
-        }
-      }
-    } else {
+  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any, inputDescriptorId: string) {
+    if (!this.verifiablePresentation.verifiableCredential) {
       this.verifiablePresentation.verifiableCredential = [];
-      this.verifiablePresentation.verifiableCredential.push(verifiableCredentialToSend);
+    }
+    for (let i = 0; i < this.verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
+      const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
+      if (currentDescriptor.id === inputDescriptorId) {
+        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path);
+      }
+    }
+  }
+
+  private createSuccessResult(idIdx: number, vcIdx: number, pathDetails: unknown[]) {
+    return this.results.push({
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      evaluator: this.getName(),
+      status: Status.INFO,
+      message: 'added variable in the limit_disclosure to the verifiableCredential',
+      payload: pathDetails,
+    });
+  }
+
+  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
+    return this.results.push({
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      evaluator: this.getName(),
+      status: Status.ERROR,
+      message: 'mandatory field not present in the verifiableCredential',
+      payload: path,
+    });
+  }
+
+  /**
+   * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
+   * @param path example: "$.verifiableCredential[0]"
+   */
+  private updateVcForPath(verifiableCredentialToSend: unknown, path: string) {
+    let innerObj = this.verifiablePresentation;
+    const pathResult = JsonPathUtils.extractInputField(innerObj, [path]);
+    const pathDetails: string[] = pathResult[0].path;
+    for (let i = 1; i < pathDetails.length; i++) {
+      if (i === pathDetails.length - 1) {
+        innerObj[pathDetails[i]] = verifiableCredentialToSend;
+      } else {
+        innerObj = innerObj[pathDetails[i]];
+      }
     }
   }
 }

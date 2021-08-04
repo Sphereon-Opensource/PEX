@@ -44,7 +44,7 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  public static extractInputField(verifiableCredential: unknown, paths: string[]): any {
+  public static extractInputField(verifiableCredential: unknown, paths: string[]): any[] {
     let result = [];
     if (paths) {
       for (const path of paths) {
