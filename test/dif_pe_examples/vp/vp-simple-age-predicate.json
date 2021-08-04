@@ -24,6 +24,7 @@
         "https://www.w3.org/2018/credentials/v1"
       ],
       "age": 19,
+      "etc": "etc",
       "credentialSchema": [
         {
           "id": "https://www.w3.org/TR/vc-data-model/#types"

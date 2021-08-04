@@ -181,8 +181,8 @@
                         },
                         {
                             "path": [
-                                "$.credentialSubject.account[*].id",
-                                "$.vc.credentialSubject.account[*].id",
+                                "$.credentialSubject.accounts[*].id",
+                                "$.vc.credentialSubject.accounts[*].id",
                                 "$.account[*].id"
                             ],
                             "purpose": "We can only remit payment to a currently-valid bank account in the US, France, or Germany, submitted as an ABA Acct # or IBAN.",
@@ -193,9 +193,9 @@
                         },
                         {
                             "path": [
-                                "$.credentialSubject.account[*].route",
-                                "$.vc.credentialSubject.account[*].route",
-                                "$.account[*].route"
+                                "$.credentialSubject.accounts[*].route",
+                                "$.vc.credentialSubject.accounts[*].route",
+                                "$.accounts[*].route"
                             ],
                             "purpose": "We can only remit payment to a currently-valid account at a US, Japanese, or German federally-accredited bank, submitted as an ABA RTN or SWIFT code.",
                             "filter": {

@@ -3,29 +3,30 @@ import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-m
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHandler {
-  public getName(): string {
-    return 'PredicateRelatedField';
+  constructor(client: EvaluationClient) {
+    super(client);
   }
 
-  public handle(pd: PresentationDefinition, _p: unknown, results: HandlerCheckResult[]): void {
+  public getName(): string {
+    return 'PredicateRelatedFieldEvaluation';
+  }
+
+  public handle(pd: PresentationDefinition): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       if (pd.input_descriptors[i].constraints && pd.input_descriptors[i].constraints.fields) {
-        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints, results);
+        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints);
       }
     }
   }
 
-  private examinePredicateRelatedField(
-    input_descriptor_idx: number,
-    constraints: Constraints,
-    results: HandlerCheckResult[]
-  ): void {
+  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {
     for (let i = 0; i < constraints.fields.length; i++) {
-      for (let j = 0; j < results.length; j++) {
-        this.examinePredicateForFilterEvaluationResult(results, j, input_descriptor_idx, constraints, i);
+      for (let j = 0; j < this.getResults().length; j++) {
+        this.examinePredicateForFilterEvaluationResult(this.getResults(), j, input_descriptor_idx, constraints, i);
       }
     }
   }

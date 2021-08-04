@@ -1,36 +1,47 @@
 import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import Ajv from 'ajv';
-import jp from 'jsonpath';
 
 import { Status } from '../ConstraintUtils';
+import { JsonPathUtils } from '../utils/jsonPathUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'FilterEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: any, results: HandlerCheckResult[]): void {
+  public handle(pd: PresentationDefinition, p: unknown): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
-    for (const vc of p.verifiableCredential.entries()) {
-      this.iterateOverInputDescriptors(inputDescriptors, vc, results);
+    this.iterateOverInputCandidates(inputDescriptors, p);
+  }
+
+  //TODO move to utils
+  private iterateOverInputCandidates(inputDescriptors: InputDescriptor[], inputCandidates: any): void {
+    const props = Object.entries(inputCandidates).filter(
+      (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
+    ) as Array<[string, Array<unknown>]>;
+    for (const [key, value] of props) {
+      for (const vc of value.entries()) {
+        this.iterateOverInputDescriptors(inputDescriptors, vc, key);
+      }
     }
   }
 
-  private iterateOverInputDescriptors(
-    inputDescriptors: InputDescriptor[],
-    vc: [number, any],
-    results: HandlerCheckResult[]
-  ): void {
+  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, unknown], path: string): void {
     for (const inputDescriptor of inputDescriptors.entries()) {
       if (this.hasFields(inputDescriptor)) {
-        this.iterateOverFields(inputDescriptor, vc, results);
+        this.iterateOverFields(inputDescriptor, vc, path);
       } else {
         const payload = { result: [], valid: true };
-        results.push({
-          ...this.createResultObject(inputDescriptor[0], vc[0], payload),
+        this.getResults().push({
+          ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
         });
       }
     }
@@ -44,62 +55,47 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     );
   }
 
-  private iterateOverFields(
-    inputDescriptor: [number, InputDescriptor],
-    vc: [number, any],
-    results: HandlerCheckResult[]
-  ): void {
+  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, unknown], path: string): void {
     for (const field of inputDescriptor[1].constraints.fields) {
-      const inputField = this.extractInputField(vc[1], field);
+      const inputField = JsonPathUtils.extractInputField(vc[1], field.path);
       if (!inputField.length) {
         const payload = { result: [], valid: false };
-        this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed to find jsonpath property');
+        this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate does not contain property');
       } else if (!this.evaluateFilter(inputField[0], field)) {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: false };
-        this.createResponse(results, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
+        this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate failed filter evaluation');
       } else {
         const payload = { ['result']: { ...inputField[0] }, ['valid']: true };
-        results.push({
-          ...this.createResultObject(inputDescriptor[0], vc[0], payload),
+        this.getResults().push({
+          ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
         });
       }
     }
   }
 
   private createResponse(
-    results: HandlerCheckResult[],
+    path: string,
     inputDescriptor: [number, InputDescriptor],
-    vc: [number, any],
-    payload: { result: any[]; valid: boolean },
+    vc: [number, unknown],
+    payload: { result: unknown[]; valid: boolean },
     message: string
   ) {
-    results.push({
-      ...this.createResultObject(inputDescriptor[0], vc[0], payload),
+    this.getResults().push({
+      ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
       ['status']: Status.ERROR,
       ['message']: message,
     });
   }
 
-  private createResultObject(idIndex: number, vcIndex: number, payload: any): HandlerCheckResult {
+  private createResultObject(path: string, idIndex: number, vcIndex: number, payload: unknown): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIndex}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIndex}]`,
+      verifiable_credential_path: `$.${path}[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: 'Input candidate valid for presentation submission',
       payload,
     };
-  }
-
-  private extractInputField(inputCandidate: any, field: Field): any {
-    let result = [];
-    for (const path of field.path) {
-      result = jp.nodes(inputCandidate, path);
-      if (result.length) {
-        break;
-      }
-    }
-    return result;
   }
 
   private evaluateFilter(result: any, field: Field) {

@@ -3,14 +3,19 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import { Status } from '../ConstraintUtils';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
+  constructor(client: EvaluationClient) {
+    super(client);
+  }
+
   public getName(): string {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: any, results: HandlerCheckResult[]): void {
+  public handle(d: PresentationDefinition, p: any): void {
     for (let i = 0; i < d.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = d.input_descriptors[i];
       const uris: string[] = inputDescriptor.schema.map((so) => so.uri);
@@ -19,9 +24,9 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         const input_descriptor_path = '$.input_descriptors[' + i + ']';
         const verifiable_credential_path = '$.verifiableCredential[' + j + ']';
         if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPresentationURI(vc), uris)) {
-          results.push(this.createInfoResultObject(input_descriptor_path, verifiable_credential_path));
+          this.getResults().push(this.createInfoResultObject(input_descriptor_path, verifiable_credential_path));
         } else {
-          results.push(this.createErrorResultObject(input_descriptor_path, verifiable_credential_path));
+          this.getResults().push(this.createErrorResultObject(input_descriptor_path, verifiable_credential_path));
         }
       }
     }
@@ -50,7 +55,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private createInfoResultObject(input_descriptor_path: string, verifiable_credential_path: string) {
-    const result = this.createResult(input_descriptor_path, verifiable_credential_path);
+    const result: HandlerCheckResult = this.createResult(input_descriptor_path, verifiable_credential_path);
     result.status = Status.INFO;
     result.message =
       'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
