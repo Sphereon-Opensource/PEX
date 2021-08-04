@@ -24,9 +24,9 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         const input_descriptor_path = '$.input_descriptors[' + i + ']';
         const verifiable_credential_path = '$.verifiableCredential[' + j + ']';
         if (UriEvaluationHandler.stringsArePresentInList(UriEvaluationHandler.getPresentationURI(vc), uris)) {
-          this.results.push(this.createInfoResultObject(input_descriptor_path, verifiable_credential_path));
+          this.getResults().push(this.createInfoResultObject(input_descriptor_path, verifiable_credential_path));
         } else {
-          this.results.push(this.createErrorResultObject(input_descriptor_path, verifiable_credential_path));
+          this.getResults().push(this.createErrorResultObject(input_descriptor_path, verifiable_credential_path));
         }
       }
     }
