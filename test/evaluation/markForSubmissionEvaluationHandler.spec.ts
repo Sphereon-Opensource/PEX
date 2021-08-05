@@ -46,8 +46,8 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     evaluationClient.results.push(...results)
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, inputCandidates);
-    const length = evaluationHandler.results.length;
-    expect(evaluationHandler.results[length - 1]).toEqual({
+    const length = evaluationHandler.getResults().length;
+    expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: "MarkForSubmissionEvaluation",
       input_descriptor_path: "$.input_descriptors[0]",
       message: "The input candidate is eligible for submission",
@@ -77,8 +77,8 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     evaluationClient.results.push(...results)
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, inputCandidates);
-    const length = evaluationHandler.results.length;
-    const actual = [evaluationHandler.results[length - 3], evaluationHandler.results[length - 2],evaluationHandler.results[length - 1]]
+    const length = evaluationHandler.getResults().length;
+    const actual = [evaluationHandler.getResults()[length - 3], evaluationHandler.getResults()[length - 2],evaluationHandler.getResults()[length - 1]]
     expect(actual).toEqual([{ 
       evaluator: "MarkForSubmissionEvaluation",
       input_descriptor_path: "$.input_descriptors[0]",

@@ -46,7 +46,7 @@ describe('evaluate', () => {
       'type': 'VerifiableCredential'
     }];
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
-    expect(subjectIsIssuerEvaluationHandler.results[0]).toEqual({
+    expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",
       "evaluator": "SubjectIsIssuerEvaluation",

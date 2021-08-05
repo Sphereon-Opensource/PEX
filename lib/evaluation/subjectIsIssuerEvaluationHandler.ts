@@ -43,22 +43,22 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   private generateErrorResult(idIdx: number, vp: unknown, vcId: string) {
     const result = this.generateResult(idIdx, vp, vcId);
     if (result == null) {
-      this.results.push(this.generateVcNotFoundError(idIdx, vp));
+      this.getResults().push(this.generateVcNotFoundError(idIdx, vp));
     } else {
       result.status = Status.ERROR;
       result.message = "couldn't verify subject is issuer.";
-      this.results.push(result);
+      this.getResults().push(result);
     }
   }
 
   private generateSuccessResult(idIdx: number, vp: unknown, vcId: string) {
     const result = this.generateResult(idIdx, vp, vcId);
     if (result == null) {
-      this.results.push(this.generateVcNotFoundError(idIdx, vp));
+      this.getResults().push(this.generateVcNotFoundError(idIdx, vp));
     } else {
       result.status = Status.INFO;
       result.message = 'subject_is_issuer verified.';
-      this.results.push(result);
+      this.getResults().push(result);
     }
   }
 

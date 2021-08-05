@@ -112,7 +112,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createSuccessResult(idIdx: number, vcIdx: number, path: string) {
-    return this.results.push({
+    return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.${path}[${vcIdx}]`,
       evaluator: this.getName(),
@@ -123,7 +123,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
-    return this.results.push({
+    return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
       evaluator: this.getName(),
