@@ -40,11 +40,13 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       (result) => result.status === Status.ERROR && result.verifiable_credential_path === `$.${path}[${vc[0]}]`
     );
     if (error) {
-      error.payload.evaluator = error.evaluator;
+      const payload = { ...error.payload };
+      payload.evaluator = error.evaluator;
       this.getResults().push({
         ...error,
         evaluator: this.getName(),
         message: 'The input candidate is not eligible for submission',
+        payload: payload
       });
     } else {
       this.createPresentationSubmission(pd, vc, path);
