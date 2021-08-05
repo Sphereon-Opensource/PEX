@@ -27,8 +27,8 @@
               "predicate": "required"
             }, {
               "path": [
-                "$.citizenship",
-                "$.details.citizenship"
+                "$.citizenship[*]",
+                "$.details.citizenship[*]"
               ],
               "filter": {
                 "type": "string",
