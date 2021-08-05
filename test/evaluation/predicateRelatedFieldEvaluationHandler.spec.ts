@@ -55,6 +55,6 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const results: HandlerCheckResult[] = evaluationClient.evaluate(pdSchema, vpSimple);
     expect(results[3]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":true, "path":["$","age"]}));
-    expect(results[4]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":"eu", "path":["$","details","citizenship"]}));
+    expect(results[4]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":"eu", "path":["$","details","citizenship",0]}));
   });
 });

@@ -25,7 +25,9 @@
       ],
       "age": 19,
       "details": {
-        "citizenship": "eu"
+        "citizenship": [
+          "eu"
+        ]
       },
       "birthPlace": "Maarssen",
       "credentialSchema": [
