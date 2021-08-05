@@ -36,13 +36,17 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, unknown], path: string): void {
-    const error = this.results.find(
+    const error = this.getResults().find(
       (result) => result.status === Status.ERROR && result.verifiable_credential_path === `$.${path}[${vc[0]}]`
     );
     if (error) {
-      this.results.push({
+      const payload = { ...error.payload };
+      payload.evaluator = error.evaluator;
+      this.getResults().push({
         ...error,
+        evaluator: this.getName(),
         message: 'The input candidate is not eligible for submission',
+        payload: payload
       });
     } else {
       this.createPresentationSubmission(pd, vc, path);
@@ -52,7 +56,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
     const verifiablePresentation = this.verifiablePresentation;
     verifiablePresentation.presentationSubmission.definition_id = pd.id;
-    const info = this.results.filter((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
+    const info = this.getResults().filter((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
     if (!verifiablePresentation[`${path}`]) {
       verifiablePresentation[`${path}`] = [];
     }
@@ -77,7 +81,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private pushToResults(r: HandlerCheckResult, id: [number, InputDescriptor]) {
-    this.results.push({
+    this.getResults().push({
       input_descriptor_path: r.input_descriptor_path,
       verifiable_credential_path: r.verifiable_credential_path,
       evaluator: this.getName(),
