@@ -51,17 +51,12 @@ export class EvaluationClient {
 
   private initEvaluationHandlers() {
     const uriEvaluation = new UriEvaluationHandler(this);
-    const inputDescriptorFilterEvaluationHandler = new InputDescriptorFilterEvaluationHandler(this);
-    const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler(this);
-    const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler(this);
-    const limitDisclosureEvaluationHandler = new LimitDisclosureEvaluationHandler(this);
-    const subjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(this);
+
     uriEvaluation
-      .setNext(inputDescriptorFilterEvaluationHandler)
-      .setNext(predicateEvaluationHandler)
-      .setNext(markForSubmissionEvaluation)
-      .setNext(limitDisclosureEvaluationHandler)
-      .setNext(subjectIsIssuerEvaluationHandler);
+      .setNext(new InputDescriptorFilterEvaluationHandler(this))
+      .setNext(new PredicateRelatedFieldEvaluationHandler(this))
+      .setNext(new MarkForSubmissionEvaluationHandler(this))
+      .setNext(new LimitDisclosureEvaluationHandler(this));
 
     return uriEvaluation;
   }
