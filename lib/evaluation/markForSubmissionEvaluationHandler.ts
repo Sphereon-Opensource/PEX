@@ -32,7 +32,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     }
   }
 
-  private extractVerifiableCredentials(inputCandidates: unknown) {
+  private extractVerifiableCredentials(inputCandidates: unknown): Array<[string, Array<unknown>]> {
     return Object.entries(inputCandidates).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
     ) as Array<[string, Array<unknown>]>;

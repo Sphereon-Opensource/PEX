@@ -20,6 +20,7 @@
                 "constraints": {
                     "fields": [
                         {
+                            "id": "banking_input_1",
                             "path": [
                                 "$.issuer",
                                 "$.vc.issuer",
@@ -28,17 +29,64 @@
                             "purpose": "We can only verify bank accounts if they are attested by a trusted bank, auditor or regulatory authority.",
                             "filter": {
                                 "type": "string",
-                                "pattern": "did:example:123|did:foo:123"
+                                "pattern": "did:example:123|did:example:456"
                             }
                         }
                     ],
                     "is_holder": [
                         {
-                            "field_id": ["1234567890", "2457913570"],
+                            "field_id": ["banking_input_1"],
                             "directive": "preferred"
                         },
                         {
-                            "field_id": ["1234567890", "2457913570"],
+                            "field_id": ["banking_input_1"],
+                            "directive": "required"
+                        },
+                        {
+                            "field_id": ["test"],
+                            "directive": "required"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": "banking_input_2",
+                "name": "Bank Account Information",
+                "purpose": "We can only remit payment to a currently-valid bank account.",
+                "group": [
+                    "A"
+                ],
+                "schema": [
+                    {
+                        "uri": "https://bank-schemas.org/1.0.0/accounts.json"
+                    },
+                    {
+                        "uri": "https://bank-schemas.org/2.0.0/accounts.json"
+                    }
+                ],
+                "constraints": {
+                    "fields": [
+                        {
+                            "id": "banking_input_2",
+                            "path": [
+                                "$.issuer",
+                                "$.vc.issuer",
+                                "$.iss"
+                            ],
+                            "purpose": "We can only verify bank accounts if they are attested by a trusted bank, auditor or regulatory authority.",
+                            "filter": {
+                                "type": "string",
+                                "pattern": "did:foo:123|did:foo:456"
+                            }
+                        }
+                    ],
+                    "is_holder": [
+                        {
+                            "field_id": ["banking_input_2"],
+                            "directive": "preferred"
+                        },
+                        {
+                            "field_id": ["banking_input_2"],
                             "directive": "required"
                         }
                     ]
