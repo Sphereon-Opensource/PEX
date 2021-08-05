@@ -56,7 +56,10 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
     const verifiablePresentation = this.verifiablePresentation;
     verifiablePresentation.presentationSubmission.definition_id = pd.id;
-    const info = this.getResults().filter((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
+    const info = this.getResults().find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
+    if (!info) {
+      return;
+    }
     if (!verifiablePresentation[`${path}`]) {
       verifiablePresentation[`${path}`] = [];
     }
@@ -66,16 +69,14 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   private addInputDescriptorToResults(
     inputDescriptors: InputDescriptor[],
     vc: [number, any],
-    info: HandlerCheckResult[],
+    info: HandlerCheckResult,
     path: string
   ) {
     for (const id of inputDescriptors.entries()) {
-      for (const r of info) {
-        if (r.input_descriptor_path === `$.input_descriptors[${id[0]}]`) {
-          const descriptor: Descriptor = { id: id[1].id, format: 'ldp_vc', path: r.verifiable_credential_path };
-          this.pushToDescriptorsMap(descriptor, vc, path);
-          this.pushToResults(r, id);
-        }
+      if (info.input_descriptor_path === `$.input_descriptors[${id[0]}]`) {
+        const descriptor: Descriptor = { id: id[1].id, format: 'ldp_vc', path: `$.${path}[${vc[0]}]` };
+        this.pushToDescriptorsMap(descriptor, vc, path);
+        this.pushToResults(info, id);
       }
     }
   }

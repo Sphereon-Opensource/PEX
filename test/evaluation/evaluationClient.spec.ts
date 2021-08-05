@@ -153,7 +153,7 @@ describe('evaluate', () => {
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
     expect(errorResults.length).toEqual(5);
-    expect(infoResults.length).toEqual(8);
+    expect(infoResults.length).toEqual(7);
   });
 
 
