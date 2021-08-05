@@ -71,7 +71,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private copyResultPathToDestinationCredential(
-    pathDetails: any[],
+    pathDetails: (string | number)[],
     verifiableCredential: unknown,
     verifiableCredentialToSend: unknown
   ) {
@@ -94,7 +94,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: any, inputDescriptorId: string) {
+  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: unknown, inputDescriptorId: string) {
     const verifiablePresentation = this.verifiablePresentation;
     if (!verifiablePresentation.verifiableCredential) {
       verifiablePresentation.verifiableCredential = [];
