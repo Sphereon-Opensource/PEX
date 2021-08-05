@@ -46,7 +46,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         ...error,
         evaluator: this.getName(),
         message: 'The input candidate is not eligible for submission',
-        payload: payload
+        payload: payload,
       });
     } else {
       this.createPresentationSubmission(pd, vc, path);

@@ -40,34 +40,53 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return schemaUris;
   }
 
-  private evaluateUris(presentationDefinitionUris: string[], inputDescriptorsUris: string[], idIdx:number, vcIdx: number): void {
+  private evaluateUris(
+    presentationDefinitionUris: string[],
+    inputDescriptorsUris: string[],
+    idIdx: number,
+    vcIdx: number
+  ): void {
     let hasError = false;
     for (let i = 0; i < presentationDefinitionUris.length; i++) {
       if (inputDescriptorsUris.find((el) => el === presentationDefinitionUris[i]) == undefined) {
-        this.getResults().push(this.createErrorResultObject(presentationDefinitionUris[i], inputDescriptorsUris, idIdx, vcIdx));
+        this.getResults().push(
+          this.createErrorResultObject(presentationDefinitionUris[i], inputDescriptorsUris, idIdx, vcIdx)
+        );
         hasError = true;
       }
     }
     if (!hasError) {
-      this.getResults().push(this.createSuccessResultObject(presentationDefinitionUris, inputDescriptorsUris, idIdx, vcIdx));
+      this.getResults().push(
+        this.createSuccessResultObject(presentationDefinitionUris, inputDescriptorsUris, idIdx, vcIdx)
+      );
     }
   }
 
-  private createSuccessResultObject(presentationDefinitionUris: string[], inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
+  private createSuccessResultObject(
+    presentationDefinitionUris: string[],
+    inputDescriptorsUris: string[],
+    idIdx: number,
+    vcIdx: number
+  ) {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
     result.message =
       'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
-    result.payload = {presentationDefinitionUris, inputDescriptorsUris}
+    result.payload = { presentationDefinitionUris, inputDescriptorsUris };
     return result;
   }
 
-  private createErrorResultObject(presentationDefinitionUri: string, inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
+  private createErrorResultObject(
+    presentationDefinitionUri: string,
+    inputDescriptorsUris: string[],
+    idIdx: number,
+    vcIdx: number
+  ) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
     result.message =
       'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
-    result.payload = {presentationDefinitionUri, inputDescriptorsUris};
+    result.payload = { presentationDefinitionUri, inputDescriptorsUris };
     return result;
   }
 
