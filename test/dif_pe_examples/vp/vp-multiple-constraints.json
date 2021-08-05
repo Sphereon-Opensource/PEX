@@ -29,6 +29,11 @@
           "eu"
         ]
       },
+      "country": [
+        {
+          "abbr": "NLD"
+        }
+      ],
       "birthPlace": "Maarssen",
       "credentialSchema": [
         {

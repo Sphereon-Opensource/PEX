@@ -39,6 +39,16 @@
                 ]
               },
               "predicate": "required"
+            }, {
+              "path": [
+                "$.country[*].abbr",
+                "$.details.country[*].abbr"
+              ],
+              "filter": {
+                "type": "string",
+                "pattern": "NLD"
+              },
+              "predicate": "required"
             }
           ]
         }
