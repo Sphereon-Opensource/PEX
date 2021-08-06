@@ -1,5 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { Chapi } from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
@@ -7,20 +8,13 @@ import { VerifiablePresentation } from './verifiablePresentation';
  * Credential Handler API Verifiable Presentation
  */
 export class CHAPIVP implements VerifiablePresentation {
-
-  type: string;
-  dataType: string;
-  data: {
-    presentationSubmission: PresentationSubmission
-  };
-  verifiableCredential: Array<VerifiableCredential>;
-  proof: any;
+  private chapi: Chapi;
 
   public getPresentationSubmission(): PresentationSubmission {
-    return undefined;
+    return this.chapi.data.presentation_submission;
   }
 
   public getVerifiableCredentials(): Array<VerifiableCredential> {
-    return undefined;
+    return this.chapi.verifiable_credential;
   }
 }
