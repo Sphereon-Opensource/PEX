@@ -20,11 +20,7 @@ describe('evaluate', () => {
     try {
       evaluationClient.evaluate(presentationDefinition, vpSimple);
     } catch (error) {
-      expect(error).toEqual({
-        'message': 'unknown exception occurred: Cannot read property \'length\' of null',
-        'status': 'error',
-        'tag': 'root'
-      });
+      expect(error.message).toEqual('Cannot read property \'length\' of null');
     }
   });
 
