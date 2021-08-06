@@ -1,31 +1,20 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { DIdComm } from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
 /***
  * Decentralized Identifiers Verifiable Presentation
  */
-export class DIDCommsVP implements VerifiablePresentation {
-  type: string;
-  id: string;
-  comment: string;
-  formats: Array<any>;
-  presentationsAttach: {
-    id: string,
-    mimeType: string,
-    data: {
-      json: {
-        presentation_submission: PresentationSubmission
-      }
-    };
-  };
+export class DIDCommVP implements VerifiablePresentation {
+  private dIdCommsMessage: DIdComm;
 
   public getPresentationSubmission(): PresentationSubmission {
-    return undefined;
+    return this.dIdCommsMessage.presentationsAttach.data.json.presentation_submission;
   }
 
   public getVerifiableCredentials(): Array<VerifiableCredential> {
-    return undefined;
+    return this.dIdCommsMessage.verifiable_credentials;
   }
 }

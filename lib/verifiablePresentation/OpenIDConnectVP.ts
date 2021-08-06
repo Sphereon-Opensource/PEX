@@ -1,5 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { OpenIdConnect } from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
@@ -7,21 +8,13 @@ import { VerifiablePresentation } from './verifiablePresentation';
  * OpenId Connect Verifiable Presentation
  */
 export class OpenIDConnectVP implements VerifiablePresentation {
-
-  iss: string;
-  sub: string;
-  preferred_username: string;
-  presentationSubmission: PresentationSubmission
-  _claim_names: {
-    verified_claims: Array<string>
-  }
-  "_claim_sources": any;
+  private openIdConnect: OpenIdConnect;
 
   public getPresentationSubmission(): PresentationSubmission {
-    return this.presentationSubmission;
+    return this.openIdConnect.presentation_submission;
   }
 
   public getVerifiableCredentials(): Array<VerifiableCredential> {
-    return null;
+    return this.openIdConnect._claim_sources;
   }
 }
