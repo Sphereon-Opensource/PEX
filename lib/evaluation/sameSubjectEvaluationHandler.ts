@@ -9,7 +9,6 @@ import { EvaluationClient } from './evaluationClient';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
-
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;

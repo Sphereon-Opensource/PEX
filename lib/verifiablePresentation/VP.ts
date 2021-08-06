@@ -1,5 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { Presentation } from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
@@ -7,18 +8,17 @@ import { VerifiablePresentation } from './verifiablePresentation';
  * Verifiable presentation - generic
  */
 export class VP implements VerifiablePresentation {
+  private presentation: Presentation;
 
-  context: Array<string>;
-  presentationSubmission: PresentationSubmission;
-  type: Array<string>;
-  verifiableCredential: Array<VerifiableCredential>;
-  proof: any;
+  constructor(pPresentation: Presentation) {
+    this.presentation = pPresentation;
+  }
 
   public getPresentationSubmission(): PresentationSubmission {
-    return this.presentationSubmission;
+    return this.presentation.presentation_submission;
   }
 
   public getVerifiableCredentials(): Array<VerifiableCredential> {
-    return this.verifiableCredential;
+    return this.presentation.verifiable_credential;
   }
 }
