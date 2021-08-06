@@ -4,8 +4,8 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
-import { InputDescriptorIsHolderEvaluationHandler } from '../../lib/evaluation/inputDescriptorIsHolderEvaluationHandler';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
+import { InputDescriptorIsHolderEvaluationHandler } from '../../lib/evaluation/inputDescriptorIsHolderEvaluationHandler';
 
 const results: HandlerCheckResult[] = [
   {
@@ -74,16 +74,15 @@ describe('inputDescriptorIsHolderEvaluationHandler tests', () => {
        "input_descriptor_path": "$.input_descriptors[0]",
        "message": "Input candidate invalid for presentation submission",
        "payload": {
-         "matched": [{"directive": "preferred", "field_id": ["banking_input_1"]}, {"directive": "required", "field_id": ["banking_input_1"]}],
-         "not_matched": [{"directive": "required", "field_id": ["test"]}]},
+         "results": [{ "valid": true }, {"directive": "required", "field_id": ["banking_input_1"], "valid": true},
+         {"directive": "required", "field_id": ["test"], "valid": false }]},
        "status": "error", "verifiable_credential_path": "$.verifiableCredential[0]"});
     expect(evaluationClient.results[7]).toEqual({
-    "evaluator": "IsHolderEvaluation",
-    "input_descriptor_path": "$.input_descriptors[1]",
-    "message": "Input candidate valid for presentation submission",
-    "payload": {
-      "matched": [{"directive": "preferred", "field_id": ["banking_input_2"]}, {"directive": "required", "field_id": ["banking_input_2"]}],
-      "not_matched": []},
-    "status": "info", "verifiable_credential_path": "$.verifiableCredential[1]"});
+       "evaluator": "IsHolderEvaluation",
+       "input_descriptor_path": "$.input_descriptors[1]",
+       "message": "Input candidate valid for presentation submission",
+       "payload": {
+         "results": [{"valid": true}, {"directive": "required", "field_id": ["banking_input_2"], "valid": true}]},
+       "status": "info", "verifiable_credential_path": "$.verifiableCredential[1]"});
   });
 });
