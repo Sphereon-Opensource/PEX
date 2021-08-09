@@ -3,7 +3,7 @@ import fs from 'fs';
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../lib';
-import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
+import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
 
 function getFile(path: string) {
@@ -23,10 +23,14 @@ const success = {
 
 const error = {
   "errors": [
-    { "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]", 
-    "name": "UriEvaluation" },
-    { "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]", 
-    "name": "MarkForSubmissionEvaluation" }
+    {
+      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]",
+      "name": "UriEvaluation"
+    },
+    {
+      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]",
+      "name": "MarkForSubmissionEvaluation"
+    }
   ], "warnings": []
 };
 
