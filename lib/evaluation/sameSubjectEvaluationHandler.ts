@@ -1,14 +1,15 @@
-import { Descriptor, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import {Descriptor, InputDescriptor, Optionality, PresentationDefinition} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
-import { Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import {Status} from '../ConstraintUtils';
+import {VerifiablePresentation} from '../verifiablePresentation';
 
-import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
+import {AbstractEvaluationHandler} from './abstractEvaluationHandler';
+import {EvaluationClient} from './evaluationClient';
+import {HandlerCheckResult} from './handlerCheckResult';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
+
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
@@ -37,9 +38,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   public handle(pd: PresentationDefinition, vp: VerifiablePresentation): void {
-    this.getSameSubjectFieldIdsToInputDescriptorsSets(pd);
-    this.getAllDescribedCredentialsPaths(vp);
-    this.getAllCredentialSubjects(this.allDescribedCredentialsPaths, vp);
+    this.findSameSubjectFieldIdsToInputDescriptorsSets(pd);
+    this.findAllDescribedCredentialsPaths(vp);
+    this.findAllCredentialSubjects(this.allDescribedCredentialsPaths, vp);
 
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.ERROR);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
@@ -48,7 +49,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   /**
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
-  private getSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
+  private findSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
     pd.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
   }
 
@@ -85,7 +86,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     inDesc: InputDescriptor
   ) {
     return (fieldId) => {
-      if (!this.getValue(fieldIdzInputDescriptors, fieldId)) {
+      if (this.getValue(fieldIdzInputDescriptors, fieldId).size < 1) {
         SameSubjectEvaluationHandler.addEntry(fieldIdzInputDescriptors, fieldId, inDesc.id);
       } else {
         this.getValue(fieldIdzInputDescriptors, fieldId).add(inDesc.id);
@@ -110,7 +111,10 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     let value: Set<string> = new Set<string>();
 
     fieldIds.forEach((fieldIdKey) => {
-      value = SameSubjectEvaluationHandler.getValueForKey(fieldIdKey, fieldId, inputDescriptorIds);
+      const tempValue: Set<string> = SameSubjectEvaluationHandler.getValueForKey(fieldIdKey, fieldId, inputDescriptorIds);
+      if (tempValue.size > 0) {
+        value = tempValue;
+      }
     });
 
     return value;
@@ -136,28 +140,28 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     fieldIdzInputDescriptors.set(fieldIds, inputDescriptors);
   }
 
-  private getAllDescribedCredentialsPaths(vp: VerifiablePresentation) {
+  private findAllDescribedCredentialsPaths(vp: VerifiablePresentation) {
     vp.getPresentationSubmission().descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
   private descriptorToPathMapper() {
-    return (descriptor) => this.getDescribedCredentialPaths(descriptor);
+    return (descriptor) => this.findDescribedCredentialPaths(descriptor);
   }
 
-  private getDescribedCredentialPaths(descriptor: Descriptor) {
+  private findDescribedCredentialPaths(descriptor: Descriptor) {
     this.allDescribedCredentialsPaths.set(descriptor.id, descriptor.path);
 
     if (descriptor.path_nested) {
-      this.getDescribedCredentialPaths(descriptor.path_nested);
+      this.findDescribedCredentialPaths(descriptor.path_nested);
     }
   }
 
-  private getAllCredentialSubjects(credentialsPaths: Map<string, string>, vp: VerifiablePresentation) {
+  private findAllCredentialSubjects(credentialsPaths: Map<string, string>, vp: VerifiablePresentation) {
     credentialsPaths.forEach(this.mapCredentialPathToCredentialSubject(vp));
   }
 
   private mapCredentialPathToCredentialSubject(vp: VerifiablePresentation) {
-    return (inDescId, path) => {
+    return (path, inDescId) => {
       this.credentialsSubjects.set(inDescId, jp.nodes(vp, path).credentialSubject);
     };
   }
@@ -194,7 +198,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
       verifiable_credential_path: credentialSubjectsSet.toString(),
       evaluator: this.getName(),
       status: myStatus,
-      payload: { fieldIdSet: fieldIdSet, credentialSubjectsSet: credentialSubjectsSet },
+      payload: {fieldIdSet: fieldIdSet, credentialSubjectsSet: credentialSubjectsSet},
       message: this.messages.get(myStatus),
     };
   }
