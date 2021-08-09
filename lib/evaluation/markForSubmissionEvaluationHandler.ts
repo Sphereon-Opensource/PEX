@@ -20,10 +20,10 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   public handle(pd: PresentationDefinition, p: unknown): void {
-    this.iterateOverInputCandidates(pd, p);
+    this.createVerifiableCredentialsArrays(pd, p);
   }
 
-  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: unknown): void {
+  private createVerifiableCredentialsArrays(pd: PresentationDefinition, inputCandidates: unknown): void {
     const verifiableCredentials = this.extractVerifiableCredentials(inputCandidates);
     for (const [key, value] of verifiableCredentials) {
       for (const vc of value.entries()) {
