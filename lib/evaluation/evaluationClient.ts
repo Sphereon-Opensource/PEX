@@ -8,6 +8,7 @@ import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterE
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
+import {SameSubjectEvaluationHandler} from "./sameSubjectEvaluationHandler";
 import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
@@ -56,7 +57,9 @@ export class EvaluationClient {
       .setNext(new InputDescriptorFilterEvaluationHandler(this))
       .setNext(new PredicateRelatedFieldEvaluationHandler(this))
       .setNext(new MarkForSubmissionEvaluationHandler(this))
-      .setNext(new LimitDisclosureEvaluationHandler(this));
+      .setNext(new LimitDisclosureEvaluationHandler(this))
+      .setNext(new SubjectIsIssuerEvaluationHandler(this))
+      .setNext(new SameSubjectEvaluationHandler(this));
 
     return uriEvaluation;
   }
