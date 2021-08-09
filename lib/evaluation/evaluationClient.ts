@@ -28,15 +28,15 @@ export class EvaluationClient {
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp);
-    while (currentHandler.hasNext()) {
-      currentHandler = currentHandler.getNext();
-      try {
+    try {
+      currentHandler.handle(pd, vp);
+      while (currentHandler.hasNext()) {
+        currentHandler = currentHandler.getNext();
         currentHandler.handle(pd, vp);
-      } catch (e) {
-        this.failed_catched.message += e.message;
-        throw this.failed_catched;
       }
+    } catch (e) {
+      this.failed_catched.message += e.message;
+      throw this.failed_catched;
     }
     return this._results;
   }

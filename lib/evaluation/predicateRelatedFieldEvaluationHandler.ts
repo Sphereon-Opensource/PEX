@@ -71,7 +71,12 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   private concatenatePath(path) {
     let completePath = '';
     for (let i = 0; i < path.length; i++) {
-      completePath += path[i] + '.';
+      if (typeof path[i] === 'number') {
+        completePath = completePath.substring(0, completePath.length - 1);
+        completePath += '[*].';
+      } else {
+        completePath += path[i] + '.';
+      }
     }
     return completePath.substring(0, completePath.length - 1);
   }

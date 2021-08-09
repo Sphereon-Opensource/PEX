@@ -15,7 +15,7 @@ export class InputDescriptorIsHolderEvaluationHandler extends AbstractEvaluation
     this.iterateOverInputCandidates(d, p);
   }
 
-  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: any): void {
+  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: unknown): void {
     const props = Object.entries(inputCandidates).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
     ) as Array<[string, Array<unknown>]>;
