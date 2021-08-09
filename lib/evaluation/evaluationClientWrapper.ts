@@ -1,7 +1,10 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { EvaluationClient } from './evaluationClient';
+import { Status } from '../ConstraintUtils';
+
 import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
+import { EvaluationClient } from './evaluationClient';
+import { EvaluationResults } from './evaluationResults';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -26,8 +29,8 @@ export class EvaluationClientWrapper {
     presentationDefinition: PresentationDefinition,
     verifiablePresentation: any
   ) {
-    console.log("presentationDefinition: ", presentationDefinition);
-    console.log("verifiablePresentation: ", verifiablePresentation);
+    console.log('presentationDefinition: ', presentationDefinition);
+    console.log('verifiablePresentation: ', verifiablePresentation);
 
     /**
      *
@@ -55,5 +58,22 @@ export class EvaluationClientWrapper {
     }
      */
     return null;
+  }
+  public evaluate(pd: PresentationDefinition, vp: unknown, ec: EvaluationClient): EvaluationResults {
+    ec.evaluate(pd, vp);
+    const result: any = {};
+    result.warnings = ec.results.filter((result) => result.status === Status.WARN).map((x) => JSON.stringify(x));
+    result.errors = ec.results
+      .filter((result) => result.status === Status.ERROR)
+      .map((x) => {
+        return {
+          name: x.evaluator,
+          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+        };
+      });
+    if (ec.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
+      result.value = ec.verifiablePresentation['presentationSubmission'];
+    }
+    return result;
   }
 }
