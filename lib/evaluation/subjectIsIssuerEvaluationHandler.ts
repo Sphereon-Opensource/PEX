@@ -26,11 +26,11 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private checkSubjectIsIssuer(inputDescriptorId: string, vp: unknown, idIdx: number) {
-    const verifiablePresentation = this.verifiablePresentation;
+    const verifiablePresentation = this.getVerifiablePresentation();
     for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
+      const currentDescriptor: Descriptor = this.getVerifiablePresentation().presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
+        const vc = JsonPathUtils.extractInputField(this.getVerifiablePresentation(), [currentDescriptor.path]);
         if (vc[0].value.issuer === vc[0].value.credentialSubject.id) {
           this.generateSuccessResult(idIdx, vp, vc[0].value.id);
         } else {

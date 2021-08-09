@@ -10,9 +10,9 @@ import { HandlerCheckResult } from './handlerCheckResult';
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
     super(client);
-    this.verifiablePresentation.presentationSubmission = {};
-    this.verifiablePresentation.presentationSubmission.descriptor_map = [];
-    this.verifiablePresentation.presentationSubmission.id = nanoid();
+    this.getVerifiablePresentation().presentationSubmission = {};
+    this.getVerifiablePresentation().presentationSubmission.descriptor_map = [];
+    this.getVerifiablePresentation().presentationSubmission.id = nanoid();
   }
 
   public getName(): string {
@@ -57,13 +57,13 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
-    this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
+    this.getVerifiablePresentation().presentationSubmission.definition_id = pd.id;
     const info = this.getResults().find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
     if (!info) {
       return;
     }
-    if (!this.verifiablePresentation[`${path}`]) {
-      this.verifiablePresentation[`${path}`] = [];
+    if (!this.getVerifiablePresentation()[`${path}`]) {
+      this.getVerifiablePresentation()[`${path}`] = [];
     }
     this.addInputDescriptorToResults(pd.input_descriptors, vc, info, path);
   }
@@ -95,10 +95,10 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private pushToDescriptorsMap(newDescriptor: Descriptor, vc: [number, unknown], path: string) {
-    const descriptorMap: Descriptor[] = this.verifiablePresentation.presentationSubmission.descriptor_map;
+    const descriptorMap: Descriptor[] = this.getVerifiablePresentation().presentationSubmission.descriptor_map;
     if (descriptorMap.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
-      this.verifiablePresentation[`${path}`].push(vc[1]);
-      this.verifiablePresentation.presentationSubmission.descriptor_map.forEach((d: Descriptor) =>
+      this.getVerifiablePresentation()[`${path}`].push(vc[1]);
+      this.getVerifiablePresentation().presentationSubmission.descriptor_map.forEach((d: Descriptor) =>
         this.addPathNestedDescriptor(d, newDescriptor)
       );
     } else if (
@@ -106,8 +106,8 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
-      this.verifiablePresentation[`${path}`].push(vc[1]);
-      this.verifiablePresentation.presentationSubmission.descriptor_map.push(newDescriptor);
+      this.getVerifiablePresentation()[`${path}`].push(vc[1]);
+      this.getVerifiablePresentation().presentationSubmission.descriptor_map.push(newDescriptor);
     }
   }
 

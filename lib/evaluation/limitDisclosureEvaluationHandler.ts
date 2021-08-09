@@ -43,8 +43,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         i
       );
       if (
-        this.verifiablePresentation.presentationSubmission &&
-        this.verifiablePresentation.presentationSubmission.descriptor_map
+        this.getVerifiablePresentation().presentationSubmission &&
+        this.getVerifiablePresentation().presentationSubmission.descriptor_map
       ) {
         this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
       }
@@ -95,7 +95,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: unknown, inputDescriptorId: string) {
-    const verifiablePresentation = this.verifiablePresentation;
+    const verifiablePresentation = this.getVerifiablePresentation();
     if (!verifiablePresentation.verifiableCredential) {
       verifiablePresentation.verifiableCredential = [];
     }
@@ -136,7 +136,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    */
   private updateVcForPath(verifiableCredentialToSend: unknown, path: string, idIdx: number) {
     this.createSuccessResult(idIdx, path);
-    let innerObj = this.verifiablePresentation;
+    let innerObj = this.getVerifiablePresentation();
     const inputField = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = inputField[0].path;
     for (let i = 1; i < pathDetails.length; i++) {

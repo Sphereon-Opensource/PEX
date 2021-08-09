@@ -81,7 +81,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: "info",
       verifiable_credential_path: "$.verifiableCredential[0]"
     });
-    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.getVerifiablePresentation().presentationSubmission).toEqual(
       expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: [{
@@ -109,7 +109,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: "error",
       verifiable_credential_path: "$.verifiableCredential[0]"
     });
-    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.getVerifiablePresentation().presentationSubmission).toEqual(
       expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: []
@@ -153,7 +153,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: "info",
       verifiable_credential_path: "$.mostInnerClaim[2]"
     }]);
-    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.getVerifiablePresentation().presentationSubmission).toEqual(
       expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: [
@@ -172,7 +172,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
           }
         ]
     }));
-    expect(evaluationHandler.verifiablePresentation.outerClaim).toEqual([{
+    expect(evaluationHandler.getVerifiablePresentation().outerClaim).toEqual([{
       comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
       vc: {
         "@context": "https://www.w3.org/2018/credentials/v1",
@@ -197,7 +197,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
         },
       },
     }]);
-    expect(evaluationHandler.verifiablePresentation.innerClaim).toEqual([{
+    expect(evaluationHandler.getVerifiablePresentation().innerClaim).toEqual([{
       comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
       vc: {
         "@context": "https://www.w3.org/2018/credentials/v1",
@@ -222,7 +222,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
         },
       },
     }]);
-    expect(evaluationHandler.verifiablePresentation.mostInnerClaim).toEqual([{
+    expect(evaluationHandler.getVerifiablePresentation().mostInnerClaim).toEqual([{
       comment: "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
       vc: {
         "@context": "https://www.w3.org/2018/credentials/v1",
