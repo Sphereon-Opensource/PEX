@@ -43,10 +43,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         i
       );
       if (
-        this.getVerifiablePresentation().presentationSubmission &&
-        this.getVerifiablePresentation().presentationSubmission.descriptor_map
+        this.verifiablePresentation.presentationSubmission &&
+        this.verifiablePresentation.presentationSubmission.descriptor_map
       ) {
-        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId, i);
+        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
       }
     }
   }
@@ -71,7 +71,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private copyResultPathToDestinationCredential(
-    pathDetails: any[],
+    pathDetails: (string | number)[],
     verifiableCredential: unknown,
     verifiableCredentialToSend: unknown
   ) {
@@ -94,27 +94,23 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private copyModifiedVerifiableCredentialToExisting(
-    verifiableCredentialToSend: any,
-    inputDescriptorId: string,
-    vcIdx: number
-  ) {
-    const verifiablePresentation = this.getVerifiablePresentation();
+  private copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend: unknown, inputDescriptorId: string) {
+    const verifiablePresentation = this.verifiablePresentation;
     if (!verifiablePresentation.verifiableCredential) {
       verifiablePresentation.verifiableCredential = [];
     }
     for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
       const currentDescriptor: Descriptor = verifiablePresentation.presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i, vcIdx);
+        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
       }
     }
   }
 
-  private createSuccessResult(idIdx: number, vcIdx: number, path: string) {
+  private createSuccessResult(idIdx: number, path: string) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.${path}[${vcIdx}]`,
+      verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: 'added variable in the limit_disclosure to the verifiableCredential',
@@ -138,9 +134,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
    * @param path example: "$.verifiableCredential[0]"
    */
-  private updateVcForPath(verifiableCredentialToSend: unknown, path: string, idIdx: number, vcIdx: number) {
-    this.createSuccessResult(idIdx, vcIdx, path);
-    let innerObj = this.getVerifiablePresentation();
+  private updateVcForPath(verifiableCredentialToSend: unknown, path: string, idIdx: number) {
+    this.createSuccessResult(idIdx, path);
+    let innerObj = this.verifiablePresentation;
     const inputField = JsonPathUtils.extractInputField(innerObj, [path]);
     const pathDetails: string[] = inputField[0].path;
     for (let i = 1; i < pathDetails.length; i++) {

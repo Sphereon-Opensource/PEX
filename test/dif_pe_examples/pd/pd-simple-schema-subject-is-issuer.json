@@ -13,40 +13,15 @@
           }
         ],
         "constraints": {
-          "limit_disclosure": "required",
+          "subject_is_issuer": "required",
           "fields": [
             {
               "path": [
-                "$.age",
-                "$.details.age"
+                "$.age"
               ],
               "filter": {
                 "type": "integer",
                 "minimum": 18
-              },
-              "predicate": "required"
-            }, {
-              "path": [
-                "$.citizenship[*]",
-                "$.details.citizenship[*]"
-              ],
-              "filter": {
-                "type": "string",
-                "enum": [
-                  "eu",
-                  "us",
-                  "uk"
-                ]
-              },
-              "predicate": "required"
-            }, {
-              "path": [
-                "$.country[*].abbr",
-                "$.details.country[*].abbr"
-              ],
-              "filter": {
-                "type": "string",
-                "pattern": "NLD"
               },
               "predicate": "required"
             }

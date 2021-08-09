@@ -24,25 +24,16 @@
         "https://www.w3.org/2018/credentials/v1"
       ],
       "age": 19,
-      "details": {
-        "citizenship": [
-          "eu"
-        ]
-      },
-      "country": [
-        {
-          "abbr": "NLD"
-        }
-      ],
-      "birthPlace": "Maarssen",
       "credentialSchema": [
         {
           "id": "https://www.w3.org/TR/vc-data-model/#types"
         }
       ],
-      "credentialSubject": null,
+      "credentialSubject": {
+        "id": "did:example:123"
+      },
       "id": "2dc74354-e965-4883-be5e-bfec48bf60c7",
-      "issuer": "",
+      "issuer": "did:example:123",
       "type": "VerifiableCredential"
     }
   ]

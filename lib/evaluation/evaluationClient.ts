@@ -8,6 +8,7 @@ import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterE
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
+import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
@@ -27,15 +28,15 @@ export class EvaluationClient {
 
   public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp);
-    while (currentHandler.hasNext()) {
-      currentHandler = currentHandler.getNext();
-      try {
+    try {
+      currentHandler.handle(pd, vp);
+      while (currentHandler.hasNext()) {
+        currentHandler = currentHandler.getNext();
         currentHandler.handle(pd, vp);
-      } catch (e) {
-        this.failed_catched.message += e.message;
-        throw this.failed_catched;
       }
+    } catch (e) {
+      this.failed_catched.message += e.message;
+      throw this.failed_catched;
     }
     return this._results;
   }
@@ -54,11 +55,13 @@ export class EvaluationClient {
     const predicateEvaluationHandler = new PredicateRelatedFieldEvaluationHandler(this);
     const markForSubmissionEvaluation = new MarkForSubmissionEvaluationHandler(this);
     const limitDisclosureEvaluationHandler = new LimitDisclosureEvaluationHandler(this);
+    const subjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(this);
     uriEvaluation
       .setNext(inputDescriptorFilterEvaluationHandler)
       .setNext(predicateEvaluationHandler)
       .setNext(markForSubmissionEvaluation)
-      .setNext(limitDisclosureEvaluationHandler);
+      .setNext(limitDisclosureEvaluationHandler)
+      .setNext(subjectIsIssuerEvaluationHandler);
 
     return uriEvaluation;
   }
