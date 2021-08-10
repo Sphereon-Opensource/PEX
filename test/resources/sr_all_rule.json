@@ -1,0 +1,43 @@
+{
+    "comment": "Note: VP, OIDC, DIDComm, or CHAPI outer wrapper would be here.",
+    "presentation_definition": {
+      "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
+      "submission_requirements": [
+        {
+          "name": "Submission of educational transcripts",
+          "purpose": "We need your complete educational transcripts to process your application",
+          "rule": "all",
+          "from": "A"
+        }
+      ],
+      "input_descriptors": [
+        {
+          "id": "Educational transcripts",
+          "name": "Submission of educational transcripts",
+          "purpose": "We need your complete educational transcripts to process your application",
+          "group": "A",
+          "schema": [
+            {
+              "uri": "https://eu.com/claims/DriversLicense"
+            }
+          ],
+          "constraints": {
+            "fields": [
+              {
+                "path": [
+                  "$.issuer",
+                  "$.vc.issuer",
+                  "$.iss"
+                ],
+                "purpose": "We can only allow people with acceptable educational qualificaiton",
+                "filter": {
+                  "type": "string",
+                  "pattern": "did:example:123|did:example:456"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
