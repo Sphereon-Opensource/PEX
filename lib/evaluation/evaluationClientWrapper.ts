@@ -13,6 +13,10 @@ export class EvaluationClientWrapper {
     this._client = new EvaluationClient();
   }
 
+  public getEvaluationClient() {
+    return this._client;
+  }
+
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     selectedCredentials: unknown[]
@@ -59,11 +63,13 @@ export class EvaluationClientWrapper {
      */
     return null;
   }
-  public evaluate(pd: PresentationDefinition, vp: unknown, ec: EvaluationClient): EvaluationResults {
-    ec.evaluate(pd, vp);
+  public evaluate(pd: PresentationDefinition, vp: unknown): EvaluationResults {
+    this._client.evaluate(pd, vp);
     const result: any = {};
-    result.warnings = ec.results.filter((result) => result.status === Status.WARN).map((x) => JSON.stringify(x));
-    result.errors = ec.results
+    result.warnings = this._client.results
+      .filter((result) => result.status === Status.WARN)
+      .map((x) => JSON.stringify(x));
+    result.errors = this._client.results
       .filter((result) => result.status === Status.ERROR)
       .map((x) => {
         return {
@@ -71,8 +77,8 @@ export class EvaluationClientWrapper {
           message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
         };
       });
-    if (ec.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
-      result.value = ec.verifiablePresentation['presentationSubmission'];
+    if (this._client.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
+      result.value = this._client.verifiablePresentation['presentationSubmission'];
     }
     return result;
   }
