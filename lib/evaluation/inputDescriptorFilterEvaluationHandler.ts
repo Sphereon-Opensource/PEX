@@ -3,6 +3,7 @@ import Ajv from 'ajv';
 
 import { Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils/jsonPathUtils';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -17,16 +18,19 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: unknown): void {
+  public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
     this.iterateOverInputCandidates(inputDescriptors, p);
   }
 
   //TODO move to utils
-  private iterateOverInputCandidates(inputDescriptors: InputDescriptor[], inputCandidates: unknown): void {
-    const props = Object.entries(inputCandidates).filter(
+  private iterateOverInputCandidates(
+    inputDescriptors: InputDescriptor[],
+    verifiablePresentation: VerifiablePresentation
+  ): void {
+    const props = Object.entries(verifiablePresentation.getRoot()).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
-    ) as Array<[string, Array<unknown>]>;
+    ) as Array<[string, Array<VerifiableCredential>]>;
     for (const [key, value] of props) {
       for (const vc of value.entries()) {
         this.iterateOverInputDescriptors(inputDescriptors, vc, key);
@@ -34,7 +38,11 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     }
   }
 
-  private iterateOverInputDescriptors(inputDescriptors: InputDescriptor[], vc: [number, unknown], path: string): void {
+  private iterateOverInputDescriptors(
+    inputDescriptors: InputDescriptor[],
+    vc: [number, VerifiableCredential],
+    path: string
+  ): void {
     for (const inputDescriptor of inputDescriptors.entries()) {
       if (this.hasFields(inputDescriptor)) {
         this.iterateOverFields(inputDescriptor, vc, path);

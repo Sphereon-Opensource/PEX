@@ -2,6 +2,7 @@ import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Status } from '../ConstraintUtils';
+import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -11,14 +12,14 @@ export class InputDescriptorIsHolderEvaluationHandler extends AbstractEvaluation
     return 'IsHolderEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: unknown): void {
+  public handle(d: PresentationDefinition, p: VerifiablePresentation): void {
     this.iterateOverInputCandidates(d, p);
   }
 
-  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: unknown): void {
+  private iterateOverInputCandidates(pd: PresentationDefinition, inputCandidates: VerifiablePresentation): void {
     const props = Object.entries(inputCandidates).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
-    ) as Array<[string, Array<unknown>]>;
+    ) as Array<[string, Array<VerifiablePresentation>]>;
     for (const [key, value] of props) {
       for (const vc of value.entries()) {
         this.iterateOverInputDescriptors(pd, vc, key);
