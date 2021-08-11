@@ -78,8 +78,8 @@ export class EvaluationClientWrapper {
       .map((x) => {
         return {
           name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`
-        }
+          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+        };
       });
     result.errors = this._client.results
       .filter((result) => result.status === Status.ERROR)
@@ -136,7 +136,7 @@ export class EvaluationClientWrapper {
     };
     const descriptorMap: Descriptor[] = [...this._client.verifiablePresentation.presentationSubmission.descriptor_map];
     for (const [i, vc] of this._client.verifiablePresentation.verifiableCredential.entries()) {
-      for (const [j, newVc] of vcs.entries()) {
+      for (const [j, newVc] of Object.entries(vcs)) {
         for (const [h, descriptor] of descriptorMap.entries()) {
           if (vc == newVc && descriptor[h].path == `$.verifiablePresentation[${i}]`) {
             descriptorMap[h].path = `$.verifiablePresentation[${j}]`;
