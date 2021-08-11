@@ -207,14 +207,4 @@ describe('evaluate', () => {
     evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
   });
-
-  it('', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_all_rule.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    //const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient(); 
-    evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
-    expect(true).toBe(true);
-  });
 });
