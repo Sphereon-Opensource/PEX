@@ -99,7 +99,6 @@ export class EvaluationClientWrapper {
     if (!this._client.results) {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
-
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
@@ -107,19 +106,7 @@ export class EvaluationClientWrapper {
       );
       for (const submissionRequirement of pd.submission_requirements) {
         if (submissionRequirement.rule === Rules.All) {
-          if (submissionRequirement.from) {
-            this.handleAllFrom(submissionRequirement, marked);
-          } else if (submissionRequirement.from_nested) {
-            for (const sr of submissionRequirement.from_nested) {
-              if (sr.rule === Rules.All) {
-                if (sr.from) {
-                  this.handleAllFrom(sr, marked);
-                }
-              } else if (sr.rule === Rules.Pick) {
-                this.handlePick(sr, marked);
-              }
-            }
-          }
+          this.handleAll(submissionRequirement, marked);
         } else if (submissionRequirement.rule === Rules.Pick) {
           this.handlePick(submissionRequirement, marked);
         } else {
@@ -130,6 +117,80 @@ export class EvaluationClientWrapper {
     return this.remapVcs(vcs);
   }
 
+  private handlePick(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]) {
+    if (submissionRequirement.from) {
+      const count = this.countMatchingInputDescriptors(submissionRequirement, marked);
+      this.handleCount(submissionRequirement, count);
+    } else if (submissionRequirement.from_nested) {
+      const counter: number = this.handleNested(submissionRequirement, marked);
+      this.handleCount(submissionRequirement, counter);
+    }
+  }
+
+  private handleAll(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]) {
+    if (submissionRequirement.from) {
+      if (this.countMatchingInputDescriptors(submissionRequirement, marked) !== marked.length) {
+        throw Error(`Not all input descriptors are members of group ${submissionRequirement.from}`);
+      }
+    } else if (submissionRequirement.from_nested) {
+      if (this.handleNested(submissionRequirement, marked) !== submissionRequirement.from_nested.length) {
+        throw Error(`Not all input descriptors satisfy the submission requirements`);
+      }
+    }
+  }
+
+  private handleNested(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]): number {
+    let counter = 0;
+    for (const sr of submissionRequirement.from_nested) {
+      if (sr.rule === Rules.All) {
+        if (sr.from) {
+          if (marked.length === this.countMatchingInputDescriptors(sr, marked)) {
+            counter++;
+          }
+        }
+      } else if (sr.rule === Rules.Pick) {
+        const count = this.countMatchingInputDescriptors(sr, marked);
+        try {
+          this.handleCount(sr, count);
+          counter++;
+        } catch (error) {
+          //Exception should be swallowed, another one will be thrown based on the counter.
+        }
+      }
+    }
+    return counter;
+  }
+
+  private countMatchingInputDescriptors(
+    submissionRequirement: SubmissionRequirement,
+    marked: HandlerCheckResult[]
+  ): number {
+    let count = 0;
+    for (const m of marked) {
+      if (m.payload.group.includes(submissionRequirement.from)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private handleCount(submissionRequirement: SubmissionRequirement, count: number): void {
+    if (submissionRequirement.count) {
+      if (count !== submissionRequirement.count) {
+        throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count}`);
+      }
+    }
+    if (submissionRequirement.min) {
+      if (count < submissionRequirement.min) {
+        throw Error(`Min: expected: ${submissionRequirement.min} actual: ${count}`);
+      }
+    }
+    if (submissionRequirement.max) {
+      if (count > submissionRequirement.max) {
+        throw Error(`Max: expected: ${submissionRequirement.max} actual: ${count}`);
+      }
+    }
+  }
   private remapVcs(vcs: unknown[]) {
     const presentationSubmission: PresentationSubmission = {
       ...this._client.verifiablePresentation.presentationSubmission,
@@ -146,38 +207,5 @@ export class EvaluationClientWrapper {
     }
     presentationSubmission.descriptor_map = descriptorMap;
     return presentationSubmission;
-  }
-
-  private handleAllFrom(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]) {
-    for (const m of marked) {
-      if (m.payload.group !== submissionRequirement.from) {
-        throw Error('group not present');
-      }
-    }
-  }
-
-  private handlePick(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]): void {
-    let count = 0;
-    if (submissionRequirement.from) {
-      for (const m of marked) {
-        if (m.payload.group === submissionRequirement.from) {
-          count++;
-        }
-      }
-      if (submissionRequirement.count) {
-        if (count !== submissionRequirement.count) {
-          throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count}`);
-        }
-      } else if (submissionRequirement.min) {
-        if (count < submissionRequirement.min) {
-          throw Error(`Min: expected: ${submissionRequirement.min} actual: ${count}`);
-        }
-      }
-      if (submissionRequirement.max) {
-        if (count > submissionRequirement.max) {
-          throw Error(`Max: expected: ${submissionRequirement.max} actual: ${count}`);
-        }
-      }
-    }
   }
 }
