@@ -26,16 +26,6 @@
                 "type": "string",
                 "pattern": "did:example:123|did:example:456"
               }
-            },
-            {
-              "path": [
-                "$.innerClaim[*].winner"
-              ],
-              "purpose": "We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.",
-              "filter": {
-                "type": "string",
-                "pattern": "did:example:123|did:example:456"
-              }
             }
           ]
         }
