@@ -1,6 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-import {DIdComm} from './models';
+import { DIdComm } from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
