@@ -10,6 +10,10 @@ import { VerifiablePresentation } from './verifiablePresentation';
 export class CHAPIVP implements VerifiablePresentation {
   private chapi: Chapi;
 
+  public getRoot(): Chapi {
+    return this.chapi;
+  }
+
   public getPresentationSubmission(): PresentationSubmission {
     return this.chapi.data.presentation_submission;
   }

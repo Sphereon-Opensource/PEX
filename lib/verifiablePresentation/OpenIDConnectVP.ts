@@ -1,6 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-import { OpenIdConnect } from './models';
+import {OpenIdConnect} from './models';
 import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
@@ -9,6 +9,10 @@ import { VerifiablePresentation } from './verifiablePresentation';
  */
 export class OpenIDConnectVP implements VerifiablePresentation {
   private openIdConnect: OpenIdConnect;
+
+  public getRoot(): OpenIdConnect {
+    return this.openIdConnect;
+  }
 
   public getPresentationSubmission(): PresentationSubmission {
     return this.openIdConnect.presentation_submission;

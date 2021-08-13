@@ -5,9 +5,7 @@ import {PresentationDefinition} from '@sphereon/pe-models';
 import {
   EvaluationClient,
   EvaluationHandler,
-  HandlerCheckResult,
   SameSubjectEvaluationHandler,
-  Status,
   VP,
 } from '../../lib';
 import {Presentation} from "../../lib/verifiablePresentation/models";
@@ -21,16 +19,12 @@ describe('sameSubjectEvaluationHandler', () => {
   it('Should record as success when the fields requiring same subject belong to same subjects', () => {
     const pd: PresentationDefinition = getFile('./test/resources/pd_require_same_subject.json').presentation_definition;
     const presentation: Presentation = getFile('./test/resources/vp_require_same_subject.json');
+    const results = getFile('./test/resources/sameSubjectEvaluationResults.json');
+
     const vp: VP = new VP(presentation);
     const evaluationHandler: EvaluationHandler = new SameSubjectEvaluationHandler(new EvaluationClient());
     evaluationHandler.handle(pd, vp as VP);
-    expect(evaluationHandler).toEqual(
-      new HandlerCheckResult(
-        'a',
-        'b',
-        'SameSubjectEvaluationHandler',
-        Status.ERROR,
-        'The field ids requiring the same subject belong to same subject'));
+    expect(evaluationHandler.client.results).toEqual(results);
   });
 
   // it('Should record as error when the fields requiring same subject do not belong to same subjects', () => {

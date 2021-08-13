@@ -1,0 +1,24 @@
+[
+  {
+    "evaluator": "SameSubjectEvaluationHandler",
+    "input_descriptor_path": "[field1Value,field2Value]",
+    "message": "The field ids requiring the same subject belong to same subject",
+    "payload": {
+      "credentialSubjectsSet": "[VCSubject2020081200]",
+      "fieldIdSet": "[field1Value,field2Value]"
+    },
+    "status": "info",
+    "verifiable_credential_path": "[VCSubject2020081200]"
+  },
+  {
+    "evaluator": "SameSubjectEvaluationHandler",
+    "input_descriptor_path": "[field3Value,field4Value]",
+    "message": "The field ids requiring the same subject belong to same subject",
+    "payload": {
+      "credentialSubjectsSet": "[VCSubject2020081205]",
+      "fieldIdSet": "[field3Value,field4Value]"
+    },
+    "status": "info",
+    "verifiable_credential_path": "[VCSubject2020081205]"
+  }
+]
