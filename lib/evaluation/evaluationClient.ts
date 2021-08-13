@@ -8,7 +8,7 @@ import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterE
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
-import {SameSubjectEvaluationHandler} from "./sameSubjectEvaluationHandler";
+import { SameSubjectEvaluationHandler } from './sameSubjectEvaluationHandler';
 import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
