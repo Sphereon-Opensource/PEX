@@ -41,11 +41,11 @@ export class EvaluationClient {
     return this._results;
   }
 
-  get results(): HandlerCheckResult[] {
+  public get results(): HandlerCheckResult[] {
     return this._results;
   }
 
-  get verifiablePresentation(): any {
+  public get verifiablePresentation(): any {
     return this._verifiablePresentation;
   }
 

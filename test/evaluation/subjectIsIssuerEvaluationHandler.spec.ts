@@ -16,7 +16,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
-    subjectIsIssuerEvaluationHandler.verifiablePresentation.presentationSubmission = {
+    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().presentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
       'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
       'descriptor_map': [
@@ -27,7 +27,7 @@ describe('evaluate', () => {
         }
       ]
     };
-    subjectIsIssuerEvaluationHandler.verifiablePresentation.verifiableCredential = [{
+    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().verifiableCredential = [{
       '@context': [
         'https://www.w3.org/2018/credentials/v1'
       ],
@@ -59,7 +59,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
-    subjectIsIssuerEvaluationHandler.verifiablePresentation.presentationSubmission = {
+    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().presentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
       'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
       'descriptor_map': [
@@ -70,7 +70,7 @@ describe('evaluate', () => {
         }
       ]
     };
-    subjectIsIssuerEvaluationHandler.verifiablePresentation.verifiableCredential = [{
+    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().verifiableCredential = [{
       '@context': [
         'https://www.w3.org/2018/credentials/v1'
       ],

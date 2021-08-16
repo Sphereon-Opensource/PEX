@@ -28,9 +28,13 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client;
   }
 
+  public set client(client: EvaluationClient) {
+    this._client = client;
+  }
+
   public abstract handle(d: PresentationDefinition, p: unknown): void;
 
-  public get verifiablePresentation(): any {
+  public getVerifiablePresentation(): any {
     return this.client.verifiablePresentation;
   }
   public getResults(): HandlerCheckResult[] {
