@@ -8,7 +8,6 @@ import {
 
 import { Status } from '../ConstraintUtils';
 
-import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -23,53 +22,7 @@ export class EvaluationClientWrapper {
   public getEvaluationClient() {
     return this._client;
   }
-
-  public selectFrom(
-    presentationDefinition: PresentationDefinition,
-    selectedCredentials: unknown[]
-  ): { matches: SubmissionRequirementMatch[]; warnings: string[] } {
-    this._client.evaluate(presentationDefinition, { verifiableCredential: selectedCredentials });
-    const submissionRequirementMatches: SubmissionRequirementMatch[] = this.createSubmissionRequirementMatches(
-      presentationDefinition,
-      this._client.verifiablePresentation
-    );
-    return { matches: submissionRequirementMatches, warnings: [] };
-  }
-
-  private createSubmissionRequirementMatches(
-    presentationDefinition: PresentationDefinition,
-    verifiablePresentation: any
-  ) {
-    console.log('presentationDefinition: ', presentationDefinition);
-    console.log('verifiablePresentation: ', verifiablePresentation);
-
-    /**
-     *
-     {
-      matches: [{
-        name: "Drinking age",
-        rule: Rules.All,
-        count: 1,
-        matches: [{
-          "@context": [
-            "https://www.w3.org/2018/credentials/v1"
-          ],
-          "age": 19,
-          "credentialSchema": [
-            {
-              "id": "https://www.w3.org/TR/vc-data-model/#types"
-            }
-          ],
-          "credentialSubject": null,
-          "id": "2dc74354-e965-4883-be5e-bfec48bf60c7",
-          "issuer": "",
-          "type": "VerifiableCredential"
-        }],
-      }], warnings: []
-    }
-     */
-    return null;
-  }
+  
   public evaluate(pd: PresentationDefinition, vp: unknown): EvaluationResults {
     this._client.evaluate(pd, vp);
     const result: any = {};
@@ -104,61 +57,36 @@ export class EvaluationClientWrapper {
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
-      for (const submissionRequirement of pd.submission_requirements) {
-        if (submissionRequirement.rule === Rules.All) {
-          this.handleAll(submissionRequirement, marked);
-        } else if (submissionRequirement.rule === Rules.Pick) {
-          this.handlePick(submissionRequirement, marked);
-        } else {
-          throw Error('Unsupported rule');
-        }
-      }
+      this.evaluateRequirements(pd.submission_requirements, marked, 0);
     }
     return this.remapVcs(vcs);
   }
 
-  private handlePick(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]) {
-    if (submissionRequirement.from) {
-      const count = this.countMatchingInputDescriptors(submissionRequirement, marked);
-      this.handleCount(submissionRequirement, count);
-    } else if (submissionRequirement.from_nested) {
-      const counter: number = this.handleNested(submissionRequirement, marked);
-      this.handleCount(submissionRequirement, counter);
-    }
-  }
-
-  private handleAll(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]) {
-    if (submissionRequirement.from) {
-      if (this.countMatchingInputDescriptors(submissionRequirement, marked) !== marked.length) {
-        throw Error(`Not all input descriptors are members of group ${submissionRequirement.from}`);
-      }
-    } else if (submissionRequirement.from_nested) {
-      if (this.handleNested(submissionRequirement, marked) !== submissionRequirement.from_nested.length) {
-        throw Error(`Not all input descriptors satisfy the submission requirements`);
-      }
-    }
-  }
-
-  private handleNested(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]): number {
-    let counter = 0;
-    for (const sr of submissionRequirement.from_nested) {
-      if (sr.rule === Rules.All) {
-        if (sr.from) {
-          if (marked.length === this.countMatchingInputDescriptors(sr, marked)) {
-            counter++;
+  private evaluateRequirements(submissionRequirement: SubmissionRequirement[], marked: HandlerCheckResult[], level: number): number {
+    let total: number = 0;
+    for (const sr of submissionRequirement) {
+      if (sr.from) {
+        if (sr.rule === Rules.All) {
+          if (this.countMatchingInputDescriptors(sr, marked) !== marked.length) {
+            throw Error(`Not all input descriptors are members of group ${sr.from}`);
+          }
+          total++;
+        } else if (sr.rule === Rules.Pick) {
+          const count = this.countMatchingInputDescriptors(sr, marked);
+          try {
+            this.handleCount(sr, count, level);
+            total++;
+          } catch (error) {
+            if (level === 0) throw error;
           }
         }
-      } else if (sr.rule === Rules.Pick) {
-        const count = this.countMatchingInputDescriptors(sr, marked);
-        try {
-          this.handleCount(sr, count);
-          counter++;
-        } catch (error) {
-          //Exception should be swallowed, another one will be thrown based on the counter.
-        }
+      } else if (sr.from_nested) {
+        const count = this.evaluateRequirements(sr.from_nested, marked, ++level);
+        total += count;
+        this.handleCount(sr, count, level);
       }
     }
-    return counter;
+    return total;
   }
 
   private countMatchingInputDescriptors(
@@ -174,20 +102,20 @@ export class EvaluationClientWrapper {
     return count;
   }
 
-  private handleCount(submissionRequirement: SubmissionRequirement, count: number): void {
+  private handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
     if (submissionRequirement.count) {
       if (count !== submissionRequirement.count) {
-        throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count}`);
+        throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count} at level: ${level}`);
       }
     }
     if (submissionRequirement.min) {
       if (count < submissionRequirement.min) {
-        throw Error(`Min: expected: ${submissionRequirement.min} actual: ${count}`);
+        throw Error(`Min: expected: ${submissionRequirement.min} actual: ${count} at level: ${level}`);
       }
     }
     if (submissionRequirement.max) {
       if (count > submissionRequirement.max) {
-        throw Error(`Max: expected: ${submissionRequirement.max} actual: ${count}`);
+        throw Error(`Max: expected: ${submissionRequirement.max} actual: ${count} at level: ${level}`);
       }
     }
   }

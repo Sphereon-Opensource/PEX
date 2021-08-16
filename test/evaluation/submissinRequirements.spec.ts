@@ -83,7 +83,7 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[4]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2');
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements max 1 from group B', () => {
@@ -92,7 +92,7 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[5]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2');
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements exactly 1 from group B', () => {
@@ -101,7 +101,7 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[6]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Count: expected: 1 actual: 2');
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Count: expected: 1 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements all from group B', () => {
@@ -170,7 +170,7 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[11]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2');
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2 at level: ');
       });
     
       it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
@@ -179,6 +179,6 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[12]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2');
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
       });
 });
