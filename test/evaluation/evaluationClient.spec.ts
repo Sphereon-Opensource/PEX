@@ -25,11 +25,13 @@ const error = {
   "errors": [
     {
       "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "name": "UriEvaluation"
+      "status": "error",
+      "tag": "UriEvaluation"
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "name": "MarkForSubmissionEvaluation"
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation"
     }
   ], "warnings": []
 };
@@ -38,31 +40,38 @@ const error_2 = {
   "errors": [
     {
       "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "name": "UriEvaluation",
+      "status": "error",
+      "tag": "UriEvaluation",
     },
     {
       "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "UriEvaluation",
+      "status": "error",
+      "tag": "UriEvaluation",
     },
     {
       "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "FilterEvaluation",
+      "status": "error",
+      "tag": "FilterEvaluation",
     },
     {
       "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "FilterEvaluation",
+      "status": "error",
+      "tag": "FilterEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     }],
   "warnings": [],
 }
@@ -71,23 +80,28 @@ const success_error = {
   "errors": [
     {
       "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "UriEvaluation",
+      "status": "error",
+      "tag": "UriEvaluation",
     },
     {
       "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "FilterEvaluation",
+      "status": "error",
+      "tag": "FilterEvaluation",
     },
     {
       "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "FilterEvaluation",
+      "status": "error",
+      "tag": "FilterEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     },
   ],
   "value": expect.objectContaining({

@@ -1,9 +1,9 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-import { Warn } from './warn';
+import { Checked } from '../ConstraintUtils';
 
 export interface EvaluationResults {
   value?: PresentationSubmission;
-  warnings?: Warn[];
-  errors?: Error[];
+  warnings?: Checked[];
+  errors?: Checked[];
 }
