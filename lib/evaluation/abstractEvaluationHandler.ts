@@ -1,5 +1,7 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
+import { VerifiablePresentation } from '../verifiablePresentation';
+
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -28,15 +30,16 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client;
   }
 
-  public set client(client: EvaluationClient) {
-    this._client = client;
-  }
+  public abstract handle(d: PresentationDefinition, p: VerifiablePresentation): void;
 
-  public abstract handle(d: PresentationDefinition, p: unknown): void;
-
-  public getVerifiablePresentation(): any {
+  public get verifiablePresentation(): VerifiablePresentation {
     return this.client.verifiablePresentation;
   }
+
+  public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {
+    this.client.verifiablePresentation = verifiablePresentation;
+  }
+
   public getResults(): HandlerCheckResult[] {
     return this.client.results;
   }

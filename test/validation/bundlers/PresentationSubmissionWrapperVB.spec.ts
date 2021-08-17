@@ -5,7 +5,7 @@ import { PresentationSubmission} from '@sphereon/pe-models';
 import { PresentationSubmissionWrapperVB } from "../../../lib";
 import { ValidationBundler } from "../../../lib";
 import { ValidationEngine } from "../../../lib";
-import { Checked, Status } from '../../../lib/ConstraintUtils';
+import { Checked, Status } from '../../../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -33,14 +33,14 @@ describe('validate', () => {
   });
 
   it('should not return error for presentation submission to be on root level', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/vp_basic.json');
+    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
     const result = new ValidationEngine().validate([{bundler: vb, target: {'presentation_submission': basicPS}}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
   it('should not return error for presentation submission to be on CHAPI location', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/vp_basic.json');
+    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
     const psWrapper = {'data': {'presentation_submission': basicPS}};
     const result = new ValidationEngine().validate([{bundler: vb, target: psWrapper}]);
@@ -48,7 +48,7 @@ describe('validate', () => {
   });
 
   it('should not return error for presentation submission to be on did com location', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/vp_basic.json');
+    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
     const psWrapper = {'presentations~attach':[{'data': {'json': {'presentation_submission': basicPS}}}]};
     const result = new ValidationEngine().validate([{bundler: vb, target: psWrapper}]);
@@ -62,7 +62,7 @@ describe('validate', () => {
   });
 
   it('should not return error for correct presentation submission schema', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/vp_basic.json');
+    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
     const psWrapper = {'presentation_submission': basicPS};
     const result = new ValidationEngine().validate([{bundler: vb, target: psWrapper}]);
@@ -70,7 +70,7 @@ describe('validate', () => {
   });
 
   it('should return error for incorrect presentation submission schema', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/vp_basic.json');
+    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
     basicPS['new_filed'] = 'make it invalid obj';
     const psWrapper = {'presentation_submission': basicPS};

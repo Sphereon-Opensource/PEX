@@ -2,6 +2,8 @@ import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/p
 import { nanoid } from 'nanoid';
 
 import { Status } from '../ConstraintUtils';
+import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { Presentation } from '../verifiablePresentation/models';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -10,21 +12,34 @@ import { HandlerCheckResult } from './handlerCheckResult';
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
     super(client);
-    this.getVerifiablePresentation().presentationSubmission = {};
-    this.getVerifiablePresentation().presentationSubmission.descriptor_map = [];
-    this.getVerifiablePresentation().presentationSubmission.id = nanoid();
   }
 
   public getName(): string {
     return 'MarkForSubmissionEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: unknown): void {
+  public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
+    this.verifiablePresentation = new VP(
+      new Presentation(
+        null,
+        {
+          id: nanoid(),
+          definition_id: pd.id,
+          descriptor_map: [],
+        },
+        null,
+        [],
+        null
+      )
+    );
     this.createVerifiableCredentialsArrays(pd, p);
   }
 
-  private createVerifiableCredentialsArrays(pd: PresentationDefinition, inputCandidates: unknown): void {
-    const verifiableCredentials = this.extractVerifiableCredentials(inputCandidates);
+  private createVerifiableCredentialsArrays(
+    pd: PresentationDefinition,
+    verifiablePresentation: VerifiablePresentation
+  ): void {
+    const verifiableCredentials = this.extractVerifiableCredentials(verifiablePresentation);
     for (const [key, value] of verifiableCredentials) {
       for (const vc of value.entries()) {
         this.iterateOverInputDescriptors(pd, vc, key);
@@ -32,8 +47,8 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     }
   }
 
-  private extractVerifiableCredentials(inputCandidates: unknown) {
-    return Object.entries(inputCandidates).filter(
+  private extractVerifiableCredentials(verifiablePresentation: VerifiablePresentation) {
+    return Object.entries(verifiablePresentation.getRoot()).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
     ) as Array<[string, Array<unknown>]>;
   }
@@ -57,13 +72,13 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
-    this.getVerifiablePresentation().presentationSubmission.definition_id = pd.id;
+    this.verifiablePresentation.getPresentationSubmission().definition_id = pd.id;
     const info = this.getResults().find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
     if (!info) {
       return;
     }
-    if (!this.getVerifiablePresentation()[`${path}`]) {
-      this.getVerifiablePresentation()[`${path}`] = [];
+    if (!this.verifiablePresentation[`${path}`]) {
+      this.verifiablePresentation[`${path}`] = [];
     }
     this.addInputDescriptorToResults(pd.input_descriptors, vc, info, path);
   }
@@ -94,20 +109,22 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     });
   }
 
-  private pushToDescriptorsMap(newDescriptor: Descriptor, vc: [number, unknown], path: string) {
-    const descriptorMap: Descriptor[] = this.getVerifiablePresentation().presentationSubmission.descriptor_map;
+  private pushToDescriptorsMap(newDescriptor: Descriptor, vc: [number, VerifiableCredential], path: string) {
+    const descriptorMap: Descriptor[] = this.verifiablePresentation.getPresentationSubmission().descriptor_map;
     if (descriptorMap.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
-      this.getVerifiablePresentation()[`${path}`].push(vc[1]);
-      this.getVerifiablePresentation().presentationSubmission.descriptor_map.forEach((d: Descriptor) =>
-        this.addPathNestedDescriptor(d, newDescriptor)
-      );
+      this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
+      this.verifiablePresentation
+        .getPresentationSubmission()
+        .descriptor_map.forEach((d: Descriptor) => this.addPathNestedDescriptor(d, newDescriptor));
     } else if (
       !descriptorMap.find(
         (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
-      this.getVerifiablePresentation()[`${path}`].push(vc[1]);
-      this.getVerifiablePresentation().presentationSubmission.descriptor_map.push(newDescriptor);
+      if (this.verifiablePresentation.getRoot()[`${path}`]) {
+        this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
+        this.verifiablePresentation.getPresentationSubmission().descriptor_map.push(newDescriptor);
+      }
     }
   }
 

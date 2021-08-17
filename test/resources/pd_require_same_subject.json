@@ -1,0 +1,77 @@
+{
+  "presentation_definition": {
+    "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
+    "input_descriptors": [
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9aaa",
+        "constraints": {
+          "fields": [
+            {
+              "id": "field1Value",
+              "path": [
+                "$.field1Value"
+              ]
+            }
+          ],
+          "same_subject": [
+            {
+              "directive": "required",
+              "field_id": [
+                "field1Value",
+                "field2Value"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9bbb",
+        "constraints": {
+          "fields": [
+            {
+              "id": "field2Value",
+              "path": [
+                "$.field2Value"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9ccc",
+        "constraints": {
+          "fields": [
+            {
+              "id": "field3Value",
+              "path": [
+                "$.field3Value"
+              ]
+            }
+          ],
+          "same_subject": [
+            {
+              "directive": "preferred",
+              "field_id": [
+                "field3Value",
+                "field4Value"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9ddd",
+        "constraints": {
+          "fields": [
+            {
+              "id": "field4Value",
+              "path": [
+                "$.field4Value"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
