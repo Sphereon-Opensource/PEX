@@ -50,6 +50,7 @@
     "typescript": "^4.2.4"
   },
   "files": [
+    "index.ts",
     "build/main",
     "build/module",
     "!**/*.spec.*",
