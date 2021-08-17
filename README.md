@@ -7,6 +7,9 @@
 
 [![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml)
 
+## Active Development
+_IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect to keep that to a minimum though._
+
 ## Background
 
 The PE-JS Library is a general use presentation exchange library that implements the functionality described in the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/). It is written in Typescript and can be compiled to any target JavaScript version.
