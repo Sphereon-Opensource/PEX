@@ -22,7 +22,7 @@ export class EvaluationClientWrapper {
   public getEvaluationClient() {
     return this._client;
   }
-  
+
   public evaluate(pd: PresentationDefinition, vp: unknown): EvaluationResults {
     this._client.evaluate(pd, vp);
     const result: any = {};
@@ -62,8 +62,12 @@ export class EvaluationClientWrapper {
     return this.remapVcs(vcs);
   }
 
-  private evaluateRequirements(submissionRequirement: SubmissionRequirement[], marked: HandlerCheckResult[], level: number): number {
-    let total: number = 0;
+  private evaluateRequirements(
+    submissionRequirement: SubmissionRequirement[],
+    marked: HandlerCheckResult[],
+    level: number
+  ): number {
+    let total = 0;
     for (const sr of submissionRequirement) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
