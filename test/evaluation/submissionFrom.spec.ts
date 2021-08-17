@@ -8,7 +8,7 @@ function getFile(path: string) {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-describe('Submission requirements tests', () => {
+describe('Submission from tests', () => {
     it('Evaluate submission requirements all from group A', () => {
         const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
