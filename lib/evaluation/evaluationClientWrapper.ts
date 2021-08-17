@@ -1,6 +1,7 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
@@ -16,13 +17,13 @@ export class EvaluationClientWrapper {
     return this._client;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: unknown): EvaluationResults {
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
     this._client.evaluate(pd, vp);
     const result: any = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
-    if (this._client.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
-      result.value = this._client.verifiablePresentation['presentationSubmission'];
+    if (this._client.verifiablePresentation.getPresentationSubmission().descriptor_map.length) {
+      result.value = this._client.verifiablePresentation.getPresentationSubmission();
     }
     return result;
   }
