@@ -65,11 +65,13 @@ const error_2 = {
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     },
     {
       "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "name": "MarkForSubmissionEvaluation",
+      "status": "error",
+      "tag": "MarkForSubmissionEvaluation",
     }],
   "warnings": [],
 }
