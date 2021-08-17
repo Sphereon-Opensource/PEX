@@ -7,9 +7,9 @@ import {
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
+
 import { SelectResults } from './core/selectResults';
 import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
-
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -47,12 +47,12 @@ export class EvaluationClientWrapper {
     for (const sr of submissionRequirements) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
-          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
+          submissionRequirementMatches.push(EvaluationClientWrapper.mapMatchingDescriptors(sr, marked));
         } else if (sr.rule === Rules.Pick) {
-          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
+          submissionRequirementMatches.push(EvaluationClientWrapper.mapMatchingDescriptors(sr, marked));
         }
       } else if (sr.from_nested) {
-        const srm = this.createSubmissionRequirementMatch(sr);
+        const srm = EvaluationClientWrapper.createSubmissionRequirementMatch(sr);
         srm.count++;
         srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
         submissionRequirementMatches.push(srm);
@@ -61,8 +61,8 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
-    const srm = this.createSubmissionRequirementMatch(sr);
+  private static mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+    const srm = EvaluationClientWrapper.createSubmissionRequirementMatch(sr);
     if (!srm.from.includes(sr.from)) {
       srm.from.push(...sr.from);
     }
@@ -75,7 +75,7 @@ export class EvaluationClientWrapper {
     return srm;
   }
 
-  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
+  private static createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
     if (sr.from) {
       return {
         rule: sr.rule,
@@ -142,14 +142,14 @@ export class EvaluationClientWrapper {
     for (const sr of submissionRequirement) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
-          if (this.countMatchingInputDescriptors(sr, marked) !== marked.length) {
+          if (EvaluationClientWrapper.countMatchingInputDescriptors(sr, marked) !== marked.length) {
             throw Error(`Not all input descriptors are members of group ${sr.from}`);
           }
           total++;
         } else if (sr.rule === Rules.Pick) {
-          const count = this.countMatchingInputDescriptors(sr, marked);
+          const count = EvaluationClientWrapper.countMatchingInputDescriptors(sr, marked);
           try {
-            this.handleCount(sr, count, level);
+            EvaluationClientWrapper.handleCount(sr, count, level);
             total++;
           } catch (error) {
             if (level === 0) throw error;
@@ -158,13 +158,13 @@ export class EvaluationClientWrapper {
       } else if (sr.from_nested) {
         const count = this.evaluateRequirements(sr.from_nested, marked, ++level);
         total += count;
-        this.handleCount(sr, count, level);
+        EvaluationClientWrapper.handleCount(sr, count, level);
       }
     }
     return total;
   }
 
-  private countMatchingInputDescriptors(
+  private static countMatchingInputDescriptors(
     submissionRequirement: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): number {
@@ -177,7 +177,7 @@ export class EvaluationClientWrapper {
     return count;
   }
 
-  private handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
+  private static handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
     if (submissionRequirement.count) {
       if (count !== submissionRequirement.count) {
         throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count} at level: ${level}`);
