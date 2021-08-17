@@ -6,10 +6,10 @@ import {
   SubmissionRequirement,
 } from '@sphereon/pe-models';
 
-import { Status } from '../ConstraintUtils';
-
+import { Checked, Status } from '../ConstraintUtils';
 import { SelectResults } from './core/selectResults';
 import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
+
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -99,26 +99,24 @@ export class EvaluationClientWrapper {
   public evaluate(pd: PresentationDefinition, vp: unknown): EvaluationResults {
     this._client.evaluate(pd, vp);
     const result: any = {};
-    result.warnings = this._client.results
-      .filter((result) => result.status === Status.WARN)
-      .map((x) => {
-        return {
-          name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
-        };
-      });
-    result.errors = this._client.results
-      .filter((result) => result.status === Status.ERROR)
-      .map((x) => {
-        return {
-          name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
-        };
-      });
+    result.warnings = this.formatNotInfo(Status.WARN);
+    result.errors = this.formatNotInfo(Status.ERROR);
     if (this._client.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
       result.value = this._client.verifiablePresentation['presentationSubmission'];
     }
     return result;
+  }
+
+  private formatNotInfo(status: Status): Checked[] {
+    return this._client.results
+      .filter((result) => result.status === status)
+      .map((x) => {
+        return {
+          tag: x.evaluator,
+          status: x.status,
+          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+        };
+      });
   }
 
   public submissionFrom(pd: PresentationDefinition, vcs: unknown[]): PresentationSubmission {

@@ -2,8 +2,8 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { SelectResults } from '../../lib/evaluation/core/selectResults';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
+import { SelectResults } from '../../lib/evaluation/core/selectResults';
 
 function getFile(path: string) {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -285,7 +285,6 @@ describe('Select from tests', () => {
         evaluationClientWrapper.evaluate(pdSchema, vpSimple);
         expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple)).toThrowError('Not all input descriptors are members of group B');
       });
-    
     
       it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
         const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
