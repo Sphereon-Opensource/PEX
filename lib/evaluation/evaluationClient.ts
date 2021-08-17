@@ -65,7 +65,7 @@ export class EvaluationClient {
     return this._results;
   }
 
-  public get verifiablePresentation(): any {
+  public get verifiablePresentation(): VerifiablePresentation {
     return this._verifiablePresentation;
   }
 
