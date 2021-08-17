@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Optionality, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status, VP } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
@@ -64,12 +64,12 @@ const error_2 = {
       "tag": "MarkForSubmissionEvaluation",
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
+      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
       "status": "error",
       "tag": "MarkForSubmissionEvaluation",
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
+      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
       "status": "error",
       "tag": "MarkForSubmissionEvaluation",
     }],
@@ -321,5 +321,41 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
+  });
+
+  it('Evaluate submission requirements all rule', () => {
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
+    pdSchema.input_descriptors = [pdSchema.input_descriptors[0]];
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
+    expect(result).toEqual(expect.objectContaining({
+      definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+      descriptor_map: [
+        {
+          id: "Educational transcripts",
+          format: "ldp_vc",
+          path: "$.verifiableCredential[0]",
+        },
+      ]
+    }));
+  });
+
+  it('Evaluate submission requirements pick rule', () => {
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
+    pdSchema.input_descriptors = [pdSchema.input_descriptors[1], pdSchema.input_descriptors[2]];
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
+    expect(result).toEqual(expect.objectContaining({
+      definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+      descriptor_map: [
+        {"format": "ldp_vc", "id": "Educational transcripts 1", "path": "$.verifiableCredential[1]"},
+        {"format": "ldp_vc", "id": "Educational transcripts 2", "path": "$.verifiableCredential[2]"}]
+    }));
   });
 });
