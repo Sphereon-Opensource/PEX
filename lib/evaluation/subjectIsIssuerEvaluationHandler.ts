@@ -65,9 +65,9 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private generateResult(idIdx: number, vp: any, vcId: string): HandlerCheckResult {
-    for (let i = 0; i < vp.verifiableCredential.length; i++) {
-      if (vp.verifiableCredential[i].id === vcId) {
+  private generateResult(idIdx: number, vp: VerifiablePresentation, vcId: string): HandlerCheckResult {
+    for (let i = 0; i < vp.getVerifiableCredentials().length; i++) {
+      if (vp.getVerifiableCredentials()[i].id === vcId) {
         return new HandlerCheckResult(
           `$.input_descriptors[${idIdx}]`,
           `$.verifiableCredential[${i}]`,

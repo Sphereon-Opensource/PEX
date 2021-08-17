@@ -156,7 +156,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private findAllDescribedCredentialsPaths() {
-    this.vPresentation.getPresentationSubmission().descriptor_map.forEach(this.descriptorToPathMapper());
+    if (this.vPresentation.getPresentationSubmission()) {
+      this.vPresentation.getPresentationSubmission().descriptor_map.forEach(this.descriptorToPathMapper());
+    }
   }
 
   private descriptorToPathMapper() {

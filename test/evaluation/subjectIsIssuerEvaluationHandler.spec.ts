@@ -47,7 +47,7 @@ describe('evaluate', () => {
       }
     ];
     subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredential, null));
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
       'verifiable_credential_path': '$.verifiableCredential[0]',
@@ -92,7 +92,7 @@ describe('evaluate', () => {
     verifiableCredentials[0]['issuer'] = 'did:example:124';
     subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredentials, null));
 
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'evaluator': 'SubjectIsIssuerEvaluation',
       'input_descriptor_path': '$.input_descriptors[0]',
