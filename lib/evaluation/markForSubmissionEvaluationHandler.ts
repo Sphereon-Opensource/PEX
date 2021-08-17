@@ -32,32 +32,12 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         null
       )
     );
-    this.createVerifiableCredentialsArrays(pd, p);
-  }
-
-  private createVerifiableCredentialsArrays(
-    pd: PresentationDefinition,
-    verifiablePresentation: VerifiablePresentation
-  ): void {
-    const verifiableCredentials = this.extractVerifiableCredentials(verifiablePresentation);
-    for (const [key, value] of verifiableCredentials) {
-      for (const vc of value.entries()) {
-        this.iterateOverInputDescriptors(pd, vc, key);
-      }
-    }
-  }
-
-  private extractVerifiableCredentials(verifiablePresentation: VerifiablePresentation) {
-    return Object.entries(verifiablePresentation.getRoot()).filter(
-      (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
-    ) as Array<[string, Array<unknown>]>;
-  }
-
-  private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, unknown], path: string): void {
-    const error = this.getResults().find(
-      (result) => result.status === Status.ERROR && result.verifiable_credential_path === `$.${path}[${vc[0]}]`
+    const errors: HandlerCheckResult[] = this.removeDuplicates(
+      this.getResults().filter((result) => result.status === Status.ERROR)
     );
-    if (error) {
+    const results: HandlerCheckResult[] = [...this.getResults()];
+    const info: HandlerCheckResult[] = this.removeDuplicates(results.filter(this.notIn(errors)));
+    errors.forEach((error) => {
       const payload = { ...error.payload };
       payload.evaluator = error.evaluator;
       this.getResults().push({
@@ -66,26 +46,66 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         message: 'The input candidate is not eligible for submission',
         payload: payload,
       });
-    } else {
-      this.createPresentationSubmission(pd, vc, path);
+    });
+    const verifiableCredentials = this.extractVerifiableCredentials(p);
+    for (const [key, value] of verifiableCredentials) {
+      for (const vc of value.entries()) {
+        this.createPresentationSubmission(pd, vc, info, key);
+      }
     }
   }
 
-  private createPresentationSubmission(pd: PresentationDefinition, vc: any, path: string) {
+  private extractVerifiableCredentials(inputCandidates: VerifiablePresentation) {
+    return Object.entries(inputCandidates.getRoot()).filter(
+      (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
+    ) as Array<[string, Array<VerifiableCredential>]>;
+  }
+
+  private notIn(array: Array<HandlerCheckResult>): (item: HandlerCheckResult) => boolean {
+    return (item: HandlerCheckResult) => {
+      return !array.find(
+        (e) =>
+          e.input_descriptor_path === item.input_descriptor_path &&
+          e.verifiable_credential_path === item.verifiable_credential_path
+      );
+    };
+  }
+
+  private removeDuplicates(array: HandlerCheckResult[]): HandlerCheckResult[] {
+    return array.reduce((filter, current) => {
+      const dk = filter.find(
+        (item) =>
+          item.input_descriptor_path === current.input_descriptor_path &&
+          item.verifiable_credential_path === current.verifiable_credential_path
+      );
+      if (!dk) {
+        return filter.concat([current]);
+      } else {
+        return filter;
+      }
+    }, []);
+  }
+
+  private createPresentationSubmission(
+    pd: PresentationDefinition,
+    vc: [number, VerifiableCredential],
+    info: HandlerCheckResult[],
+    path: string
+  ) {
     this.verifiablePresentation.getPresentationSubmission().definition_id = pd.id;
-    const info = this.getResults().find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
-    if (!info) {
+    const result = info.find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
+    if (!result) {
       return;
     }
-    if (!this.verifiablePresentation[`${path}`]) {
-      this.verifiablePresentation[`${path}`] = [];
+    if (!this.verifiablePresentation.getRoot()[`${path}`]) {
+      this.verifiablePresentation.getRoot()[`${path}`] = [];
     }
-    this.addInputDescriptorToResults(pd.input_descriptors, vc, info, path);
+    this.addInputDescriptorToResults(pd.input_descriptors, vc, result, path);
   }
 
   private addInputDescriptorToResults(
     inputDescriptors: InputDescriptor[],
-    vc: [number, any],
+    vc: [number, VerifiableCredential],
     info: HandlerCheckResult,
     path: string
   ) {
@@ -121,10 +141,8 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
-      if (this.verifiablePresentation.getRoot()[`${path}`]) {
-        this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
-        this.verifiablePresentation.getPresentationSubmission().descriptor_map.push(newDescriptor);
-      }
+      this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
+      this.verifiablePresentation.getPresentationSubmission().descriptor_map.push(newDescriptor);
     }
   }
 

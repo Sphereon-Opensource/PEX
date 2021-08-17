@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
+import { VP } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
 
 function getFile(path: string) {
@@ -14,7 +15,7 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
         const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
@@ -31,8 +32,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -49,8 +50,8 @@ describe('Submission requirements tests', () => {
         pdSchema.submission_requirements = [pdSchema.submission_requirements[2]];
         pdSchema.input_descriptors = [pdSchema.input_descriptors[0], pdSchema.input_descriptors[1]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -65,8 +66,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[3]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -82,8 +83,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[4]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2 at level: 0');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Min: expected: 3 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements max 1 from group B', () => {
@@ -91,8 +92,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[5]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements exactly 1 from group B', () => {
@@ -100,8 +101,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[6]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Count: expected: 1 actual: 2 at level: 0');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Count: expected: 1 actual: 2 at level: 0');
       });
     
       it('Evaluate submission requirements all from group B', () => {
@@ -109,8 +110,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[7]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Not all input descriptors are members of group B');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Not all input descriptors are members of group B');
       });
     
       it('Evaluate submission requirements all from group A and 2 from group B', () => {
@@ -118,8 +119,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[8]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -135,8 +136,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[9]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -152,8 +153,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[10]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
         expect(result).toEqual(expect.objectContaining({
           definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
           descriptor_map: [
@@ -169,8 +170,8 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[11]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Min: expected: 3 actual: 2 at level: 1');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Min: expected: 3 actual: 2 at level: 1');
       });
     
       it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
@@ -178,7 +179,7 @@ describe('Submission requirements tests', () => {
         const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
         pdSchema.submission_requirements = [pdSchema.submission_requirements[12]];
         const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper(); 
-        evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
+        evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
+        expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
       });
 });

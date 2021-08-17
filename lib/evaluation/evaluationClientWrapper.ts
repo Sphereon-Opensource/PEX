@@ -7,7 +7,7 @@ import {
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
@@ -26,30 +26,28 @@ export class EvaluationClientWrapper {
 
   public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
     this._client.evaluate(pd, vp);
-    const result: any = {};
-    result.warnings = this._client.results
-      .filter((result) => result.status === Status.WARN)
-      .map((x) => {
-        return {
-          name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
-        };
-      });
-    result.errors = this._client.results
-      .filter((result) => result.status === Status.ERROR)
-      .map((x) => {
-        return {
-          name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
-        };
-      });
-    if (this._client.verifiablePresentation['presentationSubmission']['descriptor_map'].length) {
-      result.value = this._client.verifiablePresentation['presentationSubmission'];
+    const result: EvaluationResults = {};
+    result.warnings = this.formatNotInfo(Status.WARN);
+    result.errors = this.formatNotInfo(Status.ERROR);
+    if (this._client.verifiablePresentation.getPresentationSubmission().descriptor_map.length) {
+      result.value = this._client.verifiablePresentation.getPresentationSubmission();
     }
     return result;
   }
 
-  public submissionFrom(pd: PresentationDefinition, vcs: unknown[]): PresentationSubmission {
+  private formatNotInfo(status: Status): Checked[] {
+    return this._client.results
+      .filter((result) => result.status === status)
+      .map((x) => {
+        return {
+          tag: x.evaluator,
+          status: x.status,
+          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+        };
+      });
+  }
+
+  public submissionFrom(pd: PresentationDefinition, vcs: VerifiableCredential[]): PresentationSubmission {
     if (!this._client.results) {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
@@ -126,13 +124,15 @@ export class EvaluationClientWrapper {
   }
   private remapVcs(vcs: unknown[]) {
     const presentationSubmission: PresentationSubmission = {
-      ...this._client.verifiablePresentation.presentationSubmission,
+      ...this._client.verifiablePresentation.getPresentationSubmission(),
     };
-    const descriptorMap: Descriptor[] = [...this._client.verifiablePresentation.presentationSubmission.descriptor_map];
-    for (const [i, vc] of this._client.verifiablePresentation.verifiableCredential.entries()) {
+    const descriptorMap: Descriptor[] = [
+      ...this._client.verifiablePresentation.getPresentationSubmission().descriptor_map,
+    ];
+    for (const [i, vc] of this._client.verifiablePresentation.getVerifiableCredentials().entries()) {
       for (const [j, newVc] of Object.entries(vcs)) {
         for (const [h, descriptor] of descriptorMap.entries()) {
-          if (vc == newVc && descriptor[h].path == `$.verifiablePresentation[${i}]`) {
+          if (vc == newVc && descriptor.path == `$.verifiablePresentation[${i}]`) {
             descriptorMap[h].path = `$.verifiablePresentation[${j}]`;
           }
         }
