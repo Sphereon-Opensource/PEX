@@ -1,6 +1,7 @@
 import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
+import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -15,12 +16,12 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: any): void {
+  public handle(d: PresentationDefinition, p: VerifiablePresentation): void {
     for (let i = 0; i < d.input_descriptors.length; i++) {
       const inputDescriptor: InputDescriptor = d.input_descriptors[i];
       const uris: string[] = inputDescriptor.schema.map((so) => so.uri);
-      for (let j = 0; j < p.verifiableCredential.length; j++) {
-        const vc = p.verifiableCredential[j];
+      for (let j = 0; j < p.getVerifiableCredentials().length; j++) {
+        const vc = p.getVerifiableCredentials()[j];
         this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
       }
     }

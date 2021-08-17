@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
+import { VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
 import { InputDescriptorIsHolderEvaluationHandler } from '../../lib/evaluation/inputDescriptorIsHolderEvaluationHandler';
@@ -13,12 +14,12 @@ function getFile(path: string): unknown {
 describe('inputDescriptorIsHolderEvaluationHandler tests', () => {
 
   it(`input descriptor's constraints.is_holder is present`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_is_holder.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorIsHolderEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, <VerifiablePresentation>inputCandidates);
     expect(evaluationClient.results).toEqual([
       {
         "evaluator": "IsHolderEvaluation",

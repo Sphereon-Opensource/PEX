@@ -1,6 +1,7 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -15,7 +16,7 @@ import { UriEvaluationHandler } from './uriEvaluationHandler';
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = {};
+    this._verifiablePresentation = null;
   }
 
   private failed_catched: Checked = {
@@ -25,9 +26,9 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiablePresentation: unknown;
+  private _verifiablePresentation: VerifiablePresentation;
 
-  public evaluate(pd: PresentationDefinition, vp: unknown): HandlerCheckResult[] {
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): HandlerCheckResult[] {
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     try {
       currentHandler.handle(pd, vp);
@@ -46,8 +47,12 @@ export class EvaluationClient {
     return this._results;
   }
 
-  get verifiablePresentation(): any {
+  public get verifiablePresentation(): VerifiablePresentation {
     return this._verifiablePresentation;
+  }
+
+  public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {
+    this._verifiablePresentation = verifiablePresentation;
   }
 
   private initEvaluationHandlers() {

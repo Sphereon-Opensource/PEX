@@ -2,6 +2,7 @@ import { Constraints, Descriptor, Optionality, PresentationDefinition } from '@s
 
 import { Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils/jsonPathUtils';
+import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -16,7 +17,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     return 'SubjectIsIssuerEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: unknown): void {
+  public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
       const constraints: Constraints = pd.input_descriptors[i].constraints;
       if (constraints && constraints.subject_is_issuer && constraints.subject_is_issuer === Optionality.Required) {
@@ -25,13 +26,15 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private checkSubjectIsIssuer(inputDescriptorId: string, vp: unknown, idIdx: number) {
+  private checkSubjectIsIssuer(inputDescriptorId: string, vp: VerifiablePresentation, idIdx: number) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
+    for (let i = 0; i < verifiablePresentation.getPresentationSubmission().descriptor_map.length; i++) {
+      const currentDescriptor: Descriptor = this.verifiablePresentation.getPresentationSubmission().descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
-        if (vc[0].value.issuer === vc[0].value.credentialSubject.id) {
+        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation['presentation'], [
+          currentDescriptor.path,
+        ]);
+        if (vc.length > 0 && vc[0].value.issuer === vc[0].value.credentialSubject.id) {
           this.generateSuccessResult(idIdx, vp, vc[0].value.id);
         } else {
           this.generateErrorResult(idIdx, vp, vc[0].value.id);
@@ -40,7 +43,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private generateErrorResult(idIdx: number, vp: unknown, vcId: string) {
+  private generateErrorResult(idIdx: number, vp: VerifiablePresentation, vcId: string) {
     const result = this.generateResult(idIdx, vp, vcId);
     if (result == null) {
       this.getResults().push(this.generateVcNotFoundError(idIdx, vp));
@@ -51,7 +54,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private generateSuccessResult(idIdx: number, vp: unknown, vcId: string) {
+  private generateSuccessResult(idIdx: number, vp: VerifiablePresentation, vcId: string) {
     const result = this.generateResult(idIdx, vp, vcId);
     if (result == null) {
       this.getResults().push(this.generateVcNotFoundError(idIdx, vp));
@@ -78,7 +81,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     return null;
   }
 
-  private generateVcNotFoundError(idIdx: number, vp: unknown) {
+  private generateVcNotFoundError(idIdx: number, vp: VerifiablePresentation) {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: undefined,

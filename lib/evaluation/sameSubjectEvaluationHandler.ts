@@ -177,10 +177,10 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapCredentialPathToCredentialSubject() {
     return (path, inDescId) => {
-      this.credentialsSubjects.set(
-        inDescId,
-        jp.nodes(this.vPresentation.getRoot(), path.concat('.credentialSubject'))[0].value
-      );
+      const subjectNode = jp.nodes(this.vPresentation.getRoot(), path.concat('.credentialSubject'));
+      if (subjectNode.length) {
+        this.credentialsSubjects.set(inDescId, subjectNode[0].value);
+      }
     };
   }
 
