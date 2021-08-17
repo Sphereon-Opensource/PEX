@@ -1,9 +1,11 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
+import { VerifiableCredential, VP } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/subjectIsIssuerEvaluationHandler';
+import { Presentation } from '../../lib/verifiablePresentation/models';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -16,7 +18,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().presentationSubmission = {
+    const presentationSubmission: PresentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
       'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
       'descriptor_map': [
@@ -27,30 +29,31 @@ describe('evaluate', () => {
         }
       ]
     };
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().verifiableCredential = [{
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1'
-      ],
-      'age': 19,
-      'credentialSchema': [
-        {
-          'id': 'https://www.w3.org/TR/vc-data-model/#types'
-        }
-      ],
+    const verifiableCredential: Array<VerifiableCredential> = [{
       'credentialSubject': {
         'id': 'did:example:123'
       },
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      'issuer': 'did:example:123',
       'type': 'VerifiableCredential'
     }];
+    verifiableCredential[0]['@context'] = [
+      'https://www.w3.org/2018/credentials/v1'
+    ];
+    verifiableCredential[0]['age'] = 19;
+    verifiableCredential[0]['issuer'] = 'did:example:123';
+    verifiableCredential[0]['credentialSchema'] = [
+      {
+        'id': 'https://www.w3.org/TR/vc-data-model/#types'
+      }
+    ];
+    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredential, null));
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
-      "evaluator": "SubjectIsIssuerEvaluation",
-      "status": "info",
-      "message": "subject_is_issuer verified."
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'evaluator': 'SubjectIsIssuerEvaluation',
+      'status': 'info',
+      'message': 'subject_is_issuer verified.'
     });
   });
 
@@ -59,7 +62,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().presentationSubmission = {
+    const presentationSubmission: PresentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
       'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
       'descriptor_map': [
@@ -70,30 +73,32 @@ describe('evaluate', () => {
         }
       ]
     };
-    subjectIsIssuerEvaluationHandler.getVerifiablePresentation().verifiableCredential = [{
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1'
-      ],
-      'age': 19,
-      'credentialSchema': [
-        {
-          'id': 'https://www.w3.org/TR/vc-data-model/#types'
-        }
-      ],
+    const verifiableCredentials: Array<VerifiableCredential> = [{
       'credentialSubject': {
         'id': 'did:example:123'
       },
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      'issuer': 'did:example:124',
       'type': 'VerifiableCredential'
     }];
+    verifiableCredentials[0]['@context'] = [
+      'https://www.w3.org/2018/credentials/v1'
+    ];
+    verifiableCredentials[0]['age'] = 19;
+    verifiableCredentials[0]['credentialSchema'] = [
+      {
+        'id': 'https://www.w3.org/TR/vc-data-model/#types'
+      }
+    ];
+    verifiableCredentials[0]['issuer'] = 'did:example:124';
+    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredentials, null));
+
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
-      "evaluator": "SubjectIsIssuerEvaluation",
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "message": "couldn't verify subject is issuer.",
-      "status": "error",
-      "verifiable_credential_path": "$.verifiableCredential[0]"
+      'evaluator': 'SubjectIsIssuerEvaluation',
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'message': 'couldn\'t verify subject is issuer.',
+      'status': 'error',
+      'verifiable_credential_path': '$.verifiableCredential[0]'
     });
   });
 });

@@ -2,11 +2,12 @@ import fs from 'fs';
 
 import { PresentationDefinition } from "@sphereon/pe-models";
 
-import { Status } from '../../lib';
+import { Status, VP } from '../../lib';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/inputDescriptorFilterEvaluationHandler';
+import { Presentation } from '../../lib/verifiablePresentation/models';
 
 const message: HandlerCheckResult = {
   input_descriptor_path: `$.input_descriptors[0]`,
@@ -24,7 +25,8 @@ function getFile(path: string): unknown {
 describe('inputDescriptorFilterEvaluationHandler tests', () => {
 
   it(`input descriptor's constraint property missing`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const message0 = {...message};
@@ -35,12 +37,13 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields property missing`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[1]];
     const message0 = {...message};
@@ -51,12 +54,13 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.length is equal to 0`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[2]];
     const message0 = {...message};
@@ -67,12 +71,13 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": true};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.path does not match`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[3]];
     const message0 = {
@@ -87,12 +92,13 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": [], "valid": false};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.filter does not match`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
     const message0 = {...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed filter evaluation'};
@@ -103,12 +109,13 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraint.fields.filter match`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
     const message1 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[1]'};
@@ -117,12 +124,16 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message, message1, message2]);
   });
 
   it(`input descriptor's constraint.fields.filter match and nested_path`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
+    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    presentation['outerClaim'] = inputCandidates.outerClaim;
+    presentation['innerClaim'] = inputCandidates.innerClaim;
+    presentation['mostInnerClaim'] = inputCandidates.mostInnerClaim;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[6]];
     const message0 = {...message, ['verifiable_credential_path']: '$.outerClaim[0]' };
@@ -136,7 +147,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message8 = {...message2, ['verifiable_credential_path']: '$.mostInnerClaim[2]' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, inputCandidates);
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results.filter(result => result.status === Status.INFO))
     .toEqual([message0, message1, message2, message3, message4, message5, message6, message7, message8]);
   });
