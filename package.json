@@ -1,5 +1,5 @@
 {
-  "name": "pe-js",
+  "name": "@sphereon/pe-js",
   "version": "0.0.1",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "build/main/index.js",
@@ -50,6 +50,7 @@
     "typescript": "^4.2.4"
   },
   "files": [
+    "index.ts",
     "build/main",
     "build/module",
     "!**/*.spec.*",

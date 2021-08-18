@@ -7,6 +7,9 @@
 
 [![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml)
 
+## Active Development
+_IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect to keep that to a minimum though._
+
 ## Background
 
 The PE-JS Library is a general use presentation exchange library that implements the functionality described in the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/). It is written in Typescript and can be compiled to any target JavaScript version.
@@ -69,10 +72,10 @@ The library can be installed direction from npmjs via:
 
 ```shell
 # install via yarn
-yarn add pe-js
+yarn add @sphereon/pe-js
 
 # install via npm
-npm install pe-js
+npm install @sphereon/pe-js
 ```
 
 The core functionality of the DIF Presentation Exchange can be outlined as follows:
@@ -84,7 +87,7 @@ The core functionality of the DIF Presentation Exchange can be outlined as follo
 #### Input Evaluation
 Input evaluation is the primary mechanism by which a verifier determines whether a presentation submission from a holder matches the requested presentation definition from the request.
 ```typescript
-import pejs from 'pe-js';
+import pejs from '@sphereon/pe-js';
 
 const presentationDefinition = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
@@ -120,7 +123,7 @@ const {value, warnings, errors} = pejs.evaluate(presentationDefinition, verifiab
 #### Credential Query
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
 ```typescript
-import pejs from 'pe-js';
+import pejs from '@sphereon/pe-js';
 
 // Definition from verifier request
 const presentationDefinition = {
@@ -162,19 +165,19 @@ const presentation = {
 #### Utilities
 In addition to the core functionality above, the underlying validation methods are exposed as low-level helper functions.
 ```typescript
-import pejs from 'pe-js';
+import pejs from '@sphereon/pe-js';
 
 const presentationDefinition = {
   ...
 };
 
-const {warnings: pdWarnings, errors: pdErrors} = pejs.validate(presentationDefinition);
+const {warnings: pdWarnings, errors: pdErrors} = pejs.validateDefinition(presentationDefinition);
 
 const presentationSubmission = {
   ...
 };
 
-const {warnings: psWarnings, errors: psErrors} = pejs.validate(presentationSubmission);
+const {warnings: psWarnings, errors: psErrors} = pejs.validateSubmission(presentationSubmission);
 ```
 
 ## API
@@ -258,7 +261,10 @@ interface PresentationSubmission {
 
 ### Validation
 ```typescript
-validate(objToValidate)
+validateDefinition(objToValidate)
+```
+```typescript
+validateSubmission(objToValidate)
 ```
 #### Description
 A validation utility function for `PresentationDefinition` and `PresentationSubmission` objects.
@@ -269,11 +275,12 @@ A validation utility function for `PresentationDefinition` and `PresentationSubm
 | `objToValidate` | <code>PresentationDefinition &#124; PresentationSubmission</code> | the presentation definition or presentation definition to be validated |
 
 #### Return value
-The `validate` method returns a validation report, with structure:
+The `validate` method returns a validated results array `NonEmptyArray<Checked>` , with structure:
 ```typescript
-interface ValidationReport {
-  warnings: string[];
-  errors: Error[];
+interface Checked {
+  tag: string;
+  status: Status;
+  message?: string;
 }
 ```
-`warnings` lists recommended structure violations and `errors` lists required structure violations according to the DIF PE specification.
+status can have following values `'info' | 'warn' | 'error'`

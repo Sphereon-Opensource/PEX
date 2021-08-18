@@ -4,7 +4,6 @@ import { Checked, Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { EvaluationHandler } from './evaluationHandler';
-import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
 import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
 import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
@@ -31,7 +30,7 @@ export class EvaluationClient {
   private _verifiablePresentation: VerifiablePresentation;
   private _did: string;
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): void {
     this._did = did;
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
@@ -44,24 +43,6 @@ export class EvaluationClient {
         throw this.failed_catched;
       }
     }
-    return this.getEvalutionResults();
-  }
-
-  private getEvalutionResults(): EvaluationResults {
-    const result: any = {};
-    result.warnings = this.results.filter((result) => result.status === Status.WARN).map((x) => JSON.stringify(x));
-    result.errors = this.results
-      .filter((result) => result.status === Status.ERROR)
-      .map((x) => {
-        return {
-          name: x.evaluator,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
-        };
-      });
-    if (this._verifiablePresentation.getPresentationSubmission().descriptor_map.length) {
-      result.value = this._verifiablePresentation.getPresentationSubmission();
-    }
-    return result;
   }
 
   public get results(): HandlerCheckResult[] {

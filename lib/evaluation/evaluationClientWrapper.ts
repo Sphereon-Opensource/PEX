@@ -7,8 +7,11 @@ import {
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { Presentation } from '../verifiablePresentation/models';
 
+import { SelectResults } from './core/selectResults';
+import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -22,6 +25,82 @@ export class EvaluationClientWrapper {
 
   public getEvaluationClient() {
     return this._client;
+  }
+  public selectFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    did: string
+  ): SelectResults {
+    this._client.evaluate(
+      presentationDefinition,
+      new VP(new Presentation([], null, [], selectedCredentials, null)),
+      did
+    );
+
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) =>
+        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+    );
+    this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
+    return {
+      matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
+      warnings: [],
+    };
+  }
+
+  private matchSubmissionRequirements(
+    submissionRequirements: SubmissionRequirement[],
+    marked: HandlerCheckResult[]
+  ): SubmissionRequirementMatch[] {
+    const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
+    for (const sr of submissionRequirements) {
+      if (sr.from) {
+        if (sr.rule === Rules.All || sr.rule === Rules.Pick) {
+          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
+        }
+      } else if (sr.from_nested) {
+        const srm = this.createSubmissionRequirementMatch(sr);
+        srm.count++;
+        srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
+        submissionRequirementMatches.push(srm);
+      }
+    }
+    return submissionRequirementMatches;
+  }
+
+  private mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+    const srm = this.createSubmissionRequirementMatch(sr);
+    if (!srm.from.includes(sr.from)) {
+      srm.from.push(...sr.from);
+    }
+    for (const m of marked) {
+      if (m.payload.group.includes(sr.from)) {
+        srm.count++;
+        srm.matches.push(m.verifiable_credential_path);
+      }
+    }
+    return srm;
+  }
+
+  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
+    if (sr.from) {
+      return {
+        rule: sr.rule,
+        count: 0,
+        matches: [],
+        from: [],
+        name: sr.name,
+      };
+    } else if (sr.from_nested) {
+      return {
+        rule: sr.rule,
+        count: 0,
+        matches: [],
+        from_nested: [],
+        name: sr.name,
+      };
+    }
+    return null;
   }
 
   public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
