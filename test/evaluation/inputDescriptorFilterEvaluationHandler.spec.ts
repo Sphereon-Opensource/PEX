@@ -3,7 +3,6 @@ import fs from 'fs';
 import { PresentationDefinition } from "@sphereon/pe-models";
 
 import { Status, VP } from '../../lib';
-import { Wallet } from '../../lib/evaluation/core/wallet';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
@@ -23,14 +22,6 @@ function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const wallet: Wallet = { 
-  data: { 
-    holder: { 
-      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
-    } 
-  }
-};
-
 describe('inputDescriptorFilterEvaluationHandler tests', () => {
 
   it(`input descriptor's constraint property missing`, () => {
@@ -44,7 +35,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
@@ -61,7 +52,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
@@ -78,7 +69,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": true};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
@@ -99,7 +90,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": [], "valid": false};
     const message2 = {...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": [], "valid": false};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
@@ -116,7 +107,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
     const message2 = {...message0, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": false};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
@@ -131,7 +122,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     message1.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
     const message2 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[2]'};
     message2.payload = {"result": {"path": ["$", "issuer"], "value": "did:foo:123"}, "valid": true};
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results).toEqual([message, message1, message2]);
@@ -154,7 +145,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message6 = {...message0, ['verifiable_credential_path']: '$.mostInnerClaim[2]' };
     const message7 = {...message1, ['verifiable_credential_path']: '$.mostInnerClaim[2]' };
     const message8 = {...message2, ['verifiable_credential_path']: '$.mostInnerClaim[2]' };
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results.filter(result => result.status === Status.INFO))

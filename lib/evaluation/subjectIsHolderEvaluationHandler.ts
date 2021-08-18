@@ -5,7 +5,6 @@ import { Status } from '../ConstraintUtils';
 import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { Wallet } from './core/wallet';
 import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler {
@@ -28,16 +27,16 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     const result = jp.query(vc[1], `$..credentialSubject.id`)[0];
     inputDescriptors.forEach((inDesc, index) => {
       if (inDesc.constraints && inDesc.constraints.is_holder) {
-        const wallet = this.client.getWallet();
+        const did = this.client.did;
         inDesc.constraints.is_holder.forEach((ih) => {
-          const resultObject = this.checkIsHolder(index, vc, result, wallet);
+          const resultObject = this.checkIsHolder(index, vc, result, did);
           this.checkDirectives(ih, resultObject);
         });
       }
     });
   }
 
-  private checkDirectives(hs: HolderSubject, resultObject: HandlerCheckResult) {
+  private checkDirectives(hs: HolderSubject, resultObject: HandlerCheckResult): void {
     if (hs.directive === 'preferred') {
       delete resultObject.payload['holder'];
       delete resultObject.payload['subject'];
@@ -51,11 +50,11 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     index: number,
     vc: [number, VerifiableCredential],
     result: any,
-    wallet: Wallet
+    did: string
   ): HandlerCheckResult {
     const resultObject = this.createResultObject(index, vc[0]);
-    resultObject.payload = { holder: wallet.data.holder.did, subject: result, is_holder: true };
-    if (result !== wallet.data.holder.did) {
+    resultObject.payload = { holder: did, subject: result, is_holder: true };
+    if (result !== did) {
       resultObject.status = Status.ERROR;
       resultObject.message = 'The entity submitting the response is not the holder of the claim';
       resultObject.payload.is_holder = false;

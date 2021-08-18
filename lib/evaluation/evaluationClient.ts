@@ -3,7 +3,6 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Checked, Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
-import { Wallet } from './core/wallet';
 import { EvaluationHandler } from './evaluationHandler';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -12,17 +11,14 @@ import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHan
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { SameSubjectEvaluationHandler } from './sameSubjectEvaluationHandler';
+import { SubjectIsHolderEvaluationHandler } from './subjectIsHolderEvaluationHandler';
 import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
-  constructor(private _wallet: Wallet) {
+  constructor() {
     this._results = [];
     this._verifiablePresentation = null;
-  }
-
-  public getWallet() {
-    return this._wallet;
   }
 
   private failed_catched: Checked = {
@@ -33,8 +29,10 @@ export class EvaluationClient {
 
   private _results: HandlerCheckResult[];
   private _verifiablePresentation: VerifiablePresentation;
+  private _did: string;
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
+    this._did = did;
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {
@@ -70,6 +68,10 @@ export class EvaluationClient {
     return this._results;
   }
 
+  public get did() {
+    return this._did;
+  }
+
   public get verifiablePresentation(): VerifiablePresentation {
     return this._verifiablePresentation;
   }
@@ -87,6 +89,7 @@ export class EvaluationClient {
       .setNext(new MarkForSubmissionEvaluationHandler(this))
       .setNext(new LimitDisclosureEvaluationHandler(this))
       .setNext(new SubjectIsIssuerEvaluationHandler(this))
+      .setNext(new SubjectIsHolderEvaluationHandler(this))
       .setNext(new SameSubjectEvaluationHandler(this));
 
     return uriEvaluation;

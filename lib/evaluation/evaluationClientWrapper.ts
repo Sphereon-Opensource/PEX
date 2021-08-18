@@ -9,7 +9,6 @@ import {
 import { Checked, Status } from '../ConstraintUtils';
 import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
-import { Wallet } from './core/wallet';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -17,20 +16,16 @@ import { HandlerCheckResult } from './handlerCheckResult';
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
 
-  constructor(private _wallet: Wallet) {
-    this._client = new EvaluationClient(this._wallet);
-  }
-
-  get wallet() {
-    return this._wallet;
+  constructor() {
+    this._client = new EvaluationClient();
   }
 
   public getEvaluationClient() {
     return this._client;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
-    this._client.evaluate(pd, vp);
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
+    this._client.evaluate(pd, vp, did);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);

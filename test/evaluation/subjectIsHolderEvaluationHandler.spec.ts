@@ -3,23 +3,14 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { VP } from '../../lib';
-import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/SubjectIsHolderEvaluationHandler';
-import { Wallet } from '../../lib/evaluation/core/wallet';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { EvaluationHandler } from '../../lib/evaluation/evaluationHandler';
 import { Presentation } from '../../lib/verifiablePresentation/models';
 
 function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const wallet: Wallet = { 
-  data: { 
-    holder: { 
-      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
-    } 
-  }
-};
+const did = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 
 describe('SubjectIsHolderEvaluationHandler tests', () => {
 
@@ -28,10 +19,9 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_is_holder.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     
-    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
-    const evaluationHandler: EvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, new VP(presentation));
-    expect(evaluationClient.results).toEqual([
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.evaluate(presentationDefinition, new VP(presentation), did);
+    expect(evaluationClient.results.filter(r => r.evaluator === "IsHolderEvaluation")).toEqual([
       {
         "evaluator": "IsHolderEvaluation",
         "input_descriptor_path": "$.input_descriptors[0]",
