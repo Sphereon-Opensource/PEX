@@ -4,7 +4,7 @@ export interface SubmissionRequirementMatch {
   name: string;
   rule: Rules;
   count: number;
-  matches: any[]; // VerifiableCredential
+  matches: string[];
   from?: string[];
   from_nested?: SubmissionRequirementMatch[];
 }
@@ -13,7 +13,7 @@ export const SubmissionRequirementMatch = class implements SubmissionRequirement
   public name: string;
   public rule: Rules;
   public count: number;
-  public matches: any[]; // this can be later changed to VerifiableCredentials
+  public matches: string[]; // this can be later changed to VerifiableCredentials
   public from?: string[];
   public from_nested?: SubmissionRequirementMatch[];
 
@@ -21,7 +21,7 @@ export const SubmissionRequirementMatch = class implements SubmissionRequirement
     name: string,
     rule: Rules,
     count: number,
-    matches: any[],
+    matches: string[],
     from?: string[],
     from_nested?: SubmissionRequirementMatch[]
   ) {
