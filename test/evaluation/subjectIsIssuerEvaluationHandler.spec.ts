@@ -3,6 +3,7 @@ import fs from 'fs';
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { VerifiableCredential, VP } from '../../lib';
+import { Wallet } from '../../lib/evaluation/core/wallet';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/subjectIsIssuerEvaluationHandler';
 import { Presentation } from '../../lib/verifiablePresentation/models';
@@ -11,12 +12,20 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
+const wallet: Wallet = { 
+  data: { 
+    holder: { 
+      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
+    } 
+  }
+};
+
 describe('evaluate', () => {
 
   it('should return ok if subject_is_issuer is verified', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     const presentationSubmission: PresentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',
@@ -60,7 +69,7 @@ describe('evaluate', () => {
   it('should return error if subject_is_issuer is not verified', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     const presentationSubmission: PresentationSubmission = {
       'id': '3cpLWMyiAT1qQXTaJNWOG',

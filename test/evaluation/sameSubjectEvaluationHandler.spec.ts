@@ -8,11 +8,20 @@ import {
   SameSubjectEvaluationHandler,
   VP,
 } from '../../lib';
+import { Wallet } from '../../lib/evaluation/core/wallet';
 import {Presentation} from "../../lib/verifiablePresentation/models";
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
+
+const wallet: Wallet = { 
+  data: { 
+    holder: { 
+      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
+    } 
+  }
+};
 
 describe('sameSubjectEvaluationHandler', () => {
 
@@ -22,7 +31,7 @@ describe('sameSubjectEvaluationHandler', () => {
     const results = getFile('./test/resources/sameSubjectEvaluationResults.json');
 
     const vp: VP = new VP(presentation);
-    const evaluationHandler: EvaluationHandler = new SameSubjectEvaluationHandler(new EvaluationClient());
+    const evaluationHandler: EvaluationHandler = new SameSubjectEvaluationHandler(new EvaluationClient(wallet));
     evaluationHandler.handle(pd, vp as VP);
     expect(evaluationHandler.client.results).toEqual(results);
   });

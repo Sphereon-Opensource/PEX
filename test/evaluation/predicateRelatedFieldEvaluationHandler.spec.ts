@@ -3,6 +3,7 @@ import fs from 'fs';
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { PredicateRelatedFieldEvaluationHandler, Status } from '../../lib';
+import { Wallet } from '../../lib/evaluation/core/wallet';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
 
@@ -10,11 +11,19 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
+const wallet: Wallet = { 
+  data: { 
+    holder: { 
+      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
+    } 
+  }
+};
+
 describe('evaluate', () => {
 
   it('should return ok if payload value of PredicateRelatedField is integer', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push(
       {
         "input_descriptor_path": "$.input_descriptors[0]",
@@ -59,7 +68,7 @@ describe('evaluate', () => {
   it('should return ok if payload value of PredicateRelatedField is boolean', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push({
         "input_descriptor_path": "$.input_descriptors[0]",
         "verifiable_credential_path": "$.verifiableCredential[0]",
@@ -103,7 +112,7 @@ describe('evaluate', () => {
   it('should return error if we process the predicate filter for this PD', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",
@@ -138,7 +147,7 @@ describe('evaluate', () => {
   it('should return ok if verifiableCredential\'s age value is matching the specification in the input descriptor', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",

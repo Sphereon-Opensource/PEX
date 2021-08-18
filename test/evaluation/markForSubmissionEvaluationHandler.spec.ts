@@ -3,6 +3,7 @@ import fs from 'fs';
 import { PresentationDefinition } from "@sphereon/pe-models";
 
 import { VP } from '../../lib';
+import { Wallet } from '../../lib/evaluation/core/wallet';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
 import { MarkForSubmissionEvaluationHandler } from "../../lib/evaluation/markForSubmissionEvaluationHandler";
@@ -63,13 +64,21 @@ function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
+const wallet: Wallet = { 
+  data: { 
+    holder: { 
+      did: 'did:example:ebfeb1f712ebc6f1c276e12ec21'
+    } 
+  }
+};
+
 describe('markForSubmissionEvaluationHandler tests', () => {
 
   it(`Mark input candidates for presentation submission`, () => {
     const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push(...results)
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
@@ -97,7 +106,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     evaluationClient.results.push(...results_with_error)
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
@@ -121,7 +130,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationClient: EvaluationClient = new EvaluationClient(wallet);
     results[0].verifiable_credential_path = "$.outerClaim[0]"
     results[1].verifiable_credential_path = "$.innerClaim[1]"
     results[2].verifiable_credential_path = "$.mostInnerClaim[2]"
@@ -130,6 +139,5 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
     const length = evaluationHandler.getResults().length;
     expect(length).toEqual(6);
-
   });
 });

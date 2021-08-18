@@ -3,6 +3,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Checked, Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
+import { Wallet } from './core/wallet';
 import { EvaluationHandler } from './evaluationHandler';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -15,9 +16,13 @@ import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHan
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
 export class EvaluationClient {
-  constructor() {
+  constructor(private _wallet: Wallet) {
     this._results = [];
     this._verifiablePresentation = null;
+  }
+
+  public getWallet() {
+    return this._wallet;
   }
 
   private failed_catched: Checked = {
