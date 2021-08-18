@@ -26,10 +26,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, VerifiableCredential]): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
     const result = jp.query(vc[1], `$..credentialSubject.id`)[0];
-    inputDescriptors.forEach((id, index) => {
-      if (id.constraints && id.constraints.is_holder) {
+    inputDescriptors.forEach((inDesc, index) => {
+      if (inDesc.constraints && inDesc.constraints.is_holder) {
         const wallet = this.client.getWallet();
-        id.constraints.is_holder.forEach((ih) => {
+        inDesc.constraints.is_holder.forEach((ih) => {
           const resultObject = this.checkIsHolder(index, vc, result, wallet);
           this.checkDirectives(ih, resultObject);
         });
