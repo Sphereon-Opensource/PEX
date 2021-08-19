@@ -1,7 +1,7 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults } from './evaluation';
-import { PresentationDefinitionVB, Validated, ValidationEngine } from './validation';
+import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 import { VerifiableCredential } from './verifiablePresentation';
 import { VerifiablePresentation } from './verifiablePresentation';
 
@@ -42,7 +42,7 @@ export class PEJS {
   public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
     return new ValidationEngine().validate([
       {
-        bundler: new PresentationDefinitionVB('root'),
+        bundler: new PresentationSubmissionVB('root'),
         target: presentationSubmission,
       },
     ]);
