@@ -44,7 +44,7 @@ export class EvaluationClientWrapper {
     this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
     return {
       matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
-      warnings: [],
+      warnings: [...this.formatNotInfo(Status.WARN)],
     };
   }
 
