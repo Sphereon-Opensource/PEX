@@ -1,0 +1,34 @@
+{
+  "presentation_definition": {
+    "id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+    "purpose": "To check if you have a valid college degree.",
+    "input_descriptors": [
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+        "purpose": "You have to have a valid Bachelor Degree.",
+        "schema": [
+          {
+            "uri": "http://example.gov/credentials/3732"
+          }
+        ],
+        "constraints": {
+          "limit_disclosure": "required",
+          "fields": [
+            {
+              "path": [
+                "$.issuer",
+                "$.vc.issuer",
+                "$.iss"
+              ],
+              "filter": {
+                "type": "string",
+                "pattern": "did:web:vc.transmute.world"
+              },
+              "predicate": "required"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
