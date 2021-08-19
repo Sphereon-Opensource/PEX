@@ -23,7 +23,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, VerifiableCredential]): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
-    const credentialSubject = this.retrieveVcSubjectId(vc[1]); 
+    const credentialSubject = this.retrieveVcSubjectId(vc[1]);
     inputDescriptors.forEach((inDesc, index) => {
       if (inDesc.constraints && inDesc.constraints.is_holder) {
         const did = this.client.did;
@@ -36,9 +36,9 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public retrieveVcSubjectId(vc: VerifiableCredential): string {
-    let did: string; 
+    let did: string;
     if (vc && vc.credentialSubject) {
-        did = vc.credentialSubject.id;
+      did = vc.credentialSubject.id;
     } else if (vc['vc'] && vc['vc'].credentialSubject) {
       did = vc['vc'].credentialSubject.id;
     }
