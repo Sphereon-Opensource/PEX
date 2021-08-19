@@ -1,5 +1,4 @@
 import { HolderSubject, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
-import jp from 'jsonpath';
 
 import { Status } from '../ConstraintUtils';
 import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
@@ -24,16 +23,26 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private iterateOverInputDescriptors(pd: PresentationDefinition, vc: [number, VerifiableCredential]): void {
     const inputDescriptors: InputDescriptor[] = pd.input_descriptors;
-    const result = jp.query(vc[1], `$..credentialSubject.id`)[0];
+    const credentialSubject = this.retrieveVcSubjectId(vc[1]); 
     inputDescriptors.forEach((inDesc, index) => {
       if (inDesc.constraints && inDesc.constraints.is_holder) {
         const did = this.client.did;
         inDesc.constraints.is_holder.forEach((ih) => {
-          const resultObject = this.checkIsHolder(index, vc, result, did);
+          const resultObject = this.checkIsHolder(index, vc, credentialSubject, did);
           this.checkDirectives(ih, resultObject);
         });
       }
     });
+  }
+
+  public retrieveVcSubjectId(vc: VerifiableCredential): string {
+    let did: string; 
+    if (vc && vc.credentialSubject) {
+        did = vc.credentialSubject.id;
+    } else if (vc['vc'] && vc['vc'].credentialSubject) {
+      did = vc['vc'].credentialSubject.id;
+    }
+    return did;
   }
 
   private checkDirectives(hs: HolderSubject, resultObject: HandlerCheckResult): void {
