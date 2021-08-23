@@ -17,7 +17,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     super(parentTag, 'submission_requirements');
   }
 
-  public getValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
+  public getValidations(srs: SubmissionRequirement[]): Validation<unknown>[] {
     let validations: Validation<SubmissionRequirement>[] = [];
     if (srs != null && srs.length > 0) {
       for (let srInd = 0; srInd < srs.length; srInd++) {
