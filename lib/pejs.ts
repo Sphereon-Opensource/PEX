@@ -1,11 +1,17 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults } from './evaluation';
-import { PresentationDefinitionVB, Validated, ValidationEngine } from './validation';
+import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 import { VerifiableCredential } from './verifiablePresentation';
 import { VerifiablePresentation } from './verifiablePresentation';
 
 export class PEJS {
+  private _evaluationClientWrapper: EvaluationClientWrapper;
+
+  constructor() {
+    this._evaluationClientWrapper = new EvaluationClientWrapper();
+  }
+
   public evaluate(
     presentationDefinition: PresentationDefinition,
     verifiablePresentation: VerifiablePresentation,
@@ -22,7 +28,7 @@ export class PEJS {
     presentationDefinition: PresentationDefinition,
     verifiableCredential: VerifiableCredential[]
   ): PresentationSubmission {
-    return new EvaluationClientWrapper().submissionFrom(presentationDefinition, verifiableCredential);
+    return this._evaluationClientWrapper.submissionFrom(presentationDefinition, verifiableCredential);
   }
 
   public validateDefinition(presentationDefinition: PresentationDefinition): Validated {
@@ -37,7 +43,7 @@ export class PEJS {
   public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
     return new ValidationEngine().validate([
       {
-        bundler: new PresentationDefinitionVB('root'),
+        bundler: new PresentationSubmissionVB('root'),
         target: presentationSubmission,
       },
     ]);

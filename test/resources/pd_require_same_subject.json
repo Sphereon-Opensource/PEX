@@ -7,9 +7,9 @@
         "constraints": {
           "fields": [
             {
-              "id": "field1Value",
+              "id": "field1Key",
               "path": [
-                "$.field1Value"
+                "$.field1Key"
               ]
             }
           ],
@@ -17,8 +17,8 @@
             {
               "directive": "required",
               "field_id": [
-                "field1Value",
-                "field2Value"
+                "field1Key",
+                "field2Key"
               ]
             }
           ]
@@ -29,9 +29,9 @@
         "constraints": {
           "fields": [
             {
-              "id": "field2Value",
+              "id": "field2Key",
               "path": [
-                "$.field2Value"
+                "$.field2Key"
               ]
             }
           ]
@@ -42,9 +42,9 @@
         "constraints": {
           "fields": [
             {
-              "id": "field3Value",
+              "id": "field3Key",
               "path": [
-                "$.field3Value"
+                "$.field3Key"
               ]
             }
           ],
@@ -52,8 +52,8 @@
             {
               "directive": "preferred",
               "field_id": [
-                "field3Value",
-                "field4Value"
+                "field3Key",
+                "field4Key"
               ]
             }
           ]
@@ -64,9 +64,9 @@
         "constraints": {
           "fields": [
             {
-              "id": "field4Value",
+              "id": "field4Key",
               "path": [
-                "$.field4Value"
+                "$.field4Key"
               ]
             }
           ]

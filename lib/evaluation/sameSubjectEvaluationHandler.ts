@@ -39,9 +39,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return 'SameSubjectEvaluationHandler';
   }
 
-  public handle(pd: PresentationDefinition, vp: VerifiablePresentation): void {
+  public handle(pd: PresentationDefinition): void {
     this.pDefinition = pd;
-    this.vPresentation = vp;
+    this.vPresentation = this.client.verifiablePresentation;
 
     this.findSameSubjectFieldIdsToInputDescriptorsSets();
     this.findAllDescribedCredentialsPaths();
