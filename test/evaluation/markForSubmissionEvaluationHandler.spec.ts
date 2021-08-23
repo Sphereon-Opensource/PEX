@@ -130,6 +130,5 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
     const length = evaluationHandler.getResults().length;
     expect(length).toEqual(6);
-
   });
 });

@@ -10,6 +10,7 @@ import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHan
 import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
 import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
 import { SameSubjectEvaluationHandler } from './sameSubjectEvaluationHandler';
+import { SubjectIsHolderEvaluationHandler } from './subjectIsHolderEvaluationHandler';
 import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
 import { UriEvaluationHandler } from './uriEvaluationHandler';
 
@@ -27,8 +28,10 @@ export class EvaluationClient {
 
   private _results: HandlerCheckResult[];
   private _verifiablePresentation: VerifiablePresentation;
+  private _did: string;
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, holderDid: string): void {
+    this._did = holderDid;
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {
@@ -44,6 +47,10 @@ export class EvaluationClient {
 
   public get results(): HandlerCheckResult[] {
     return this._results;
+  }
+
+  public get did() {
+    return this._did;
   }
 
   public get verifiablePresentation(): VerifiablePresentation {
@@ -63,6 +70,7 @@ export class EvaluationClient {
       .setNext(new MarkForSubmissionEvaluationHandler(this))
       .setNext(new LimitDisclosureEvaluationHandler(this))
       .setNext(new SubjectIsIssuerEvaluationHandler(this))
+      .setNext(new SubjectIsHolderEvaluationHandler(this))
       .setNext(new SameSubjectEvaluationHandler(this));
 
     return uriEvaluation;

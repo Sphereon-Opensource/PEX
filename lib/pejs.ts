@@ -14,9 +14,10 @@ export class PEJS {
 
   public evaluate(
     presentationDefinition: PresentationDefinition,
-    verifiablePresentation: VerifiablePresentation
+    verifiablePresentation: VerifiablePresentation,
+    did: string
   ): EvaluationResults {
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiablePresentation);
+    return new EvaluationClientWrapper().evaluate(presentationDefinition, verifiablePresentation, did);
   }
 
   public selectFrom() {

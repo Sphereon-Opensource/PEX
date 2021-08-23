@@ -10,6 +10,8 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
+const did = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
+
 describe('evaluate', () => {
 
   it('should return error if uri in inputDescriptors doesn\'t match', function() {
@@ -18,7 +20,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     try {
-      evaluationClient.evaluate(presentationDefinition, vpSimple);
+      evaluationClient.evaluate(presentationDefinition, vpSimple, did);
     } catch (error) {
       expect(error.message).toEqual('Cannot read property \'length\' of null');
     }
@@ -29,7 +31,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.results[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
       'verifiable_credential_path': '$.verifiableCredential[0]',
@@ -64,7 +66,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -74,7 +76,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.verifiableCredential[0].credentialSchema[0].id = 'https://www.w3.org/TR/vc-data-model/#types1';
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.results[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
       'verifiable_credential_path': '$.verifiableCredential[0]',
@@ -109,7 +111,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.verifiableCredential[0].credentialSchema.push({ id: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
   });
@@ -120,7 +122,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     vpSimple.verifiableCredential[0].credentialSchema.push({ id: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -130,7 +132,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
     expect(errorResults.length).toEqual(7);
@@ -142,7 +144,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://eu.com/claims/DriversLicense';
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
 
     let errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     let infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
@@ -161,7 +163,7 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual(undefined);
   });
 
@@ -170,7 +172,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     delete presentationDefinition.input_descriptors[0].constraints.limit_disclosure;
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual('etc');
   });
 
@@ -179,7 +181,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].constraints.limit_disclosure = Optionality.Preferred;
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual('etc');
   });
 
@@ -187,7 +189,7 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
   });
 
@@ -196,7 +198,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors;
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual(undefined);
   });
 
@@ -204,7 +206,7 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple), did);
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
   });
 });

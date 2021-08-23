@@ -26,12 +26,16 @@ export class EvaluationClientWrapper {
   public getEvaluationClient() {
     return this._client;
   }
-
   public selectFrom(
     presentationDefinition: PresentationDefinition,
-    selectedCredentials: VerifiableCredential[]
+    selectedCredentials: VerifiableCredential[],
+    did: string
   ): SelectResults {
-    this._client.evaluate(presentationDefinition, new VP(new Presentation([], null, [], selectedCredentials, null)));
+    this._client.evaluate(
+      presentationDefinition,
+      new VP(new Presentation([], null, [], selectedCredentials, null)),
+      did
+    );
 
     const marked: HandlerCheckResult[] = this._client.results.filter(
       (result) =>
@@ -40,7 +44,7 @@ export class EvaluationClientWrapper {
     this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
     return {
       matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
-      warnings: [],
+      warnings: [...this.formatNotInfo(Status.WARN)],
     };
   }
 
@@ -99,8 +103,8 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
-    this._client.evaluate(pd, vp);
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
+    this._client.evaluate(pd, vp, did);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
