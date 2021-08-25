@@ -23,7 +23,6 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.iterateOverInputCandidates(inputDescriptors, p);
   }
 
-  //TODO move to utils
   private iterateOverInputCandidates(
     inputDescriptors: InputDescriptor[],
     verifiablePresentation: VerifiablePresentation

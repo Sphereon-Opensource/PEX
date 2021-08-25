@@ -10,14 +10,14 @@ export class Presentation {
   presentation_submission: PresentationSubmission;
   type: Array<string>;
   verifiableCredential: Array<VerifiableCredential>;
-  proof: any;
+  proof: unknown;
 
   public constructor(
     context: Array<string>,
     presentation_submission: PresentationSubmission,
     type: Array<string>,
     verifiableCredential: Array<VerifiableCredential>,
-    proof: any
+    proof: unknown
   ) {
     this.context = context;
     this.presentation_submission = presentation_submission;

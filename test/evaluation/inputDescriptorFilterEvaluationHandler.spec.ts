@@ -25,8 +25,8 @@ function getFile(path: string): unknown {
 describe('inputDescriptorFilterEvaluationHandler tests', () => {
 
   it(`input descriptor's constraint property missing`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const message0 = {...message};
@@ -42,8 +42,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraints.fields property missing`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[1]];
     const message0 = {...message};
@@ -59,8 +59,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraints.fields.length is equal to 0`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[2]];
     const message0 = {...message};
@@ -76,8 +76,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraints.fields.path does not match`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[3]];
     const message0 = {
@@ -97,8 +97,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraints.fields.filter does not match`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
     const message0 = {...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed filter evaluation'};
@@ -114,8 +114,8 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraint.fields.filter match`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
     const message1 = {...message, ['verifiable_credential_path']: '$.verifiableCredential[1]'};
@@ -129,11 +129,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
   });
 
   it(`input descriptor's constraint.fields.filter match and nested_path`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates.presentation_submission, inputCandidates.type, inputCandidates.verifiableCredential, inputCandidates.proof);
-    presentation['outerClaim'] = inputCandidates.outerClaim;
-    presentation['innerClaim'] = inputCandidates.innerClaim;
-    presentation['mostInnerClaim'] = inputCandidates.mostInnerClaim;
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
+    presentation['outerClaim'] = inputCandidates['outerClaim'];
+    presentation['innerClaim'] = inputCandidates['innerClaim'];
+    presentation['mostInnerClaim'] = inputCandidates['mostInnerClaim'];
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[6]];
     const message0 = {...message, ['verifiable_credential_path']: '$.outerClaim[0]' };
