@@ -21,4 +21,9 @@ export class DIDCommVP implements VerifiablePresentation {
   public getVerifiableCredentials(): Array<VerifiableCredential> {
     return this.dIdCommsMessage.verifiable_credentials;
   }
+
+  //TODO: might need a bit of refactoring
+  getHolder(): string {
+    return this.dIdCommsMessage.holder;
+  }
 }

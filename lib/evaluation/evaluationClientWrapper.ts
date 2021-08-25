@@ -26,6 +26,7 @@ export class EvaluationClientWrapper {
   public getEvaluationClient() {
     return this._client;
   }
+
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     selectedCredentials: VerifiableCredential[],
@@ -33,8 +34,7 @@ export class EvaluationClientWrapper {
   ): SelectResults {
     this._client.evaluate(
       presentationDefinition,
-      new VP(new Presentation([], null, [], selectedCredentials, null)),
-      did
+      new VP(new Presentation([], null, [], selectedCredentials, did, null))
     );
 
     const marked: HandlerCheckResult[] = this._client.results.filter(
@@ -103,8 +103,8 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, did: string): EvaluationResults {
-    this._client.evaluate(pd, vp, did);
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
+    this._client.evaluate(pd, vp);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
@@ -201,6 +201,7 @@ export class EvaluationClientWrapper {
       }
     }
   }
+
   private remapVcs(vcs: unknown[]) {
     const presentationSubmission: PresentationSubmission = {
       ...this._client.verifiablePresentation.getPresentationSubmission(),

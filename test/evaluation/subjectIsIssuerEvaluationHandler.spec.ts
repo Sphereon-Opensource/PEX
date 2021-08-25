@@ -46,7 +46,7 @@ describe('evaluate', () => {
         'id': 'https://www.w3.org/TR/vc-data-model/#types'
       }
     ];
-    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredential, null));
+    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredential, null, null));
     subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
@@ -90,7 +90,7 @@ describe('evaluate', () => {
       }
     ];
     verifiableCredentials[0]['issuer'] = 'did:example:124';
-    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredentials, null));
+    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredentials, null, null));
 
     subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({

@@ -11,4 +11,6 @@ export interface VerifiablePresentation {
   getPresentationSubmission(): PresentationSubmission;
 
   getVerifiableCredentials(): Array<VerifiableCredential>;
+
+  getHolder(): string;
 }

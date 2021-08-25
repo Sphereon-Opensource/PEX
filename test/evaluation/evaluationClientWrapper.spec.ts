@@ -2,15 +2,13 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { Status, VP } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
+import { EvaluationClient, EvaluationClientWrapper, Status, VP } from '../../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const did = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
+const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 
 const success = {
   "errors": [],
@@ -128,7 +126,8 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = "https://www.w3.org/TR/vc-data-model/#types1";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.results[0]).toEqual({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",
@@ -165,7 +164,8 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: "https://www.w3.org/TR/vc-data-model/#types1" });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
     expect(evaluationResults).toEqual(success);
@@ -177,7 +177,8 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.w3.org/TR/vc-data-model/#types1";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.results[0]).toEqual({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$.verifiableCredential[0]",
@@ -188,7 +189,7 @@ describe('evaluate', () => {
         "inputDescriptorsUris": [
           "https://www.w3.org/TR/vc-data-model/#types"
         ],
-        "presentationDefinitionUri": "https://www.w3.org/TR/vc-data-model/#types1"
+        'presentationDefinitionUri': 'https://www.w3.org/TR/vc-data-model/#types1'
       }
     });
     expect(evaluationClient.results[3]).toEqual({
@@ -214,7 +215,8 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0].credentialSchema.push({ id: "https://www.w3.org/TR/vc-data-model/#types1" });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
     expect(evaluationResults).toEqual(error);
@@ -227,7 +229,8 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0].credentialSchema.push({ id: "https://www.w3.org/TR/vc-data-model/#types1" });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
     expect(evaluationResults).toEqual(success);
@@ -240,7 +243,8 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = "https://business-standards.org/schemas/employment-history.json";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
     expect(errorResults.length).toEqual(7);
@@ -254,7 +258,8 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = "https://eu.com/claims/DriversLicense";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
     expect(errorResults.length).toEqual(5);
@@ -267,7 +272,8 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
@@ -278,7 +284,8 @@ describe('evaluate', () => {
     delete pdSchema.input_descriptors[0].constraints.limit_disclosure;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual("etc");
     expect(evaluationResults).toEqual(success);
   });
@@ -289,17 +296,19 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].constraints.limit_disclosure = Optionality.Preferred;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual("etc");
     expect(evaluationResults).toEqual(success);
   });
 
-  it('should return ok if vc[0] doesn\'t have the birthPlace field', function () {
+  it('should return ok if vc[0] doesn\'t have the birthPlace field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
@@ -307,10 +316,10 @@ describe('evaluate', () => {
   it('should return ok if vc[0] doesn\'t have the etc field', function () {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
@@ -320,7 +329,8 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
@@ -331,7 +341,8 @@ describe('evaluate', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
     pdSchema.input_descriptors = [pdSchema.input_descriptors[0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
@@ -351,7 +362,8 @@ describe('evaluate', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
     pdSchema.input_descriptors = [pdSchema.input_descriptors[1], pdSchema.input_descriptors[2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple), did);
+    vpSimple.holder = HOLDER_DID;
+    evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
