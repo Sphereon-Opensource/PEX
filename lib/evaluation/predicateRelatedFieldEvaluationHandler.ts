@@ -53,7 +53,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       if (constraints.fields[fieldIdx].predicate === Optionality.Required) {
         results.push(resultObject);
       } else {
-        resultObject.payload.value = true;
+        resultObject.payload['value'] = true;
         results.push(resultObject);
       }
     }
@@ -84,7 +84,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   private createResultObject(
     input_descriptor_idx: number,
     resultIdx: number,
-    evaluationResult: any,
+    evaluationResult: unknown,
     results: HandlerCheckResult[]
   ) {
     return {

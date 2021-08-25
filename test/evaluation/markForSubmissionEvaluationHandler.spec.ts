@@ -118,19 +118,4 @@ describe('markForSubmissionEvaluationHandler tests', () => {
         descriptor_map: []
       }));
   });
-
-  it(`Mark input candidates with nested paths for presentation submission`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
-    presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationClient: EvaluationClient = new EvaluationClient();
-    results[0].verifiable_credential_path = '$.outerClaim[0]';
-    results[1].verifiable_credential_path = '$.innerClaim[1]';
-    results[2].verifiable_credential_path = '$.mostInnerClaim[2]';
-    evaluationClient.results.push(...results);
-    const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
-    const length = evaluationHandler.getResults().length;
-    expect(length).toEqual(6);
-  });
 });
