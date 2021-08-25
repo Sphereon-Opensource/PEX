@@ -343,7 +343,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: [
@@ -364,7 +364,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
       descriptor_map: [

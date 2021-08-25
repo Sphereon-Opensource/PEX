@@ -18,7 +18,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -36,7 +36,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -55,7 +55,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -72,7 +72,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -90,7 +90,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Min: expected: 3 actual: 2 at level: 0');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Min: expected: 3 actual: 2 at level: 0');
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
@@ -100,7 +100,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
   });
 
   it('Evaluate submission requirements exactly 1 from group B', () => {
@@ -110,7 +110,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Count: expected: 1 actual: 2 at level: 0');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Count: expected: 1 actual: 2 at level: 0');
   });
 
   it('Evaluate submission requirements all from group B', () => {
@@ -120,7 +120,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Not all input descriptors are members of group B');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Not all input descriptors are members of group B');
   });
 
   it('Evaluate submission requirements all from group A and 2 from group B', () => {
@@ -130,7 +130,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -148,7 +148,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -166,7 +166,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
@@ -184,7 +184,7 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Min: expected: 3 actual: 2 at level: 1');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Min: expected: 3 actual: 2 at level: 1');
   });
 
   it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
@@ -194,6 +194,6 @@ describe('Submission requirements tests', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements[12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential, holderDid)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
+    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
   });
 });
