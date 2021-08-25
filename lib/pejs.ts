@@ -15,11 +15,13 @@ export class PEJS {
     presentationDefinition: PresentationDefinition,
     verifiablePresentation: VerifiablePresentation
   ): EvaluationResults {
-    return new EvaluationClientWrapper().evaluate(presentationDefinition, verifiablePresentation);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiablePresentation);
   }
 
-  public selectFrom() {
-    throw new Error('Not implemented in Alpha. Planned for Beta.');
+  public selectFrom(presentationDefinition: PresentationDefinition,
+                    selectedCredentials: VerifiableCredential[],
+                    holderDid: string) {
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, selectedCredentials, holderDid);
   }
 
   public submissionFrom(
@@ -33,8 +35,8 @@ export class PEJS {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionVB('root'),
-        target: presentationDefinition,
-      },
+        target: presentationDefinition
+      }
     ]);
   }
 
@@ -42,8 +44,8 @@ export class PEJS {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationSubmissionVB('root'),
-        target: presentationSubmission,
-      },
+        target: presentationSubmission
+      }
     ]);
   }
 }
