@@ -20,7 +20,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIdzInputDescriptorsIsHolderPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, any>;
+  private credentialsSubjects: Map<string, unknown>;
 
   private messages: Map<Status, string>;
 
@@ -193,9 +193,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private confirmFieldSetHasSameHolder(status: 'info' | 'warn' | 'error') {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
       const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
-      inputDescriptorIds.forEach((inDescId) =>
-        credentialSubjectsSet.add({ ...this.credentialsSubjects.get(inDescId) })
-      );
+      inputDescriptorIds.forEach((inDescId) => credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId)));
       this.addResult(credentialSubjectsSet, fieldIdSet, status);
     };
   }
