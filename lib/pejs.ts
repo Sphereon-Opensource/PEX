@@ -18,9 +18,11 @@ export class PEJS {
     return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiablePresentation);
   }
 
-  public selectFrom(presentationDefinition: PresentationDefinition,
-                    selectedCredentials: VerifiableCredential[],
-                    holderDid: string) {
+  public selectFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    holderDid: string
+  ) {
     return this._evaluationClientWrapper.selectFrom(presentationDefinition, selectedCredentials, holderDid);
   }
 
@@ -35,8 +37,8 @@ export class PEJS {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionVB('root'),
-        target: presentationDefinition
-      }
+        target: presentationDefinition,
+      },
     ]);
   }
 
@@ -44,8 +46,8 @@ export class PEJS {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationSubmissionVB('root'),
-        target: presentationSubmission
-      }
+        target: presentationSubmission,
+      },
     ]);
   }
 }
