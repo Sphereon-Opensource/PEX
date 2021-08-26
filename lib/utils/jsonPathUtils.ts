@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jp from 'jsonpath';
 
 export class JsonPathUtils {
   /**
-   *
    * @param verifiableCredential: a vc object can be found in verifiablePresentation.verifiableCredential[i]
    * @param paths: paths that can be found in Field object
    * @return a result object containing value of the correct path in the verifiableCredential and the correct path
