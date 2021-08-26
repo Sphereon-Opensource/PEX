@@ -12,5 +12,6 @@ export class Chapi {
     presentation_submission: PresentationSubmission;
   };
   verifiable_credential: Array<VerifiableCredential>;
+  holder?: string;
   proof: unknown;
 }

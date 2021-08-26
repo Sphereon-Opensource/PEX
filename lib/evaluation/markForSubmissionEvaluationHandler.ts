@@ -2,8 +2,7 @@ import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/p
 import { nanoid } from 'nanoid';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
-import { Presentation } from '../verifiablePresentation/models';
+import { Presentation, VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -29,6 +28,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         },
         null,
         [],
+        p.getHolder(),
         null
       )
     );

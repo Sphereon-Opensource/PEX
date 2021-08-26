@@ -113,7 +113,7 @@ describe('sameSubjectEvaluationHandler', () => {
           "type": "VerifiableCredential"
         }
       ]}
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['proof']);
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['holder'], inputCandidates['proof']);
     evaluationClient.verifiablePresentation = new VP(presentation);
     evaluationHandler.handle(pd);
     expect(evaluationHandler.client.results).toEqual(results);
