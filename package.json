@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pe-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -25,7 +25,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@sphereon/pe-models": "0.0.4",
+    "@sphereon/pe-models": "0.0.5",
     "ajv": "^8.1.0",
     "ajv-formats": "^2.1.0",
     "jsonpath": "^1.1.1",
