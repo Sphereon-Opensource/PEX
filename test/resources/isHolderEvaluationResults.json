@@ -1,0 +1,46 @@
+[
+    {
+      "evaluator": "IsHolderEvaluation",
+      "input_descriptor_path": "[accounts]",
+      "message": "The field ids requiring the subject to be the holder",
+      "payload": {
+        "credentialSubjectsSet": ["accounts"],
+        "fieldIdSet": "[accounts]"
+      },
+      "status": "info",
+      "verifiable_credential_path": "[$.verifiableCredential[0]]"
+    },
+    {
+      "evaluator": "IsHolderEvaluation",
+      "input_descriptor_path": "[active]",
+      "message": "The field ids requiring the subject to be the holder",
+      "payload": {
+        "credentialSubjectsSet": ["active"],
+        "fieldIdSet": "[active]"
+      },
+      "status": "error",
+      "verifiable_credential_path": "[$.verifiableCredential[1]]"
+    },
+    {
+      "evaluator": "IsHolderEvaluation",
+      "input_descriptor_path": "[license,test]",
+      "message": "The field ids requiring the subject to be the holder",
+      "payload": {
+        "credentialSubjectsSet": ["license"],
+        "fieldIdSet": "[license,test]"
+      },
+      "status": "error",
+      "verifiable_credential_path": "[$.verifiableCredential[2]]"
+    },
+    {
+      "evaluator": "IsHolderEvaluation",
+      "input_descriptor_path": "[accounts]",
+      "message": "The field ids preferring the subject to be the holder",
+      "payload": {
+        "credentialSubjectsSet": ["accounts"],
+        "fieldIdSet": "[accounts]"
+      },
+      "status": "warn",
+      "verifiable_credential_path": "[$.verifiableCredential[0]]"
+    }
+  ]

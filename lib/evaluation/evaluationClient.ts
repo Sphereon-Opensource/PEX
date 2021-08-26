@@ -53,6 +53,10 @@ export class EvaluationClient {
     return this._did;
   }
 
+  public set did(did: string) {
+    this._did = did;
+  }
+
   public get verifiablePresentation(): VerifiablePresentation {
     return this._verifiablePresentation;
   }

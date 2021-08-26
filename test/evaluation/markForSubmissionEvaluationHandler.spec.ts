@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VP } from '../../lib';
+import { Presentation, VP } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/markForSubmissionEvaluationHandler';
@@ -66,13 +66,14 @@ function getFile(path: string): unknown {
 describe('markForSubmissionEvaluationHandler tests', () => {
 
   it(`Mark input candidates for presentation submission`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['holder'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',
@@ -94,13 +95,14 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['holder'], inputCandidates['proof']);
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
+    evaluationHandler.handle(presentationDefinition, new VP(presentation));
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',
@@ -115,20 +117,5 @@ describe('markForSubmissionEvaluationHandler tests', () => {
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: []
       }));
-  });
-
-  it(`Mark input candidates with nested paths for presentation submission`, () => {
-    const inputCandidates: any = getFile('./test/dif_pe_examples/vp/vp_nested_submission.json');
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
-    presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
-    const evaluationClient: EvaluationClient = new EvaluationClient();
-    results[0].verifiable_credential_path = '$.outerClaim[0]';
-    results[1].verifiable_credential_path = '$.innerClaim[1]';
-    results[2].verifiable_credential_path = '$.mostInnerClaim[2]';
-    evaluationClient.results.push(...results);
-    const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, new VP(inputCandidates));
-    const length = evaluationHandler.getResults().length;
-    expect(length).toEqual(6);
   });
 });

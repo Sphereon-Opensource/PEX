@@ -23,7 +23,6 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.iterateOverInputCandidates(inputDescriptors, p);
   }
 
-  //TODO move to utils
   private iterateOverInputCandidates(
     inputDescriptors: InputDescriptor[],
     verifiablePresentation: VerifiablePresentation
@@ -106,10 +105,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: any, field: Field) {
+  private evaluateFilter(result: unknown, field: Field) {
     if (field.filter) {
       const ajv = new Ajv();
-      const valid = ajv.validate(field.filter, result.value);
+      const valid = ajv.validate(field.filter, result['value']);
       if (!valid) {
         return false;
       }
