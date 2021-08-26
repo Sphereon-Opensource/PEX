@@ -11,5 +11,6 @@ export class OpenIdConnect {
   _claim_names: {
     verified_claims: Array<string>;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   '_claim_sources': any;
 }
