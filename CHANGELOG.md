@@ -1,6 +1,6 @@
 # Release Notes
 
-## v0.1.0 BETA1 - TBD
+## v0.1.0 BETA1 - 2021-08-27
 - pejs.selectFrom() method
 - Fixed: submissionFrom should use results from evaluate
 
