@@ -25,4 +25,8 @@ export class VP implements VerifiablePresentation {
   public getVerifiableCredentials(): Array<VerifiableCredential> {
     return this.presentation.verifiableCredential;
   }
+
+  getHolder(): string {
+    return this.presentation.holder;
+  }
 }

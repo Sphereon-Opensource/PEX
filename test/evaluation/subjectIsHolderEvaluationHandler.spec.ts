@@ -10,7 +10,7 @@ function getFile(path: string): unknown {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const did = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
+const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 
 describe('SubjectIsHolderEvaluationHandler tests', () => {
 
@@ -20,7 +20,8 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(presentationDefinition, new VP(presentation), did);
+    presentation.holder = HOLDER_DID;
+    evaluationClient.evaluate(presentationDefinition, new VP(presentation));
     expect(evaluationClient.results.filter(r => r.evaluator === "IsHolderEvaluation")).toEqual([
       {
         "evaluator": "IsHolderEvaluation",

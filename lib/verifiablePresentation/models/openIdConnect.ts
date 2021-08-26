@@ -1,5 +1,7 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { VerifiableCredential } from '../verifiableCredential';
+
 /***
  * OpenId Connect Verifiable Presentation
  */
@@ -11,5 +13,6 @@ export class OpenIdConnect {
   _claim_names: {
     verified_claims: Array<string>;
   };
-  '_claim_sources': any;
+  holder: string;
+  '_claim_sources': Array<VerifiableCredential>;
 }

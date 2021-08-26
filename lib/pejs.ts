@@ -2,8 +2,7 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 
 import { EvaluationClientWrapper, EvaluationResults } from './evaluation';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { VerifiableCredential } from './verifiablePresentation';
-import { VerifiablePresentation } from './verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from './verifiablePresentation';
 
 export class PEJS {
   private _evaluationClientWrapper: EvaluationClientWrapper;
@@ -14,14 +13,17 @@ export class PEJS {
 
   public evaluate(
     presentationDefinition: PresentationDefinition,
-    verifiablePresentation: VerifiablePresentation,
-    did: string
+    verifiablePresentation: VerifiablePresentation
   ): EvaluationResults {
-    return new EvaluationClientWrapper().evaluate(presentationDefinition, verifiablePresentation, did);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiablePresentation);
   }
 
-  public selectFrom() {
-    throw new Error('Not implemented in Alpha. Planned for Beta.');
+  public selectFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    holderDid: string
+  ) {
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, selectedCredentials, holderDid);
   }
 
   public submissionFrom(

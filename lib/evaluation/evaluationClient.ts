@@ -30,8 +30,8 @@ export class EvaluationClient {
   private _verifiablePresentation: VerifiablePresentation;
   private _did: string;
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation, holderDid: string): void {
-    this._did = holderDid;
+  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
+    this._did = vp.getHolder();
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {
