@@ -233,7 +233,7 @@ interface SubmissionRequirementMatch {
   count: number;
   from?: string[];
   from_nested?: SubmissionRequirementMatch[];
-  matches: VerifiableCredential[];
+  matches: string[]; // VerifiableCredential Address
 }
 ```
 
