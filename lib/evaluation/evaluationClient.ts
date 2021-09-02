@@ -18,6 +18,7 @@ export class EvaluationClient {
   constructor() {
     this._results = [];
     this._verifiablePresentation = null;
+    this._did = null;
   }
 
   private failed_catched: Checked = {

@@ -7,6 +7,7 @@ import {
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { JsonPathUtils } from '../utils';
 import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
 import { Presentation } from '../verifiablePresentation/models';
 
@@ -36,15 +37,25 @@ export class EvaluationClientWrapper {
       presentationDefinition,
       new VP(new Presentation([], null, [], selectedCredentials, did, null))
     );
-
+    const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
+    if (presentationDefinition.submission_requirements) {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      );
+      this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
+      return {
+        matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
+        warnings,
+      };
+    }
+    // Handling cases without pd.submission_requirements
     const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) =>
-        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
     );
-    this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
     return {
-      matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
-      warnings: [...this.formatNotInfo(Status.WARN)],
+      matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
+      warnings,
     };
   }
 
@@ -63,6 +74,29 @@ export class EvaluationClientWrapper {
         srm.count++;
         srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
         submissionRequirementMatches.push(srm);
+      }
+    }
+    return submissionRequirementMatches;
+  }
+
+  private matchWithoutSubmissionRequirements(
+    marked: HandlerCheckResult[],
+    pd: PresentationDefinition
+  ): SubmissionRequirementMatch[] {
+    const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
+    const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
+    for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
+      const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
+      if (idRes.length) {
+        const submissionRequirementMatch: SubmissionRequirementMatch = new SubmissionRequirementMatch(
+          idRes[0].value.name,
+          Rules.All,
+          1,
+          sameIdVCs,
+          null,
+          null
+        );
+        submissionRequirementMatches.push(submissionRequirementMatch);
       }
     }
     return submissionRequirementMatches;
@@ -220,5 +254,30 @@ export class EvaluationClientWrapper {
     }
     presentationSubmission.descriptor_map = descriptorMap;
     return presentationSubmission;
+  }
+
+  private partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
+    const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
+
+    const partitionedBasedOnID: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
+    // 1. We partition the marked logs based on their inputDescriptorPath
+    for (let i = 0; i < marked.length; i++) {
+      const currentIdPath: string = marked[i].input_descriptor_path;
+      if (partitionedBasedOnID.has(currentIdPath)) {
+        partitionedBasedOnID.get(currentIdPath).push(marked[i]);
+      } else {
+        partitionedBasedOnID.set(currentIdPath, [marked[i]]);
+      }
+    }
+
+    // 2. Within those paths, we partition them based on their verifiableCredentialPath
+    for (const [idPath, sameIdCheckResults] of partitionedBasedOnID.entries()) {
+      const vcPaths: string[] = [];
+      for (let i = 0; i < sameIdCheckResults.length; i++) {
+        vcPaths.push(sameIdCheckResults[i].verifiable_credential_path);
+      }
+      partitionedResults.set(idPath, vcPaths);
+    }
+    return partitionedResults;
   }
 }
