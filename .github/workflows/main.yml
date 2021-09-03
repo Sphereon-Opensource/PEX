@@ -17,9 +17,10 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
         name: codecoverage # optional
+        flags: unittest
         fail_ci_if_error: true # optional (default = false)
         directory: ./coverage/reports/
-        files: ./coverage1.xml,./coverage2.xml
+        #files: ./coverage1.xml,./coverage2.xml
         verbose: true # optional (default = false)
     - name: install node v12
       uses: actions/setup-node@v1
