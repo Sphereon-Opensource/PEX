@@ -5,7 +5,7 @@
   <br>
 </h1>
 
-[![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml)
+[![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Sphereon-Opensource/pe-js/branch/develop/graph/badge.svg?token=9P1JGUYA35)](https://codecov.io/gh/Sphereon-Opensource/pe-js) [![NPM Version](https://img.shields.io/npm/v/@sphereon/pe-js.svg)](https://npm.im/@sphereon/pe-js)
 
 ## Active Development
 _IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we expect to keep that to a minimum though._
