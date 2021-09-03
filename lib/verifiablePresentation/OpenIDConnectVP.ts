@@ -21,4 +21,9 @@ export class OpenIDConnectVP implements VerifiablePresentation {
   public getVerifiableCredentials(): Array<VerifiableCredential> {
     return this.openIdConnect._claim_sources;
   }
+
+  //TODO: might need a bit of refactoring
+  getHolder(): string {
+    return this.openIdConnect.holder;
+  }
 }

@@ -1,27 +1,36 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults } from './evaluation';
-import { PresentationDefinitionVB, Validated, ValidationEngine } from './validation';
-import { VerifiableCredential } from './verifiablePresentation';
-import { VerifiablePresentation } from './verifiablePresentation';
+import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import { VerifiableCredential, VerifiablePresentation } from './verifiablePresentation';
 
 export class PEJS {
+  private _evaluationClientWrapper: EvaluationClientWrapper;
+
+  constructor() {
+    this._evaluationClientWrapper = new EvaluationClientWrapper();
+  }
+
   public evaluate(
     presentationDefinition: PresentationDefinition,
     verifiablePresentation: VerifiablePresentation
   ): EvaluationResults {
-    return new EvaluationClientWrapper().evaluate(presentationDefinition, verifiablePresentation);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiablePresentation);
   }
 
-  public selectFrom() {
-    throw new Error('Not implemented in Alpha. Planned for Beta.');
+  public selectFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    holderDid: string
+  ) {
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, selectedCredentials, holderDid);
   }
 
   public submissionFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredential: VerifiableCredential[]
   ): PresentationSubmission {
-    return new EvaluationClientWrapper().submissionFrom(presentationDefinition, verifiableCredential);
+    return this._evaluationClientWrapper.submissionFrom(presentationDefinition, verifiableCredential);
   }
 
   public validateDefinition(presentationDefinition: PresentationDefinition): Validated {
@@ -36,7 +45,7 @@ export class PEJS {
   public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
     return new ValidationEngine().validate([
       {
-        bundler: new PresentationDefinitionVB('root'),
+        bundler: new PresentationSubmissionVB('root'),
         target: presentationSubmission,
       },
     ]);

@@ -7,8 +7,12 @@ import {
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { JsonPathUtils } from '../utils';
+import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { Presentation } from '../verifiablePresentation/models';
 
+import { SelectResults } from './core/selectResults';
+import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -22,6 +26,114 @@ export class EvaluationClientWrapper {
 
   public getEvaluationClient() {
     return this._client;
+  }
+
+  public selectFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    did: string
+  ): SelectResults {
+    this._client.evaluate(
+      presentationDefinition,
+      new VP(new Presentation([], null, [], selectedCredentials, did, null))
+    );
+    const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
+    if (presentationDefinition.submission_requirements) {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      );
+      this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
+      return {
+        matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
+        warnings,
+      };
+    }
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+    );
+    return {
+      matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
+      warnings,
+    };
+  }
+
+  private matchSubmissionRequirements(
+    submissionRequirements: SubmissionRequirement[],
+    marked: HandlerCheckResult[]
+  ): SubmissionRequirementMatch[] {
+    const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
+    for (const sr of submissionRequirements) {
+      if (sr.from) {
+        if (sr.rule === Rules.All || sr.rule === Rules.Pick) {
+          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
+        }
+      } else if (sr.from_nested) {
+        const srm = this.createSubmissionRequirementMatch(sr);
+        srm.count++;
+        srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
+        submissionRequirementMatches.push(srm);
+      }
+    }
+    return submissionRequirementMatches;
+  }
+
+  private matchWithoutSubmissionRequirements(
+    marked: HandlerCheckResult[],
+    pd: PresentationDefinition
+  ): SubmissionRequirementMatch[] {
+    const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
+    const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
+    for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
+      const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
+      if (idRes.length) {
+        const submissionRequirementMatch: SubmissionRequirementMatch = new SubmissionRequirementMatch(
+          idRes[0].value.name,
+          Rules.All,
+          1,
+          sameIdVCs,
+          null,
+          null
+        );
+        submissionRequirementMatches.push(submissionRequirementMatch);
+      }
+    }
+    return submissionRequirementMatches;
+  }
+
+  private mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+    const srm = this.createSubmissionRequirementMatch(sr);
+    if (!srm.from.includes(sr.from)) {
+      srm.from.push(...sr.from);
+    }
+    for (const m of marked) {
+      if (m.payload.group.includes(sr.from)) {
+        srm.count++;
+        srm.matches.push(m.verifiable_credential_path);
+      }
+    }
+    return srm;
+  }
+
+  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
+    if (sr.from) {
+      return {
+        rule: sr.rule,
+        count: 0,
+        matches: [],
+        from: [],
+        name: sr.name,
+      };
+    } else if (sr.from_nested) {
+      return {
+        rule: sr.rule,
+        count: 0,
+        matches: [],
+        from_nested: [],
+        name: sr.name,
+      };
+    }
+    return null;
   }
 
   public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
@@ -122,6 +234,7 @@ export class EvaluationClientWrapper {
       }
     }
   }
+
   private remapVcs(vcs: unknown[]) {
     const presentationSubmission: PresentationSubmission = {
       ...this._client.verifiablePresentation.getPresentationSubmission(),
@@ -140,5 +253,28 @@ export class EvaluationClientWrapper {
     }
     presentationSubmission.descriptor_map = descriptorMap;
     return presentationSubmission;
+  }
+
+  private partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
+    const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
+
+    const partitionedBasedOnID: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
+    for (let i = 0; i < marked.length; i++) {
+      const currentIdPath: string = marked[i].input_descriptor_path;
+      if (partitionedBasedOnID.has(currentIdPath)) {
+        partitionedBasedOnID.get(currentIdPath).push(marked[i]);
+      } else {
+        partitionedBasedOnID.set(currentIdPath, [marked[i]]);
+      }
+    }
+
+    for (const [idPath, sameIdCheckResults] of partitionedBasedOnID.entries()) {
+      const vcPaths: string[] = [];
+      for (let i = 0; i < sameIdCheckResults.length; i++) {
+        vcPaths.push(sameIdCheckResults[i].verifiable_credential_path);
+      }
+      partitionedResults.set(idPath, vcPaths);
+    }
+    return partitionedResults;
   }
 }

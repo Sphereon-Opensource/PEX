@@ -21,4 +21,8 @@ export class CHAPIVP implements VerifiablePresentation {
   public getVerifiableCredentials(): Array<VerifiableCredential> {
     return this.chapi.verifiable_credential;
   }
+
+  getHolder(): string {
+    return this.chapi.holder;
+  }
 }

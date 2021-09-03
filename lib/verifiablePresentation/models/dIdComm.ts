@@ -20,4 +20,5 @@ export class DIdComm {
     };
   };
   verifiable_credentials: Array<VerifiableCredential>;
+  holder: string;
 }

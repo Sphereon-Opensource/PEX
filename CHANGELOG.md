@@ -3,15 +3,18 @@
 ## v0.1.0 - 2021-09-03
 This is the first Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
-- 1st Beta release:
+- Added:
   * pejs.selectFrom() method
-  * Bugfixes
+
+- Fixed:
+  * submissionFrom should use results from evaluate
+  * validateSubmission should be successfully called
 
 
-- Planned:
-  1. Implement actual hashlink validation, according to [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation)
-  
+- Known issues:
+  1. Implementation of actual hashlink validation, according to [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) is missing
      >4.3.1- If the Input Descriptor schema object uri is a hashlink or similar value that points to immutable content, then the content of the retrieved schema must also match
+  
   2. Some entries in [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) are addressing `nested credentials` and `nested paths`, which are currently only partially supported.
 
 

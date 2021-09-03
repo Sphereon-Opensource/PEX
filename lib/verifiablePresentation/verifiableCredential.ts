@@ -3,6 +3,6 @@
  */
 export interface VerifiableCredential {
   id: string;
-  credentialSubject: any;
+  credentialSubject: unknown;
   type: string;
 }

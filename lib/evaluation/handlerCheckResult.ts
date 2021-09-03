@@ -6,6 +6,7 @@ export interface HandlerCheckResult {
   evaluator: string;
   status: Status;
   message?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload?: any;
 }
 

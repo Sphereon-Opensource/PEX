@@ -134,7 +134,7 @@ const presentationDefinition = {
 const credentials = await secureStore.getCredentials();
 
 // Find matching credentials
-const srMatches = pejs.selectFrom(presentationDefinition, credentials);
+const srMatches = pejs.selectFrom(presentationDefinition, credentials, holderDid);
 
 // An example that selects the first 'count' credentials from
 // the matches. in a real scenario, the user has to select what 
@@ -207,7 +207,7 @@ interface EvaluationResults {
 
 ### SelectFrom
 ```typescript
-selectFrom(presentationDefinition, credentials)
+selectFrom(presentationDefinition, credentials, holderDid)
 ```
 ##### Description
 Gathers the matching credentials that fit a given presentation definition
@@ -217,6 +217,7 @@ Gathers the matching credentials that fit a given presentation definition
 |------|------|------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
 | `credentials` | `VerifiableCredential[]` | the array of verifiable credentials to select from |
+| `holderDid` | `string` | the holder's did. this can be found in VerifiablePresentation's holder property |
 
 #### Return value
 If selection is successful or partially successful, `matches` will be a non-null array of `SubmissionRequirementMatch` object representing the matching credentials for each `SubmissionRequirement` in the `presentationDefinition` input parameter.
@@ -232,7 +233,7 @@ interface SubmissionRequirementMatch {
   count: number;
   from?: string[];
   from_nested?: SubmissionRequirementMatch[];
-  matches: VerifiableCredential[];
+  matches: string[]; // VerifiableCredential Address
 }
 ```
 
@@ -284,3 +285,9 @@ interface Checked {
 }
 ```
 status can have following values `'info' | 'warn' | 'error'`
+
+## Further work:
+1. Based on the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation)
+>*4.3.1- If the Input Descriptor schema object uri is a hashlink or similar value that points to immutable content, then the content of the retrieved schema must also match* This hashlink validation is currently not included.
+
+2. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are addressing `nested credentials` and `nested paths` these are currently not fully support yet.

@@ -6,7 +6,7 @@ export * from './evaluationHandler';
 export * from './evaluationResults';
 export * from './handlerCheckResult';
 export * from './inputDescriptorFilterEvaluationHandler';
-export * from './inputDescriptorIsHolderEvaluationHandler';
+export * from './subjectIsHolderEvaluationHandler';
 export * from './limitDisclosureEvaluationHandler';
 export * from './markForSubmissionEvaluationHandler';
 export * from './predicateRelatedFieldEvaluationHandler';
