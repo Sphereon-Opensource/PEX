@@ -49,7 +49,6 @@ export class EvaluationClientWrapper {
         warnings,
       };
     }
-    // Handling cases without pd.submission_requirements
     const marked: HandlerCheckResult[] = this._client.results.filter(
       (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
     );
@@ -260,7 +259,6 @@ export class EvaluationClientWrapper {
     const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
 
     const partitionedBasedOnID: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
-    // 1. We partition the marked logs based on their inputDescriptorPath
     for (let i = 0; i < marked.length; i++) {
       const currentIdPath: string = marked[i].input_descriptor_path;
       if (partitionedBasedOnID.has(currentIdPath)) {
@@ -270,7 +268,6 @@ export class EvaluationClientWrapper {
       }
     }
 
-    // 2. Within those paths, we partition them based on their verifiableCredentialPath
     for (const [idPath, sameIdCheckResults] of partitionedBasedOnID.entries()) {
       const vcPaths: string[] = [];
       for (let i = 0; i < sameIdCheckResults.length; i++) {
