@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: codecov/codecov-action@v2
+    - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
         name: codecoverage # optional
         flags: unittest
         fail_ci_if_error: true # optional (default = false)
-        directory: ./coverage/reports/
+        #directory: ./coverage/reports/
         #files: ./coverage1.xml,./coverage2.xml
         verbose: true # optional (default = false)
     - name: install node v12
