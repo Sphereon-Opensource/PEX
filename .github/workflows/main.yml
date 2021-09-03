@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  tsc:
-    name: tsc
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -25,3 +25,13 @@ jobs:
       run: yarn build
     - name: yarn test
       run: yarn test
+    - name: codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecove # optional
+        flags: unittest
+        fail_ci_if_error: true # optional (default = false)
+        #directory: ./coverage/reports/
+        #files: ./coverage1.xml,./coverage2.xml
+        verbose: true # optional (default = false)
