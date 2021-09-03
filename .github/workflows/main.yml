@@ -13,6 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        name: codecoverage # optional
+        fail_ci_if_error: true # optional (default = false)
+        verbose: true # optional (default = false)
     - name: install node v12
       uses: actions/setup-node@v1
       with:
