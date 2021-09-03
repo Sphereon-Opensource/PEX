@@ -6,6 +6,7 @@ This is the first Beta release of the Presentation Exchange typescript library. 
 - Added:
   * pejs.selectFrom() method
 
+
 - Fixed:
   * submissionFrom should use results from evaluate
   * validateSubmission should be successfully called
