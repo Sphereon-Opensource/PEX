@@ -1,5 +1,12 @@
 # Release Notes
 
+## v0.1.1 - 2021-09-09
+This is the second Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
+
+- Fixed:
+  * strict flag in projects gave errors on pe-js
+
+  
 ## v0.1.0 - 2021-09-03
 This is the first Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
