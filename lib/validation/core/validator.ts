@@ -11,6 +11,10 @@ export class Validation<T> {
   message: string;
   status?: Status;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Validatable {}
+
 export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
 
 export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validated => {

@@ -3,7 +3,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
-import { Validation, ValidationPredicate } from '../core';
+import { Validatable, Validation, ValidationPredicate } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
@@ -26,7 +26,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<Field>[] {
+  public getValidations(fields: Field[]): Validation<Validatable>[] {
     let validations: Validation<Field>[] = [];
 
     if (fields != null) {
@@ -37,7 +37,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation<unknown>[] {
+  public getValidationsFor(field: Field, indx: number): Validation<Validatable>[] {
     return [
       {
         tag: this.getMyTag(indx),
