@@ -26,7 +26,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<Field>[] {
+  public getValidations(fields: Field[]): Validation<unknown>[] {
     let validations: Validation<Field>[] = [];
 
     if (fields != null) {
