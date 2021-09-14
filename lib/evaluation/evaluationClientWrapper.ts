@@ -38,6 +38,7 @@ export class EvaluationClientWrapper {
       new VP(new Presentation([], null, [], selectedCredentials, did, null))
     );
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
+    const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
     if (presentationDefinition.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
@@ -45,6 +46,7 @@ export class EvaluationClientWrapper {
       );
       this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
       return {
+        errors: marked.length > 0 ? [] : errors,
         matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
         warnings,
       };
@@ -53,6 +55,7 @@ export class EvaluationClientWrapper {
       (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
     );
     return {
+      errors: marked.length > 0 ? [] : errors,
       matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
       warnings,
     };

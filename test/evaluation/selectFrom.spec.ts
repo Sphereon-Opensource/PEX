@@ -19,17 +19,18 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
-        'matches': [
-          {
-            'count': 3,
-            'from': ['A'],
-            'matches': ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-            'name': 'Submission of educational transcripts',
-            'rule': 'all'
-          }
-        ],
-        'warnings': []
-      }
+      'errors': [],
+      'matches': [
+        {
+          'count': 3,
+          'from': ['A'],
+          'matches': ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+          'name': 'Submission of educational transcripts',
+          'rule': 'all'
+        }
+      ],
+      'warnings': []
+    }
     );
   });
 
@@ -40,6 +41,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 2,
@@ -64,6 +66,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 1,
@@ -105,6 +108,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 2,
@@ -128,6 +132,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 1,
@@ -170,6 +175,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 1,
@@ -212,6 +218,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      'errors': [],
       'matches': [
         {
           'count': 1,
@@ -293,5 +300,15 @@ describe('selectFrom tests', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements[12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toThrowError('Max: expected: 1 actual: 2 at level: 1');
+  });
+
+  it('Evaluate case with error result', () => {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-PermanentResidentCard.json').presentation_definition;
+    const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
+    expect(result.errors.length).toEqual(3);
+    expect(result.errors.map(e => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation', 'IsHolderEvaluation']);
+
   });
 });

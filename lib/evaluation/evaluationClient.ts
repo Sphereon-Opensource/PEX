@@ -1,6 +1,6 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Checked, Status } from '../ConstraintUtils';
+import { Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { EvaluationHandler } from './evaluationHandler';
@@ -21,10 +21,11 @@ export class EvaluationClient {
     this._did = null;
   }
 
-  private failed_catched: Checked = {
+  private failed_catched = {
     tag: 'root',
     status: Status.ERROR,
     message: 'unknown exception occurred: ',
+    stacktrace: '',
   };
 
   private _results: HandlerCheckResult[];
@@ -41,6 +42,7 @@ export class EvaluationClient {
         currentHandler.handle(pd, vp);
       } catch (e) {
         this.failed_catched.message += e.message;
+        this.failed_catched.stacktrace = e;
         throw this.failed_catched;
       }
     }
