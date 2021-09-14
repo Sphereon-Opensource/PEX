@@ -220,4 +220,14 @@ describe('evaluate', () => {
     evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
   });
+
+  it('should return ok if vc[0] doesn\'t have the birthPlace field', function() {
+    const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    delete presentationDefinition.submission_requirements;
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    vpSimple.holder = HOLDER_DID;
+    evaluationClient.evaluate(presentationDefinition, new VP(vpSimple));
+    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
+  });
 });
