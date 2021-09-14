@@ -193,7 +193,11 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private confirmFieldSetHasSameHolder(status: 'info' | 'warn' | 'error') {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
       const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
-      inputDescriptorIds.forEach((inDescId) => credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId)));
+      inputDescriptorIds.forEach((inDescId) => {
+        if (this.credentialsSubjects.has(inDescId)) {
+          credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId));
+        }
+      });
       this.addResult(credentialSubjectsSet, fieldIdSet, status);
     };
   }
@@ -234,9 +238,13 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private getCredentialFields(credentialSubjectsSet: Set<unknown>): string[] {
-    return Array.from(credentialSubjectsSet)
-      .map((el) => Object.keys(el['value']))
-      .reduce((acc, val) => acc.concat(val))
-      .filter((x) => x !== 'id');
+    if (credentialSubjectsSet.size) {
+      return Array.from(credentialSubjectsSet)
+        .map((el) => Object.keys(el['value']))
+        .reduce((acc, val) => acc.concat(val))
+        .filter((x) => x !== 'id');
+    } else {
+      return [];
+    }
   }
 }
