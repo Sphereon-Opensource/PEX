@@ -2,6 +2,7 @@ import { PresentationSubmission } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
+import { PresentationSubmissionSchema } from '../core/presentationSubmissionSchema';
 
 import { PresentationSubmissionVB } from './presentationSubmissionVB';
 import { ValidationBundler } from './validationBundler';
@@ -56,7 +57,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return (presentationSubmission: PresentationSubmission): boolean => {
       let isValid = true;
       if (presentationSubmission != null) {
-        const presentationSubmissionSchema = PresentationSubmissionWrapperVB.getPresentationSubmissionSchema();
+        const presentationSubmissionSchema = PresentationSubmissionSchema.getPresentationSubmissionSchema();
 
         const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
         const validate = ajv.compile(presentationSubmissionSchema);
@@ -111,60 +112,5 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
       }
     });
     return targets;
-  }
-
-  //TODO: pass it with a config file
-  private static getPresentationSubmissionSchema() {
-    return {
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'Presentation Submission',
-      type: 'object',
-      properties: {
-        presentation_submission: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-            },
-            definition_id: {
-              type: 'string',
-            },
-            descriptor_map: {
-              type: 'array',
-              items: {
-                $ref: '#/definitions/descriptor',
-              },
-            },
-          },
-          required: ['id', 'definition_id', 'descriptor_map'],
-          additionalProperties: false,
-        },
-      },
-      definitions: {
-        descriptor: {
-          type: 'object',
-          properties: {
-            id: {
-              type: 'string',
-            },
-            path: {
-              type: 'string',
-            },
-            path_nested: {
-              type: 'object',
-              $ref: '#/definitions/descriptor',
-            },
-            format: {
-              type: 'string',
-              enum: ['jwt', 'jwt_vc', 'jwt_vp', 'ldp', 'ldp_vc', 'ldp_vp'],
-            },
-          },
-          required: ['id', 'path', 'format'],
-          additionalProperties: false,
-        },
-      },
-      required: ['presentation_submission'],
-      additionalProperties: false,
-    };
   }
 }
