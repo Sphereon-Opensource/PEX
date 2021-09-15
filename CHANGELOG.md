@@ -1,5 +1,14 @@
 # Release Notes
 
+## v0.2.1 - 2021-09-15
+Updated dependencies and some forgotten expression changes
+
+- Changed:
+  * Updated all dependencies
+  
+- Fixed:
+  * Remove usage of &&= in all expressions
+
 ## v0.2.0 - 2021-09-15
 Some fixes regarding usage in React. Better error handling
 
