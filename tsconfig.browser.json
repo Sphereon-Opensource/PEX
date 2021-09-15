@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "ES6",
-    "outDir": "dist/main",
+    "outDir": "dist/browser",
     "moduleResolution": "node",
     "module": "commonjs",
     "declaration": true,
@@ -30,11 +30,10 @@
     "listFiles": false
     /* Print names of files part of the compilation. */,
     "pretty": true,
-/*
+
     "lib": [
-      "es7", "dom"
-    ],*/
-    "types": ["jest", "node"]
+      "es2015", "dom", "es6"
+    ]
   },
   "include": [
     "index.ts",
