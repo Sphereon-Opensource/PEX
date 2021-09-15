@@ -72,10 +72,9 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     let doesEachDescriptorHasOneIdOnAllLevelsOfNesting = true;
     if (descriptor_map != null) {
       for (let i = 0; i < descriptor_map.length; i++) {
-        doesEachDescriptorHasOneIdOnAllLevelsOfNesting &&= PresentationSubmissionVB.isIdSameForEachLevelOfNesting(
-          descriptor_map[i],
-          descriptor_map[i].id
-        );
+        doesEachDescriptorHasOneIdOnAllLevelsOfNesting =
+          doesEachDescriptorHasOneIdOnAllLevelsOfNesting &&
+          PresentationSubmissionVB.isIdSameForEachLevelOfNesting(descriptor_map[i], descriptor_map[i].id);
       }
     }
 
@@ -86,7 +85,8 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     let isSame = true;
     if (descriptor != null && descriptor.path_nested != null) {
       if (descriptor.path_nested.id == id) {
-        isSame &&= PresentationSubmissionVB.isIdSameForEachLevelOfNesting(descriptor.path_nested, id); // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+        // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+        isSame = isSame && PresentationSubmissionVB.isIdSameForEachLevelOfNesting(descriptor.path_nested, id);
       } else {
         isSame = false;
       }
@@ -116,7 +116,9 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     }
 
     if (descriptor.path_nested != null) {
-      isProofFormatKnown &&= PresentationSubmissionVB.formatShouldBeKnown(descriptor.path_nested, formats); // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+      // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+      isProofFormatKnown =
+        isProofFormatKnown && PresentationSubmissionVB.formatShouldBeKnown(descriptor.path_nested, formats);
     }
 
     return isProofFormatKnown;
@@ -142,7 +144,8 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
       }
 
       if (descriptor.path_nested != null) {
-        PresentationSubmissionVB.pathShouldBeValid(descriptor.path_nested, invalidPaths); // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+        // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
+        PresentationSubmissionVB.pathShouldBeValid(descriptor.path_nested, invalidPaths);
       }
     }
 
