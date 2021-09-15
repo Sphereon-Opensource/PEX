@@ -220,8 +220,8 @@ Gathers the matching credentials that fit a given presentation definition
 | `holderDid` | `string` | the holder's did. this can be found in VerifiablePresentation's holder property |
 
 #### Return value
-- If selection is successful or partially successful, `matches` will be a non-null array of `SubmissionRequirementMatch` object representing the matching credentials for each `SubmissionRequirement` in the `presentationDefinition` input parameter.
-- If selection is not successful, you can `errors` will be a not empty array showing in details, what failed in your selection process. 
+- If the selection was successful or partially successful, the `matches` array will consist of `SubmissionRequirementMatch` object(s), representing the matching credentials for each `SubmissionRequirement` in the `presentationDefinition` input parameter.
+- If the selection was not successful, the `errors` array will consist of `Checked` object(s), representing what has failed in your selection process. 
 
 ```typescript
 interface SelectResults {
