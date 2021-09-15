@@ -1,9 +1,10 @@
-import fs from 'fs';
-
 import { Format, JwtObject, LdpObject, PresentationDefinition, SubmissionRequirement } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
+import { JwtAlgos } from '../core/jwtAlgos';
+import { LdpTypes } from '../core/ldpTypes';
+import { PresentationDefinitionSchema } from '../core/presentationDefinitionSchema';
 
 import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
@@ -93,22 +94,22 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     let areExpectedValuesPresent = true;
 
     if (format?.jwt != null) {
-      areExpectedValuesPresent &&= format.jwt.alg?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt.alg?.length > 0;
     }
     if (format?.jwt_vc != null) {
-      areExpectedValuesPresent &&= format.jwt_vc.alg?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vc.alg?.length > 0;
     }
     if (format?.jwt_vp != null) {
-      areExpectedValuesPresent &&= format.jwt_vp.alg?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vp.alg?.length > 0;
     }
     if (format?.ldp != null) {
-      areExpectedValuesPresent &&= format.ldp.proof_type?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.ldp.proof_type?.length > 0;
     }
     if (format?.ldp_vc != null) {
-      areExpectedValuesPresent &&= format.ldp_vc.proof_type?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.ldp_vc.proof_type?.length > 0;
     }
     if (format?.ldp_vp != null) {
-      areExpectedValuesPresent &&= format.ldp_vp.proof_type?.length > 0;
+      areExpectedValuesPresent = areExpectedValuesPresent && format.ldp_vp.proof_type?.length > 0;
     }
 
     return areExpectedValuesPresent;
@@ -118,8 +119,8 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     let unknownProofsAndAlgorithms: string[] = [];
 
     if (format != null) {
-      const jwtAlgos: string[] = PresentationDefinitionVB.getFile('./resources/jwt_algos.json').alg;
-      const ldpTypes: string[] = PresentationDefinitionVB.getFile('./resources/ldp_types.json').proof_types;
+      const jwtAlgos: string[] = JwtAlgos.getJwtAlgos();
+      const ldpTypes: string[] = LdpTypes.getLdpTypes();
 
       unknownProofsAndAlgorithms = [
         ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt, jwtAlgos),
@@ -198,9 +199,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
   private shouldBeAsPerJsonSchema(): ValidationPredicate<unknown> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
-      const presentationDefinitionSchema = JSON.parse(
-        fs.readFileSync('resources/presentation_definition.schema.json', 'utf-8')
-      );
+      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
 
       const validate = this.ajv.compile(presentationDefinitionSchema);
       const valid = validate(presentationDefinition);
@@ -211,10 +210,5 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
 
       return valid;
     };
-  }
-
-  private static getFile(path: string) {
-    // TODO extract to generic utils or use something like lodash
-    return JSON.parse(fs.readFileSync(path, 'utf-8'));
   }
 }

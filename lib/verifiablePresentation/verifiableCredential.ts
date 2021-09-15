@@ -4,5 +4,5 @@
 export interface VerifiableCredential {
   id: string;
   credentialSubject: unknown;
-  type: string;
+  type: string | string[];
 }

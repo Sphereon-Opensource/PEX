@@ -1,9 +1,8 @@
-import fs from 'fs';
-
 import { PresentationSubmission } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
+import { PresentationSubmissionSchema } from '../core/presentationSubmissionSchema';
 
 import { PresentationSubmissionVB } from './presentationSubmissionVB';
 import { ValidationBundler } from './validationBundler';
@@ -58,9 +57,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return (presentationSubmission: PresentationSubmission): boolean => {
       let isValid = true;
       if (presentationSubmission != null) {
-        const presentationSubmissionSchema = JSON.parse(
-          fs.readFileSync('resources/presentation_submission.schema.json', 'utf-8')
-        );
+        const presentationSubmissionSchema = PresentationSubmissionSchema.getPresentationSubmissionSchema();
 
         const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
         const validate = ajv.compile(presentationSubmissionSchema);
