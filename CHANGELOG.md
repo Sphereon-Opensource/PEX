@@ -1,5 +1,11 @@
 # Release Notes
 
+## v0.2.2 - 2021-09-15
+Make project compatible with browsers / react
+
+- Fixed:
+  * Make compatible with browsers/react
+  
 ## v0.2.1 - 2021-09-15
 Updated dependencies and some forgotten expression changes
 
