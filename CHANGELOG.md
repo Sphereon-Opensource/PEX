@@ -1,5 +1,16 @@
 # Release Notes
 
+## v0.2.0 - 2021-09-15
+Some fixes regarding usage in React. Better error handling
+
+- Fixed:
+  * Remove usage of &&= in expressions
+  * Restrict usage of fs to tests only, so not used at runtime
+  * Move errors from strings to an object
+
+- Added:
+  * Return stacktraces
+
 ## v0.1.1 - 2021-09-09
 This is the second Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
