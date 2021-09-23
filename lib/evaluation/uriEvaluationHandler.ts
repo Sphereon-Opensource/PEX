@@ -100,7 +100,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
   private static fetchContextUris(vc) {
     const schemaUris: string[] = [];
-    if (vc['@context']) {
+    if (vc && vc['@context']) {
       if (vc['@context'].length && typeof vc['@context'] != 'string') {
         for (let i = 0; i < vc['@context'].length; i++) {
           schemaUris.push(vc['@context'][i]);
