@@ -1,5 +1,15 @@
 # Release Notes
 
+## v0.2.2 - 2021-09-23
+Updated dependencies and some forgotten expression changes
+
+- Fixed:
+  * Incorrect handling of the schema array in the submission requirements. See: https://github.com/decentralized-identity/presentation-exchange/issues/250
+
+- Updated:
+  * Dependency of tmpl updated from 1.0.4 to 1.0.5 because of a CVE 
+
+
 ## v0.2.1 - 2021-09-15
 Updated dependencies and some forgotten expression changes
 
