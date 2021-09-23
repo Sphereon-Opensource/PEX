@@ -1,6 +1,6 @@
 # Release Notes
 ## v0.2.3 - 2021-09-23
-Updated dependencies and some forgotten expression changes
+Updated dependency and fixed schema handling
 
 - Fixed:
   * Incorrect handling of the schema array in the submission requirements. See: https://github.com/decentralized-identity/presentation-exchange/issues/250
