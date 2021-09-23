@@ -30,21 +30,9 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   public static getPresentationURI(vc): string[] {
     const schemaUris: string[] = [];
     if (vc['@context']) {
-      if (vc['@context'].length && typeof vc['@context'] != 'string') {
-        for (let i = 0; i < vc['@context'].length; i++) {
-          schemaUris.push(vc['@context'][i]);
-        }
-      } else {
-        schemaUris.push(vc['@context']);
-      }
-    } else if (vc.vc && vc.vc['@context']) {
-      if (vc.vc['@context'].length && typeof vc.vc['@context'] != 'string') {
-        for (let i = 0; i < vc.vc['@context'].length; i++) {
-          schemaUris.push(vc.vc['@context'][i]);
-        }
-      } else {
-        schemaUris.push(vc.vc['@context']);
-      }
+      schemaUris.push(...this.fetchContextUris(vc));
+    } else if (vc.vc['@context']) {
+      schemaUris.push(...this.fetchContextUris(vc.vc));
     }
     return schemaUris;
   }
@@ -108,5 +96,19 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       status: undefined,
       message: undefined,
     };
+  }
+
+  private static fetchContextUris(vc) {
+    const schemaUris: string[] = [];
+    if (vc['@context']) {
+      if (vc['@context'].length && typeof vc['@context'] != 'string') {
+        for (let i = 0; i < vc['@context'].length; i++) {
+          schemaUris.push(vc['@context'][i]);
+        }
+      } else {
+        schemaUris.push(vc['@context']);
+      }
+    }
+    return schemaUris;
   }
 }
