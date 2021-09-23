@@ -11,157 +11,166 @@ function getFile(path: string) {
 const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 
 const success = {
-  "errors": [],
-  "value": expect.objectContaining({
-    "definition_id": "31e2f0f1-6b70-411d-b239-56aed5321884",
-    "descriptor_map": [
-      { "format": "ldp_vc", "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8", "path": "$.verifiableCredential[0]" }
+  'errors': [],
+  'value': expect.objectContaining({
+    'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
+    'descriptor_map': [
+      { 'format': 'ldp_vc', 'id': '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'path': '$.verifiableCredential[0]' }
     ]
   }),
-  "warnings": []
+  'warnings': []
 };
 
 const error = {
-  "errors": [
+  'errors': [
     {
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "status": "error",
-      "tag": "UriEvaluation"
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'status': 'error',
+      'tag': 'UriEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation"
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
     }
-  ], "warnings": []
+  ], 'warnings': []
 };
 
 const error_2 = {
-  "errors": [
+  'errors': [
     {
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "status": "error",
-      "tag": "UriEvaluation",
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'status': 'error',
+      'tag': 'UriEvaluation'
     },
     {
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "status": "error",
-      "tag": "UriEvaluation",
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'UriEvaluation'
     },
     {
-      "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "status": "error",
-      "tag": "FilterEvaluation",
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'status': 'error',
+      'tag': 'FilterEvaluation'
     },
     {
-      "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "status": "error",
-      "tag": "FilterEvaluation",
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'FilterEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation",
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation",
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation",
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
     }],
-  "warnings": [],
-}
+  'warnings': []
+};
 
 const success_error = {
-  "errors": [
+  'errors': [
     {
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "status": "error",
-      "tag": "UriEvaluation",
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'status': 'error',
+      'tag': 'UriEvaluation'
     },
     {
-      "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "status": "error",
-      "tag": "FilterEvaluation",
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'UriEvaluation'
     },
     {
-      "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "status": "error",
-      "tag": "FilterEvaluation",
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'status': 'error',
+      'tag': 'FilterEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation",
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'FilterEvaluation'
     },
     {
-      "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]",
-      "status": "error",
-      "tag": "MarkForSubmissionEvaluation",
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
     },
+    {
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'status': 'error',
+      'tag': 'MarkForSubmissionEvaluation'
+    }
   ],
-  "value": expect.objectContaining({
-    "definition_id": "32f54163-7166-48f1-93d8-ff217bdb0653",
-    "descriptor_map": [
+  'value': expect.objectContaining({
+    'definition_id': '32f54163-7166-48f1-93d8-ff217bdb0653',
+    'descriptor_map': [
       {
-        "format": "ldp_vc",
-        "id": "bankaccount_input",
-        "path": "$.verifiableCredential[0]",
+        'format': 'ldp_vc',
+        'id': 'bankaccount_input',
+        'path': '$.verifiableCredential[0]'
       }
     ]
   }),
-  "warnings": [],
-}
+  'warnings': []
+};
 
 describe('evaluate', () => {
 
   // Step 1: Matching Uri Schema
-  it('should return error if uri in inputDescriptors doesn\'t match', function () {
+  it('should return error if uri in inputDescriptors doesn\'t match', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors[0].schema[0].uri = "https://www.w3.org/TR/vc-data-model/#types1";
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.results[0]).toEqual({
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
-      "evaluator": "UriEvaluation",
-      "status": "error",
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.",
-      "payload": {
-        "inputDescriptorsUris": [
-          "https://www.w3.org/TR/vc-data-model/#types1"
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'evaluator': 'UriEvaluation',
+      'status': 'error',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      'payload': {
+        'inputDescriptorsUris': [
+          'https://www.w3.org/TR/vc-data-model/#types1'
         ],
-        "presentationDefinitionUri": "https://www.w3.org/TR/vc-data-model/#types"
-      },
+        'presentationDefinitionUris': [
+          'https://www.w3.org/2018/credentials/v1'
+        ]
+      }
     });
     expect(evaluationClient.results[3]).toEqual({
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
-      "evaluator": "MarkForSubmissionEvaluation",
-      "status": "error",
-      "message": "The input candidate is not eligible for submission",
-      "payload": {
-        "evaluator": "UriEvaluation",
-        "inputDescriptorsUris": [
-          "https://www.w3.org/TR/vc-data-model/#types1"
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'evaluator': 'MarkForSubmissionEvaluation',
+      'status': 'error',
+      'message': 'The input candidate is not eligible for submission',
+      'payload': {
+        'evaluator': 'UriEvaluation',
+        'inputDescriptorsUris': [
+          'https://www.w3.org/TR/vc-data-model/#types1'
         ],
-        "presentationDefinitionUri": "https://www.w3.org/TR/vc-data-model/#types"
-      },
+        'presentationDefinitionUris': [
+          'https://www.w3.org/2018/credentials/v1'
+        ]
+      }
     });
     expect(evaluationResults).toEqual(error);
   });
 
-  it('should return ok if uri in vp matches at least one of input_descriptor\'s uris', function () {
+  it('should return ok if uri in vp matches at least one of input_descriptor\'s uris', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors[0].schema.push({ uri: "https://www.w3.org/TR/vc-data-model/#types1" });
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -171,48 +180,52 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(success);
   });
 
-  it('should return error if uri in verifiableCredential doesn\'t match', function () {
+  it('should return error if uri in verifiableCredential doesn\'t match', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.w3.org/TR/vc-data-model/#types1";
+    vpSimple.verifiableCredential[0]['@context'] = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.results[0]).toEqual({
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
-      "evaluator": "UriEvaluation",
-      "status": "error",
-      "message": "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.",
-      "payload": {
-        "inputDescriptorsUris": [
-          "https://www.w3.org/TR/vc-data-model/#types"
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'evaluator': 'UriEvaluation',
+      'status': 'error',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      'payload': {
+        'inputDescriptorsUris': [
+          'https://www.w3.org/2018/credentials/v1'
         ],
-        'presentationDefinitionUri': 'https://www.w3.org/TR/vc-data-model/#types1'
+        'presentationDefinitionUris': [
+          'https://www.w3.org/TR/vc-data-model/#types1'
+        ]
       }
     });
     expect(evaluationClient.results[3]).toEqual({
-      "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
-      "evaluator": "MarkForSubmissionEvaluation",
-      "status": "error",
-      "message": "The input candidate is not eligible for submission",
-      "payload": {
-        "evaluator": "UriEvaluation",
-        "inputDescriptorsUris": [
-          "https://www.w3.org/TR/vc-data-model/#types"
+      'input_descriptor_path': '$.input_descriptors[0]',
+      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'evaluator': 'MarkForSubmissionEvaluation',
+      'status': 'error',
+      'message': 'The input candidate is not eligible for submission',
+      'payload': {
+        'evaluator': 'UriEvaluation',
+        'inputDescriptorsUris': [
+          'https://www.w3.org/2018/credentials/v1'
         ],
-        "presentationDefinitionUri": "https://www.w3.org/TR/vc-data-model/#types1"
-      },
+        'presentationDefinitionUris': [
+          'https://www.w3.org/TR/vc-data-model/#types1'
+        ]
+      }
     });
     expect(evaluationResults).toEqual(error);
   });
 
-  it('should return error if all the uris in vp don\'t match at least one of input_descriptor\'s uris', function () {
+  it('should return error if all the uris in vp don\'t match at least one of input_descriptor\'s uris', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0].credentialSchema.push({ id: "https://www.w3.org/TR/vc-data-model/#types1" });
+    vpSimple.verifiableCredential[0][`@context`] = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -222,11 +235,10 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(error);
   });
 
-  it('should return ok if all the uris in vp match at least one of input_descriptor\'s uris', function () {
+  it('should return ok if all the uris in vp match at least one of input_descriptor\'s uris', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors[0].schema.push({ uri: "https://www.w3.org/TR/vc-data-model/#types1" });
-    vpSimple.verifiableCredential[0].credentialSchema.push({ id: "https://www.w3.org/TR/vc-data-model/#types1" });
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -237,10 +249,10 @@ describe('evaluate', () => {
   });
 
   // Mark for submission should
-  it('Mark for submission should mark all 3 VCs as error.', () => {
+  it('Mark for submission should not fill out the presentation_submission object', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_simple_example.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json')
-    pdSchema.input_descriptors[0].schema[0].uri = "https://business-standards.org/schemas/employment-history.json";
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -254,20 +266,20 @@ describe('evaluate', () => {
 
   it('Mark for submission should mark all 3 VCs as error.', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_simple_example.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json')
-    pdSchema.input_descriptors[0].schema[0].uri = "https://eu.com/claims/DriversLicense";
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://eu.com/claims/DriversLicense';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
-    expect(errorResults.length).toEqual(5);
-    expect(infoResults.length).toEqual(7);
+    expect(errorResults.length).toEqual(6);
+    expect(infoResults.length).toEqual(6);
     expect(evaluationResults).toEqual(success_error);
   });
   // Step 4: limit_disclosure related tests
-  it('should return ok if limit_disclosure deletes the etc field', function () {
+  it('should return ok if limit_disclosure deletes the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -278,7 +290,7 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(success);
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
+  it('should return error if limit_disclosure deletes the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     delete pdSchema.input_descriptors[0].constraints.limit_disclosure;
@@ -286,11 +298,11 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual("etc");
+    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual('etc');
     expect(evaluationResults).toEqual(success);
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
+  it('should return error if limit_disclosure deletes the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].constraints.limit_disclosure = Optionality.Preferred;
@@ -298,13 +310,14 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual("etc");
+    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual('etc');
     expect(evaluationResults).toEqual(success);
   });
 
   it('should return ok if vc[0] doesn\'t have the birthPlace field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -313,7 +326,7 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(success);
   });
 
-  it('should return ok if vc[0] doesn\'t have the etc field', function () {
+  it('should return ok if vc[0] doesn\'t have the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -321,17 +334,6 @@ describe('evaluate', () => {
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['etc']).toEqual(undefined);
-    expect(evaluationResults).toEqual(success);
-  });
-
-  it('should return ok if vc[0] doesn\'t have the birthPlace field', function () {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    vpSimple.holder = HOLDER_DID;
-    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(evaluationClient.verifiablePresentation.getVerifiableCredentials()[0]['birthPlace']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
 
@@ -345,13 +347,13 @@ describe('evaluate', () => {
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
-      definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
         {
-          id: "Educational transcripts",
-          format: "ldp_vc",
-          path: "$.verifiableCredential[0]",
-        },
+          id: 'Educational transcripts',
+          format: 'ldp_vc',
+          path: '$.verifiableCredential[0]'
+        }
       ]
     }));
   });
@@ -361,15 +363,16 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
     pdSchema.input_descriptors = [pdSchema.input_descriptors[1], pdSchema.input_descriptors[2]];
+    vpSimple.verifiableCredential[0].vc.issuer = "did:foo:123";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
-      definition_id: "32f54163-7166-48f1-93d8-ff217bdb0653",
+      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
-        {"format": "ldp_vc", "id": "Educational transcripts 1", "path": "$.verifiableCredential[1]"},
-        {"format": "ldp_vc", "id": "Educational transcripts 2", "path": "$.verifiableCredential[2]"}]
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[0]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[1]' }]
     }));
   });
 });

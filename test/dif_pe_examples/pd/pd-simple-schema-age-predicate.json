@@ -9,7 +9,7 @@
         "purpose": "Your age should be greater or equal to 18.",
         "schema": [
           {
-            "uri": "https://www.w3.org/TR/vc-data-model/#types"
+            "uri": "https://www.w3.org/2018/credentials/v1"
           }
         ],
         "constraints": {

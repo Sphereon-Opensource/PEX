@@ -29,42 +29,39 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
   private static getPresentationURI(vc): string[] {
     const schemaUris: string[] = [];
-    if (vc.credentialSchema) {
-      for (let i = 0; i < vc.credentialSchema.length; i++) {
-        schemaUris.push(vc.credentialSchema[i].id);
-      }
-    } else if (vc.vc && vc.vc.id) {
-      schemaUris.push(vc.vc.id);
-    } else if (vc.id) {
-      schemaUris.push(vc.id);
+    if (vc && vc['@context']) {
+      schemaUris.push(...this.fetchContextUris(vc));
+    } else if (vc && vc.vc['@context']) {
+      schemaUris.push(...this.fetchContextUris(vc.vc));
     }
     return schemaUris;
   }
 
   private evaluateUris(
-    presentationDefinitionUris: string[],
+    verifiableCredentialUris: string[],
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
   ): void {
-    let hasError = false;
-    for (let i = 0; i < presentationDefinitionUris.length; i++) {
-      if (inputDescriptorsUris.find((el) => el === presentationDefinitionUris[i]) == undefined) {
-        this.getResults().push(
-          this.createErrorResultObject(presentationDefinitionUris[i], inputDescriptorsUris, idIdx, vcIdx)
-        );
-        hasError = true;
+    let hasAnyMatch = false;
+    for (let i = 0; i < verifiableCredentialUris.length; i++) {
+      if (inputDescriptorsUris.find((el) => el === verifiableCredentialUris[i]) != undefined) {
+        hasAnyMatch = true;
       }
     }
-    if (!hasError) {
+    if (hasAnyMatch) {
       this.getResults().push(
-        this.createSuccessResultObject(presentationDefinitionUris, inputDescriptorsUris, idIdx, vcIdx)
+        this.createSuccessResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx)
+      );
+    } else {
+      this.getResults().push(
+        this.createErrorResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx)
       );
     }
   }
 
   private createSuccessResultObject(
-    presentationDefinitionUris: string[],
+    verifiableCredentialUris: string[],
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -72,13 +69,13 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
     result.message =
-      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
-    result.payload = { presentationDefinitionUris, inputDescriptorsUris };
+      '@context URI(s) for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
+    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
 
   private createErrorResultObject(
-    presentationDefinitionUri: string,
+    verifiableCredentialUris: string[],
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -86,8 +83,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
     result.message =
-      'presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
-    result.payload = { presentationDefinitionUri, inputDescriptorsUris };
+      '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
+    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
 
@@ -99,5 +96,19 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       status: undefined,
       message: undefined,
     };
+  }
+
+  private static fetchContextUris(vc) {
+    const schemaUris: string[] = [];
+    if (vc && vc['@context']) {
+      if (vc['@context'].length && typeof vc['@context'] != 'string') {
+        for (let i = 0; i < vc['@context'].length; i++) {
+          schemaUris.push(vc['@context'][i]);
+        }
+      } else {
+        schemaUris.push(vc['@context']);
+      }
+    }
+    return schemaUris;
   }
 }
