@@ -2,6 +2,7 @@ export class LdpTypes {
   //TODO: pass it with a config file
   public static getLdpTypes(): string[] {
     return [
+      'Ed25519VerificationKey2018',
       'Ed25519Signature2018',
       'RsaSignature2018',
       'EcdsaSecp256k1Signature2019',

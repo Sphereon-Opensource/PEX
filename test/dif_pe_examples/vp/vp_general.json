@@ -32,7 +32,7 @@
     {
       "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
       "vc": {
-        "@context": "https://www.w3.org/2018/credentials/v1",
+        "@context": "https://eu.com/claims/DriversLicense",
         "id": "https://eu.com/claims/DriversLicense",
         "type": [
           "EUDriversLicense"
@@ -55,7 +55,7 @@
       }
     },
     {
-      "@context": "https://www.w3.org/2018/credentials/v1",
+      "@context": "https://business-standards.org/schemas/employment-history.json",
       "id": "https://business-standards.org/schemas/employment-history.json",
       "type": [
         "VerifiableCredential",

@@ -26,26 +26,31 @@ describe('evaluate', () => {
   it('should return error for not matching (exactly) any URI for the schema of the candidate input with one of the Input Descriptor schema object uri values.', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0].credentialSchema[0].id = "https://www.test.org/mock"
+    vpSimple.verifiableCredential[0]['@context'][0] = "https://www.test.org/mock"
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, new VP(vpSimple));
-    expect(evaluationHandler.getResults()[0]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', "$.verifiableCredential[0]", "UriEvaluation", Status.ERROR, "presentation_definition URI for the schema of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.", {
-      "presentationDefinitionUri": "https://www.test.org/mock",
-      "inputDescriptorsUris": [
-        "https://www.w3.org/TR/vc-data-model/#types"
-      ]
-    }));
+    expect(evaluationHandler.getResults()[0]).toEqual(
+      new HandlerCheckResult(
+        '$.input_descriptors[0]', "$.verifiableCredential[0]", "UriEvaluation",
+        Status.ERROR,
+        "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.",
+        {
+          "inputDescriptorsUris": [
+            "https://www.w3.org/2018/credentials/v1"
+          ],
+          "presentationDefinitionUris": ["https://www.test.org/mock"],
+        }));
   });
 
- it('should generate 6 error result fo this test case.', () => {
+  it('should generate 6 error result fo this test case.', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_examples.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-   evaluationHandler.handle(pdSchema, new VP(vpSimple));
-   const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
-   expect(errorResults.length).toEqual(6);
+    evaluationHandler.handle(pdSchema, new VP(vpSimple));
+    const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
+    expect(errorResults.length).toEqual(6);
   });
 
   it('should generate 5 error result and 1 info.', () => {
