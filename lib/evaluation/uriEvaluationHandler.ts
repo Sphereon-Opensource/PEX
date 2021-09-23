@@ -27,11 +27,11 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  public static getPresentationURI(vc): string[] {
+  private static getPresentationURI(vc): string[] {
     const schemaUris: string[] = [];
-    if (vc['@context']) {
+    if (vc && vc['@context']) {
       schemaUris.push(...this.fetchContextUris(vc));
-    } else if (vc.vc['@context']) {
+    } else if (vc && vc.vc['@context']) {
       schemaUris.push(...this.fetchContextUris(vc.vc));
     }
     return schemaUris;
