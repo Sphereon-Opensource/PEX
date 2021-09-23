@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pe-js",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
