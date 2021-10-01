@@ -6,16 +6,16 @@ import {
   SubmissionRequirement,
 } from '@sphereon/pe-models';
 
-import {Checked, Status} from '../ConstraintUtils';
-import {JsonPathUtils} from '../utils';
-import {VerifiableCredential, VerifiablePresentation, VP} from '../verifiablePresentation';
-import {Presentation} from '../verifiablePresentation';
+import { Checked, Status } from '../ConstraintUtils';
+import { JsonPathUtils } from '../utils';
+import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { Presentation } from '../verifiablePresentation';
 
-import {SelectResults} from './core';
-import {SubmissionRequirementMatch} from './core';
-import {EvaluationClient} from './evaluationClient';
-import {EvaluationResults} from './evaluationResults';
-import {HandlerCheckResult} from './handlerCheckResult';
+import { SelectResults } from './core';
+import { SubmissionRequirementMatch } from './core';
+import { EvaluationClient } from './evaluationClient';
+import { EvaluationResults } from './evaluationResults';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -56,7 +56,7 @@ export class EvaluationClientWrapper {
     );
     return {
       errors: marked.length > 0 ? [] : errors,
-      matches: [...EvaluationClientWrapper.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
+      matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
       warnings,
     };
   }
@@ -69,10 +69,10 @@ export class EvaluationClientWrapper {
     for (const sr of submissionRequirements) {
       if (sr.from) {
         if (sr.rule === Rules.All || sr.rule === Rules.Pick) {
-          submissionRequirementMatches.push(EvaluationClientWrapper.mapMatchingDescriptors(sr, marked));
+          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
         }
       } else if (sr.from_nested) {
-        const srm = EvaluationClientWrapper.createSubmissionRequirementMatch(sr);
+        const srm = this.createSubmissionRequirementMatch(sr);
         srm.count++;
         srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
         submissionRequirementMatches.push(srm);
@@ -81,12 +81,12 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private static matchWithoutSubmissionRequirements(
+  private matchWithoutSubmissionRequirements(
     marked: HandlerCheckResult[],
     pd: PresentationDefinition
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
-    const partitionedResults: Map<string, string[]> = EvaluationClientWrapper.partitionCheckResults(marked);
+    const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
     for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
@@ -104,8 +104,8 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private static mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
-    const srm = EvaluationClientWrapper.createSubmissionRequirementMatch(sr);
+  private mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+    const srm = this.createSubmissionRequirementMatch(sr);
     if (!srm.from.includes(sr.from)) {
       srm.from.push(...sr.from);
     }
@@ -120,7 +120,7 @@ export class EvaluationClientWrapper {
     return srm;
   }
 
-  private static createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
+  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
     if (sr.from) {
       return {
         rule: sr.rule,
@@ -187,14 +187,14 @@ export class EvaluationClientWrapper {
     for (const sr of submissionRequirement) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
-          if (EvaluationClientWrapper.countMatchingInputDescriptors(sr, marked) !== marked.length) {
+          if (this.countMatchingInputDescriptors(sr, marked) !== marked.length) {
             throw Error(`Not all input descriptors are members of group ${sr.from}`);
           }
           total++;
         } else if (sr.rule === Rules.Pick) {
-          const count = EvaluationClientWrapper.countMatchingInputDescriptors(sr, marked);
+          const count = this.countMatchingInputDescriptors(sr, marked);
           try {
-            EvaluationClientWrapper.handleCount(sr, count, level);
+            this.handleCount(sr, count, level);
             total++;
           } catch (error) {
             if (level === 0) throw error;
@@ -203,13 +203,13 @@ export class EvaluationClientWrapper {
       } else if (sr.from_nested) {
         const count = this.evaluateRequirements(sr.from_nested, marked, ++level);
         total += count;
-        EvaluationClientWrapper.handleCount(sr, count, level);
+        this.handleCount(sr, count, level);
       }
     }
     return total;
   }
 
-  private static countMatchingInputDescriptors(
+  private countMatchingInputDescriptors(
     submissionRequirement: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): number {
@@ -222,7 +222,7 @@ export class EvaluationClientWrapper {
     return count;
   }
 
-  private static handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
+  private handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
     if (submissionRequirement.count) {
       if (count !== submissionRequirement.count) {
         throw Error(`Count: expected: ${submissionRequirement.count} actual: ${count} at level: ${level}`);
@@ -260,7 +260,7 @@ export class EvaluationClientWrapper {
     return presentationSubmission;
   }
 
-  private static partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
+  private partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
     const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
 
     const partitionedBasedOnID: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
