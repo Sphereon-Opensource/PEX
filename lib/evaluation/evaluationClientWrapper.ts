@@ -8,11 +8,9 @@ import {
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
-import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
-import { Presentation } from '../verifiablePresentation';
+import { Presentation, VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
 
-import { SelectResults } from './core';
-import { SubmissionRequirementMatch } from './core';
+import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -30,12 +28,14 @@ export class EvaluationClientWrapper {
 
   public selectFrom(
     presentationDefinition: PresentationDefinition,
-    selectedCredentials: VerifiableCredential[],
+    selectableCredentials: VerifiableCredential[],
     did: string
   ): SelectResults {
+    let selectResults: SelectResults;
+
     this._client.evaluate(
       presentationDefinition,
-      new VP(new Presentation([], null, [], selectedCredentials, did, null))
+      new VP(new Presentation([], null, [], selectableCredentials, did, null))
     );
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
@@ -45,20 +45,25 @@ export class EvaluationClientWrapper {
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
-      return {
+      selectResults = {
         errors: marked.length > 0 ? [] : errors,
         matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
+        verifiableCredentials: this._client.verifiablePresentation.getVerifiableCredentials(),
+        warnings,
+      };
+    } else {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+      );
+      selectResults = {
+        errors: marked.length > 0 ? [] : errors,
+        matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
+        verifiableCredentials: this._client.verifiablePresentation.getVerifiableCredentials(),
         warnings,
       };
     }
-    const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
-    );
-    return {
-      errors: marked.length > 0 ? [] : errors,
-      matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
-      warnings,
-    };
+
+    return selectResults;
   }
 
   private matchSubmissionRequirements(
