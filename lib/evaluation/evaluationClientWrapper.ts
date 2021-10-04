@@ -1,11 +1,9 @@
-import jp from 'jsonpath';
 import {
-  Descriptor,
   InputDescriptor,
   PresentationDefinition,
   PresentationSubmission,
   Rules,
-  SubmissionRequirement
+  SubmissionRequirement,
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
@@ -188,9 +186,11 @@ export class EvaluationClientWrapper {
   }
 
   public submissionFrom(pd: PresentationDefinition, vcs: VerifiableCredential[]): PresentationSubmission {
+    console.log(vcs);
     if (!this._client.results) {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
+
     let matched: [number, HandlerCheckResult[]];
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
@@ -198,8 +198,14 @@ export class EvaluationClientWrapper {
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
+      const inDescIndexes = matched[1].map((e) => e.input_descriptor_path.match(/\d+/)[0]);
+      const desc: InputDescriptor[] = inDescIndexes.map((i) => pd.input_descriptors[i]);
+      const matchedDescriptors = this._client.verifiablePresentation
+        .getPresentationSubmission()
+        .descriptor_map.filter((value) => desc.map((e) => e.id).includes(value.id));
+      this._client.verifiablePresentation.getPresentationSubmission().descriptor_map = matchedDescriptors;
     }
-    return this.remapVcs(pd.input_descriptors, vcs , matched[1]);
+    return this._client.verifiablePresentation.getPresentationSubmission();
   }
 
   private evaluateRequirements(
@@ -208,7 +214,7 @@ export class EvaluationClientWrapper {
     level: number
   ): [number, HandlerCheckResult[]] {
     let total = 0;
-    const result: HandlerCheckResult[] =[];
+    const result: HandlerCheckResult[] = [];
     for (const sr of submissionRequirement) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
@@ -269,30 +275,6 @@ export class EvaluationClientWrapper {
         throw Error(`Max: expected: ${submissionRequirement.max} actual: ${count} at level: ${level}`);
       }
     }
-  }
-
-  private remapVcs(inDesc: InputDescriptor[], vcs: unknown[], matched: HandlerCheckResult[]) {
-    const presentationSubmission: PresentationSubmission = {
-      ...this._client.verifiablePresentation.getPresentationSubmission(),
-    };
-
-    const descriptorMap: Descriptor[] = [
-      ...presentationSubmission.descriptor_map,
-    ];
-
-    matched.forEach(m => {
-      const descriptor = jp.node(inDesc, m.input_descriptor_path).value;
-      const vc = jp.node(vcs, m.verifiable_credential_path).value;
-      if (descriptor && vc) {
-        descriptorMap.forEach(dm => {
-          if (dm.path_nested) {
-
-          }
-        })
-      }
-    })
-
-    return presentationSubmission;
   }
 
   private partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
