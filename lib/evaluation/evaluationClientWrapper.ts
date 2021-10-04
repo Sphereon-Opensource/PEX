@@ -1,9 +1,11 @@
+import jp from 'jsonpath';
 import {
   Descriptor,
+  InputDescriptor,
   PresentationDefinition,
   PresentationSubmission,
   Rules,
-  SubmissionRequirement,
+  SubmissionRequirement
 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../ConstraintUtils';
@@ -44,17 +46,24 @@ export class EvaluationClientWrapper {
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
-      this.evaluateRequirements(presentationDefinition.submission_requirements, marked, 0);
+      const matchSubmissionRequirements = this.matchSubmissionRequirements(
+        presentationDefinition.submission_requirements,
+        marked
+      );
+      const vcs = this.extractVCIndexes(matchSubmissionRequirements).map(
+        (i) => this._client.verifiablePresentation.getVerifiableCredentials()[i]
+      );
       selectResults = {
         errors: marked.length > 0 ? [] : errors,
-        matches: [...this.matchSubmissionRequirements(presentationDefinition.submission_requirements, marked)],
-        verifiableCredentials: this._client.verifiablePresentation.getVerifiableCredentials(),
+        matches: [...matchSubmissionRequirements],
+        verifiableCredentials: vcs,
         warnings,
       };
     } else {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
+
       selectResults = {
         errors: marked.length > 0 ? [] : errors,
         matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
@@ -64,6 +73,15 @@ export class EvaluationClientWrapper {
     }
 
     return selectResults;
+  }
+
+  private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]) {
+    const matches = matchSubmissionRequirements.map((e) => e.matches).flat();
+    if (!matches || !matches.length) {
+      const sr = matchSubmissionRequirements.map((e: SubmissionRequirementMatch) => e.from_nested).flat();
+      return this.extractVCIndexes(sr);
+    }
+    return Array.from(new Set(matches.map((s) => parseInt(s.match(/\d+/)[0]))));
   }
 
   private matchSubmissionRequirements(
@@ -173,58 +191,66 @@ export class EvaluationClientWrapper {
     if (!this._client.results) {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
+    let matched: [number, HandlerCheckResult[]];
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
-      this.evaluateRequirements(pd.submission_requirements, marked, 0);
+      matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
     }
-    return this.remapVcs(vcs);
+    return this.remapVcs(pd.input_descriptors, vcs , matched[1]);
   }
 
   private evaluateRequirements(
     submissionRequirement: SubmissionRequirement[],
     marked: HandlerCheckResult[],
     level: number
-  ): number {
+  ): [number, HandlerCheckResult[]] {
     let total = 0;
+    const result: HandlerCheckResult[] =[];
     for (const sr of submissionRequirement) {
       if (sr.from) {
         if (sr.rule === Rules.All) {
-          if (this.countMatchingInputDescriptors(sr, marked) !== marked.length) {
+          const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
+          if (count !== marked.length) {
             throw Error(`Not all input descriptors are members of group ${sr.from}`);
           }
           total++;
+          result.push(...matched);
         } else if (sr.rule === Rules.Pick) {
-          const count = this.countMatchingInputDescriptors(sr, marked);
+          const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
           try {
             this.handleCount(sr, count, level);
             total++;
           } catch (error) {
             if (level === 0) throw error;
           }
+          result.push(...matched);
         }
       } else if (sr.from_nested) {
-        const count = this.evaluateRequirements(sr.from_nested, marked, ++level);
+        const [count, matched] = this.evaluateRequirements(sr.from_nested, marked, ++level);
         total += count;
+        result.push(...matched);
         this.handleCount(sr, count, level);
       }
     }
-    return total;
+    return [total, result];
   }
 
   private countMatchingInputDescriptors(
     submissionRequirement: SubmissionRequirement,
     marked: HandlerCheckResult[]
-  ): number {
+  ): [number, HandlerCheckResult[]] {
     let count = 0;
+    const matched: HandlerCheckResult[] = [];
     for (const m of marked) {
       if (m.payload.group.includes(submissionRequirement.from)) {
+        matched.push(m);
         count++;
       }
     }
-    return count;
+    return [count, matched];
   }
 
   private handleCount(submissionRequirement: SubmissionRequirement, count: number, level: number): void {
@@ -245,23 +271,27 @@ export class EvaluationClientWrapper {
     }
   }
 
-  private remapVcs(vcs: unknown[]) {
+  private remapVcs(inDesc: InputDescriptor[], vcs: unknown[], matched: HandlerCheckResult[]) {
     const presentationSubmission: PresentationSubmission = {
       ...this._client.verifiablePresentation.getPresentationSubmission(),
     };
+
     const descriptorMap: Descriptor[] = [
-      ...this._client.verifiablePresentation.getPresentationSubmission().descriptor_map,
+      ...presentationSubmission.descriptor_map,
     ];
-    for (const [i, vc] of this._client.verifiablePresentation.getVerifiableCredentials().entries()) {
-      for (const [j, newVc] of Object.entries(vcs)) {
-        for (const [h, descriptor] of descriptorMap.entries()) {
-          if (vc == newVc && descriptor.path == `$.verifiablePresentation[${i}]`) {
-            descriptorMap[h].path = `$.verifiablePresentation[${j}]`;
+
+    matched.forEach(m => {
+      const descriptor = jp.node(inDesc, m.input_descriptor_path).value;
+      const vc = jp.node(vcs, m.verifiable_credential_path).value;
+      if (descriptor && vc) {
+        descriptorMap.forEach(dm => {
+          if (dm.path_nested) {
+
           }
-        }
+        })
       }
-    }
-    presentationSubmission.descriptor_map = descriptorMap;
+    })
+
     return presentationSubmission;
   }
 

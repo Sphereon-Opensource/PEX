@@ -23,7 +23,8 @@ describe('Submission requirements tests', () => {
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
         { 'format': 'ldp_vc', 'id': 'Educational transcripts', 'path': '$.verifiableCredential[0]' },
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[1]' }
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[1]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[2]' }
       ]
     }));
   });
@@ -35,7 +36,13 @@ describe('Submission requirements tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, new VP(vpSimple));
-    expect(() => evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential)).toThrowError('Min: expected: 2 actual: 1 at level: 0');
+    expect(evaluationClientWrapper.submissionFrom(pdSchema, vpSimple)).toEqual(expect.objectContaining({
+      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+      descriptor_map: [
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[1]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[2]' }
+      ]
+    }));
   });
 
   it('Evaluate submission requirements either all from group A or 2 from group B', () => {

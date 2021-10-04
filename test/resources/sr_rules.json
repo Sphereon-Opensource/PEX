@@ -172,7 +172,7 @@
           "group": ["A", "B"],
           "schema": [
             {
-              "uri": "https://eu.com/claims/DriversLicense"
+              "uri": "https://www.w3.org/2018/credentials/v1"
             }
           ],
           "constraints": {

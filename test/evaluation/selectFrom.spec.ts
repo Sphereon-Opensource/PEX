@@ -2,7 +2,6 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { SelectResults } from '../../lib/evaluation/core/selectResults';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
 
 function getFile(path: string) {
@@ -17,19 +16,89 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
         'errors': [],
         'matches': [
           {
-            'count': 2,
+            'count': 3,
             'from': ['A'],
-            'matches': ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
+            'matches': ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
             'name': 'Submission of educational transcripts',
             'rule': 'all'
           }
         ],
-        'warnings': []
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
       }
     );
   });
@@ -37,13 +106,9 @@ describe('selectFrom tests', () => {
   it('Evaluate submission requirements min 2 from group B', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    pdSchema.input_descriptors[1].schema.push({ uri: 'https://eu.com/claims/DriversLicense' });
-    pdSchema.input_descriptors[1].schema.push({ uri: 'https://business-standards.org/schemas/employment-history.json' });
-    vpSimple.verifiableCredential[2]['@context'] = 'https://eu.com/claims/DriversLicense';
     pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
@@ -57,6 +122,52 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
       'warnings': []
     });
   });
@@ -65,30 +176,30 @@ describe('selectFrom tests', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[2]];
-    pdSchema.input_descriptors = [pdSchema.input_descriptors[0], pdSchema.input_descriptors[1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
           'count': 1,
           'from_nested': [
             {
-              'count': 2,
+              'count': 3,
               'from': ['A'],
               'matches': [
                 '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'all'
             },
             {
-              'count': 1,
+              'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -100,6 +211,77 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
       'warnings': []
     });
   });
@@ -109,18 +291,64 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
-          'count': 1,
+          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]'
+            '$.verifiableCredential[1]',
+            '$.verifiableCredential[2]'
           ],
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
         }
       ],
       'warnings': []
@@ -132,28 +360,29 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
           'count': 1,
           'from_nested': [
             {
-              'count': 2,
+              'count': 3,
               'from': ['A'],
               'matches': [
                 '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'all'
             },
             {
-              'count': 1,
+              'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -162,6 +391,77 @@ describe('selectFrom tests', () => {
           'matches': [],
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'all'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
         }
       ],
       'warnings': []
@@ -173,28 +473,29 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
           'count': 1,
           'from_nested': [
             {
-              'count': 2,
+              'count': 3,
               'from': ['A'],
               'matches': [
                 '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'all'
             },
             {
-              'count': 1,
+              'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -203,6 +504,77 @@ describe('selectFrom tests', () => {
           'matches': [],
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
         }
       ],
       'warnings': []
@@ -214,28 +586,29 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(result).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
       'errors': [],
       'matches': [
         {
           'count': 1,
           'from_nested': [
             {
-              'count': 2,
+              'count': 3,
               'from': ['A'],
               'matches': [
                 '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'all'
             },
             {
-              'count': 1,
+              'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]'
+                '$.verifiableCredential[1]',
+                '$.verifiableCredential[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -244,6 +617,77 @@ describe('selectFrom tests', () => {
           'matches': [],
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
         }
       ],
       'warnings': []
@@ -255,7 +699,68 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toThrowError('Min: expected: 3 actual: 1 at level: 0');
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          'count': 2,
+          'from': ['B'],
+          'matches': [
+            '$.verifiableCredential[1]',
+            '$.verifiableCredential[2]'
+          ],
+          'name': 'Eligibility to Work Proof',
+          'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
@@ -263,10 +768,68 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const selectResults: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(selectResults.errors.length).toEqual(0);
-    expect(selectResults.matches[0].name).toEqual(pdSchema.submission_requirements[0].name);
-    // expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toThrowError('Max: expected: 1 actual: 2 at level: 0');
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          'count': 2,
+          'from': ['B'],
+          'matches': [
+            '$.verifiableCredential[1]',
+            '$.verifiableCredential[2]'
+          ],
+          'name': 'Eligibility to Work Proof',
+          'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate submission requirements exactly 1 from group B', () => {
@@ -274,9 +837,68 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const selectResults: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(selectResults.errors.length).toEqual(0);
-    expect(selectResults.matches[0].name).toEqual(pdSchema.submission_requirements[0].name);
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          'count': 2,
+          'from': ['B'],
+          'matches': [
+            '$.verifiableCredential[1]',
+            '$.verifiableCredential[2]'
+          ],
+          'name': 'Eligibility to Work Proof',
+          'rule': 'pick'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate submission requirements all from group B', () => {
@@ -284,7 +906,68 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toThrowError('Not all input descriptors are members of group B');
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          'count': 2,
+          'from': ['B'],
+          'matches': [
+            '$.verifiableCredential[1]',
+            '$.verifiableCredential[2]'
+          ],
+          'name': 'Submission of educational transcripts',
+          'rule': 'all'
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
@@ -292,7 +975,114 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(() => evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toThrowError('Min: expected: 3 actual: 1 at level: 1');
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          "count": 1,
+          "from_nested": [
+            {
+              "count": 3,
+              "from": [
+                "A"
+              ],
+              "matches": [
+                "$.verifiableCredential[0]",
+                "$.verifiableCredential[1]",
+                "$.verifiableCredential[2]"
+              ],
+              "rule": "all"
+            },
+            {
+              "count": 2,
+              "from": [
+                "B"
+              ],
+              "matches": [
+                "$.verifiableCredential[1]",
+                "$.verifiableCredential[2]"
+              ],
+              "rule": "pick"
+            }
+          ],
+          "matches": [],
+          "name": "Confirm banking relationship or employment and residence proofs",
+          "rule": "pick"
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
@@ -300,9 +1090,114 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.submission_requirements = [pdSchema.submission_requirements[12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const selectResults: SelectResults = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
-    expect(selectResults.errors.length).toEqual(0);
-    expect(selectResults.matches[0].name).toEqual(pdSchema.submission_requirements[0].name);
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      'errors': [],
+      'matches': [
+        {
+          "count": 1,
+          "from_nested": [
+            {
+              "count": 3,
+              "from": [
+                "A"
+              ],
+              "matches": [
+                "$.verifiableCredential[0]",
+                "$.verifiableCredential[1]",
+                "$.verifiableCredential[2]"
+              ],
+              "rule": "all"
+            },
+            {
+              "count": 2,
+              "from": [
+                "B"
+              ],
+              "matches": [
+                "$.verifiableCredential[1]",
+                "$.verifiableCredential[2]"
+              ],
+              "rule": "pick"
+            }
+          ],
+          "matches": [],
+          "name": "Confirm banking relationship or employment and residence proofs",
+          "rule": "pick"
+        }
+      ],
+      "verifiableCredentials": [
+        {
+          "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+          "vc": {
+            "@context": "https://eu.com/claims/DriversLicense",
+            "credentialSubject": {
+              "accounts": [
+                {
+                  "id": "1234567890",
+                  "route": "DE-9876543210"
+                },
+                {
+                  "id": "2457913570",
+                  "route": "DE-0753197542"
+                }
+              ],
+              "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+            },
+            "id": "https://eu.com/claims/DriversLicense",
+            "issuanceDate": "2010-01-01T19:73:24Z",
+            "issuer": "did:example:123",
+            "type": [
+              "EUDriversLicense"
+            ]
+          }
+        },
+        {
+          "@context": "https://business-standards.org/schemas/employment-history.json",
+          "credentialSubject": {
+            "active": true,
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21"
+          },
+          "id": "https://business-standards.org/schemas/employment-history.json",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "EcdsaSecp256k1VerificationKey2019",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "VerifiableCredential",
+            "GenericEmploymentCredential"
+          ]
+        },
+        {
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          "credentialSubject": {
+            "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",
+            "license": {
+              "dob": "07/13/80",
+              "number": "34DGE352"
+            }
+          },
+          "id": "https://eu.com/claims/DriversLicense",
+          "issuanceDate": "2010-01-01T19:73:24Z",
+          "issuer": "did:foo:123",
+          "proof": {
+            "created": "2017-06-18T21:19:10Z",
+            "jws": "...",
+            "proofPurpose": "assertionMethod",
+            "type": "RsaSignature2018",
+            "verificationMethod": "https://example.edu/issuers/keys/1"
+          },
+          "type": [
+            "EUDriversLicense"
+          ]
+        }
+      ],
+      'warnings': []
+    });
   });
 
   it('Evaluate case without presentation submission', () => {
