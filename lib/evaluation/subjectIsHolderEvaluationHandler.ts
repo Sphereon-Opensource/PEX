@@ -57,7 +57,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private mapFieldIdsToInputDescriptors() {
     return (inputDescriptor) => {
-      inputDescriptor.constraints.is_holder?.forEach(this.mapIsHolderToInputDescriptors(inputDescriptor));
+      inputDescriptor.constraints?.is_holder?.forEach(this.mapIsHolderToInputDescriptors(inputDescriptor));
     };
   }
 

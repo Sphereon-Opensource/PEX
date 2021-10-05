@@ -60,7 +60,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapFieldIdsToInputDescriptors() {
     return (inputDescriptor) => {
-      inputDescriptor.constraints.same_subject?.forEach(this.mapSameSubjectsToInputDescriptors(inputDescriptor));
+      inputDescriptor.constraints?.same_subject?.forEach(this.mapSameSubjectsToInputDescriptors(inputDescriptor));
     };
   }
 
