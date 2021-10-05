@@ -1,4 +1,3 @@
-import { URL } from 'url';
 
 import { InputDescriptor, Schema } from '@sphereon/pe-models';
 
