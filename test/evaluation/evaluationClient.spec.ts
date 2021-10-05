@@ -12,7 +12,7 @@ const HOLDER_DID = 'HOLDER_DID:example:ebfeb1f712ebc6f1c276e12ec21';
 
 describe('evaluate', () => {
 
-  it('should return error if uri in inputDescriptors doesn\'t match', function () {
+  it('should return error with null vc in inputDescriptors doesn\'t match', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple = new VP(new Presentation(null, null, null, null, HOLDER_DID, null));
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -20,7 +20,9 @@ describe('evaluate', () => {
     try {
       evaluationClient.evaluate(presentationDefinition, vpSimple);
     } catch (error) {
-      expect(error.message).toEqual('Cannot read property \'length\' of null');
+      expect(error.message).toContain('Cannot read propert');
+      // Cannot read property 'length' of null
+      // the above weird comparison is to remain compatible with both versions of node.
     }
   });
 

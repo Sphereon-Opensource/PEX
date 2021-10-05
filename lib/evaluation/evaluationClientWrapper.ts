@@ -9,10 +9,10 @@ import {
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
 import { VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
-import { Presentation } from '../verifiablePresentation/models';
+import { Presentation } from '../verifiablePresentation';
 
-import { SelectResults } from './core/selectResults';
-import { SubmissionRequirementMatch } from './core/submissionRequirementMatch';
+import { SelectResults } from './core';
+import { SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
 import { EvaluationResults } from './evaluationResults';
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -112,7 +112,9 @@ export class EvaluationClientWrapper {
     for (const m of marked) {
       if (m.payload.group.includes(sr.from)) {
         srm.count++;
-        srm.matches.push(m.verifiable_credential_path);
+        if (srm.matches.indexOf(m.verifiable_credential_path) === -1) {
+          srm.matches.push(m.verifiable_credential_path);
+        }
       }
     }
     return srm;
@@ -274,7 +276,9 @@ export class EvaluationClientWrapper {
     for (const [idPath, sameIdCheckResults] of partitionedBasedOnID.entries()) {
       const vcPaths: string[] = [];
       for (let i = 0; i < sameIdCheckResults.length; i++) {
-        vcPaths.push(sameIdCheckResults[i].verifiable_credential_path);
+        if (vcPaths.indexOf(sameIdCheckResults[i].verifiable_credential_path) === -1) {
+          vcPaths.push(sameIdCheckResults[i].verifiable_credential_path);
+        }
       }
       partitionedResults.set(idPath, vcPaths);
     }
