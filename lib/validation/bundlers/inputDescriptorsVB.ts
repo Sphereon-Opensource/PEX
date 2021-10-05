@@ -1,4 +1,3 @@
-
 import { InputDescriptor, Schema } from '@sphereon/pe-models';
 
 import { Validation, ValidationPredicate } from '../core';
