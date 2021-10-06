@@ -1,4 +1,12 @@
 # Release Notes
+## v0.2.4 - 2021-10-06
+Bugfix release
+
+- Fixed:
+  * We returned duplicate submission requirements in some cases
+  * Remove URL package import, fixes react-native support
+  * Fixed 2 code-paths that could have undefined values
+  
 ## v0.2.3 - 2021-09-23
 Updated dependency and fixed schema handling
 
