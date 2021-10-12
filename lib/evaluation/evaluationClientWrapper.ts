@@ -8,7 +8,7 @@ import {
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
-import { Presentation, VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -32,11 +32,14 @@ export class EvaluationClientWrapper {
     did: string
   ): SelectResults {
     let selectResults: SelectResults;
-
-    this._client.evaluate(
-      presentationDefinition,
-      new VP(new Presentation([], null, [], selectableCredentials, did, null))
-    );
+    this._client.evaluate(presentationDefinition, {
+      '@context': null,
+      type: null,
+      presentationSubmission: null,
+      verifiableCredential: selectableCredentials,
+      holder: did,
+      proof: null,
+    });
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
     if (presentationDefinition.submission_requirements) {
@@ -49,7 +52,7 @@ export class EvaluationClientWrapper {
         marked
       );
       const vcs = this.extractVCIndexes(matchSubmissionRequirements).map(
-        (i) => this._client.verifiablePresentation.getVerifiableCredentials()[i]
+        (i) => this._client.verifiablePresentation.verifiableCredential[i]
       );
       selectResults = {
         errors: marked.length > 0 ? [] : errors,
@@ -65,7 +68,7 @@ export class EvaluationClientWrapper {
       selectResults = {
         errors: marked.length > 0 ? [] : errors,
         matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
-        verifiableCredentials: this._client.verifiablePresentation.getVerifiableCredentials(),
+        verifiableCredentials: this._client.verifiablePresentation.verifiableCredential,
         warnings,
       };
     }
@@ -74,12 +77,14 @@ export class EvaluationClientWrapper {
   }
 
   private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]) {
-    const matches = matchSubmissionRequirements.map((e) => e.matches).flat();
-    if (!matches || !matches.length) {
-      const sr = matchSubmissionRequirements.map((e: SubmissionRequirementMatch) => e.from_nested).flat();
-      return this.extractVCIndexes(sr);
+    const matches = matchSubmissionRequirements.map((e) => e.matches);
+    const matchesFlattened = [].concat(...matches);
+    if (!matchesFlattened || !matchesFlattened.length) {
+      const sr = matchSubmissionRequirements.map((e: SubmissionRequirementMatch) => e.from_nested);
+      const srFlattened = [].concat(...sr);
+      return this.extractVCIndexes(srFlattened);
     }
-    return Array.from(new Set(matches.map((s) => parseInt(s.match(/\d+/)[0]))));
+    return Array.from(new Set(matchesFlattened.map((s) => parseInt(s.match(/\d+/)[0]))));
   }
 
   private matchSubmissionRequirements(
@@ -167,8 +172,8 @@ export class EvaluationClientWrapper {
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
-    if (this._client.verifiablePresentation.getPresentationSubmission().descriptor_map.length) {
-      result.value = this._client.verifiablePresentation.getPresentationSubmission();
+    if (this._client.verifiablePresentation.presentationSubmission.descriptor_map.length) {
+      result.value = this._client.verifiablePresentation.presentationSubmission;
     }
     return result;
   }
@@ -200,12 +205,12 @@ export class EvaluationClientWrapper {
       matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
       const inDescIndexes = matched[1].map((e) => e.input_descriptor_path.match(/\d+/)[0]);
       const desc: InputDescriptor[] = inDescIndexes.map((i) => pd.input_descriptors[i]);
-      const matchedDescriptors = this._client.verifiablePresentation
-        .getPresentationSubmission()
-        .descriptor_map.filter((value) => desc.map((e) => e.id).includes(value.id));
-      this._client.verifiablePresentation.getPresentationSubmission().descriptor_map = matchedDescriptors;
+      const matchedDescriptors = this._client.verifiablePresentation.presentationSubmission.descriptor_map.filter(
+        (value) => desc.map((e) => e.id).includes(value.id)
+      );
+      this._client.verifiablePresentation.presentationSubmission.descriptor_map = matchedDescriptors;
     }
-    return this._client.verifiablePresentation.getPresentationSubmission();
+    return this._client.verifiablePresentation.presentationSubmission;
   }
 
   private evaluateRequirements(

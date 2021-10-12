@@ -33,7 +33,7 @@ export class EvaluationClient {
   private _did: string;
 
   public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
-    this._did = vp.getHolder();
+    this._did = vp.holder;
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {

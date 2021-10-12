@@ -1,7 +1,7 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
+import { VerifiableCredential } from './SSI.types';
 import { OpenIdConnect } from './models';
-import { VerifiableCredential } from './verifiableCredential';
 import { VerifiablePresentation } from './verifiablePresentation';
 
 /***

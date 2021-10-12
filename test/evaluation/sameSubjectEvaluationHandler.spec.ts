@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { EvaluationClient, Presentation, SameSubjectEvaluationHandler, VP } from '../../lib';
+import { EvaluationClient, SameSubjectEvaluationHandler, VerifiablePresentation } from '../../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -113,8 +113,15 @@ describe('sameSubjectEvaluationHandler', () => {
           "type": "VerifiableCredential"
         }
       ]}
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['holder'], inputCandidates['proof']);
-    evaluationClient.verifiablePresentation = new VP(presentation);
+    const presentation: VerifiablePresentation = {
+      '@context': inputCandidates['@context'],
+      presentationSubmission: inputCandidates['presentation_submission'],
+      type: inputCandidates['type'],
+      verifiableCredential: inputCandidates['verifiableCredential'],
+      holder: inputCandidates['holder'],
+      proof: inputCandidates['proof']
+    };
+    evaluationClient.verifiablePresentation = presentation;
     evaluationHandler.handle(pd);
     expect(evaluationHandler.client.results).toEqual(results);
   });

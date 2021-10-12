@@ -27,7 +27,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     inputDescriptors: InputDescriptor[],
     verifiablePresentation: VerifiablePresentation
   ): void {
-    const props = Object.entries(verifiablePresentation.getRoot()).filter(
+    const props = Object.entries(verifiablePresentation).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
     ) as Array<[string, Array<VerifiableCredential>]>;
     for (const [key, value] of props) {
@@ -62,7 +62,11 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     );
   }
 
-  private iterateOverFields(inputDescriptor: [number, InputDescriptor], vc: [number, unknown], path: string): void {
+  private iterateOverFields(
+    inputDescriptor: [number, InputDescriptor],
+    vc: [number, VerifiableCredential],
+    path: string
+  ): void {
     for (const field of inputDescriptor[1].constraints.fields) {
       const inputField = JsonPathUtils.extractInputField(vc[1], field.path);
       if (!inputField.length) {

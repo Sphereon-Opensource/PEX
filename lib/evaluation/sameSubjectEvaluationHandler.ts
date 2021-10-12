@@ -156,8 +156,8 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private findAllDescribedCredentialsPaths() {
-    if (this.vPresentation.getPresentationSubmission()) {
-      this.vPresentation.getPresentationSubmission().descriptor_map.forEach(this.descriptorToPathMapper());
+    if (this.vPresentation.presentationSubmission) {
+      this.vPresentation.presentationSubmission.descriptor_map.forEach(this.descriptorToPathMapper());
     }
   }
 
@@ -179,7 +179,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapCredentialPathToCredentialSubject() {
     return (path, inDescId) => {
-      const subjectNode = jp.nodes(this.vPresentation.getRoot(), path.concat('.credentialSubject'));
+      const subjectNode = jp.nodes(this.vPresentation, path.concat('.credentialSubject'));
       if (subjectNode.length) {
         this.credentialsSubjects.set(inDescId, subjectNode[0].value);
       }

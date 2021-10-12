@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { PEJS, Validated, VP } from '../lib';
+import { PEJS, Validated, VerifiablePresentation } from '../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -27,10 +27,10 @@ describe('evaluate', () => {
 
   it('Evaluate case without any error', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluate(pdSchema, new VP(vpSimple));
+    const evaluationResults = pejs.evaluate(pdSchema, vpSimple);
     expect(evaluationResults.value.descriptor_map.length).toEqual(1);
     expect(evaluationResults.errors.length).toEqual(0);
   });
@@ -42,7 +42,7 @@ describe('evaluate', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
-    pejs.evaluate(pdSchema, new VP(vpSimple));
+    pejs.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',

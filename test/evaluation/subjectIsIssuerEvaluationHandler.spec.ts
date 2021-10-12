@@ -2,10 +2,9 @@ import fs from 'fs';
 
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { VerifiableCredential, VP } from '../../lib';
+import { VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/subjectIsIssuerEvaluationHandler';
-import { Presentation } from '../../lib/verifiablePresentation/models';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -15,7 +14,7 @@ describe('evaluate', () => {
 
   it('should return ok if subject_is_issuer is verified', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     const presentationSubmission: PresentationSubmission = {
@@ -34,7 +33,11 @@ describe('evaluate', () => {
         'id': 'did:example:123'
       },
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      'type': 'VerifiableCredential'
+      'type': ['VerifiableCredential'],
+      '@context': [],
+      'issuer': null,
+      'issuanceDate': null,
+      'proof': null
     }];
     verifiableCredential[0]['@context'] = [
       'https://www.w3.org/2018/credentials/v1'
@@ -46,8 +49,15 @@ describe('evaluate', () => {
         'id': 'https://www.w3.org/TR/vc-data-model/#types'
       }
     ];
-    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredential, null, null));
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
+    subjectIsIssuerEvaluationHandler.verifiablePresentation =  {
+      '@context': [],
+      type: null,
+      presentationSubmission,
+      verifiableCredential,
+      holder: null,
+      proof: null
+    };
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
       'verifiable_credential_path': '$.verifiableCredential[0]',
@@ -59,7 +69,7 @@ describe('evaluate', () => {
 
   it('should return error if subject_is_issuer is not verified', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     const presentationSubmission: PresentationSubmission = {
@@ -78,7 +88,11 @@ describe('evaluate', () => {
         'id': 'did:example:123'
       },
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      'type': 'VerifiableCredential'
+      'type': ['VerifiableCredential'],
+      '@context': null,
+      'issuer': null,
+      'issuanceDate': null,
+      'proof': null
     }];
     verifiableCredentials[0]['@context'] = [
       'https://www.w3.org/2018/credentials/v1'
@@ -90,9 +104,16 @@ describe('evaluate', () => {
       }
     ];
     verifiableCredentials[0]['issuer'] = 'did:example:124';
-    subjectIsIssuerEvaluationHandler.verifiablePresentation = new VP(new Presentation([], presentationSubmission, [], verifiableCredentials, null, null));
+    subjectIsIssuerEvaluationHandler.verifiablePresentation = {
+      '@context': [],
+      type: null,
+      presentationSubmission,
+      verifiableCredential: verifiableCredentials,
+      holder: null,
+      proof: null
+    };
 
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, new VP(vpSimple));
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'evaluator': 'SubjectIsIssuerEvaluation',
       'input_descriptor_path': '$.input_descriptors[0]',

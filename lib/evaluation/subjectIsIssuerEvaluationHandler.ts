@@ -28,12 +28,10 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
 
   private checkSubjectIsIssuer(inputDescriptorId: string, vp: VerifiablePresentation, idIdx: number) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.getPresentationSubmission().descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = this.verifiablePresentation.getPresentationSubmission().descriptor_map[i];
+    for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
+      const currentDescriptor: Descriptor = this.verifiablePresentation.presentationSubmission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation['presentation'], [
-          currentDescriptor.path,
-        ]);
+        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
         if (vc.length > 0 && vc[0].value.issuer === vc[0].value.credentialSubject.id) {
           this.generateSuccessResult(idIdx, vp, vc[0].value.id);
         } else {
@@ -66,8 +64,8 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private generateResult(idIdx: number, vp: VerifiablePresentation, vcId: string): HandlerCheckResult {
-    for (let i = 0; i < vp.getVerifiableCredentials().length; i++) {
-      if (vp.getVerifiableCredentials()[i].id === vcId) {
+    for (let i = 0; i < vp.verifiableCredential.length; i++) {
+      if (vp.verifiableCredential[i]['id'] === vcId) {
         return new HandlerCheckResult(
           `$.input_descriptors[${idIdx}]`,
           `$.verifiableCredential[${i}]`,

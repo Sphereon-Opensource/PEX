@@ -2,7 +2,7 @@ import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/p
 import { nanoid } from 'nanoid';
 
 import { Status } from '../ConstraintUtils';
-import { Presentation, VerifiableCredential, VerifiablePresentation, VP } from '../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 import { EvaluationClient } from './evaluationClient';
@@ -18,20 +18,18 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
-    this.verifiablePresentation = new VP(
-      new Presentation(
-        null,
-        {
-          id: nanoid(),
-          definition_id: pd.id,
-          descriptor_map: [],
-        },
-        null,
-        [],
-        p.getHolder(),
-        null
-      )
-    );
+    this.verifiablePresentation = {
+      '@context': null,
+      type: null,
+      presentationSubmission: {
+        id: nanoid(),
+        definition_id: pd.id,
+        descriptor_map: [],
+      },
+      holder: p.holder,
+      verifiableCredential: null,
+      proof: null,
+    };
     const errors: HandlerCheckResult[] = this.removeDuplicates(
       this.getResults().filter((result) => result.status === Status.ERROR)
     );
@@ -56,7 +54,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private extractVerifiableCredentials(inputCandidates: VerifiablePresentation) {
-    return Object.entries(inputCandidates.getRoot()).filter(
+    return Object.entries(inputCandidates).filter(
       (x) => Array.isArray(x[1]) && x[1].length && typeof x[1][0] === 'object'
     ) as Array<[string, Array<VerifiableCredential>]>;
   }
@@ -92,13 +90,13 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     info: HandlerCheckResult[],
     path: string
   ) {
-    this.verifiablePresentation.getPresentationSubmission().definition_id = pd.id;
+    this.verifiablePresentation.presentationSubmission.definition_id = pd.id;
     const result = info.find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
     if (!result) {
       return;
     }
-    if (!this.verifiablePresentation.getRoot()[`${path}`]) {
-      this.verifiablePresentation.getRoot()[`${path}`] = [];
+    if (!this.verifiablePresentation[`${path}`]) {
+      this.verifiablePresentation[`${path}`] = [];
     }
     this.addInputDescriptorToResults(pd.input_descriptors, vc, result, path);
   }
@@ -130,19 +128,19 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private pushToDescriptorsMap(newDescriptor: Descriptor, vc: [number, VerifiableCredential], path: string) {
-    const descriptorMap: Descriptor[] = this.verifiablePresentation.getPresentationSubmission().descriptor_map;
+    const descriptorMap: Descriptor[] = this.verifiablePresentation.presentationSubmission.descriptor_map;
     if (descriptorMap.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
-      this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
-      this.verifiablePresentation
-        .getPresentationSubmission()
-        .descriptor_map.forEach((d: Descriptor) => this.addPathNestedDescriptor(d, newDescriptor));
+      this.verifiablePresentation[`${path}`].push(vc[1]);
+      this.verifiablePresentation.presentationSubmission.descriptor_map.forEach((d: Descriptor) =>
+        this.addPathNestedDescriptor(d, newDescriptor)
+      );
     } else if (
       !descriptorMap.find(
         (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
-      this.verifiablePresentation.getRoot()[`${path}`].push(vc[1]);
-      this.verifiablePresentation.getPresentationSubmission().descriptor_map.push(newDescriptor);
+      this.verifiablePresentation[`${path}`].push(vc[1]);
+      this.verifiablePresentation.presentationSubmission.descriptor_map.push(newDescriptor);
     }
   }
 

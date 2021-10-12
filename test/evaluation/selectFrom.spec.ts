@@ -991,6 +991,7 @@ describe('selectFrom tests', () => {
                 "$.verifiableCredential[1]",
                 "$.verifiableCredential[2]"
               ],
+              "name": undefined,
               "rule": "all"
             },
             {
@@ -1002,6 +1003,7 @@ describe('selectFrom tests', () => {
                 "$.verifiableCredential[1]",
                 "$.verifiableCredential[2]"
               ],
+              "name": undefined,
               "rule": "pick"
             }
           ],
@@ -1106,6 +1108,7 @@ describe('selectFrom tests', () => {
                 "$.verifiableCredential[1]",
                 "$.verifiableCredential[2]"
               ],
+              "name": undefined,
               "rule": "all"
             },
             {
@@ -1117,6 +1120,7 @@ describe('selectFrom tests', () => {
                 "$.verifiableCredential[1]",
                 "$.verifiableCredential[2]"
               ],
+              "name": undefined,
               "rule": "pick"
             }
           ],
