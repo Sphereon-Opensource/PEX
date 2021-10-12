@@ -87,10 +87,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   private createResponse(
     path: string,
     inputDescriptor: [number, InputDescriptor],
-    vc: [number, unknown],
+    vc: [number, VerifiableCredential],
     payload: { result: unknown[]; valid: boolean },
     message: string
-  ) {
+  ): void {
     this.getResults().push({
       ...this.createResultObject(path, inputDescriptor[0], vc[0], payload),
       ['status']: Status.ERROR,
@@ -109,7 +109,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: unknown, field: Field) {
+  private evaluateFilter(result: unknown, field: Field): boolean {
     if (field.filter) {
       const ajv = new Ajv();
       const valid = ajv.validate(field.filter, result['value']);

@@ -2,6 +2,7 @@ import { Descriptor, InputDescriptor, Optionality, PresentationDefinition } from
 import jp from 'jsonpath';
 
 import { Status } from '../ConstraintUtils';
+import { CredentialSubject } from '../verifiablePresentation';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
@@ -20,7 +21,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIdzInputDescriptorsIsHolderPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, unknown>;
+  private credentialsSubjects: Map<string, CredentialSubject>;
 
   private messages: Map<Status, string>;
 
@@ -31,7 +32,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.fieldIdzInputDescriptorsIsHolderPreferred = new Map<Set<string>, Set<string>>();
     this.allDescribedCredentialsPaths = new Map<string, string>();
 
-    this.credentialsSubjects = new Map<string, string>();
+    this.credentialsSubjects = new Map<string, CredentialSubject>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
@@ -192,7 +193,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private confirmFieldSetHasSameHolder(status: 'info' | 'warn' | 'error') {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
-      const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
+      const credentialSubjectsSet: Set<CredentialSubject> = new Set<CredentialSubject>();
       inputDescriptorIds.forEach((inDescId) => {
         if (this.credentialsSubjects.has(inDescId)) {
           credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId));
@@ -202,7 +203,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private addResult(credentialSubjectsSet: Set<unknown>, fieldIdSet: Set<string>, status: Status) {
+  private addResult(credentialSubjectsSet: Set<CredentialSubject>, fieldIdSet: Set<string>, status: Status) {
     let myStatus: Status = status === Status.ERROR ? Status.INFO : status;
     credentialSubjectsSet.forEach((cs) => {
       if (cs['value']['id'] !== this.client.did) {
@@ -220,13 +221,15 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private getResult(
     fieldIdSet: Set<string>,
-    credentialSubjectsSet: Set<unknown>,
+    credentialSubjectsSet: Set<CredentialSubject>,
     myStatus: Status
   ): HandlerCheckResult {
-    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el) => jp.stringify(el['path'].slice(0, 3)));
+    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el: unknown) =>
+      jp.stringify(el['path'].slice(0, 3))
+    );
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
     const verifiableCredentialPath = '[' + paths.join(',') + ']';
-    const credentialFields: Array<string> = this.getCredentialFields(credentialSubjectsSet);
+    const credentialFields: Array<string> = this.getCredentialFields(credentialSubjectsSet as Set<CredentialSubject>);
     return {
       input_descriptor_path: inputDescriptorPath,
       verifiable_credential_path: verifiableCredentialPath,
@@ -237,7 +240,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private getCredentialFields(credentialSubjectsSet: Set<unknown>): string[] {
+  private getCredentialFields(credentialSubjectsSet: Set<CredentialSubject>): string[] {
     if (credentialSubjectsSet.size) {
       return Array.from(credentialSubjectsSet)
         .map((el) => Object.keys(el['value']))

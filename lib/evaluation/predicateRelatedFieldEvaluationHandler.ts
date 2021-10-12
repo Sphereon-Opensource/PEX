@@ -86,7 +86,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     resultIdx: number,
     evaluationResult: unknown,
     results: HandlerCheckResult[]
-  ) {
+  ): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,
       verifiable_credential_path: results[resultIdx].verifiable_credential_path,

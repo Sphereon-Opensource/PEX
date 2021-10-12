@@ -72,7 +72,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private determineNecessaryPaths(
     vc: VerifiableCredential,
-    vcToSend: unknown,
+    vcToSend: VerifiableCredential,
     fields: Field[],
     idIdx: number,
     vcIdx: number
@@ -90,11 +90,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private copyResultPathToDestinationCredential(
     pathDetails: (string | number)[],
-    verifiableCredential: unknown,
-    verifiableCredentialToSend: unknown
+    verifiableCredential: VerifiableCredential,
+    verifiableCredentialToSend: VerifiableCredential
   ) {
-    let objectCursor = verifiableCredential;
-    let currentCursorInToSendObj = verifiableCredentialToSend;
+    let objectCursor: unknown = verifiableCredential;
+    let currentCursorInToSendObj: unknown = verifiableCredentialToSend;
     for (let i = 1; i < pathDetails.length; i++) {
       objectCursor = objectCursor[pathDetails[i]];
       if (pathDetails.length == i + 1) {
