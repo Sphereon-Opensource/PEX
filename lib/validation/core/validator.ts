@@ -4,10 +4,10 @@ import { Validated } from './validated';
 
 export type ValidationPredicate<T> = (t: T) => boolean;
 
-export class Validation<T> {
+export class Validation {
   tag: string;
-  target: T;
-  predicate: ValidationPredicate<T>;
+  target: unknown;
+  predicate: ValidationPredicate<unknown>;
   message: string;
   status?: Status;
 }
@@ -15,12 +15,12 @@ export class Validation<T> {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Validatable {}
 
-export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
+export type ValidateAll = (validations: Validation[]) => Validated;
 
-export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validated => {
+export const validate: ValidateAll = (validations: Validation[]): Validated => {
   const validateResults: Checked[] = validations.map((validation) => mapper(validation));
 
-  function toChecked(validation: Validation<T>) {
+  function toChecked(validation: Validation) {
     return new Checked(validation.tag, Status.ERROR, validation.message);
   }
 
@@ -28,7 +28,7 @@ export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validate
     return new Checked(tag, Status.INFO, 'ok');
   }
 
-  function mapper(validation: Validation<T>): Checked {
+  function mapper(validation: Validation): Checked {
     let result;
 
     try {

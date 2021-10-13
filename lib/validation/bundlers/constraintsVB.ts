@@ -32,7 +32,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     super(parentTag, 'constraints');
   }
 
-  public getValidations(constraints: Constraints): Validation<unknown>[] {
+  public getValidations(constraints: Constraints): Validation[] {
     return [
       {
         tag: this.getTag(),
@@ -111,8 +111,8 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     );
   }
 
-  getIsHolderValidations(subjects: Array<HolderSubject>): Validation<unknown>[] {
-    let validations: Validation<unknown>[] = [];
+  getIsHolderValidations(subjects: Array<HolderSubject>): Validation[] {
+    let validations: Validation[] = [];
     for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
       validations = [
         {
@@ -150,8 +150,8 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     return validations;
   }
 
-  getSameSubjectValidations(subjects: Array<HolderSubject>): Validation<unknown>[] {
-    let validations: Validation<unknown>[] = [];
+  getSameSubjectValidations(subjects: Array<HolderSubject>): Validation[] {
+    let validations: Validation[] = [];
     for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
       validations = [
         {
@@ -220,7 +220,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     constraints: Constraints,
     subjects: Array<HolderSubject>,
     message: string
-  ): Validation<unknown>[] {
+  ): Validation[] {
     const missingFieldIds: string[] = [];
 
     if (subjects != null) {

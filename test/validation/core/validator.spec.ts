@@ -54,7 +54,7 @@ describe('validation utils tests', () => {
         {
           tag: 'person.name',
           target: john,
-          predicate: (p): boolean => p.name !== undefined,
+          predicate: (p): boolean => p['name'] !== undefined,
           message: 'Person should be named', // Inlined predicate
         },
         {
@@ -77,7 +77,7 @@ describe('validation utils tests', () => {
     const john: Person = {name: 'john'};
     const result = validate(
       [
-        {tag: 'person.name', target: john, predicate: (person): boolean => person.name !== undefined, message: 'Person should be named'},
+        {tag: 'person.name', target: john, predicate: (person): boolean => person['name'] !== undefined, message: 'Person should be named'},
         {tag: 'person.name', target: john, predicate: throwExceptionForNoReason, message: 'This one failed first'},
         {tag: 'person.name', target: john, predicate: throwExceptionForAgainNoReason, message: 'This one failed as well'}
       ]);

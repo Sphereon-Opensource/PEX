@@ -12,7 +12,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     super(parentTag, 'presentation_submission');
   }
 
-  public getValidations(ps: PresentationSubmission): Validation<unknown>[] {
+  public getValidations(ps: PresentationSubmission): Validation[] {
     return [
       {
         tag: this.getTag(),

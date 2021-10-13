@@ -18,7 +18,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
   }
 
-  public getValidations(pd: PresentationDefinition): Validation<unknown>[] {
+  public getValidations(pd: PresentationDefinition): Validation[] {
     return [
       ...this.myValidations(pd),
       ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors),
@@ -26,7 +26,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     ];
   }
 
-  private myValidations(pd: PresentationDefinition): Validation<unknown>[] {
+  private myValidations(pd: PresentationDefinition): Validation[] {
     return [
       // E Section 4.B   : The Input Descriptors (#term:input-descriptors) required for submission are described by the submission_requirements. If no submission_requirements value is present, all inputs listed in the input_descriptors array are required for submission.
       {

@@ -3,12 +3,12 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
-import { Validatable, Validation, ValidationPredicate } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
 export class FieldsVB extends ValidationBundler<Field[]> {
-  private schemaValidator: Ajv;
+  private readonly schemaValidator: Ajv;
 
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
   private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
@@ -26,8 +26,8 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<Validatable>[] {
-    let validations: Validation<Field>[] = [];
+  public getValidations(fields: Field[]): Validation[] {
+    let validations: Validation[] = [];
 
     if (fields != null) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
@@ -37,7 +37,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation<Validatable>[] {
+  public getValidationsFor(field: Field, indx: number): Validation[] {
     return [
       {
         tag: this.getMyTag(indx),

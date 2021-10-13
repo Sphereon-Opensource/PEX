@@ -17,8 +17,8 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     super(parentTag, 'input_descriptor');
   }
 
-  public getValidations(inputDescriptors: InputDescriptor[]): Validation<unknown>[] {
-    let validations: Validation<unknown>[] = [];
+  public getValidations(inputDescriptors: InputDescriptor[]): Validation[] {
+    let validations: Validation[] = [];
 
     inputDescriptors.forEach((inputDescriptor, inDescInd) => {
       validations = [...validations, ...this.getValidationFor(inputDescriptor, inDescInd)];
@@ -33,7 +33,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return validations;
   }
 
-  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
+  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
@@ -78,7 +78,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return name == null || name.length > 0;
   }
 
-  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
+  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation {
     const nonUniqueInputDescriptorIds: string[] = [];
     const uniqueInputDescriptorIds: Set<string> = new Set<string>();
 
@@ -100,7 +100,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
+  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
 
@@ -171,7 +171,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return new RegExp(format).test(uri);
   }
 
-  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
+  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation[] {
     if (inputDescriptor !== null) {
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }

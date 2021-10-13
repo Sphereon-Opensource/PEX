@@ -1,6 +1,6 @@
 import { SubmissionRequirement } from '@sphereon/pe-models';
 
-import { Validatable, Validation } from '../core';
+import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
@@ -17,8 +17,8 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     super(parentTag, 'submission_requirements');
   }
 
-  public getValidations(srs: SubmissionRequirement[]): Validation<Validatable>[] {
-    let validations: Validation<Validatable>[] = [];
+  public getValidations(srs: SubmissionRequirement[]): Validation[] {
+    let validations: Validation[] = [];
     if (srs != null && srs.length > 0) {
       for (let srInd = 0; srInd < srs.length; srInd++) {
         validations = [...validations, ...this.getMyValidations(srInd, srs), ...this.getSubValidations(srInd, srs)];
@@ -27,7 +27,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return validations;
   }
 
-  private getMyValidations(srInd: number, srs: SubmissionRequirement[]): Validation<Validatable>[] {
+  private getMyValidations(srInd: number, srs: SubmissionRequirement[]): Validation[] {
     return [
       {
         tag: this.getMyTag(srInd),
@@ -84,7 +84,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation<Validatable>[] {
+  private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation[] {
     const fromNested = srs[srInd].from_nested as SubmissionRequirement[];
     return fromNested != null
       ? new SubmissionRequirementVB(this.getFromNestedTag(srInd)).getValidations(fromNested)
