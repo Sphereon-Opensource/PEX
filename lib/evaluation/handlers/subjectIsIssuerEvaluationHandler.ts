@@ -1,12 +1,12 @@
 import { Constraints, Descriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status } from '../ConstraintUtils';
-import { JsonPathUtils } from '../utils/jsonPathUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {

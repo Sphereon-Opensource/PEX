@@ -1,19 +1,45 @@
+import {
+  Constraints,
+  Descriptor,
+  Field,
+  Format,
+  HolderSubject,
+  InputDescriptor,
+  PresentationDefinition,
+  PresentationSubmission,
+  Schema,
+  Statuses,
+  SubmissionRequirement,
+} from '@sphereon/pe-models';
+
 import { Checked, hasErrors, Status } from '../../ConstraintUtils';
 
 import { Validated } from './validated';
 
-export type ValidationPredicate<T> = (t: T) => boolean;
+export type Target =
+  | Field
+  | Constraints
+  | InputDescriptor
+  | PresentationDefinition
+  | PresentationSubmission
+  | SubmissionRequirement
+  | Descriptor[]
+  | Format
+  | Schema[]
+  | HolderSubject
+  | Statuses
+  | string
+  | string[];
+
+export type ValidationPredicate<Target> = (t: Target) => boolean;
 
 export class Validation {
   tag: string;
-  target: unknown;
-  predicate: ValidationPredicate<unknown>;
+  target: Target;
+  predicate: ValidationPredicate<Target>;
   message: string;
   status?: Status;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Validatable {}
 
 export type ValidateAll = (validations: Validation[]) => Validated;
 

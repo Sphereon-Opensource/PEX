@@ -1,13 +1,13 @@
 import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
-import { Status } from '../ConstraintUtils';
-import { JsonPathUtils } from '../utils/jsonPathUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {

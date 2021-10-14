@@ -1,10 +1,10 @@
 import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status } from '../ConstraintUtils';
+import { Status } from '../../ConstraintUtils';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {

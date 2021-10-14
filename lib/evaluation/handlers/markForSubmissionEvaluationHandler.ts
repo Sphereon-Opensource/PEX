@@ -1,12 +1,12 @@
 import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 import { nanoid } from 'nanoid';
 
-import { Status } from '../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {

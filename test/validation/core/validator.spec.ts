@@ -1,26 +1,21 @@
 import { validate } from '../../../lib';
 import { Checked, Status } from '../../../lib/ConstraintUtils';
 
-interface Person {
-  name?: string
-}
-
 function toChecked(message: string) {
   return new Checked('person.name', Status.ERROR, message);
 }
 
 describe('validation utils tests', () => {
   it('validate: for basic validation', () => {
-    const john: Person = {name: 'john'};
 
-    function personShouldBeNamed(person: Person): boolean { // Predicate declared separately.
-      return person.name !== undefined;
+    function personShouldBeNamed(personName: string): boolean { // Predicate declared separately.
+      return personName !== undefined;
     }
 
     const results = validate([
       {
         tag: 'person.name',
-        target: john,
+        target: 'john',
         predicate: personShouldBeNamed,
         message: 'Person should be named'
       }
@@ -32,11 +27,11 @@ describe('validation utils tests', () => {
     const throwException = (): boolean => {
       throw new Error();
     };
-    const john: Person = {};
+    const personName = '';
     const result = validate([
       {
         tag: 'person.name',
-        target: john,
+        target: personName,
         predicate: throwException,
         message: 'Something bad happened'
       }
@@ -48,18 +43,18 @@ describe('validation utils tests', () => {
     const throwException = (): boolean => {
       throw new Error();
     }; // predicate throwing error
-    const john: Person = {name: 'john'};
+    const personName = 'john';
     const result = validate(
       [
         {
           tag: 'person.name',
-          target: john,
-          predicate: (p): boolean => p['name'] !== undefined,
+          target: personName,
+          predicate: (p): boolean => p !== undefined,
           message: 'Person should be named', // Inlined predicate
         },
         {
           tag: 'person.name',
-          target: john,
+          target: personName,
           predicate: throwException,
           message: 'This one failed'
         }
@@ -74,12 +69,12 @@ describe('validation utils tests', () => {
     const throwExceptionForAgainNoReason = (): boolean => {
       throw new Error('This one failed as well');
     };
-    const john: Person = {name: 'john'};
+    const personName = 'john';
     const result = validate(
       [
-        {tag: 'person.name', target: john, predicate: (person): boolean => person['name'] !== undefined, message: 'Person should be named'},
-        {tag: 'person.name', target: john, predicate: throwExceptionForNoReason, message: 'This one failed first'},
-        {tag: 'person.name', target: john, predicate: throwExceptionForAgainNoReason, message: 'This one failed as well'}
+        {tag: 'person.name', target: personName, predicate: (name): boolean => name !== undefined, message: 'Person should be named'},
+        {tag: 'person.name', target: personName, predicate: throwExceptionForNoReason, message: 'This one failed first'},
+        {tag: 'person.name', target: personName, predicate: throwExceptionForAgainNoReason, message: 'This one failed as well'}
       ]);
 
     expect(result).toEqual(

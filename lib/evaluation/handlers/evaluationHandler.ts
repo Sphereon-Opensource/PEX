@@ -1,8 +1,7 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiablePresentation } from '../verifiablePresentation';
-
-import { EvaluationClient } from './evaluationClient';
+import { VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
 
 export interface EvaluationHandler {
   client: EvaluationClient;

@@ -202,6 +202,7 @@ export class EvaluationClientWrapper {
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
+      //TODO match the submitted vcs with the input_descriptors;
       matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
       const inDescIndexes = matched[1].map((e) => e.input_descriptor_path.match(/\d+/)[0]);
       const desc: InputDescriptor[] = inDescIndexes.map((i) => pd.input_descriptors[i]);

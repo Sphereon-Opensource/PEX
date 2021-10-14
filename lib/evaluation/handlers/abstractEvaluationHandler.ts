@@ -1,10 +1,10 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
-import { EvaluationClient } from './evaluationClient';
 import { EvaluationHandler } from './evaluationHandler';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   private nextHandler: EvaluationHandler;

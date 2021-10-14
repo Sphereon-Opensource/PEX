@@ -3,16 +3,16 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
-import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
-import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
-import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
-import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
-import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
-import { SameSubjectEvaluationHandler } from './sameSubjectEvaluationHandler';
-import { SubjectIsHolderEvaluationHandler } from './subjectIsHolderEvaluationHandler';
-import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
-import { UriEvaluationHandler } from './uriEvaluationHandler';
+import { EvaluationHandler } from './handlers/evaluationHandler';
+import { InputDescriptorFilterEvaluationHandler } from './handlers/inputDescriptorFilterEvaluationHandler';
+import { LimitDisclosureEvaluationHandler } from './handlers/limitDisclosureEvaluationHandler';
+import { MarkForSubmissionEvaluationHandler } from './handlers/markForSubmissionEvaluationHandler';
+import { PredicateRelatedFieldEvaluationHandler } from './handlers/predicateRelatedFieldEvaluationHandler';
+import { SameSubjectEvaluationHandler } from './handlers/sameSubjectEvaluationHandler';
+import { SubjectIsHolderEvaluationHandler } from './handlers/subjectIsHolderEvaluationHandler';
+import { SubjectIsIssuerEvaluationHandler } from './handlers/subjectIsIssuerEvaluationHandler';
+import { UriEvaluationHandler } from './handlers/uriEvaluationHandler';
 
 export class EvaluationClient {
   constructor() {

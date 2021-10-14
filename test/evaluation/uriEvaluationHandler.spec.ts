@@ -5,7 +5,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Status, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from "../../lib/evaluation/evaluationClient";
 import { HandlerCheckResult } from "../../lib/evaluation/handlerCheckResult";
-import { UriEvaluationHandler } from "../../lib/evaluation/uriEvaluationHandler";
+import { UriEvaluationHandler } from "../../lib/evaluation/handlers/uriEvaluationHandler";
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

@@ -4,7 +4,7 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 
 import { VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/subjectIsIssuerEvaluationHandler';
+import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers/subjectIsIssuerEvaluationHandler';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

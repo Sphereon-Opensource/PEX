@@ -1,12 +1,12 @@
 import { Descriptor, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
-import { Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   private pDefinition: PresentationDefinition;

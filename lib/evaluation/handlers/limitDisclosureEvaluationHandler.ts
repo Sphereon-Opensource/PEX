@@ -1,11 +1,11 @@
 import { Constraints, Descriptor, Field, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status } from '../ConstraintUtils';
-import { JsonPathUtils } from '../utils/jsonPathUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
 
 export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
   static mandatoryFields: string[] = ['@context', 'credentialSchema'];

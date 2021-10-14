@@ -5,7 +5,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
-import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/markForSubmissionEvaluationHandler';
+import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers/markForSubmissionEvaluationHandler';
 
 const results: HandlerCheckResult[] = [
   {
