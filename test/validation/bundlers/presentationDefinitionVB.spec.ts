@@ -29,26 +29,6 @@ describe('validate', () => {
     }
   );
 
-  it('should return error for missing id', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    delete basicPD.id;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'id should not be empty')]);
-  });
-
-  it('should return error for null id', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.id = null;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'id should not be empty')]);
-  });
-
   it('should return error for empty id', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
     basicPD.id = '';
@@ -62,16 +42,6 @@ describe('validate', () => {
   it('should not return error for missing name', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
     delete basicPD.name;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
-  });
-
-  it('should not return error for null name', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.name = null;
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
@@ -99,16 +69,6 @@ describe('validate', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
-  it('should not return error for null purpose', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.purpose = null;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
-  });
-
   it('should return error for empty purpose', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
     basicPD.purpose = '';
@@ -129,16 +89,6 @@ describe('validate', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
-  it('should not return error for null format', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.format = null;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
-  });
-
   it('should not return error for empty format', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
     basicPD.format = {};
@@ -149,29 +99,9 @@ describe('validate', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
-  it('should return error for missing algo', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    delete basicPD.format.jwt.alg;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty')]);
-  });
-
-  it('should return error for empty null algo', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.format.jwt.alg = null;
-
-    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty')]);
-  });
-
   it('should return error for empty algo', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.format = {"jwt":{"alg": []}};
+    basicPD!.format = {"jwt":{"alg": []}};
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
@@ -181,7 +111,7 @@ describe('validate', () => {
 
   it('should return error for empty algo value', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD.format.jwt.alg = [''];
+    basicPD!.format!.jwt!.alg = [''];
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 

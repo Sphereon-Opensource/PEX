@@ -293,7 +293,7 @@ describe('evaluate', () => {
   it('should return error if limit_disclosure deletes the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    delete pdSchema.input_descriptors[0].constraints.limit_disclosure;
+    delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -305,7 +305,7 @@ describe('evaluate', () => {
   it('should return error if limit_disclosure deletes the etc field', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors[0].constraints.limit_disclosure = Optionality.Preferred;
+    pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
@@ -327,21 +327,21 @@ describe('evaluate', () => {
   });
 
   it('should return ok if vc[0] doesn\'t have the etc field', function() {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json') as PresentationDefinition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    vpSimple.holder = HOLDER_DID;
+    vpSimple!.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual(undefined);
+    expect(evaluationClient!.verifiablePresentation!.verifiableCredential![0]!['etc']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
 
   it('Evaluate submission requirements all rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
-    pdSchema.input_descriptors = [pdSchema.input_descriptors[0]];
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json') as PresentationDefinition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
+    pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
@@ -359,12 +359,12 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements pick rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    pdSchema.submission_requirements = [pdSchema.submission_requirements[1]];
-    vpSimple.verifiableCredential[0].vc['issuer'] = "did:foo:123";
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json') as PresentationDefinition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
+    vpSimple!.verifiableCredential![0]!.vc['issuer'] = "did:foo:123";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple.holder = HOLDER_DID;
+    vpSimple!.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({

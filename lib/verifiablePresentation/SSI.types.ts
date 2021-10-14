@@ -27,7 +27,7 @@ export interface Credential {
   issuanceDate?: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
-  [x: string]: unknown;
+  [x: string]: any;
 }
 
 export interface VerifiableCredential extends Credential {

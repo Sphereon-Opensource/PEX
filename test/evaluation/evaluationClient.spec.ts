@@ -11,28 +11,6 @@ function getFile(path: string) {
 const HOLDER_DID = 'HOLDER_DID:example:ebfeb1f712ebc6f1c276e12ec21';
 
 describe('evaluate', () => {
-
-  it('should return error with null vc in inputDescriptors doesn\'t match', function () {
-    const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = {
-      '@context': null,
-      type: null,
-      proof: null,
-      verifiableCredential: null,
-      holder: HOLDER_DID,
-      presentationSubmission: null
-    };
-    const evaluationClient: EvaluationClient = new EvaluationClient();
-    presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
-    try {
-      evaluationClient.evaluate(presentationDefinition, vpSimple);
-    } catch (error) {
-      expect(error.message).toContain('Cannot read propert');
-      // Cannot read property 'length' of null
-      // the above weird comparison is to remain compatible with both versions of node.
-    }
-  });
-
   it('should return error if uri in inputDescriptors doesn\'t match', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -190,7 +168,7 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    delete presentationDefinition.input_descriptors[0].constraints.limit_disclosure;
+    delete presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure;
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
     expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual('etc');
@@ -200,7 +178,7 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    presentationDefinition.input_descriptors[0].constraints.limit_disclosure = Optionality.Preferred;
+    presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
     expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual('etc');

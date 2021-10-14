@@ -5,7 +5,7 @@ import { VerifiableCredential } from '../SSI.types';
 /***
  * OpenId Connect Verifiable Presentation
  */
-export class OpenIdConnect {
+export interface OpenIdConnect {
   iss: string;
   sub: string;
   preferred_username: string;

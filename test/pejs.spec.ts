@@ -21,8 +21,8 @@ describe('evaluate', () => {
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
     const result = pejs.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
-    expect(result.errors.length).toEqual(3);
-    expect(result.errors.map(e => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation', 'IsHolderEvaluation']);
+    expect(result!.errors!.length).toEqual(3);
+    expect(result!.errors!.map(e => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation', 'IsHolderEvaluation']);
   });
 
   it('Evaluate case without any error', () => {
@@ -31,15 +31,15 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
     const evaluationResults = pejs.evaluate(pdSchema, vpSimple);
-    expect(evaluationResults.value.descriptor_map.length).toEqual(1);
-    expect(evaluationResults.errors.length).toEqual(0);
+    expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
+    expect(evaluationResults!.errors!.length).toEqual(0);
   });
 
   it('Evaluate submission requirements all from group A', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
-    pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
+    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
     pejs.evaluate(pdSchema, vpSimple);
@@ -56,7 +56,7 @@ describe('evaluate', () => {
 
   it('Evaluate pd schema of our sr_rules.json pd', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    pdSchema.submission_requirements = [pdSchema.submission_requirements[0]];
+    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateDefinition(pdSchema);
     expect(result).toEqual([{ 'message': 'ok', 'status': 'info', 'tag': 'root' }]);

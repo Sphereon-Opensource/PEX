@@ -66,16 +66,16 @@ function getFile(path: string): unknown {
 describe('markForSubmissionEvaluationHandler tests', () => {
 
   it(`Mark input candidates for presentation submission`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentation: VerifiablePresentation = {
       '@context': inputCandidates['@context'],
-      presentationSubmission: inputCandidates['presentation_submission'],
+      presentationSubmission: inputCandidates['presentationSubmission'],
       type: inputCandidates['type'],
       verifiableCredential: inputCandidates['verifiableCredential'],
       holder: inputCandidates['holder'],
       proof: inputCandidates['proof']
     };
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
@@ -102,16 +102,16 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const inputCandidates: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentation: VerifiablePresentation = {
       '@context': inputCandidates['@context'],
-      presentationSubmission: inputCandidates['presentation_submission'],
+      presentationSubmission: inputCandidates['presentationSubmission'],
       type: inputCandidates['type'],
       verifiableCredential: inputCandidates['verifiableCredential'],
       holder: inputCandidates['holder'],
       proof: inputCandidates['proof']
     };
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json')['presentation_definition'];
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);

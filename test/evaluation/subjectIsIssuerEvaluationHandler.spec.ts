@@ -35,9 +35,9 @@ describe('evaluate', () => {
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
       'type': ['VerifiableCredential'],
       '@context': [],
-      'issuer': null,
-      'issuanceDate': null,
-      'proof': null
+      'issuer': '',
+      'issuanceDate': '',
+      'proof': {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     }];
     verifiableCredential[0]['@context'] = [
       'https://www.w3.org/2018/credentials/v1'
@@ -51,11 +51,11 @@ describe('evaluate', () => {
     ];
     subjectIsIssuerEvaluationHandler.verifiablePresentation =  {
       '@context': [],
-      type: null,
+      type: '',
       presentationSubmission,
       verifiableCredential,
-      holder: null,
-      proof: null
+      holder: '',
+      proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     };
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
@@ -89,10 +89,10 @@ describe('evaluate', () => {
       },
       'id': '2dc74354-e965-4883-be5e-bfec48bf60c7',
       'type': ['VerifiableCredential'],
-      '@context': null,
-      'issuer': null,
-      'issuanceDate': null,
-      'proof': null
+      '@context': [],
+      'issuer': '',
+      'issuanceDate': '',
+      'proof': {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     }];
     verifiableCredentials[0]['@context'] = [
       'https://www.w3.org/2018/credentials/v1'
@@ -106,11 +106,11 @@ describe('evaluate', () => {
     verifiableCredentials[0]['issuer'] = 'did:example:124';
     subjectIsIssuerEvaluationHandler.verifiablePresentation = {
       '@context': [],
-      type: null,
+      type: '',
       presentationSubmission,
       verifiableCredential: verifiableCredentials,
-      holder: null,
-      proof: null
+      holder: '',
+      proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     };
 
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);

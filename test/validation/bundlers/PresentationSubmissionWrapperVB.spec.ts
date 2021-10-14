@@ -68,14 +68,4 @@ describe('validate', () => {
     const result = new ValidationEngine().validate([{bundler: vb, target: psWrapper}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
-
-  it('should return error for incorrect presentation submission schema', () => {
-    const basicPS: PresentationSubmission = getFile('./test/resources/ps_basic.json');
-    const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionWrapperVB('root');
-    basicPS['new_filed'] = 'make it invalid obj';
-    const psWrapper = {'presentation_submission': basicPS};
-    const result = new ValidationEngine().validate([{bundler: vb, target: psWrapper}]);
-    expect(result).toEqual([new Checked('root.psWrapper[0]', Status.ERROR, 'presentation_submission should be as per json schema.')]);
-  });
-
 });

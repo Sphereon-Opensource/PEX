@@ -58,7 +58,7 @@ describe('evaluate', () => {
 
   it('should return ok if payload value of PredicateRelatedField is boolean', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
+    presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
         "input_descriptor_path": "$.input_descriptors[0]",
@@ -102,7 +102,7 @@ describe('evaluate', () => {
 
   it('should return error if we process the predicate filter for this PD', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
-    presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
+    presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
@@ -137,7 +137,7 @@ describe('evaluate', () => {
 
   it('should return ok if verifiableCredential\'s age value is matching the specification in the input descriptor', function () {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
-    presentationDefinition.input_descriptors[0].constraints.fields[0].predicate = Optionality.Preferred;
+    presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",

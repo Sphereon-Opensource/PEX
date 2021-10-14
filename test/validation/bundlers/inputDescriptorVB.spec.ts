@@ -74,28 +74,6 @@ describe('inputDescriptorsVB tests', () => {
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')],);
   });
 
-  it('should report error for undefined id', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
-    const ve = new ValidationEngine();
-
-    const testableInputDescriptors = getTestableInputDescriptors();
-    delete testableInputDescriptors[0].id;
-
-    const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
-  });
-
-  it('should report error for a null id', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
-    const ve = new ValidationEngine();
-
-    const testableInputDescriptors = getTestableInputDescriptors();
-    delete testableInputDescriptors[0].id;
-
-    const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
-    expect(result).toEqual(toChecked('input descriptor id must be non-empty string'));
-  });
-
   it('should report error for an empty id', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
@@ -142,7 +120,7 @@ describe('inputDescriptorsVB tests', () => {
     const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
-    testableInputDescriptors[1].constraints.fields[0].id = 'uuid2021-05-04 00';
+    testableInputDescriptors![1]!.constraints!.fields![0]!.id = 'uuid2021-05-04 00';
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
     expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
