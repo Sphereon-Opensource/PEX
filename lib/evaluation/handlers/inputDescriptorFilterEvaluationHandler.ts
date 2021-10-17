@@ -55,11 +55,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private hasFields(inputDescriptor: [number, InputDescriptor]): boolean {
-    return (
-      inputDescriptor[1].constraints &&
-      inputDescriptor[1].constraints.fields &&
-      inputDescriptor[1].constraints.fields.length > 0
-    );
+    return !!(inputDescriptor[1].constraints && inputDescriptor[1].constraints.fields && inputDescriptor[1].constraints.fields.length);
   }
 
   private iterateOverFields(
@@ -67,8 +63,15 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     vc: [number, VerifiableCredential],
     path: string
   ): void {
-    for (const field of inputDescriptor[1].constraints.fields) {
-      const inputField = JsonPathUtils.extractInputField(vc[1], field.path);
+    const fields: Field[] =
+      inputDescriptor[1] && inputDescriptor[1].constraints && inputDescriptor[1].constraints.fields
+        ? inputDescriptor[1].constraints.fields
+        : [];
+    for (const field of fields) {
+      let inputField = [];
+      if (field.path) {
+        inputField = JsonPathUtils.extractInputField(vc[1], field.path);
+      }
       if (!inputField.length) {
         const payload = { result: [], valid: false };
         this.createResponse(path, inputDescriptor, vc, payload, 'Input candidate does not contain property');
@@ -109,13 +112,9 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: unknown, field: Field): boolean {
+  private evaluateFilter(result: { path: string[]; value: any }, field: Field): boolean {
     if (field.filter) {
-      const ajv = new Ajv();
-      const valid = ajv.validate(field.filter, result['value']);
-      if (!valid) {
-        return false;
-      }
+      return new Ajv().validate(field.filter, result.value);
     }
     return true;
   }

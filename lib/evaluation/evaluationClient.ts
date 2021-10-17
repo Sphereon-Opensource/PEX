@@ -17,8 +17,15 @@ import { UriEvaluationHandler } from './handlers/uriEvaluationHandler';
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = null;
-    this._did = null;
+    this._verifiablePresentation = {
+      '@context': [],
+      type: '',
+      holder: '',
+      verifiableCredential: [],
+      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
+      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    };
+    this._did = '';
   }
 
   private failed_catched = {
@@ -40,7 +47,7 @@ export class EvaluationClient {
       currentHandler = currentHandler.getNext();
       try {
         currentHandler.handle(pd, vp);
-      } catch (e) {
+      } catch (e: any) {
         this.failed_catched.message += e.message;
         this.failed_catched.stacktrace = e;
         throw this.failed_catched;

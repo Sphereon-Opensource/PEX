@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
+import { VerifiableCredential } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
 
 function getFile(path: string) {
@@ -1215,8 +1216,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate driver license name result', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json').presentation_definition;
-    const vc = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json').presentation_definition as PresentationDefinition;
+    const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as VerifiableCredential;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
     expect(result!.errors!.length).toEqual(0);

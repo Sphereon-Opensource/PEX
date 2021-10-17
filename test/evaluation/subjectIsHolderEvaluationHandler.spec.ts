@@ -2,11 +2,18 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { SubjectIsHolderEvaluationHandler, VerifiablePresentation } from '../../lib';
+import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 
-function getFile(path: string): unknown {
-  return JSON.parse(fs.readFileSync(path, 'utf-8'));
+function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+  const file: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  if (Object.keys(file).includes('presentation_definition')) {
+    return file.presentation_definition as PresentationDefinition;
+  } else if (Object.keys(file).includes('presentation_submission')) {
+    return file as VerifiablePresentation;
+  } else {
+    return file as VerifiableCredential
+  }
 }
 
 const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
@@ -18,15 +25,7 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const results = getFile('./test/resources/isHolderEvaluationResults.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    const inputCandidates: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as VerifiablePresentation;
-    const presentation: VerifiablePresentation = {
-      '@context': inputCandidates['@context'],
-      presentationSubmission: inputCandidates['presentationSubmission'],
-      type: inputCandidates['type'],
-      verifiableCredential: inputCandidates['verifiableCredential'],
-      holder: inputCandidates['holder'],
-      proof: inputCandidates['proof']
-    };
+    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as VerifiablePresentation;
     evaluationClient.verifiablePresentation = presentation;
     evaluationClient.did = HOLDER_DID;
     evaluationHandler.handle(presentationDefinition);

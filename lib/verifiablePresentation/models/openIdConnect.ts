@@ -14,5 +14,5 @@ export interface OpenIdConnect {
     verified_claims: Array<string>;
   };
   holder: string;
-  '_claim_sources': Array<VerifiableCredential>;
+  _claim_sources: Array<VerifiableCredential>;
 }

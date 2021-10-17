@@ -27,6 +27,7 @@ export interface Credential {
   issuanceDate?: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
+  vc?: VerifiableCredential;
   [x: string]: any;
 }
 
@@ -44,7 +45,7 @@ export interface Presentation {
 }
 
 export interface VerifiablePresentation extends Presentation {
-  presentationSubmission: PresentationSubmission;
+  presentation_submission: PresentationSubmission;
   proof: Proof;
 }
 

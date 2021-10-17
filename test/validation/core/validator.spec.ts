@@ -1,4 +1,4 @@
-import { Target, validate } from '../../../lib';
+import { validate } from '../../../lib';
 import { Checked, Status } from '../../../lib/ConstraintUtils';
 
 function toChecked(message: string) {
@@ -8,7 +8,7 @@ function toChecked(message: string) {
 describe('validation utils tests', () => {
   it('validate: for basic validation', () => {
 
-    function personShouldBeNamed(personName: Target): boolean { // Predicate declared separately.
+    function personShouldBeNamed(personName: string): boolean { // Predicate declared separately.
       return personName !== undefined;
     }
 

@@ -1,4 +1,4 @@
-import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
 import { EvaluationClient } from '../evaluationClient';
@@ -16,17 +16,19 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   }
 
   public handle(pd: PresentationDefinition): void {
-    for (let i = 0; i < pd.input_descriptors.length; i++) {
-      if (pd.input_descriptors[i].constraints && pd.input_descriptors[i].constraints.fields) {
-        this.examinePredicateRelatedField(i, pd.input_descriptors[i].constraints);
+    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+      if (inDesc.constraints) {
+        this.examinePredicateRelatedField(index, inDesc.constraints);
       }
-    }
+    });
   }
 
   private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {
-    for (let i = 0; i < constraints.fields.length; i++) {
-      for (let j = 0; j < this.getResults().length; j++) {
-        this.examinePredicateForFilterEvaluationResult(this.getResults(), j, input_descriptor_idx, constraints, i);
+    if (constraints && constraints.fields) {
+      for (let i = 0; i < constraints.fields.length; i++) {
+        for (let j = 0; j < this.getResults().length; j++) {
+          this.examinePredicateForFilterEvaluationResult(this.getResults(), j, input_descriptor_idx, constraints, i);
+        }
       }
     }
   }
@@ -45,8 +47,12 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       results[resultIdx].payload.result.path &&
       results[resultIdx].evaluator === 'FilterEvaluation' &&
       input_descriptor_idx === resultInputDescriptorIdx &&
+      constraints &&
+      constraints.fields &&
+      constraints.fields[fieldIdx] &&
       constraints.fields[fieldIdx].predicate &&
-      constraints.fields[fieldIdx].path.includes(this.concatenatePath(results[resultIdx].payload.result.path))
+      constraints.fields[fieldIdx].path &&
+      constraints.fields[fieldIdx].path!.includes(this.concatenatePath(results[resultIdx].payload.result.path))
     ) {
       const evaluationResult = { ...results[resultIdx].payload.result };
       const resultObject = this.createResultObject(input_descriptor_idx, resultIdx, evaluationResult, results);
@@ -68,7 +74,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     return parseInt(idx);
   }
 
-  private concatenatePath(path) {
+  private concatenatePath(path: string): string {
     let completePath = '';
     for (let i = 0; i < path.length; i++) {
       if (typeof path[i] === 'number') {

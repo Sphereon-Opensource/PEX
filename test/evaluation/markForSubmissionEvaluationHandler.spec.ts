@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiablePresentation } from '../../lib';
+import { VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers/markForSubmissionEvaluationHandler';
@@ -59,8 +59,15 @@ const results_with_error: HandlerCheckResult[] = [
   }
 ];
 
-function getFile(path: string): unknown {
-  return JSON.parse(fs.readFileSync(path, 'utf-8'));
+function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+  const file: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  if (file.hasOwnProperty("presentation_definition")) {
+    return file.presentation_definition as PresentationDefinition;
+  } else if (file.hasOwnProperty('presentation_submission')) {
+    return file as VerifiablePresentation;
+  } else {
+    return file as VerifiableCredential;
+  }
 }
 
 describe('markForSubmissionEvaluationHandler tests', () => {
@@ -69,7 +76,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const inputCandidates: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentation: VerifiablePresentation = {
       '@context': inputCandidates['@context'],
-      presentationSubmission: inputCandidates['presentationSubmission'],
+      presentation_submission: inputCandidates['presentation_submission'],
       type: inputCandidates['type'],
       verifiableCredential: inputCandidates['verifiableCredential'],
       holder: inputCandidates['holder'],
@@ -90,7 +97,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: 'info',
       verifiable_credential_path: '$.verifiableCredential[0]'
     });
-    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.verifiablePresentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [{
@@ -105,7 +112,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const inputCandidates: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentation: VerifiablePresentation = {
       '@context': inputCandidates['@context'],
-      presentationSubmission: inputCandidates['presentationSubmission'],
+      presentation_submission: inputCandidates['presentation_submission'],
       type: inputCandidates['type'],
       verifiableCredential: inputCandidates['verifiableCredential'],
       holder: inputCandidates['holder'],
@@ -126,7 +133,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: 'error',
       verifiable_credential_path: '$.verifiableCredential[0]'
     });
-    expect(evaluationHandler.verifiablePresentation.presentationSubmission).toEqual(
+    expect(evaluationHandler.verifiablePresentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: []

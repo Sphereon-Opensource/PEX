@@ -51,7 +51,7 @@ export class JsonPathUtils {
     obj: VerifiablePresentation | VerifiableCredential | PresentationDefinition,
     paths: string[]
   ): any[] {
-    let result = [];
+    let result: any[] = [];
     if (paths) {
       for (const path of paths) {
         result = jp.nodes(obj, path);

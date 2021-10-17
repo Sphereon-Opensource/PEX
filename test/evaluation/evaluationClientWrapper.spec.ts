@@ -327,7 +327,7 @@ describe('evaluate', () => {
   });
 
   it('should return ok if vc[0] doesn\'t have the etc field', function() {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json') as PresentationDefinition;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -338,7 +338,7 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements all rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json') as PresentationDefinition;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
@@ -359,10 +359,10 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements pick rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json') as PresentationDefinition;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
-    vpSimple!.verifiableCredential![0]!.vc['issuer'] = "did:foo:123";
+    vpSimple!.verifiableCredential![0]!.vc!.issuer = "did:foo:123";
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = HOLDER_DID;
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);

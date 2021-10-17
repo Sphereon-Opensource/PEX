@@ -1,7 +1,7 @@
 import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -17,21 +17,19 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   public handle(d: PresentationDefinition, p: VerifiablePresentation): void {
-    for (let i = 0; i < d.input_descriptors.length; i++) {
-      const inputDescriptor: InputDescriptor = d.input_descriptors[i];
-      const uris: string[] = inputDescriptor.schema.map((so) => so.uri);
-      for (let j = 0; j < p.verifiableCredential.length; j++) {
-        const vc = p.verifiableCredential[j];
+    d.input_descriptors.forEach((inDesc: InputDescriptor, i: number) => {
+      const uris: string[] = inDesc.schema.map((so) => so.uri);
+      p.verifiableCredential.forEach((vc: VerifiableCredential, j: number) => {
         this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
-      }
-    }
+      });
+    });
   }
 
-  private static getPresentationURI(vc): string[] {
+  private static getPresentationURI(vc: VerifiableCredential): string[] {
     const schemaUris: string[] = [];
     if (vc && vc['@context']) {
       schemaUris.push(...this.fetchContextUris(vc));
-    } else if (vc && vc.vc['@context']) {
+    } else if (vc && vc.vc && vc.vc['@context']) {
       schemaUris.push(...this.fetchContextUris(vc.vc));
     }
     return schemaUris;
@@ -93,21 +91,17 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
       evaluator: this.getName(),
-      status: undefined,
+      status: Status.INFO,
       message: undefined,
     };
   }
 
-  private static fetchContextUris(vc) {
+  private static fetchContextUris(vc: VerifiableCredential): string[] {
     const schemaUris: string[] = [];
-    if (vc && vc['@context']) {
-      if (vc['@context'].length && typeof vc['@context'] != 'string') {
-        for (let i = 0; i < vc['@context'].length; i++) {
-          schemaUris.push(vc['@context'][i]);
-        }
-      } else {
-        schemaUris.push(vc['@context']);
-      }
+    if (Array.isArray(vc['@context'])) {
+      schemaUris.push(...vc['@context']);
+    } else if (typeof vc['@context'] === 'string') {
+      schemaUris.push(vc['@context']);
     }
     return schemaUris;
   }

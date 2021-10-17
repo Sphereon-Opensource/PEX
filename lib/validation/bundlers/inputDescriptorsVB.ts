@@ -17,8 +17,8 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     super(parentTag, 'input_descriptor');
   }
 
-  public getValidations(inputDescriptors: InputDescriptor[]): Validation[] {
-    let validations: Validation[] = [];
+  public getValidations(inputDescriptors: InputDescriptor[]): Validation<any>[] {
+    let validations: Validation<unknown>[] = [];
 
     inputDescriptors.forEach((inputDescriptor, inDescInd) => {
       validations = [...validations, ...this.getValidationFor(inputDescriptor, inDescInd)];
@@ -33,7 +33,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return validations;
   }
 
-  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation[] {
+  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<any>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
@@ -78,7 +78,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return name == null || name.length > 0;
   }
 
-  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation {
+  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<any> {
     const nonUniqueInputDescriptorIds: string[] = [];
     const uniqueInputDescriptorIds: Set<string> = new Set<string>();
 
@@ -100,12 +100,12 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation {
+  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation<any> {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
 
     for (const inDesc of inputDescriptors) {
-      if (inDesc.constraints != null) {
+      if (inDesc.constraints && inDesc.constraints.fields) {
         for (const field of inDesc.constraints.fields) {
           if (field.id != null) {
             const oldSize = uniqueInputDescriptorFieldsIds.size;
@@ -139,7 +139,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     };
   }
 
-  isAValidURI(uri) {
+  isAValidURI(uri: string) {
     try {
       new URL(uri);
     } catch (err) {
@@ -149,7 +149,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return true;
   }
 
-  private static isValidDIDURI(uri) {
+  private static isValidDIDURI(uri: string) {
     const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
     const format =
       '^' +
@@ -171,8 +171,8 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return new RegExp(format).test(uri);
   }
 
-  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation[] {
-    if (inputDescriptor !== null) {
+  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation<any>[] {
+    if (inputDescriptor !== null && inputDescriptor.constraints) {
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }
     return [];

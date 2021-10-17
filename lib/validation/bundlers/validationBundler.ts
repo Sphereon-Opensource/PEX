@@ -10,7 +10,7 @@ export abstract class ValidationBundler<T> {
     this.myTag = myTag;
   }
 
-  public abstract getValidations(t: T | T[]): Validation[];
+  public abstract getValidations(t: T | T[]): Validation<unknown>[];
 
   protected getTag() {
     return this.parentTag != null ? this.parentTag + '.' + this.myTag : this.myTag;

@@ -7,7 +7,7 @@ import { HandlerCheckResult } from '../handlerCheckResult';
 import { EvaluationHandler } from './evaluationHandler';
 
 export abstract class AbstractEvaluationHandler implements EvaluationHandler {
-  private nextHandler: EvaluationHandler;
+  private nextHandler!: EvaluationHandler;
 
   constructor(private _client: EvaluationClient) {}
 

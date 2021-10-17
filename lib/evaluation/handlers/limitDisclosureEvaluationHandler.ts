@@ -1,4 +1,5 @@
-import { Constraints, Descriptor, Field, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Descriptor, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
@@ -19,12 +20,16 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
-    for (let i = 0; i < pd.input_descriptors.length; i++) {
-      const constraints: Constraints = pd.input_descriptors[i].constraints;
-      if (constraints && constraints.limit_disclosure && constraints.limit_disclosure === Optionality.Required) {
-        this.limitDisclosureShouldBeEnforced(p, constraints.fields, i, pd.input_descriptors[i].id);
+    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+      if (
+        inDesc.constraints &&
+        inDesc.constraints.limit_disclosure &&
+        inDesc.constraints.fields &&
+        inDesc.constraints.limit_disclosure === Optionality.Required
+      ) {
+        this.limitDisclosureShouldBeEnforced(p, inDesc.constraints.fields, index, inDesc.id);
       }
-    }
+    });
   }
 
   private limitDisclosureShouldBeEnforced(
@@ -45,8 +50,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         i
       );
       if (
-        this.verifiablePresentation.presentationSubmission &&
-        this.verifiablePresentation.presentationSubmission.descriptor_map
+        this.verifiablePresentation.presentation_submission &&
+        this.verifiablePresentation.presentation_submission.descriptor_map
       ) {
         this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
       }
@@ -76,14 +81,16 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     fields: Field[],
     idIdx: number,
     vcIdx: number
-  ) {
+  ): void {
     for (let i = 0; i < fields.length; i++) {
       const field: Field = fields[i];
-      const inputField = JsonPathUtils.extractInputField(vc, field.path);
-      if (inputField.length > 0) {
-        this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend);
-      } else {
-        this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+      if (field && field.path) {
+        const inputField = JsonPathUtils.extractInputField(vc, field.path);
+        if (inputField.length > 0) {
+          this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend);
+        } else {
+          this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+        }
       }
     }
   }
@@ -92,22 +99,17 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     pathDetails: (string | number)[],
     verifiableCredential: VerifiableCredential,
     verifiableCredentialToSend: VerifiableCredential
-  ) {
-    let objectCursor: unknown = verifiableCredential;
-    let currentCursorInToSendObj: unknown = verifiableCredentialToSend;
+  ): void {
+    let objectCursor: any = verifiableCredential;
+    let currentCursorInToSendObj: any = verifiableCredentialToSend;
     for (let i = 1; i < pathDetails.length; i++) {
       objectCursor = objectCursor[pathDetails[i]];
       if (pathDetails.length == i + 1) {
         currentCursorInToSendObj[pathDetails[i]] = objectCursor;
-      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] === 'string') {
-        currentCursorInToSendObj[pathDetails[i]] = {};
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
       } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] !== 'string') {
-        currentCursorInToSendObj[pathDetails[i]] = [{}];
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+        currentCursorInToSendObj = [{}];
       } else {
-        currentCursorInToSendObj[pathDetails[i]] = {};
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+        currentCursorInToSendObj = {};
       }
     }
   }
@@ -117,8 +119,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorId: string
   ) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.presentationSubmission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = verifiablePresentation.presentationSubmission.descriptor_map[i];
+    for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
+      const currentDescriptor: Descriptor = verifiablePresentation.presentation_submission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
         this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
       }
@@ -153,17 +155,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    * @param path example: "$.verifiableCredential[0]"
    * @param idIdx
    */
-  private updateVcForPath(verifiableCredentialToSend: VerifiableCredential, path: string, idIdx: number) {
+  private updateVcForPath(verifiableCredentialToSend: VerifiableCredential, path: string, idIdx: number): void {
     this.createSuccessResult(idIdx, path);
-    let innerObj = this.verifiablePresentation;
-    const inputField = JsonPathUtils.extractInputField(innerObj, [path]);
-    const pathDetails: string[] = inputField[0].path;
-    for (let i = 1; i < pathDetails.length; i++) {
-      if (i === pathDetails.length - 1) {
-        innerObj[pathDetails[i]] = verifiableCredentialToSend;
-      } else {
-        innerObj = innerObj[pathDetails[i]];
-      }
-    }
+    jp.apply(this.verifiablePresentation, path, (value: VerifiableCredential) => {
+      value = verifiableCredentialToSend;
+      return value;
+    });
   }
 }

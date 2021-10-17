@@ -32,7 +32,7 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     super(parentTag, 'constraints');
   }
 
-  public getValidations(constraints: Constraints): Validation[] {
+  public getValidations(constraints: Constraints): Validation<any>[] {
     return [
       {
         tag: this.getTag(),
@@ -58,9 +58,9 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
         predicate: ConstraintsVB.shouldBeKnownOption,
         message: this.subjectIsIssuerShouldBeKnownValueMsg,
       },
-      ...this.getIsHolderValidations(constraints?.is_holder),
-      ...this.getSameSubjectValidations(constraints?.same_subject),
-      ...new FieldsVB(this.getTag()).getValidations(constraints?.fields),
+      ...this.getIsHolderValidations(constraints),
+      ...this.getSameSubjectValidations(constraints),
+      ...this.getFieldsValidations(constraints),
       ...this.fieldIdInSubjectMustCorrespondToFieldId(
         constraints,
         constraints?.is_holder,
@@ -72,6 +72,13 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
         this.sameSubjectFieldIdMustCorrespondToFieldIdMsg
       ),
     ];
+  }
+
+  private getFieldsValidations(constraints: Constraints): Validation<any>[] {
+    if (constraints && constraints.fields) {
+      return new FieldsVB(this.getTag()).getValidations(constraints.fields);
+    }
+    return [];
   }
 
   private static disclosureLimitShouldHaveKnownValue(limit_disclosure: Optionality): boolean {
@@ -93,9 +100,9 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
       this.pdStatusShouldBeKnown(statuses?.suspended);
   }
 
-  private static pdStatusShouldBeKnown(pdStatus: PdStatus): boolean {
+  private static pdStatusShouldBeKnown(pdStatus: PdStatus | undefined): boolean {
     return (
-      pdStatus == null ||
+      !pdStatus ||
       pdStatus.directive === Directives.Allowed ||
       pdStatus.directive === Directives.Disallowed ||
       pdStatus.directive === Directives.Required
@@ -111,82 +118,90 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     );
   }
 
-  getIsHolderValidations(subjects: Array<HolderSubject>): Validation[] {
-    let validations: Validation[] = [];
-    for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
-      validations = [
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd],
-          predicate: ConstraintsVB.fieldIdIsMandatory,
-          message: this.fieldIdIsMandatoryMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.field_id,
-          predicate: ConstraintsVB.fieldIdMustBeArray,
-          message: this.fieldIdMustBeArrayOfStringsMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.field_id,
-          predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
-          message: this.fieldIdMustBeArrayOfStringsMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.directive,
-          predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
-          message: this.subjectMustContainDirectivePropertyMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.directive,
-          predicate: ConstraintsVB.shouldBeKnownOption,
-          message: this.directiveMustHaveOneOfTheKnownPropertiesMsg,
-        },
-      ];
+  getIsHolderValidations(constraints: Constraints): Validation<any>[] {
+    if (constraints && constraints.is_holder) {
+      let validations: Validation<any>[] = [];
+      const subjects = constraints.is_holder;
+      for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
+        validations = [
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd],
+            predicate: ConstraintsVB.fieldIdIsMandatory,
+            message: this.fieldIdIsMandatoryMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.field_id,
+            predicate: ConstraintsVB.fieldIdMustBeArray,
+            message: this.fieldIdMustBeArrayOfStringsMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.field_id,
+            predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
+            message: this.fieldIdMustBeArrayOfStringsMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.directive,
+            predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
+            message: this.subjectMustContainDirectivePropertyMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.directive,
+            predicate: ConstraintsVB.shouldBeKnownOption,
+            message: this.directiveMustHaveOneOfTheKnownPropertiesMsg,
+          },
+        ];
+      }
+      return validations;
     }
-    return validations;
+    return [];
   }
 
-  getSameSubjectValidations(subjects: Array<HolderSubject>): Validation[] {
-    let validations: Validation[] = [];
-    for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
-      validations = [
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd],
-          predicate: ConstraintsVB.fieldIdIsMandatory,
-          message: this.sameSubjectFieldIdIsMandatoryMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.field_id,
-          predicate: ConstraintsVB.fieldIdMustBeArray,
-          message: this.fieldIdMustBeArrayOfStringsMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.field_id,
-          predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
-          message: this.sameSubjectFieldIdMustBeArrayOfStringsMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.directive,
-          predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
-          message: this.sameSubjectFieldMustContainDirectivePropertyMsg,
-        },
-        {
-          tag: this.getMyTag(subjectInd),
-          target: subjects[subjectInd]?.directive,
-          predicate: ConstraintsVB.shouldBeKnownOption,
-          message: this.sameSubjectDirectiveMustHaveOneOfTheKnownPropertiesMsg,
-        },
-      ];
+  getSameSubjectValidations(constraints: Constraints): Validation<any>[] {
+    if (constraints && constraints.same_subject) {
+      let validations: Validation<any>[] = [];
+      const subjects = constraints.same_subject;
+      for (let subjectInd = 0; subjectInd < subjects?.length; subjectInd++) {
+        validations = [
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd],
+            predicate: ConstraintsVB.fieldIdIsMandatory,
+            message: this.sameSubjectFieldIdIsMandatoryMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.field_id,
+            predicate: ConstraintsVB.fieldIdMustBeArray,
+            message: this.fieldIdMustBeArrayOfStringsMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.field_id,
+            predicate: ConstraintsVB.fieldIdMustBeArrayOfStrings,
+            message: this.sameSubjectFieldIdMustBeArrayOfStringsMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.directive,
+            predicate: ConstraintsVB.subjectMustContainDirectiveProperty,
+            message: this.sameSubjectFieldMustContainDirectivePropertyMsg,
+          },
+          {
+            tag: this.getMyTag(subjectInd),
+            target: subjects[subjectInd]?.directive,
+            predicate: ConstraintsVB.shouldBeKnownOption,
+            message: this.sameSubjectDirectiveMustHaveOneOfTheKnownPropertiesMsg,
+          },
+        ];
+      }
+      return validations;
     }
-    return validations;
+    return [];
   }
 
   protected getMyTag(srInd: number) {
@@ -218,12 +233,11 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
 
   fieldIdInSubjectMustCorrespondToFieldId(
     constraints: Constraints,
-    subjects: Array<HolderSubject>,
+    subjects: Array<HolderSubject> | undefined,
     message: string
-  ): Validation[] {
+  ): Validation<any>[] {
     const missingFieldIds: string[] = [];
-
-    if (subjects != null) {
+    if (subjects) {
       for (const subject of subjects) {
         if (subject?.field_id != null) {
           for (const fieldId of subject?.field_id) {
@@ -248,6 +262,9 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
   }
 
   private static isValidFieldId(constraints: Constraints, fieldId: string): boolean {
-    return fieldId == null || fieldId.length === 0 || constraints.fields?.map((field) => field.id).includes(fieldId);
+    if (constraints && constraints.fields) {
+      return fieldId == null || fieldId.length === 0 || constraints.fields?.map((field) => field.id).includes(fieldId);
+    }
+    return false;
   }
 }

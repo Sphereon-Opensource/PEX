@@ -12,7 +12,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     super(parentTag, 'psWrapper');
   }
 
-  public getValidations(psWrapper: unknown): Validation[] {
+  public getValidations(psWrapper: unknown): Validation<unknown>[] {
     return [
       {
         tag: this.getTag(),
@@ -31,14 +31,14 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     ];
   }
 
-  private getSchemaValidations(psWrapper: unknown) {
-    const schemaValidations = [];
+  private getSchemaValidations(psWrapper: unknown): Validation<any>[] {
+    const schemaValidations: Validation<any>[] = [];
     this.getPS(psWrapper).forEach((ps, index) => schemaValidations.push(this.getSchemaValidation(index, ps)));
 
     return schemaValidations;
   }
 
-  private getSchemaValidation(index: number, ps) {
+  private getSchemaValidation(index: number, ps: any) {
     return {
       tag: this.getMyTag(index),
       target: { presentation_submission: ps },
@@ -52,7 +52,7 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private static shouldConformToSchema(): ValidationPredicate<unknown> {
+  private static shouldConformToSchema(): ValidationPredicate<any> {
     // TODO can be be extracted as a generic function
     return (presentationSubmission: PresentationSubmission): boolean => {
       let isValid = true;
@@ -71,43 +71,40 @@ export class PresentationSubmissionWrapperVB extends ValidationBundler<unknown> 
     };
   }
 
-  private getPSValidations(psWrapper) {
-    const validations = [];
+  private getPSValidations(psWrapper: any): Validation<any>[] {
+    const validations: Validation<any>[] = [];
     this.getPS(psWrapper).forEach((ps) =>
       validations.push(...new PresentationSubmissionVB(this.getTag()).getValidations(ps))
     );
     return validations;
   }
 
-  private getPS(psWrapper) {
-    const targets = [];
-    if (psWrapper != null) {
-      if (psWrapper.presentation_submission != null) {
+  private getPS(psWrapper: any): PresentationSubmission[] {
+    const targets: PresentationSubmission[] = [];
+    if (psWrapper) {
+      if (psWrapper.presentation_submission) {
         targets.push(psWrapper.presentation_submission);
       }
 
-      if (psWrapper['presentations~attach'] != null) {
+      if (psWrapper['presentations~attach']) {
         targets.push(...this.getFromDidComLocation(psWrapper));
       }
 
-      if (psWrapper.data != null) {
+      if (psWrapper.data) {
         targets.push(PresentationSubmissionWrapperVB.getFromChapiLocation(psWrapper));
       }
     }
     return targets;
   }
 
-  private static getFromChapiLocation(psWrapper) {
-    if (psWrapper.data?.presentation_submission != null) {
-      return psWrapper?.data?.presentation_submission;
-    }
-    return null;
+  private static getFromChapiLocation(psWrapper: any): PresentationSubmission {
+    return psWrapper?.data?.presentation_submission;
   }
 
-  private getFromDidComLocation(psWrapper) {
-    const targets = [];
-    psWrapper['presentations~attach'].forEach((attachment) => {
-      if (attachment.data?.json?.presentation_submission != null) {
+  private getFromDidComLocation(psWrapper: any): PresentationSubmission[] {
+    const targets: PresentationSubmission[] = [];
+    psWrapper['presentations~attach'].forEach((attachment: any) => {
+      if (attachment.data?.json?.presentation_submission) {
         targets.push(attachment.data?.json?.presentation_submission);
       }
     });

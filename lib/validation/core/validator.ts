@@ -1,52 +1,26 @@
-import {
-  Constraints,
-  Descriptor,
-  Field,
-  Format,
-  HolderSubject,
-  InputDescriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Schema,
-  Statuses,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
-
 import { Checked, hasErrors, Status } from '../../ConstraintUtils';
 
 import { Validated } from './validated';
 
-export type Target =
-  | Field
-  | Constraints
-  | InputDescriptor
-  | PresentationDefinition
-  | PresentationSubmission
-  | SubmissionRequirement
-  | Descriptor[]
-  | Format
-  | Schema[]
-  | HolderSubject
-  | Statuses
-  | string
-  | string[];
+export type ValidationPredicate<T> = (t: T) => boolean;
 
-export type ValidationPredicate<Target> = (t: Target) => boolean;
-
-export class Validation {
+export interface Validation<T> {
   tag: string;
-  target: Target;
-  predicate: ValidationPredicate<Target>;
+  target: T;
+  predicate: ValidationPredicate<T>;
   message: string;
   status?: Status;
 }
 
-export type ValidateAll = (validations: Validation[]) => Validated;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Validatable {}
 
-export const validate: ValidateAll = (validations: Validation[]): Validated => {
+export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
+
+export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validated => {
   const validateResults: Checked[] = validations.map((validation) => mapper(validation));
 
-  function toChecked(validation: Validation) {
+  function toChecked(validation: Validation<T>) {
     return new Checked(validation.tag, Status.ERROR, validation.message);
   }
 
@@ -54,7 +28,7 @@ export const validate: ValidateAll = (validations: Validation[]): Validated => {
     return new Checked(tag, Status.INFO, 'ok');
   }
 
-  function mapper(validation: Validation): Checked {
+  function mapper(validation: Validation<T>): Checked {
     let result;
 
     try {

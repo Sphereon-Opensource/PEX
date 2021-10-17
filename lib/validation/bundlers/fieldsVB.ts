@@ -26,10 +26,9 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation[] {
-    let validations: Validation[] = [];
-
-    if (fields != null) {
+  public getValidations(fields: Field[]): Validation<any>[] {
+    let validations: Validation<any>[] = [];
+    if (fields) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [...validations, ...this.getValidationsFor(fields[srInd], srInd)];
       }
@@ -37,7 +36,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation[] {
+  public getValidationsFor(field: Field, indx: number): Validation<any>[] {
     return [
       {
         tag: this.getMyTag(indx),

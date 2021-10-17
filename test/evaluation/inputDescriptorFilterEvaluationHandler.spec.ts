@@ -7,7 +7,7 @@ import {
   EvaluationHandler,
   HandlerCheckResult,
   InputDescriptorFilterEvaluationHandler,
-  Status, VerifiablePresentation
+  Status, VerifiableCredential, VerifiablePresentation
 } from '../../lib';
 
 const message: HandlerCheckResult = {
@@ -19,8 +19,15 @@ const message: HandlerCheckResult = {
   message: 'Input candidate valid for presentation submission'
 };
 
-function getFile(path: string): unknown {
-  return JSON.parse(fs.readFileSync(path, 'utf-8'));
+function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+  const file: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  if (file.hasOwnProperty("presentation_definition")) {
+    return file.presentation_definition as PresentationDefinition;
+  } else if (file.hasOwnProperty('presentation_submission')) {
+    return file as VerifiablePresentation;
+  } else {
+    return file as VerifiableCredential;
+  }
 }
 
 describe('inputDescriptorFilterEvaluationHandler tests', () => {

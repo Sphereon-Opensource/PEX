@@ -52,7 +52,7 @@ describe('evaluate', () => {
     subjectIsIssuerEvaluationHandler.verifiablePresentation =  {
       '@context': [],
       type: '',
-      presentationSubmission,
+      presentation_submission: presentationSubmission,
       verifiableCredential,
       holder: '',
       proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
@@ -107,7 +107,7 @@ describe('evaluate', () => {
     subjectIsIssuerEvaluationHandler.verifiablePresentation = {
       '@context': [],
       type: '',
-      presentationSubmission,
+      presentation_submission: presentationSubmission,
       verifiableCredential: verifiableCredentials,
       holder: '',
       proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}

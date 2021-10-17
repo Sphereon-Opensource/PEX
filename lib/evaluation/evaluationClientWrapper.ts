@@ -33,20 +33,21 @@ export class EvaluationClientWrapper {
   ): SelectResults {
     let selectResults: SelectResults;
     this._client.evaluate(presentationDefinition, {
-      '@context': null,
-      type: null,
-      presentationSubmission: null,
+      '@context': [],
+      type: '',
+      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
       verifiableCredential: selectableCredentials,
       holder: did,
-      proof: null,
+      proof: { verificationMethod: '', proofPurpose: '', jws: '', type: '', created: '' },
     });
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
     if (presentationDefinition.submission_requirements) {
-      const marked: HandlerCheckResult[] = this._client.results.filter(
+      const info: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
+      const marked = Array.from(new Set(info));
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
         presentationDefinition.submission_requirements,
         marked
@@ -72,19 +73,37 @@ export class EvaluationClientWrapper {
         warnings,
       };
     }
-
     return selectResults;
   }
 
-  private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]) {
-    const matches = matchSubmissionRequirements.map((e) => e.matches);
-    const matchesFlattened = [].concat(...matches);
+  private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]): number[] {
+    const indexes: number[] = [];
+    const matchesFlattened: string[] = [];
+    matchSubmissionRequirements.forEach((s) => matchesFlattened.push(...s.matches));
+    indexes.push(...this.parseIndexes(matchesFlattened));
     if (!matchesFlattened || !matchesFlattened.length) {
-      const sr = matchSubmissionRequirements.map((e: SubmissionRequirementMatch) => e.from_nested);
-      const srFlattened = [].concat(...sr);
-      return this.extractVCIndexes(srFlattened);
+      const srFlattened: SubmissionRequirementMatch[] = [];
+      matchSubmissionRequirements.forEach((e) => {
+        if (e.from_nested) {
+          srFlattened.push(...e.from_nested);
+        }
+      });
+      if (srFlattened && srFlattened.length) {
+        indexes.push(...this.extractVCIndexes(srFlattened));
+      }
     }
-    return Array.from(new Set(matchesFlattened.map((s) => parseInt(s.match(/\d+/)[0]))));
+    return indexes;
+  }
+
+  private parseIndexes(matchesFlattened: string[]): number[] {
+    const withoutDoubles: Set<number> = new Set<number>();
+    matchesFlattened.forEach((s: string) => {
+      const m = s.match(/\d+/);
+      if (m) {
+        withoutDoubles.add(parseInt(m[0]));
+      }
+    });
+    return Array.from(withoutDoubles);
   }
 
   private matchSubmissionRequirements(
@@ -95,13 +114,18 @@ export class EvaluationClientWrapper {
     for (const sr of submissionRequirements) {
       if (sr.from) {
         if (sr.rule === Rules.All || sr.rule === Rules.Pick) {
-          submissionRequirementMatches.push(this.mapMatchingDescriptors(sr, marked));
+          const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
+          if (matchingDescriptors) {
+            submissionRequirementMatches.push(matchingDescriptors);
+          }
         }
       } else if (sr.from_nested) {
         const srm = this.createSubmissionRequirementMatch(sr);
-        srm.count++;
-        srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
-        submissionRequirementMatches.push(srm);
+        if (srm && srm.from_nested) {
+          srm.count++;
+          srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
+          submissionRequirementMatches.push(srm);
+        }
       }
     }
     return submissionRequirementMatches;
@@ -121,8 +145,8 @@ export class EvaluationClientWrapper {
           Rules.All,
           1,
           sameIdVCs,
-          null,
-          null
+          [],
+          []
         );
         submissionRequirementMatches.push(submissionRequirementMatch);
       }
@@ -130,30 +154,35 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private mapMatchingDescriptors(sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+  private mapMatchingDescriptors(
+    sr: SubmissionRequirement,
+    marked: HandlerCheckResult[]
+  ): SubmissionRequirementMatch | null {
     const srm = this.createSubmissionRequirementMatch(sr);
-    if (!srm.from.includes(sr.from)) {
-      srm.from.push(...sr.from);
-    }
-    for (const m of marked) {
-      if (m.payload.group.includes(sr.from)) {
-        srm.count++;
-        if (srm.matches.indexOf(m.verifiable_credential_path) === -1) {
-          srm.matches.push(m.verifiable_credential_path);
+    if (srm && srm.from && sr.from) {
+      if (!srm.from.includes(sr.from)) {
+        srm.from.push(sr.from);
+      }
+      for (const m of marked) {
+        if (m.payload.group.includes(sr.from)) {
+          srm.count++;
+          if (srm.matches.indexOf(m.verifiable_credential_path) === -1) {
+            srm.matches.push(m.verifiable_credential_path);
+          }
         }
       }
     }
     return srm;
   }
 
-  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch {
+  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch | null {
     if (sr.from) {
       return {
         rule: sr.rule,
         count: 0,
         matches: [],
         from: [],
-        name: sr.name,
+        name: sr?.name,
       };
     } else if (sr.from_nested) {
       return {
@@ -161,7 +190,7 @@ export class EvaluationClientWrapper {
         count: 0,
         matches: [],
         from_nested: [],
-        name: sr.name,
+        name: sr?.name,
       };
     }
     return null;
@@ -172,8 +201,8 @@ export class EvaluationClientWrapper {
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
-    if (this._client.verifiablePresentation.presentationSubmission.descriptor_map.length) {
-      result.value = this._client.verifiablePresentation.presentationSubmission;
+    if (this._client.verifiablePresentation.presentation_submission.descriptor_map.length) {
+      result.value = this._client.verifiablePresentation.presentation_submission;
     }
     return result;
   }
@@ -204,14 +233,20 @@ export class EvaluationClientWrapper {
       );
       //TODO match the submitted vcs with the input_descriptors;
       matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
-      const inDescIndexes = matched[1].map((e) => e.input_descriptor_path.match(/\d+/)[0]);
-      const desc: InputDescriptor[] = inDescIndexes.map((i) => pd.input_descriptors[i]);
-      const matchedDescriptors = this._client.verifiablePresentation.presentationSubmission.descriptor_map.filter(
+      const inDescIndexes: number[] = [];
+      matched[1].forEach((e: HandlerCheckResult) => {
+        const index: RegExpMatchArray | null = e.input_descriptor_path.match(/\d+/);
+        if (index) {
+          inDescIndexes.push(parseInt(index[0]));
+        }
+      });
+      const desc: InputDescriptor[] = inDescIndexes.map((i: number) => pd.input_descriptors[i]);
+      const matchedDescriptors = this._client.verifiablePresentation.presentation_submission.descriptor_map.filter(
         (value) => desc.map((e) => e.id).includes(value.id)
       );
-      this._client.verifiablePresentation.presentationSubmission.descriptor_map = matchedDescriptors;
+      this._client.verifiablePresentation.presentation_submission.descriptor_map = matchedDescriptors;
     }
-    return this._client.verifiablePresentation.presentationSubmission;
+    return this._client.verifiablePresentation.presentation_submission;
   }
 
   private evaluateRequirements(
@@ -290,7 +325,10 @@ export class EvaluationClientWrapper {
     for (let i = 0; i < marked.length; i++) {
       const currentIdPath: string = marked[i].input_descriptor_path;
       if (partitionedBasedOnID.has(currentIdPath)) {
-        partitionedBasedOnID.get(currentIdPath).push(marked[i]);
+        const partBasedOnID = partitionedBasedOnID.get(currentIdPath);
+        if (partBasedOnID) {
+          partBasedOnID.push(marked[i]);
+        }
       } else {
         partitionedBasedOnID.set(currentIdPath, [marked[i]]);
       }

@@ -18,15 +18,19 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
   }
 
-  public getValidations(pd: PresentationDefinition): Validation[] {
-    return [
-      ...this.myValidations(pd),
-      ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors),
-      ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
-    ];
+  public getValidations(pd: PresentationDefinition): Validation<any>[] {
+    if (pd.submission_requirements) {
+      return [
+        ...this.myValidations(pd),
+        ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors),
+        ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
+      ];
+    } else {
+      return [...this.myValidations(pd), ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors)];
+    }
   }
 
-  private myValidations(pd: PresentationDefinition): Validation[] {
+  private myValidations(pd: PresentationDefinition): Validation<any>[] {
     return [
       // E Section 4.B   : The Input Descriptors (#term:input-descriptors) required for submission are described by the submission_requirements. If no submission_requirements value is present, all inputs listed in the input_descriptors array are required for submission.
       {
@@ -121,16 +125,14 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     if (format != null) {
       const jwtAlgos: string[] = JwtAlgos.getJwtAlgos();
       const ldpTypes: string[] = LdpTypes.getLdpTypes();
-
-      unknownProofsAndAlgorithms = [
-        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt, jwtAlgos),
-        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt_vc, jwtAlgos),
-        ...PresentationDefinitionVB.isJWTAlgoKnown(format.jwt_vp, jwtAlgos),
-
-        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp, ldpTypes),
-        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp_vc, ldpTypes),
-        ...PresentationDefinitionVB.isLDPProofKnown(format.ldp_vp, ldpTypes),
-      ];
+      unknownProofsAndAlgorithms = [];
+      for (const [key, value] of Object.entries(format)) {
+        if (key.startsWith('jwt')) {
+          unknownProofsAndAlgorithms.push(...PresentationDefinitionVB.isJWTAlgoKnown(value, jwtAlgos));
+        } else {
+          unknownProofsAndAlgorithms.push(...PresentationDefinitionVB.isLDPProofKnown(value, ldpTypes));
+        }
+      }
     }
     return unknownProofsAndAlgorithms.length === 0;
   }
@@ -164,13 +166,13 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       const groups = pd.input_descriptors
         .map((inDesc) => inDesc?.group)
         .filter((groups, index) => groups != null && groups[index] != null)
-        .map((groups, index) => groups[index]);
+        .map((groups, index) => groups![index]);
       const groupStrings: Set<string> = new Set<string>(groups);
 
       const fromValues = PresentationDefinitionVB.flatten(pd.submission_requirements)
-        .map((srs) => srs?.from)
-        .filter((fromValues, index) => fromValues != null && fromValues[index] != null)
-        .map((fromValues, index) => fromValues[index]);
+        .map((srs: SubmissionRequirement) => srs?.from)
+        .filter((fromValues: string | undefined, index: number) => fromValues != null && fromValues![index] != null)
+        .map((fromValues: string | undefined, index: number) => fromValues![index]);
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 
@@ -184,19 +186,19 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return true;
   }
 
-  private static flatten(srs: SubmissionRequirement[]) {
+  private static flatten(srs: SubmissionRequirement[]): SubmissionRequirement[] {
     return srs?.reduce(
-      (accumulator, submissionRequirement) =>
+      (accumulator: SubmissionRequirement[], submissionRequirement: SubmissionRequirement) =>
         accumulator.concat(
           Array.isArray(submissionRequirement.from_nested)
-            ? this.flatten(submissionRequirement.from_nested as SubmissionRequirement[])
+            ? this.flatten(submissionRequirement.from_nested)
             : submissionRequirement
         ),
       []
     );
   }
 
-  private shouldBeAsPerJsonSchema(): ValidationPredicate<unknown> {
+  private shouldBeAsPerJsonSchema(): ValidationPredicate<any> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
