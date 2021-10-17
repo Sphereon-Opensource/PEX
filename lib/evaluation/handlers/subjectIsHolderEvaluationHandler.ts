@@ -237,11 +237,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.getResults().push(this.getResult(fieldIdSet, credentialSubjectsSet, myStatus));
   }
 
-  private getResult(
-    fieldIdSet: Set<string>,
-    credentialSubjectsSet: Set<any>,
-    myStatus: Status
-  ): HandlerCheckResult {
+  private getResult(fieldIdSet: Set<string>, credentialSubjectsSet: Set<any>, myStatus: Status): HandlerCheckResult {
     const paths: Array<string> = Array.from(credentialSubjectsSet).map((el) => jp.stringify(el['path'].slice(0, 3)));
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
     const verifiableCredentialPath = '[' + paths.join(',') + ']';

@@ -55,7 +55,11 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private hasFields(inputDescriptor: [number, InputDescriptor]): boolean {
-    return !!(inputDescriptor[1].constraints && inputDescriptor[1].constraints.fields && inputDescriptor[1].constraints.fields.length);
+    return !!(
+      inputDescriptor[1].constraints &&
+      inputDescriptor[1].constraints.fields &&
+      inputDescriptor[1].constraints.fields.length
+    );
   }
 
   private iterateOverFields(

@@ -61,9 +61,9 @@ const results_with_error: HandlerCheckResult[] = [
 
 function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
   const file: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
-  if (file.hasOwnProperty("presentation_definition")) {
+  if (Object.keys(file).includes("presentation_definition")) {
     return file.presentation_definition as PresentationDefinition;
-  } else if (file.hasOwnProperty('presentation_submission')) {
+  } else if (Object.keys(file).includes('presentation_submission')) {
     return file as VerifiablePresentation;
   } else {
     return file as VerifiableCredential;

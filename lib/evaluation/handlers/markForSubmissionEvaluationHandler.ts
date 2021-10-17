@@ -37,10 +37,19 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       },
     };
     const results: HandlerCheckResult[] = [...this.getResults()];
-    const errors: HandlerCheckResult[] = this.removeDuplicate(results.filter((result: HandlerCheckResult) => result.status === Status.ERROR));
+    const errors: HandlerCheckResult[] = this.removeDuplicate(
+      results.filter((result: HandlerCheckResult) => result.status === Status.ERROR)
+    );
     const info: HandlerCheckResult[] = this.removeDuplicate(
-      results.filter((result: HandlerCheckResult) => result.status === Status.INFO &&
-        !errors.find(e => e.input_descriptor_path === result.input_descriptor_path && e.verifiable_credential_path === result.verifiable_credential_path))
+      results.filter(
+        (result: HandlerCheckResult) =>
+          result.status === Status.INFO &&
+          !errors.find(
+            (e) =>
+              e.input_descriptor_path === result.input_descriptor_path &&
+              e.verifiable_credential_path === result.verifiable_credential_path
+          )
+      )
     );
     errors.forEach((error) => {
       const payload = { ...error.payload };
@@ -62,7 +71,11 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
 
   private removeDuplicate(results: HandlerCheckResult[]) {
     return results.reduce((arr: HandlerCheckResult[], cur: HandlerCheckResult) => {
-      const result = arr.find(i => i.input_descriptor_path === cur.input_descriptor_path && i.verifiable_credential_path === cur.verifiable_credential_path);
+      const result = arr.find(
+        (i) =>
+          i.input_descriptor_path === cur.input_descriptor_path &&
+          i.verifiable_credential_path === cur.verifiable_credential_path
+      );
       if (!result) {
         return arr.concat([cur]);
       } else {
