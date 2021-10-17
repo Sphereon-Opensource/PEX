@@ -60,7 +60,9 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private findIsHolderFieldIdsToInputDescriptorsSets() {
-    this.pDefinition.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
+    if (this.pDefinition && this.pDefinition.input_descriptors) {
+      this.pDefinition.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
+    }
   }
 
   private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {
@@ -107,9 +109,12 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds: Array<string>): Array<string> {
-    return this.pDefinition.input_descriptors
-      .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
-      .map((filteredInDesces) => filteredInDesces.id);
+    if (this.pDefinition && this.pDefinition.input_descriptors) {
+      return this.pDefinition.input_descriptors
+        .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
+        .map((filteredInDesces) => filteredInDesces.id);
+    }
+    return [];
   }
 
   private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
@@ -167,7 +172,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private findAllDescribedCredentialsPaths() {
-    if (this.vPresentation.presentation_submission) {
+    if (this.vPresentation && this.vPresentation.presentation_submission) {
       this.vPresentation.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
     }
   }
