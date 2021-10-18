@@ -6,7 +6,7 @@ import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePrese
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 
 function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
-  const file: any = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
   if (Object.keys(file).includes('presentation_definition')) {
     return file.presentation_definition as PresentationDefinition;
   } else if (Object.keys(file).includes('presentation_submission')) {

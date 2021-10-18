@@ -17,8 +17,8 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     super(parentTag, 'submission_requirements');
   }
 
-  public getValidations(srs: SubmissionRequirement[]): Validation<any>[] {
-    let validations: Validation<any>[] = [];
+  public getValidations(srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
+    let validations: Validation<SubmissionRequirement>[] = [];
     if (srs != null && srs.length > 0) {
       for (let srInd = 0; srInd < srs.length; srInd++) {
         validations = [...validations, ...this.getMyValidations(srInd, srs), ...this.getSubValidations(srInd, srs)];
@@ -27,7 +27,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return validations;
   }
 
-  private getMyValidations(srInd: number, srs: SubmissionRequirement[]): Validation<any>[] {
+  private getMyValidations(srInd: number, srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     return [
       {
         tag: this.getMyTag(srInd),
@@ -84,7 +84,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation<any>[] {
+  private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     const fromNested = srs[srInd].from_nested as SubmissionRequirement[];
     return fromNested != null
       ? new SubmissionRequirementVB(this.getFromNestedTag(srInd)).getValidations(fromNested)

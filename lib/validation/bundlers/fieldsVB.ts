@@ -26,8 +26,8 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<any>[] {
-    let validations: Validation<any>[] = [];
+  public getValidations(fields: Field[]): Validation<Field>[] {
+    let validations: Validation<Field>[] = [];
     if (fields) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [...validations, ...this.getValidationsFor(fields[srInd], srInd)];
@@ -36,7 +36,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation<any>[] {
+  public getValidationsFor(field: Field, indx: number): Validation<Field>[] {
     return [
       {
         tag: this.getMyTag(indx),
@@ -58,14 +58,14 @@ export class FieldsVB extends ValidationBundler<Field[]> {
       },
       {
         tag: this.getMyTag(indx),
-        target: field?.purpose,
-        predicate: FieldsVB.optionalNonEmptyString,
+        target: field,
+        predicate: (field: Field) => FieldsVB.optionalNonEmptyString(field?.purpose),
         message: this.purposeShouldBeANonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(indx),
-        target: field?.predicate,
-        predicate: FieldsVB.shouldBeKnownOption,
+        target: field,
+        predicate: (field: Field) => FieldsVB.shouldBeKnownOption(field?.predicate),
         message: this.shouldBeKnownOptionMsg,
       },
     ];
@@ -116,12 +116,12 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return (fieldObj: Field): boolean => !(fieldObj.predicate != null && fieldObj.filter == null);
   }
 
-  private static optionalNonEmptyString(str: string): boolean {
+  private static optionalNonEmptyString(str: string | undefined): boolean {
     // TODO extract to generic utils or use something like lodash
     return str == null || str.length > 0;
   }
 
-  private static shouldBeKnownOption(option: Optionality): boolean {
+  private static shouldBeKnownOption(option: Optionality | undefined): boolean {
     // TODO can be be extracted as a generic function
     return option == null || option == Optionality.Required || option == Optionality.Preferred;
   }

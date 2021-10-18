@@ -1,4 +1,4 @@
-import { Constraints, Directives, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
+import { Constraints, Directives, Field, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
 
 import { Validation, ValidationPredicate } from '../core';
 
@@ -32,30 +32,31 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     super(parentTag, 'constraints');
   }
 
-  public getValidations(constraints: Constraints): Validation<any>[] {
+  public getValidations(constraints: Constraints): (Validation<Constraints> | Validation<Field>)[] {
     return [
       {
         tag: this.getTag(),
-        target: constraints?.limit_disclosure,
-        predicate: ConstraintsVB.disclosureLimitShouldHaveKnownValue,
+        target: constraints,
+        predicate: (constraints: Constraints) =>
+          ConstraintsVB.disclosureLimitShouldHaveKnownValue(constraints?.limit_disclosure),
         message: this.disclosureLimitShouldHaveKnownValueMsg,
       },
       {
         tag: this.getTag(),
-        target: constraints?.statuses,
-        predicate: ConstraintsVB.statusShouldHaveKnownValue,
+        target: constraints,
+        predicate: (constraints: Constraints) => ConstraintsVB.statusShouldHaveKnownValue(constraints?.statuses),
         message: this.statusShouldHaveKnownValueMsg,
       },
       {
         tag: this.getTag(),
-        target: constraints?.statuses,
+        target: constraints,
         predicate: ConstraintsVB.statusDirectiveShouldHaveKnownValue(),
         message: this.statusDirectiveShouldHaveKnownValueMsg,
       },
       {
         tag: this.getTag(),
-        target: constraints?.subject_is_issuer,
-        predicate: ConstraintsVB.shouldBeKnownOption,
+        target: constraints,
+        predicate: (constraints: Constraints) => ConstraintsVB.shouldBeKnownOption(constraints?.subject_is_issuer),
         message: this.subjectIsIssuerShouldBeKnownValueMsg,
       },
       ...this.getIsHolderValidations(constraints),
@@ -74,14 +75,14 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     ];
   }
 
-  private getFieldsValidations(constraints: Constraints): Validation<any>[] {
-    if (constraints && constraints.fields) {
+  private getFieldsValidations(constraints: Constraints): Validation<Field>[] {
+    if (constraints?.fields?.length) {
       return new FieldsVB(this.getTag()).getValidations(constraints.fields);
     }
     return [];
   }
 
-  private static disclosureLimitShouldHaveKnownValue(limit_disclosure: Optionality): boolean {
+  private static disclosureLimitShouldHaveKnownValue(limit_disclosure: Optionality | undefined): boolean {
     return (
       limit_disclosure == null ||
       limit_disclosure === Optionality.Preferred ||
@@ -89,27 +90,27 @@ export class ConstraintsVB extends ValidationBundler<Constraints> {
     );
   }
 
-  private static statusShouldHaveKnownValue(statuses: Statuses): boolean {
+  private static statusShouldHaveKnownValue(statuses: Statuses | undefined): boolean {
     return statuses == null || statuses.active != null || statuses.revoked != null || statuses.suspended != null;
   }
 
-  private static statusDirectiveShouldHaveKnownValue(): ValidationPredicate<Statuses> {
-    return (statuses: Statuses): boolean =>
-      this.pdStatusShouldBeKnown(statuses?.active) &&
-      this.pdStatusShouldBeKnown(statuses?.revoked) &&
-      this.pdStatusShouldBeKnown(statuses?.suspended);
+  private static statusDirectiveShouldHaveKnownValue(): ValidationPredicate<Constraints> {
+    return (constraints: Constraints): boolean =>
+      this.pdStatusShouldBeKnown(constraints?.statuses?.active) &&
+      this.pdStatusShouldBeKnown(constraints?.statuses?.revoked) &&
+      this.pdStatusShouldBeKnown(constraints?.statuses?.suspended);
   }
 
   private static pdStatusShouldBeKnown(pdStatus: PdStatus | undefined): boolean {
     return (
-      !pdStatus ||
+      pdStatus == null ||
       pdStatus.directive === Directives.Allowed ||
       pdStatus.directive === Directives.Disallowed ||
       pdStatus.directive === Directives.Required
     );
   }
 
-  private static shouldBeKnownOption(subject_is_issuer: Optionality): boolean {
+  private static shouldBeKnownOption(subject_is_issuer: Optionality | undefined): boolean {
     // TODO can be be extracted as a generic function
     return (
       subject_is_issuer == null ||

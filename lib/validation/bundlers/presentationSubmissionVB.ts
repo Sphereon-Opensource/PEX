@@ -12,48 +12,51 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
     super(parentTag, 'presentation_submission');
   }
 
-  public getValidations(ps: PresentationSubmission): Validation<any>[] {
+  public getValidations(ps: PresentationSubmission): Validation<PresentationSubmission>[] {
     return [
       {
         tag: this.getTag(),
         target: ps,
-        predicate: (ps) => ps != null,
+        predicate: (ps: PresentationSubmission) => ps != null,
         message: 'presentation_submission should be non null.',
       },
       {
         tag: this.getTag(),
-        target: ps?.id,
-        predicate: PresentationSubmissionVB.nonEmptyString,
+        target: ps,
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.nonEmptyString(ps?.id),
         message: 'id should not be empty',
       },
       {
         tag: this.getTag(),
-        target: ps?.definition_id,
-        predicate: PresentationSubmissionVB.nonEmptyString,
+        target: ps,
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.nonEmptyString(ps?.definition_id),
         message: 'presentation_definition_id should not be empty',
       },
       {
         tag: this.getTag(),
-        target: ps?.descriptor_map,
-        predicate: PresentationSubmissionVB.descriptorMapMustBePresent,
+        target: ps,
+        predicate: (ps: PresentationSubmission) =>
+          PresentationSubmissionVB.descriptorMapMustBePresent(ps?.descriptor_map),
         message: 'descriptor_map should be a non-empty list',
       },
       {
         tag: this.getTag(),
-        target: ps?.descriptor_map,
-        predicate: PresentationSubmissionVB.idMustBeSameForEachLevelOfNesting,
+        target: ps,
+        predicate: (ps: PresentationSubmission) =>
+          PresentationSubmissionVB.idMustBeSameForEachLevelOfNesting(ps?.descriptor_map),
         message: 'each descriptor should have a one id in it, on all levels',
       },
       {
         tag: this.getTag(),
-        target: ps?.descriptor_map,
-        predicate: PresentationSubmissionVB.formatsShouldBeKnown,
+        target: ps,
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.formatsShouldBeKnown(ps?.descriptor_map),
         message: 'each format should be one of the known format',
       },
       {
         tag: this.getTag(),
-        target: ps?.descriptor_map,
-        predicate: PresentationSubmissionVB.pathsShouldBeValidJsonPaths,
+        target: ps,
+        predicate: (ps: PresentationSubmission) =>
+          PresentationSubmissionVB.pathsShouldBeValidJsonPaths(ps?.descriptor_map),
         message: 'each path should be a valid jsonPath',
       },
     ];

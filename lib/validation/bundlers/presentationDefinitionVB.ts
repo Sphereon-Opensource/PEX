@@ -1,4 +1,13 @@
-import { Format, JwtObject, LdpObject, PresentationDefinition, SubmissionRequirement } from '@sphereon/pe-models';
+import {
+  Constraints,
+  Field,
+  Format,
+  InputDescriptor,
+  JwtObject,
+  LdpObject,
+  PresentationDefinition,
+  SubmissionRequirement,
+} from '@sphereon/pe-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
@@ -10,7 +19,9 @@ import { InputDescriptorsVB } from './inputDescriptorsVB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { ValidationBundler } from './validationBundler';
 
-export class PresentationDefinitionVB extends ValidationBundler<PresentationDefinition> {
+export class PresentationDefinitionVB extends ValidationBundler<
+  Field | Constraints | InputDescriptor | PresentationDefinition | SubmissionRequirement
+> {
   private ajv: Ajv;
 
   constructor(parentTag: string) {
@@ -18,7 +29,15 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
   }
 
-  public getValidations(pd: PresentationDefinition): Validation<any>[] {
+  public getValidations(
+    pd: PresentationDefinition
+  ): (
+    | Validation<Field>
+    | Validation<Constraints>
+    | Validation<InputDescriptor>
+    | Validation<PresentationDefinition>
+    | Validation<SubmissionRequirement>
+  )[] {
     if (pd.submission_requirements) {
       return [
         ...this.myValidations(pd),
@@ -30,7 +49,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     }
   }
 
-  private myValidations(pd: PresentationDefinition): Validation<any>[] {
+  private myValidations(pd: PresentationDefinition): Validation<PresentationDefinition>[] {
     return [
       // E Section 4.B   : The Input Descriptors (#term:input-descriptors) required for submission are described by the submission_requirements. If no submission_requirements value is present, all inputs listed in the input_descriptors array are required for submission.
       {
@@ -47,44 +66,45 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
       },
       {
         tag: this.getTag(),
-        target: pd?.id,
-        predicate: PresentationDefinitionVB.nonEmptyString,
+        target: pd,
+        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.nonEmptyString(pd?.id),
         message: 'id should not be empty',
       },
       {
         tag: this.getTag(),
-        target: pd?.name,
-        predicate: PresentationDefinitionVB.optionalNonEmptyString,
+        target: pd,
+        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.optionalNonEmptyString(pd?.name),
         message: 'name should be a non-empty string',
       },
       {
         tag: this.getTag(),
-        target: pd?.purpose,
-        predicate: PresentationDefinitionVB.optionalNonEmptyString,
+        target: pd,
+        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.optionalNonEmptyString(pd?.purpose),
         message: 'purpose should be a non-empty string',
       },
       {
         tag: this.getTag(),
-        target: pd?.format,
-        predicate: PresentationDefinitionVB.formatValuesShouldNotBeEmpty,
+        target: pd,
+        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.formatValuesShouldNotBeEmpty(pd?.format),
         message: 'formats values should not empty',
       },
       {
         tag: this.getTag(),
-        target: pd?.format,
-        predicate: PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues,
+        target: pd,
+        predicate: (pd: PresentationDefinition) =>
+          PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues(pd?.format),
         message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: PresentationDefinitionVB.groupShouldMatchSubmissionRequirements,
+        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.groupShouldMatchSubmissionRequirements(pd),
         message: 'input descriptor group should match the from in submission requirements.',
       },
     ];
   }
 
-  private static optionalNonEmptyString(str: string): boolean {
+  private static optionalNonEmptyString(str: string | undefined): boolean {
     // TODO extract to generic utils or use something like lodash
     return str == null || str.length > 0;
   }
@@ -94,7 +114,7 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return id != null && id.length > 0;
   }
 
-  private static formatValuesShouldNotBeEmpty(format: Format): boolean {
+  private static formatValuesShouldNotBeEmpty(format: Format | undefined): boolean {
     let areExpectedValuesPresent = true;
 
     if (format?.jwt != null) {
@@ -119,10 +139,10 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     return areExpectedValuesPresent;
   }
 
-  private static formatValuesShouldBeAmongKnownValues(format: Format): boolean {
+  private static formatValuesShouldBeAmongKnownValues(format: Format | undefined): boolean {
     let unknownProofsAndAlgorithms: string[] = [];
 
-    if (format != null) {
+    if (format) {
       const jwtAlgos: string[] = JwtAlgos.getJwtAlgos();
       const ldpTypes: string[] = LdpTypes.getLdpTypes();
       unknownProofsAndAlgorithms = [];
@@ -198,18 +218,12 @@ export class PresentationDefinitionVB extends ValidationBundler<PresentationDefi
     );
   }
 
-  private shouldBeAsPerJsonSchema(): ValidationPredicate<any> {
+  private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinition> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
-
       const validate = this.ajv.compile(presentationDefinitionSchema);
       const valid = validate(presentationDefinition);
-
-      if (!valid) {
-        //console.log(validate.errors);
-      }
-
       return valid;
     };
   }
