@@ -1,9 +1,5 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-export interface CredentialSubject {
-  [x: string]: unknown;
-}
-
 export interface Proof {
   type: string;
   created: string;
@@ -21,14 +17,14 @@ export interface CredentialStatus {
 export interface Credential {
   '@context': string[];
   id: string;
-  type: string[];
-  credentialSubject: CredentialSubject;
+  type: string[] | string;
+  credentialSubject: unknown;
   issuer: string;
   issuanceDate?: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
   vc?: VerifiableCredential;
-  [x: string]: any;
+  [x: string]: unknown;
 }
 
 export interface VerifiableCredential extends Credential {
@@ -39,7 +35,7 @@ export interface VerifiableCredential extends Credential {
 
 export interface Presentation {
   '@context': string[];
-  type: string;
+  type: string[] | string;
   verifiableCredential: VerifiableCredential[];
   holder: string;
 }

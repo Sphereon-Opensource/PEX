@@ -16,25 +16,8 @@ import { HandlerCheckResult } from '../handlerCheckResult';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
-  private pDefinition: PresentationDefinition = { id: '', input_descriptors: [] };
-  private vPresentation: VerifiablePresentation = {
-    '@context': [],
-    holder: '',
-    presentation_submission: {
-      id: '',
-      definition_id: '',
-      descriptor_map: [],
-    },
-    proof: {
-      type: '',
-      created: '',
-      proofPurpose: '',
-      verificationMethod: '',
-      jws: '',
-    },
-    type: '',
-    verifiableCredential: [],
-  };
+  private pDefinition: PresentationDefinition | undefined;
+  private vPresentation: VerifiablePresentation | undefined;
 
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
@@ -79,7 +62,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
   private findSameSubjectFieldIdsToInputDescriptorsSets() {
-    this.pDefinition.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
+    this.pDefinition?.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
   }
 
   private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {
@@ -92,9 +75,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return (sameSubjectGroup: HolderSubject) => {
       let fieldIdzInputDescriptors: Map<Set<string>, Set<string>> = new Map<Set<string>, Set<string>>();
       if (sameSubjectGroup.directive === Optionality.Required) {
-        fieldIdzInputDescriptors = new Map([...this.fieldIdzInputDescriptorsSameSubjectRequired]);
+        fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectRequired;
       } else if (sameSubjectGroup.directive === Optionality.Preferred) {
-        fieldIdzInputDescriptors = new Map([...this.fieldIdzInputDescriptorsSameSubjectPreferred]);
+        fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectPreferred;
       }
       this.upsertFieldIdToInputDescriptorMapping(fieldIdzInputDescriptors, sameSubjectGroup.field_id, inDesc.id);
     };
@@ -117,7 +100,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     const inputDescriptorIds: Array<string> = this.getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds);
     inputDescriptorIds.push(inDescId);
 
-    if (this.getValue(fieldIdzInputDescriptors, searchableFieldIds) == null) {
+    if (!this.getValue(fieldIdzInputDescriptors, searchableFieldIds)) {
       SameSubjectEvaluationHandler.addEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
     } else {
       this.updateEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
@@ -125,9 +108,12 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds: Array<string>): Array<string> {
-    return this.pDefinition.input_descriptors
-      .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
-      .map((filteredInDesces) => filteredInDesces.id);
+    if (this.pDefinition?.input_descriptors) {
+      return this.pDefinition?.input_descriptors
+        .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
+        .map((filteredInDesces) => filteredInDesces.id);
+    }
+    return [];
   }
 
   private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
@@ -151,12 +137,8 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   getValue(
     fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
     searchableFieldIds: Array<string>
-  ): { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } {
-    let entry: { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } = {
-      mappedFieldIds: new Set<string>(),
-      mappedInputDescriptorIds: new Set<string>(),
-    };
-
+  ): { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined {
+    let entry: { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined;
     for (const [mappedFieldIds, mappedInputDescriptorIds] of fieldIdzInputDescriptors.entries()) {
       if (Array.from(mappedFieldIds.values()).filter((value) => searchableFieldIds.includes(value)).length > 0) {
         entry = { mappedFieldIds, mappedInputDescriptorIds };
@@ -184,15 +166,13 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   ) {
     const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
 
-    searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
+    searchableFieldIds.forEach((searchableFieldId) => entry?.mappedFieldIds.add(searchableFieldId));
 
-    inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
+    inputDescriptorIds.forEach((inputDescriptorId) => entry?.mappedInputDescriptorIds.add(inputDescriptorId));
   }
 
   private findAllDescribedCredentialsPaths() {
-    if (this.vPresentation.presentation_submission) {
-      this.vPresentation.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
-    }
+    this.vPresentation?.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
   private descriptorToPathMapper(): (descriptor: Descriptor) => void {
@@ -231,7 +211,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     status: 'info' | 'warn' | 'error'
   ): (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => void {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
-      const credentialSubjectsSet: Set<string> = new Set<string>();
+      const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
       inputDescriptorIds.forEach((inDescId: string) => {
         const credentialSubject = this.credentialsSubjects.get(inDescId);
         if (credentialSubject) {
@@ -242,7 +222,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     };
   }
 
-  private addResult(credentialSubjectsSet: Set<string>, fieldIdSet: Set<string>, status: Status) {
+  private addResult(credentialSubjectsSet: Set<unknown>, fieldIdSet: Set<string>, status: Status) {
     let myStatus: Status = Status.INFO;
 
     if (credentialSubjectsSet.size > 1) {
@@ -253,7 +233,11 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     this.getResults().push(this.getResult(fieldIdSet, credentialSubjectsSet, myStatus));
   }
 
-  private getResult(fieldIdSet: Set<string>, credentialSubjectsSet: Set<string>, myStatus: Status): HandlerCheckResult {
+  private getResult(
+    fieldIdSet: Set<string>,
+    credentialSubjectsSet: Set<unknown>,
+    myStatus: Status
+  ): HandlerCheckResult {
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
     const verifiableCredentialPath = '[' + Array.from(credentialSubjectsSet).join(',') + ']';
     return {

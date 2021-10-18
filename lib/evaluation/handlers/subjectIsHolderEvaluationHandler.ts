@@ -9,7 +9,6 @@ import {
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { CredentialSubject } from '../../verifiablePresentation';
 import { VerifiablePresentation } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -28,7 +27,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIdzInputDescriptorsIsHolderPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, CredentialSubject>;
+  private credentialsSubjects: Map<string, unknown>;
 
   private messages: Map<Status, string>;
 
@@ -39,7 +38,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.fieldIdzInputDescriptorsIsHolderPreferred = new Map<Set<string>, Set<string>>();
     this.allDescribedCredentialsPaths = new Map<string, string>();
 
-    this.credentialsSubjects = new Map<string, CredentialSubject>();
+    this.credentialsSubjects = new Map<string, unknown>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
@@ -109,17 +108,17 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds: Array<string>): Array<string> {
-    if (this.pDefinition && this.pDefinition.input_descriptors) {
+    if (this.pDefinition) {
       return this.pDefinition.input_descriptors
         .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
-        .map((filteredInDesces) => filteredInDesces.id);
+        .map((filteredInDesces: InputDescriptor) => filteredInDesces.id);
     }
     return [];
   }
 
   private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
     return (inDesc: InputDescriptor) => {
-      if (inDesc && inDesc.constraints && inDesc.constraints.fields) {
+      if (inDesc.constraints?.fields) {
         return inDesc.constraints.fields.filter(this.fieldExistsInInputDescriptor(searchableFieldIds)).length > 0;
       }
       return false;
@@ -128,7 +127,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private fieldExistsInInputDescriptor(searchableFieldIds: Array<string>): (field: Field) => boolean {
     return (field: Field) => {
-      if (field && field.id) {
+      if (field?.id) {
         return searchableFieldIds.includes(field.id);
       }
       return false;
@@ -165,16 +164,12 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorIds: Array<string>
   ) {
     const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
-    if (entry) {
-      searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
-      inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
-    }
+    searchableFieldIds.forEach((searchableFieldId) => entry?.mappedFieldIds.add(searchableFieldId));
+    inputDescriptorIds.forEach((inputDescriptorId) => entry?.mappedInputDescriptorIds.add(inputDescriptorId));
   }
 
   private findAllDescribedCredentialsPaths() {
-    if (this.vPresentation && this.vPresentation.presentation_submission) {
-      this.vPresentation.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
-    }
+    this.vPresentation?.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
   private descriptorToPathMapper(): (descriptor: Descriptor) => void {
@@ -212,7 +207,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private confirmFieldSetHasSameHolder(status: 'info' | 'warn' | 'error') {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
       const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
-      inputDescriptorIds.forEach((inDescId) => {
+      inputDescriptorIds.forEach((inDescId: string) => {
         if (this.credentialsSubjects.has(inDescId)) {
           credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId));
         }
@@ -221,9 +216,9 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private addResult(credentialSubjectsSet: Set<any>, fieldIdSet: Set<string>, status: Status) {
+  private addResult(credentialSubjectsSet: Set<unknown>, fieldIdSet: Set<string>, status: Status) {
     let myStatus: Status = status === Status.ERROR ? Status.INFO : status;
-    credentialSubjectsSet.forEach((cs) => {
+    credentialSubjectsSet.forEach((cs: any) => {
       if (cs['value']['id'] !== this.client.did) {
         myStatus = Status.ERROR;
       }
@@ -237,8 +232,14 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.getResults().push(this.getResult(fieldIdSet, credentialSubjectsSet, myStatus));
   }
 
-  private getResult(fieldIdSet: Set<string>, credentialSubjectsSet: Set<any>, myStatus: Status): HandlerCheckResult {
-    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el) => jp.stringify(el['path'].slice(0, 3)));
+  private getResult(
+    fieldIdSet: Set<string>,
+    credentialSubjectsSet: Set<unknown>,
+    myStatus: Status
+  ): HandlerCheckResult {
+    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el: any) =>
+      jp.stringify(el['path'].slice(0, 3))
+    );
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
     const verifiableCredentialPath = '[' + paths.join(',') + ']';
     const credentialFields: Array<string> = this.getCredentialFields(credentialSubjectsSet);
