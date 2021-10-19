@@ -100,14 +100,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     verifiableCredential: VerifiableCredential,
     verifiableCredentialToSend: VerifiableCredential
   ): void {
-    let objectCursor: any = verifiableCredential;
-    let currentCursorInToSendObj: any = verifiableCredentialToSend;
+    let objectCursor: { [x: string]: unknown } = { ...verifiableCredential };
+    let currentCursorInToSendObj: { [x: string]: unknown } = { ...verifiableCredentialToSend };
     for (let i = 1; i < pathDetails.length; i++) {
-      objectCursor = objectCursor[pathDetails[i]];
+      objectCursor = objectCursor[pathDetails[i]] as { [x: string]: unknown };
       if (pathDetails.length == i + 1) {
         currentCursorInToSendObj[pathDetails[i]] = objectCursor;
       } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] !== 'string') {
-        currentCursorInToSendObj = [{}];
+        currentCursorInToSendObj = Object.assign(currentCursorInToSendObj, [{}]);
       } else {
         currentCursorInToSendObj = {};
       }
