@@ -2,6 +2,7 @@ import {
   Constraints,
   Field,
   Format,
+  HolderSubject,
   InputDescriptor,
   JwtObject,
   LdpObject,
@@ -20,7 +21,7 @@ import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { ValidationBundler } from './validationBundler';
 
 export class PresentationDefinitionVB extends ValidationBundler<
-  Field | Constraints | InputDescriptor | PresentationDefinition | SubmissionRequirement
+  Field | HolderSubject | Constraints | InputDescriptor | PresentationDefinition | SubmissionRequirement
 > {
   private ajv: Ajv;
 
@@ -33,8 +34,10 @@ export class PresentationDefinitionVB extends ValidationBundler<
     pd: PresentationDefinition
   ): (
     | Validation<Field>
+    | Validation<HolderSubject>
     | Validation<Constraints>
     | Validation<InputDescriptor>
+    | Validation<InputDescriptor[]>
     | Validation<PresentationDefinition>
     | Validation<SubmissionRequirement>
   )[] {
@@ -183,16 +186,20 @@ export class PresentationDefinitionVB extends ValidationBundler<
 
   private static groupShouldMatchSubmissionRequirements(pd: PresentationDefinition): boolean {
     if (pd.submission_requirements != null && pd.submission_requirements.length > 0) {
-      const groups = pd.input_descriptors
-        .map((inDesc) => inDesc?.group)
-        .filter((groups, index) => groups != null && groups[index] != null)
-        .map((groups, index) => groups![index]);
+      const groups: string[] = [];
+      pd.input_descriptors.forEach((inDesc: InputDescriptor) => {
+        if (inDesc.group) {
+          groups.push(...inDesc.group);
+        }
+      });
       const groupStrings: Set<string> = new Set<string>(groups);
 
-      const fromValues = PresentationDefinitionVB.flatten(pd.submission_requirements)
-        .map((srs: SubmissionRequirement) => srs?.from)
-        .filter((fromValues: string | undefined, index: number) => fromValues != null && fromValues![index] != null)
-        .map((fromValues: string | undefined, index: number) => fromValues![index]);
+      const fromValues: string[] = [];
+      PresentationDefinitionVB.flatten(pd.submission_requirements).forEach((srs: SubmissionRequirement) => {
+        if (srs.from) {
+          fromValues.push(...srs.from);
+        }
+      });
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 

@@ -145,8 +145,8 @@ describe('constraints tests', () => {
     delete constraints.fields;
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([
-      new Checked('root.constraints', Status.ERROR, 'is_holder field_id must correspond to a present field object id property'),
-      new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property'),
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')
     ]);
   });
 
@@ -157,8 +157,8 @@ describe('constraints tests', () => {
     constraints.fields = [];
     const result = ve.validate([{bundler: vb, target: constraints}]);
     expect(result).toEqual([
-      new Checked('root.constraints', Status.ERROR, 'is_holder field_id must correspond to a present field object id property'),
-      new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property'),
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')
     ]);
   });
 
@@ -204,7 +204,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = [''];
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root.constraints[0]', Status.ERROR, 'same_subject object field_id property must be an array of strings')],);
+    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')],);
   });
 
   it('There should be error reported for same_subject[0].field_id missing', () => {
@@ -213,7 +213,7 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = ['missing_fieldID'];
     const result = ve.validate([{bundler: vb, target: constraints}]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'same_subject field_id must correspond to a present field object id property')],);
+    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')],);
   });
 
 });

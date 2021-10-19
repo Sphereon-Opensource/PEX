@@ -47,9 +47,9 @@ export class EvaluationClient {
       currentHandler = currentHandler.getNext();
       try {
         currentHandler.handle(pd, vp);
-      } catch (e: any) {
-        this.failed_catched.message += e.message;
-        this.failed_catched.stacktrace = e;
+      } catch (e) {
+        this.failed_catched.message += (e as Error).message;
+        this.failed_catched.stacktrace = e as string;
         throw this.failed_catched;
       }
     }

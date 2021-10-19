@@ -116,7 +116,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: any }, field: Field): boolean {
+  private evaluateFilter(result: { path: string[]; value: unknown }, field: Field): boolean {
     if (field.filter) {
       return new Ajv().validate(field.filter, result.value);
     }

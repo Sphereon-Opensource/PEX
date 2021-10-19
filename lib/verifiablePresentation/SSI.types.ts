@@ -1,4 +1,5 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
+import { PathComponent } from 'jsonpath';
 
 export interface Proof {
   type: string;
@@ -67,3 +68,5 @@ export interface LinkedDataProof {
   nonce: string;
   signatureValue: string;
 }
+
+export type JsonpathType = { path: PathComponent[]; value: { id: string; [x: string]: unknown } };

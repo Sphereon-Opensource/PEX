@@ -52,7 +52,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       constraints.fields[fieldIdx] &&
       constraints.fields[fieldIdx].predicate &&
       constraints.fields[fieldIdx].path &&
-      constraints.fields[fieldIdx].path!.includes(this.concatenatePath(results[resultIdx].payload.result.path))
+      constraints.fields[fieldIdx].path?.includes(this.concatenatePath(results[resultIdx].payload.result.path))
     ) {
       const evaluationResult = { ...results[resultIdx].payload.result };
       const resultObject = this.createResultObject(input_descriptor_idx, resultIdx, evaluationResult, results);

@@ -119,4 +119,20 @@ describe('validate', () => {
     expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'formats should only have known identifiers for alg or proof_type')]);
   });
 
+  it('should report error for duplicate id', () => {
+    const basicPD: PresentationDefinition = getFile('./test/resources/pd_require_is_holder.json').presentation_definition;
+    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
+    const ve = new ValidationEngine();
+    basicPD.input_descriptors[0].constraints!.fields![0]!.id = 'uuid2021-05-04 00';
+    basicPD.input_descriptors[0].constraints!.is_holder![0].field_id[0] = 'uuid2021-05-04 00';
+    basicPD.input_descriptors[0].schema = [{ uri: 'https://www.w3.org/2018/credentials/v1' }];
+    basicPD.input_descriptors[1].constraints!.fields![0]!.id = 'uuid2021-05-04 00';
+    basicPD.input_descriptors[1].constraints!.is_holder![0].field_id[0] = 'uuid2021-05-04 00';
+    basicPD.input_descriptors[1].schema = [{ uri: 'https://www.w3.org/2018/credentials/v1' }];
+    delete basicPD.input_descriptors[2];
+    delete basicPD.input_descriptors[3];
+    const result = ve.validate([{bundler: vb, target: basicPD}]);
+    expect(result).toEqual([new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique')]);
+  });
+
 });

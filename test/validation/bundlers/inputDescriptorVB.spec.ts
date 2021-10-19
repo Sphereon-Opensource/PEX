@@ -124,5 +124,4 @@ describe('inputDescriptorsVB tests', () => {
     const result = ve.validate([{bundler: vb, target: testableInputDescriptors}]);
     expect(result).toEqual([new Checked('root.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
-
 });
