@@ -4,15 +4,17 @@ import { Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
 import { HandlerCheckResult } from './handlerCheckResult';
-import { EvaluationHandler } from './handlers/evaluationHandler';
-import { InputDescriptorFilterEvaluationHandler } from './handlers/inputDescriptorFilterEvaluationHandler';
-import { LimitDisclosureEvaluationHandler } from './handlers/limitDisclosureEvaluationHandler';
-import { MarkForSubmissionEvaluationHandler } from './handlers/markForSubmissionEvaluationHandler';
-import { PredicateRelatedFieldEvaluationHandler } from './handlers/predicateRelatedFieldEvaluationHandler';
-import { SameSubjectEvaluationHandler } from './handlers/sameSubjectEvaluationHandler';
-import { SubjectIsHolderEvaluationHandler } from './handlers/subjectIsHolderEvaluationHandler';
-import { SubjectIsIssuerEvaluationHandler } from './handlers/subjectIsIssuerEvaluationHandler';
-import { UriEvaluationHandler } from './handlers/uriEvaluationHandler';
+import {
+  EvaluationHandler,
+  InputDescriptorFilterEvaluationHandler,
+  LimitDisclosureEvaluationHandler,
+  MarkForSubmissionEvaluationHandler,
+  PredicateRelatedFieldEvaluationHandler,
+  SameSubjectEvaluationHandler,
+  SubjectIsHolderEvaluationHandler,
+  SubjectIsIssuerEvaluationHandler,
+  UriEvaluationHandler,
+} from './handlers';
 
 export class EvaluationClient {
   constructor() {
