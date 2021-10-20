@@ -20,7 +20,7 @@ export interface Credential {
   id: string;
   type: string[] | string;
   credentialSubject: unknown;
-  issuer: string;
+  issuer: unknown;
   issuanceDate?: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
@@ -39,34 +39,11 @@ export interface Presentation {
   type: string[] | string;
   verifiableCredential: VerifiableCredential[];
   holder: string;
+  proof?: Proof;
 }
 
 export interface VerifiablePresentation extends Presentation {
   presentation_submission: PresentationSubmission;
-  proof: Proof;
-}
-
-export interface OidcClaimJson {
-  essential?: boolean;
-  value?: string;
-  values?: string[];
-}
-
-export interface OidcClaimRequest {
-  [x: string]: null | OidcClaimJson;
-}
-
-export interface OidcClaim {
-  vc?: OidcClaimRequest;
-  [x: string]: unknown;
-}
-
-export interface LinkedDataProof {
-  type: string;
-  created: string;
-  creator: string;
-  nonce: string;
-  signatureValue: string;
 }
 
 export type JsonpathType = { path: PathComponent[]; value: { id: string; [x: string]: unknown } };
