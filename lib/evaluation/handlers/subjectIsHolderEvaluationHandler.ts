@@ -164,7 +164,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorIds: Array<string>
   ) {
     const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
-    if (!!entry) {
+    if (entry) {
       searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
       inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
     }
