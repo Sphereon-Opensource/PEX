@@ -98,7 +98,7 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
 
   private static pdStatusShouldBeKnown(pdStatus: PdStatus | undefined): boolean {
     return (
-      pdStatus == null ||
+      !pdStatus ||
       pdStatus.directive === Directives.Allowed ||
       pdStatus.directive === Directives.Disallowed ||
       pdStatus.directive === Directives.Required

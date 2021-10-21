@@ -9,7 +9,7 @@ import {
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { JsonpathType, VerifiablePresentation } from '../../verifiablePresentation';
+import { CredentialSubjectJsonpathNode, VerifiablePresentation } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -27,7 +27,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIdzInputDescriptorsIsHolderPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, JsonpathType>;
+  private credentialsSubjects: Map<string, CredentialSubjectJsonpathNode>;
 
   private messages: Map<Status, string>;
 
@@ -38,7 +38,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.fieldIdzInputDescriptorsIsHolderPreferred = new Map<Set<string>, Set<string>>();
     this.allDescribedCredentialsPaths = new Map<string, string>();
 
-    this.credentialsSubjects = new Map<string, JsonpathType>();
+    this.credentialsSubjects = new Map<string, CredentialSubjectJsonpathNode>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
@@ -190,7 +190,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private mapCredentialPathToCredentialSubject(): (path: string, inDescId: string) => void {
     return (path: string, inDescId: string) => {
-      const subjectNode: JsonpathType[] = jp.nodes(this.vPresentation, path.concat('..credentialSubject'));
+      const subjectNode: CredentialSubjectJsonpathNode[] = jp.nodes(
+        this.vPresentation,
+        path.concat('..credentialSubject')
+      );
       if (subjectNode.length) {
         this.credentialsSubjects.set(inDescId, subjectNode[0]);
       }
@@ -206,7 +209,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private confirmFieldSetHasSameHolder(status: 'info' | 'warn' | 'error') {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
-      const credentialSubjectsSet: Set<JsonpathType> = new Set<JsonpathType>();
+      const credentialSubjectsSet: Set<CredentialSubjectJsonpathNode> = new Set<CredentialSubjectJsonpathNode>();
       inputDescriptorIds.forEach((inDescId: string) => {
         if (this.credentialsSubjects.has(inDescId)) {
           const cs = this.credentialsSubjects.get(inDescId);
@@ -219,9 +222,13 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private addResult(credentialSubjectsSet: Set<JsonpathType>, fieldIdSet: Set<string>, status: Status) {
+  private addResult(
+    credentialSubjectsSet: Set<CredentialSubjectJsonpathNode>,
+    fieldIdSet: Set<string>,
+    status: Status
+  ) {
     let myStatus: Status = status === Status.ERROR ? Status.INFO : status;
-    credentialSubjectsSet.forEach((cs: JsonpathType) => {
+    credentialSubjectsSet.forEach((cs: CredentialSubjectJsonpathNode) => {
       if (cs.value.id !== this.client.did) {
         myStatus = Status.ERROR;
       }
@@ -237,10 +244,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private getResult(
     fieldIdSet: Set<string>,
-    credentialSubjectsSet: Set<JsonpathType>,
+    credentialSubjectsSet: Set<CredentialSubjectJsonpathNode>,
     myStatus: Status
   ): HandlerCheckResult {
-    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el: JsonpathType) =>
+    const paths: Array<string> = Array.from(credentialSubjectsSet).map((el: CredentialSubjectJsonpathNode) =>
       jp.stringify(el.path.slice(0, 3))
     );
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
@@ -256,10 +263,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private getCredentialFields(credentialSubjectsSet: Set<JsonpathType>): string[] {
+  private getCredentialFields(credentialSubjectsSet: Set<CredentialSubjectJsonpathNode>): string[] {
     if (credentialSubjectsSet.size) {
       return Array.from(credentialSubjectsSet)
-        .map((el: JsonpathType) => Object.keys(el.value))
+        .map((el: CredentialSubjectJsonpathNode) => Object.keys(el.value))
         .reduce((acc: string[], val: string[]) => acc.concat(val))
         .filter((x: string) => x !== 'id');
     } else {

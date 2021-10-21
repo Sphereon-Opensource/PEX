@@ -1,6 +1,11 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
+export interface CredentialSubject {
+  id?: string;
+  [x: string]: unknown;
+}
+
 export interface Proof {
   type: string;
   created: string;
@@ -19,7 +24,7 @@ export interface Credential {
   '@context': string[];
   id: string;
   type: string[] | string;
-  credentialSubject: unknown;
+  credentialSubject: CredentialSubject;
   issuer: unknown;
   issuanceDate?: string;
   expirationDate?: string;
@@ -46,4 +51,4 @@ export interface VerifiablePresentation extends Presentation {
   presentation_submission: PresentationSubmission;
 }
 
-export type JsonpathType = { path: PathComponent[]; value: { id: string; [x: string]: unknown } };
+export type CredentialSubjectJsonpathNode = { path: PathComponent[]; value: CredentialSubject };

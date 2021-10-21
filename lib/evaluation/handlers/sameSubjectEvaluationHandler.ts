@@ -9,7 +9,7 @@ import {
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiablePresentation } from '../../verifiablePresentation';
+import { CredentialSubject, CredentialSubjectJsonpathNode, VerifiablePresentation } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -23,7 +23,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, string>;
+  private credentialsSubjects: Map<string, CredentialSubject>;
 
   private messages: Map<Status, string>;
 
@@ -34,7 +34,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<Set<string>, Set<string>>();
     this.allDescribedCredentialsPaths = new Map<string, string>();
 
-    this.credentialsSubjects = new Map<string, string>();
+    this.credentialsSubjects = new Map<string, CredentialSubject>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the same subject belong to same subject');
@@ -62,7 +62,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
   private findSameSubjectFieldIdsToInputDescriptorsSets() {
-    this.pDefinition?.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
+    this.pDefinition?.input_descriptors?.forEach(this.mapFieldIdsToInputDescriptors());
   }
 
   private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {
@@ -163,16 +163,17 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
     searchableFieldIds: Array<string>,
     inputDescriptorIds: Array<string>
-  ) {
+  ): void {
     const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
 
-    searchableFieldIds.forEach((searchableFieldId) => entry?.mappedFieldIds.add(searchableFieldId));
-
-    inputDescriptorIds.forEach((inputDescriptorId) => entry?.mappedInputDescriptorIds.add(inputDescriptorId));
+    if (entry) {
+      searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
+      inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
+    }
   }
 
   private findAllDescribedCredentialsPaths() {
-    this.vPresentation?.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
+    this.vPresentation?.presentation_submission?.descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
   private descriptorToPathMapper(): (descriptor: Descriptor) => void {
@@ -193,7 +194,10 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapCredentialPathToCredentialSubject() {
     return (path: string, inDescId: string) => {
-      const subjectNode = jp.nodes(this.vPresentation, path.concat('.credentialSubject'));
+      const subjectNode: CredentialSubjectJsonpathNode[] = jp.nodes(
+        this.vPresentation,
+        path.concat('.credentialSubject')
+      );
       if (subjectNode.length) {
         this.credentialsSubjects.set(inDescId, subjectNode[0].value);
       }
@@ -211,18 +215,18 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     status: 'info' | 'warn' | 'error'
   ): (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => void {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
-      const credentialSubjectsSet: Set<unknown> = new Set<unknown>();
+      const credentialSubjectsSet: Set<string> = new Set<string>();
       inputDescriptorIds.forEach((inDescId: string) => {
         const credentialSubject = this.credentialsSubjects.get(inDescId);
-        if (credentialSubject) {
-          credentialSubjectsSet.add(credentialSubject);
+        if (!!credentialSubject && !!credentialSubject.id) {
+          credentialSubjectsSet.add(credentialSubject.id);
         }
       });
       this.addResult(credentialSubjectsSet, fieldIdSet, status);
     };
   }
 
-  private addResult(credentialSubjectsSet: Set<unknown>, fieldIdSet: Set<string>, status: Status) {
+  private addResult(credentialSubjectsSet: Set<string>, fieldIdSet: Set<string>, status: Status) {
     let myStatus: Status = Status.INFO;
 
     if (credentialSubjectsSet.size > 1) {
@@ -233,11 +237,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     this.getResults().push(this.getResult(fieldIdSet, credentialSubjectsSet, myStatus));
   }
 
-  private getResult(
-    fieldIdSet: Set<string>,
-    credentialSubjectsSet: Set<unknown>,
-    myStatus: Status
-  ): HandlerCheckResult {
+  private getResult(fieldIdSet: Set<string>, credentialSubjectsSet: Set<string>, myStatus: Status): HandlerCheckResult {
     const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
     const verifiableCredentialPath = '[' + Array.from(credentialSubjectsSet).join(',') + ']';
     return {

@@ -57,13 +57,12 @@ describe('sameSubjectEvaluationHandler', () => {
           "@context": [
             "https://www.w3.org/2018/credentials/v1"
           ],
-          "field1Key": "field1Value",
           "credentialSchema": [
             {
               "id": "https://www.w3.org/TR/vc-data-model/#types"
             }
           ],
-          "credentialSubject": "VCSubject2020081200",
+          "credentialSubject": { id: "VCSubject2020081200", "field1Key": "field1Value" },
           "id": "867bfe7a-5b91-46b2-aaaa-70028b8d9aaa",
           "issuer": "VC1Issuer",
           "issuanceDate": '',
@@ -74,13 +73,12 @@ describe('sameSubjectEvaluationHandler', () => {
           "@context": [
             "https://www.w3.org/2018/credentials/v1"
           ],
-          "field2Key": "field2Value",
           "credentialSchema": [
             {
               "id": "https://www.w3.org/TR/vc-data-model/#types"
             }
           ],
-          "credentialSubject": "VCSubject2020081200",
+          "credentialSubject": { id: "VCSubject2020081200", "field2Key": "field2Value" },
           "id": "867bfe7a-5b91-46b2-bbbb-70028b8d9bbb",
           "issuer": "VC2Issuer",
           "issuanceDate": '',
@@ -91,13 +89,12 @@ describe('sameSubjectEvaluationHandler', () => {
           "@context": [
             "https://www.w3.org/2018/credentials/v1"
           ],
-          "field3Key": "field3Value",
           "credentialSchema": [
             {
               "id": "https://www.w3.org/TR/vc-data-model/#types"
             }
           ],
-          "credentialSubject": "VCSubject2020081205",
+          "credentialSubject": { id: "VCSubject2020081205", "field3Key": "field3Value" },
           "id": "867bfe7a-5b91-46b2-cccc-70028b8d9ccc",
           "issuer": "VC3Issuer",
           "issuanceDate": '',
@@ -108,13 +105,12 @@ describe('sameSubjectEvaluationHandler', () => {
           "@context": [
             "https://www.w3.org/2018/credentials/v1"
           ],
-          "field4Key": "field4Value",
           "credentialSchema": [
             {
               "id": "https://www.w3.org/TR/vc-data-model/#types"
             }
           ],
-          "credentialSubject": "VCSubject2020081205",
+          "credentialSubject": { id: "VCSubject2020081205", "field4Key": "field4Value" },
           "id": "867bfe7a-5b91-46b2-dddd-70028b8d9ddd",
           "issuer": "VC4Issuer",
           "issuanceDate": '',
