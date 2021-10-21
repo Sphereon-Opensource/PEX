@@ -3,7 +3,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": { "project": "./tsconfig.json" },
   "env": { "es6": true },
-  "ignorePatterns": ["node_modules", "dist", "coverage", "jest.config.js", "test"],
+  "ignorePatterns": ["node_modules", "dist", "coverage", "jest.config.js"],
   "plugins": ["import", "eslint-comments"],
   "extends": [
     "eslint:recommended",
@@ -28,5 +28,15 @@
       "error",
       { "ignoreDeclarationSort": true, "ignoreCase": true }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "test/**/*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-non-null-assertion": "off"
+      }
+    }
+  ]
 }
