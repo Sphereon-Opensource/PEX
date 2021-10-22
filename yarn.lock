@@ -1132,6 +1132,11 @@
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
+"@types/jsonpath@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@types/jsonpath/-/jsonpath-0.2.0.tgz#13c62db22a34d9c411364fac79fd374d63445aa1"
+  integrity sha512-v7qlPA0VpKUlEdhghbDqRoKMxFB3h3Ch688TApBJ6v+XLDdvWCGLJIYiPKGZnS6MAOie+IorCfNYVHOPIHSWwQ==
+
 "@types/minimist@^1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"

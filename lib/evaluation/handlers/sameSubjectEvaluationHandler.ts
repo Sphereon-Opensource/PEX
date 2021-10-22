@@ -1,22 +1,29 @@
-import { Descriptor, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import {
+  Descriptor,
+  Field,
+  HolderSubject,
+  InputDescriptor,
+  Optionality,
+  PresentationDefinition,
+} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
-import { Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { CredentialSubject, CredentialSubjectJsonpathNode, VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
-  private pDefinition: PresentationDefinition;
-  private vPresentation: VerifiablePresentation;
+  private pDefinition: PresentationDefinition | undefined;
+  private vPresentation: VerifiablePresentation | undefined;
 
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
   private readonly allDescribedCredentialsPaths: Map<string, string>;
 
-  private credentialsSubjects: Map<string, string>;
+  private credentialsSubjects: Map<string, CredentialSubject>;
 
   private messages: Map<Status, string>;
 
@@ -27,7 +34,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<Set<string>, Set<string>>();
     this.allDescribedCredentialsPaths = new Map<string, string>();
 
-    this.credentialsSubjects = new Map<string, string>();
+    this.credentialsSubjects = new Map<string, CredentialSubject>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the same subject belong to same subject');
@@ -55,25 +62,23 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
   private findSameSubjectFieldIdsToInputDescriptorsSets() {
-    this.pDefinition.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
+    this.pDefinition?.input_descriptors?.forEach(this.mapFieldIdsToInputDescriptors());
   }
 
-  private mapFieldIdsToInputDescriptors() {
-    return (inputDescriptor) => {
+  private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {
+    return (inputDescriptor: InputDescriptor) => {
       inputDescriptor.constraints?.same_subject?.forEach(this.mapSameSubjectsToInputDescriptors(inputDescriptor));
     };
   }
 
-  private mapSameSubjectsToInputDescriptors(inDesc: InputDescriptor) {
-    return (sameSubjectGroup) => {
-      let fieldIdzInputDescriptors;
-
+  private mapSameSubjectsToInputDescriptors(inDesc: InputDescriptor): (sameSubjectGroup: HolderSubject) => void {
+    return (sameSubjectGroup: HolderSubject) => {
+      let fieldIdzInputDescriptors: Map<Set<string>, Set<string>> = new Map<Set<string>, Set<string>>();
       if (sameSubjectGroup.directive === Optionality.Required) {
         fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectRequired;
       } else if (sameSubjectGroup.directive === Optionality.Preferred) {
         fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectPreferred;
       }
-
       this.upsertFieldIdToInputDescriptorMapping(fieldIdzInputDescriptors, sameSubjectGroup.field_id, inDesc.id);
     };
   }
@@ -95,7 +100,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     const inputDescriptorIds: Array<string> = this.getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds);
     inputDescriptorIds.push(inDescId);
 
-    if (this.getValue(fieldIdzInputDescriptors, searchableFieldIds) == null) {
+    if (!this.getValue(fieldIdzInputDescriptors, searchableFieldIds)) {
       SameSubjectEvaluationHandler.addEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
     } else {
       this.updateEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
@@ -103,26 +108,37 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds: Array<string>): Array<string> {
-    return this.pDefinition.input_descriptors
-      .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
-      .map((filteredInDesces) => filteredInDesces.id);
+    if (this.pDefinition?.input_descriptors) {
+      return this.pDefinition?.input_descriptors
+        .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
+        .map((filteredInDesces) => filteredInDesces.id);
+    }
+    return [];
   }
 
-  private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>) {
-    return (inDesc) =>
-      inDesc.constraints.fields.filter(this.fieldExistsInInputDescriptor(searchableFieldIds)).length > 0;
+  private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
+    return (inDesc: InputDescriptor) => {
+      if (inDesc && inDesc.constraints && inDesc.constraints.fields) {
+        return inDesc.constraints.fields.filter(this.fieldExistsInInputDescriptor(searchableFieldIds)).length > 0;
+      }
+      return false;
+    };
   }
 
-  private fieldExistsInInputDescriptor(searchableFieldIds: Array<string>) {
-    return (value) => searchableFieldIds.includes(value.id);
+  private fieldExistsInInputDescriptor(searchableFieldIds: Array<string>): (field: Field) => boolean {
+    return (field: Field) => {
+      if (field && field.id) {
+        return searchableFieldIds.includes(field.id);
+      }
+      return false;
+    };
   }
 
   getValue(
     fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
     searchableFieldIds: Array<string>
-  ): { mappedFieldIds; mappedInputDescriptorIds } {
-    let entry: { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } = null;
-
+  ): { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined {
+    let entry: { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined;
     for (const [mappedFieldIds, mappedInputDescriptorIds] of fieldIdzInputDescriptors.entries()) {
       if (Array.from(mappedFieldIds.values()).filter((value) => searchableFieldIds.includes(value)).length > 0) {
         entry = { mappedFieldIds, mappedInputDescriptorIds };
@@ -147,25 +163,24 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
     searchableFieldIds: Array<string>,
     inputDescriptorIds: Array<string>
-  ) {
+  ): void {
     const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
 
-    searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
-
-    inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
-  }
-
-  private findAllDescribedCredentialsPaths() {
-    if (this.vPresentation.getPresentationSubmission()) {
-      this.vPresentation.getPresentationSubmission().descriptor_map.forEach(this.descriptorToPathMapper());
+    if (entry) {
+      searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
+      inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
     }
   }
 
-  private descriptorToPathMapper() {
-    return (descriptor) => this.findDescribedCredentialPaths(descriptor);
+  private findAllDescribedCredentialsPaths() {
+    this.vPresentation?.presentation_submission?.descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
-  private findDescribedCredentialPaths(descriptor: Descriptor) {
+  private descriptorToPathMapper(): (descriptor: Descriptor) => void {
+    return (descriptor: Descriptor) => this.findDescribedCredentialPaths(descriptor);
+  }
+
+  private findDescribedCredentialPaths(descriptor: Descriptor): void {
     this.allDescribedCredentialsPaths.set(descriptor.id, descriptor.path);
 
     if (descriptor.path_nested) {
@@ -178,8 +193,11 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapCredentialPathToCredentialSubject() {
-    return (path, inDescId) => {
-      const subjectNode = jp.nodes(this.vPresentation.getRoot(), path.concat('.credentialSubject'));
+    return (path: string, inDescId: string) => {
+      const subjectNode: CredentialSubjectJsonpathNode[] = jp.nodes(
+        this.vPresentation,
+        path.concat('.credentialSubject')
+      );
       if (subjectNode.length) {
         this.credentialsSubjects.set(inDescId, subjectNode[0].value);
       }
@@ -193,10 +211,17 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     fieldIdzInputDescriptorsGroups.forEach(this.confirmFieldSetHasSameSubject(status));
   }
 
-  private confirmFieldSetHasSameSubject(status: 'info' | 'warn' | 'error') {
+  private confirmFieldSetHasSameSubject(
+    status: 'info' | 'warn' | 'error'
+  ): (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => void {
     return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
       const credentialSubjectsSet: Set<string> = new Set<string>();
-      inputDescriptorIds.forEach((inDescId) => credentialSubjectsSet.add(this.credentialsSubjects.get(inDescId)));
+      inputDescriptorIds.forEach((inDescId: string) => {
+        const credentialSubject = this.credentialsSubjects.get(inDescId);
+        if (!!credentialSubject && !!credentialSubject.id) {
+          credentialSubjectsSet.add(credentialSubject.id);
+        }
+      });
       this.addResult(credentialSubjectsSet, fieldIdSet, status);
     };
   }

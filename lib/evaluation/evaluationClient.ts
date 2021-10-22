@@ -3,22 +3,31 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { Status } from '../ConstraintUtils';
 import { VerifiablePresentation } from '../verifiablePresentation';
 
-import { EvaluationHandler } from './evaluationHandler';
 import { HandlerCheckResult } from './handlerCheckResult';
-import { InputDescriptorFilterEvaluationHandler } from './inputDescriptorFilterEvaluationHandler';
-import { LimitDisclosureEvaluationHandler } from './limitDisclosureEvaluationHandler';
-import { MarkForSubmissionEvaluationHandler } from './markForSubmissionEvaluationHandler';
-import { PredicateRelatedFieldEvaluationHandler } from './predicateRelatedFieldEvaluationHandler';
-import { SameSubjectEvaluationHandler } from './sameSubjectEvaluationHandler';
-import { SubjectIsHolderEvaluationHandler } from './subjectIsHolderEvaluationHandler';
-import { SubjectIsIssuerEvaluationHandler } from './subjectIsIssuerEvaluationHandler';
-import { UriEvaluationHandler } from './uriEvaluationHandler';
+import {
+  EvaluationHandler,
+  InputDescriptorFilterEvaluationHandler,
+  LimitDisclosureEvaluationHandler,
+  MarkForSubmissionEvaluationHandler,
+  PredicateRelatedFieldEvaluationHandler,
+  SameSubjectEvaluationHandler,
+  SubjectIsHolderEvaluationHandler,
+  SubjectIsIssuerEvaluationHandler,
+  UriEvaluationHandler,
+} from './handlers';
 
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = null;
-    this._did = null;
+    this._verifiablePresentation = {
+      '@context': [],
+      type: '',
+      holder: '',
+      verifiableCredential: [],
+      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
+      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    };
+    this._did = '';
   }
 
   private failed_catched = {
@@ -33,7 +42,7 @@ export class EvaluationClient {
   private _did: string;
 
   public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
-    this._did = vp.getHolder();
+    this._did = vp.holder;
     let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
     currentHandler.handle(pd, vp);
     while (currentHandler.hasNext()) {
@@ -41,8 +50,8 @@ export class EvaluationClient {
       try {
         currentHandler.handle(pd, vp);
       } catch (e) {
-        this.failed_catched.message += e.message;
-        this.failed_catched.stacktrace = e;
+        this.failed_catched.message += (e as Error).message;
+        this.failed_catched.stacktrace = e as string;
         throw this.failed_catched;
       }
     }

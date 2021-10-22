@@ -4,16 +4,13 @@ import { Validated } from './validated';
 
 export type ValidationPredicate<T> = (t: T) => boolean;
 
-export class Validation<T> {
+export interface Validation<T> {
   tag: string;
   target: T;
   predicate: ValidationPredicate<T>;
   message: string;
   status?: Status;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Validatable {}
 
 export type ValidateAll = <T>(validations: Validation<T>[]) => Validated;
 

@@ -3,12 +3,12 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
-import { Validatable, Validation, ValidationPredicate } from '../core';
+import { Validation, ValidationPredicate } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
 export class FieldsVB extends ValidationBundler<Field[]> {
-  private schemaValidator: Ajv;
+  private readonly schemaValidator: Ajv;
 
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
   private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
@@ -26,10 +26,9 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<Validatable>[] {
+  public getValidations(fields: Field[]): Validation<Field>[] {
     let validations: Validation<Field>[] = [];
-
-    if (fields != null) {
+    if (fields) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [...validations, ...this.getValidationsFor(fields[srInd], srInd)];
       }
@@ -37,7 +36,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation<Validatable>[] {
+  public getValidationsFor(field: Field, indx: number): Validation<Field>[] {
     return [
       {
         tag: this.getMyTag(indx),
@@ -59,14 +58,14 @@ export class FieldsVB extends ValidationBundler<Field[]> {
       },
       {
         tag: this.getMyTag(indx),
-        target: field?.purpose,
-        predicate: FieldsVB.optionalNonEmptyString,
+        target: field,
+        predicate: (field: Field) => FieldsVB.optionalNonEmptyString(field?.purpose),
         message: this.purposeShouldBeANonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(indx),
-        target: field?.predicate,
-        predicate: FieldsVB.shouldBeKnownOption,
+        target: field,
+        predicate: (field: Field) => FieldsVB.shouldBeKnownOption(field?.predicate),
         message: this.shouldBeKnownOptionMsg,
       },
     ];
@@ -117,12 +116,12 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return (fieldObj: Field): boolean => !(fieldObj.predicate != null && fieldObj.filter == null);
   }
 
-  private static optionalNonEmptyString(str: string): boolean {
+  private static optionalNonEmptyString(str: string | undefined): boolean {
     // TODO extract to generic utils or use something like lodash
     return str == null || str.length > 0;
   }
 
-  private static shouldBeKnownOption(option: Optionality): boolean {
+  private static shouldBeKnownOption(option: Optionality | undefined): boolean {
     // TODO can be be extracted as a generic function
     return option == null || option == Optionality.Required || option == Optionality.Preferred;
   }

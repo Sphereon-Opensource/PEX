@@ -1,7 +1,7 @@
 import { Rules } from '@sphereon/pe-models';
 
 export interface SubmissionRequirementMatch {
-  name: string;
+  name?: string;
   rule: Rules;
   count: number;
   matches: string[];

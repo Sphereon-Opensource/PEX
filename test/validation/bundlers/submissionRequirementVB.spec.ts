@@ -13,7 +13,7 @@ describe('validate', () => {
       from: 'B'
     }]
 
-    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd');
+    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd') as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{bundler: vb, target: srs}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
@@ -25,7 +25,7 @@ describe('validate', () => {
       from_nested: []
     }]
 
-    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd');
+    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd') as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{bundler: vb, target: srs}]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
@@ -58,7 +58,7 @@ describe('validate', () => {
       }
     ];
 
-    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd');
+    const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB('pd') as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{bundler: vb, target: srs}]);
     expect(result).toEqual([

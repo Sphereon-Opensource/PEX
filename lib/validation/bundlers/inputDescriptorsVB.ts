@@ -1,4 +1,4 @@
-import { InputDescriptor, Schema } from '@sphereon/pe-models';
+import { Constraints, Field, HolderSubject, InputDescriptor, Schema } from '@sphereon/pe-models';
 
 import { Validation, ValidationPredicate } from '../core';
 
@@ -9,58 +9,109 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
   private readonly idMustBeNonEmptyStringMsg = 'input descriptor id must be non-empty string';
   private readonly nameShouldBeNonEmptyStringMsg = 'input descriptor name should be non-empty string';
   private readonly purposeShouldBeNonEmptyStringMsg = 'input descriptor purpose should be non-empty string';
-  private readonly idMustBeUniqueMsg = 'input descriptor id must be unique';
-  private readonly fieldsIdMustBeUniqueMsg = 'fields id must be unique';
   private readonly shouldHaveValidSchemaURIMsg = 'schema should have valid URI';
 
   constructor(parentTag: string) {
     super(parentTag, 'input_descriptor');
   }
 
-  public getValidations(inputDescriptors: InputDescriptor[]): Validation<unknown>[] {
-    let validations: Validation<unknown>[] = [];
+  public getValidations(
+    inputDescriptors: InputDescriptor[]
+  ): (
+    | Validation<InputDescriptor>
+    | Validation<InputDescriptor[]>
+    | Validation<Constraints>
+    | Validation<Field>
+    | Validation<HolderSubject>
+  )[] {
+    let validations: (
+      | Validation<InputDescriptor>
+      | Validation<InputDescriptor[]>
+      | Validation<Constraints>
+      | Validation<Field>
+      | Validation<HolderSubject>
+    )[] = [];
+
+    validations.push(
+      {
+        tag: this.getTag(),
+        target: inputDescriptors,
+        predicate: (inDescs: InputDescriptor[]) => this.shouldHaveUniqueIds(inDescs),
+        message: 'input descriptor ids must be unique',
+      },
+      {
+        tag: this.getTag(),
+        target: inputDescriptors,
+        predicate: (inDescs: InputDescriptor[]) => this.shouldHaveUniqueFieldsIds(inDescs),
+        message: 'fields id must be unique',
+      }
+    );
 
     inputDescriptors.forEach((inputDescriptor, inDescInd) => {
-      validations = [...validations, ...this.getValidationFor(inputDescriptor, inDescInd)];
+      validations = [
+        ...validations,
+        ...this.getValidationFor(inputDescriptor, inDescInd),
+        ...this.constraintsValidations(inputDescriptor, inDescInd),
+      ];
     });
-
-    validations = [
-      ...validations,
-      this.shouldHaveUniqueIds(inputDescriptors),
-      this.shouldHaveUniqueFieldsIds(inputDescriptors),
-    ];
-
     return validations;
   }
 
-  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
+  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<InputDescriptor>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
-        target: inputDescriptor?.id,
-        predicate: InputDescriptorsVB.nonEmptyString,
+        target: inputDescriptor,
+        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.nonEmptyString(inDesc?.id),
         message: this.idMustBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inputDescriptor?.schema,
+        target: inputDescriptor,
         predicate: this.isValidSchema(),
         message: this.shouldHaveValidSchemaURIMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inputDescriptor?.name,
-        predicate: InputDescriptorsVB.optionalNonEmptyString,
+        target: inputDescriptor,
+        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.optionalNonEmptyString(inDesc?.name),
         message: this.nameShouldBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
-        target: inputDescriptor?.purpose,
-        predicate: InputDescriptorsVB.optionalNonEmptyString,
+        target: inputDescriptor,
+        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.optionalNonEmptyString(inDesc?.purpose),
         message: this.purposeShouldBeNonEmptyStringMsg,
       },
-      ...this.constraintsValidations(inputDescriptor, inDescInd),
     ];
+  }
+
+  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): boolean {
+    const nonUniqueInputDescriptorFieldsIds: string[] = [];
+    const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
+    const tmp: Field[] = [];
+    inputDescriptors
+      .map((e) => e.constraints?.fields)
+      .forEach((e) => {
+        if (e) {
+          tmp.push(...e);
+        }
+      });
+    tmp.forEach((e) => {
+      if (e.id) {
+        nonUniqueInputDescriptorFieldsIds.push(e.id);
+      }
+    });
+    nonUniqueInputDescriptorFieldsIds.forEach((id) => uniqueInputDescriptorFieldsIds.add(id));
+    return nonUniqueInputDescriptorFieldsIds.length === uniqueInputDescriptorFieldsIds.size;
+  }
+
+  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): boolean {
+    const nonUniqueInputDescriptorIds: string[] = [];
+    const uniqueInputDescriptorIds: Set<string> = new Set<string>();
+    inputDescriptors.forEach((e) => nonUniqueInputDescriptorIds.push(e.id));
+    nonUniqueInputDescriptorIds.forEach((e) => uniqueInputDescriptorIds.add(e));
+    return nonUniqueInputDescriptorIds.length === uniqueInputDescriptorIds.size;
   }
 
   protected getMyTag(srInd: number) {
@@ -73,73 +124,24 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return id != null && id.length > 0;
   }
 
-  private static optionalNonEmptyString(name: string): boolean {
+  private static optionalNonEmptyString(name: string | undefined): boolean {
     // TODO extract to generic utils or use something like lodash
     return name == null || name.length > 0;
   }
 
-  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
-    const nonUniqueInputDescriptorIds: string[] = [];
-    const uniqueInputDescriptorIds: Set<string> = new Set<string>();
-
-    for (const inDesc of inputDescriptors) {
-      const oldSize = uniqueInputDescriptorIds.size;
-      uniqueInputDescriptorIds.add(inDesc.id);
-      const newSize = uniqueInputDescriptorIds.size;
-
-      if (oldSize === newSize) {
-        nonUniqueInputDescriptorIds.push(inDesc.id);
-      }
-    }
-
-    return {
-      tag: this.getTag(),
-      target: nonUniqueInputDescriptorIds,
-      predicate: (nonUniqueInputDescriptorIds: string[]) => nonUniqueInputDescriptorIds.length === 0,
-      message: this.idMustBeUniqueMsg,
-    };
-  }
-
-  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): Validation<unknown> {
-    const nonUniqueInputDescriptorFieldsIds: string[] = [];
-    const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
-
-    for (const inDesc of inputDescriptors) {
-      if (inDesc.constraints != null) {
-        for (const field of inDesc.constraints.fields) {
-          if (field.id != null) {
-            const oldSize = uniqueInputDescriptorFieldsIds.size;
-            uniqueInputDescriptorFieldsIds.add(field.id);
-            const newSize = uniqueInputDescriptorFieldsIds.size;
-
-            if (oldSize === newSize) {
-              nonUniqueInputDescriptorFieldsIds.push(field.id);
-            }
-          }
-        }
-      }
-    }
-
-    return {
-      tag: this.getTag(),
-      target: nonUniqueInputDescriptorFieldsIds,
-      predicate: (nonUniqueInputDescriptorFieldsIds: string[]) => nonUniqueInputDescriptorFieldsIds.length === 0,
-      message: this.fieldsIdMustBeUniqueMsg,
-    };
-  }
-
-  isValidSchema(): ValidationPredicate<Array<Schema>> {
+  isValidSchema(): ValidationPredicate<InputDescriptor> {
     // TODO extract to generic util or use built-in method
-    return (schemas: Array<Schema>): boolean => {
+    return (inDesc: InputDescriptor): boolean => {
       return (
-        schemas.filter(
-          (schema) => this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
+        inDesc.schema.filter(
+          (schema: Schema) =>
+            this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
         ).length > 0
       );
     };
   }
 
-  isAValidURI(uri) {
+  isAValidURI(uri: string) {
     try {
       new URL(uri);
     } catch (err) {
@@ -149,7 +151,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return true;
   }
 
-  private static isValidDIDURI(uri) {
+  private static isValidDIDURI(uri: string) {
     const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
     const format =
       '^' +
@@ -171,8 +173,11 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return new RegExp(format).test(uri);
   }
 
-  constraintsValidations(inputDescriptor: InputDescriptor, inDescInd: number): Validation<unknown>[] {
-    if (inputDescriptor !== null) {
+  constraintsValidations(
+    inputDescriptor: InputDescriptor,
+    inDescInd: number
+  ): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
+    if (inputDescriptor.constraints) {
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }
     return [];

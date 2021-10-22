@@ -2,11 +2,18 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Presentation, SubjectIsHolderEvaluationHandler, VP } from '../../lib';
+import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 
-function getFile(path: string): unknown {
-  return JSON.parse(fs.readFileSync(path, 'utf-8'));
+function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+  const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
+  if (Object.keys(file).includes('presentation_definition')) {
+    return file.presentation_definition as PresentationDefinition;
+  } else if (Object.keys(file).includes('presentation_submission')) {
+    return file as VerifiablePresentation;
+  } else {
+    return file as VerifiableCredential
+  }
 }
 
 const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
@@ -14,13 +21,12 @@ const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 describe('SubjectIsHolderEvaluationHandler tests', () => {
 
   it(`input descriptor's constraints.is_holder is present`, () => {
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_require_is_holder.json')['presentation_definition'];
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_require_is_holder.json') as PresentationDefinition;
     const results = getFile('./test/resources/isHolderEvaluationResults.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    const inputCandidates: unknown = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json');
-    const presentation: Presentation = new Presentation(inputCandidates['@context'], inputCandidates['presentation_submission'], inputCandidates['type'], inputCandidates['verifiableCredential'], inputCandidates['holder'], inputCandidates['proof']);
-    evaluationClient.verifiablePresentation = new VP(presentation);
+    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as VerifiablePresentation;
+    evaluationClient.verifiablePresentation = presentation;
     evaluationClient.did = HOLDER_DID;
     evaluationHandler.handle(presentationDefinition);
     expect(evaluationHandler.client.results).toEqual(results);

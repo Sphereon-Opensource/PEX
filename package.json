@@ -8,7 +8,13 @@
   "module": "dist/module/index.js",
   "repository": "https://github.com/Sphereon-Opensource/pe-js.git",
   "license": "Apache-2.0",
-  "keywords": ["SSI", "Presentation Exchange", "Verifiable Credentials", "Verifiable Presentations", "DIF"],
+  "keywords": [
+    "SSI",
+    "Presentation Exchange",
+    "Verifiable Credentials",
+    "Verifiable Presentations",
+    "DIF"
+  ],
   "scripts": {
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.main.json",
@@ -35,6 +41,7 @@
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
+    "@types/jsonpath": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
     "@typescript-eslint/parser": "^4.31.1",
     "codecov": "^3.8.3",

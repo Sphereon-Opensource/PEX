@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { PresentationDefinition } from '@sphereon/pe-models';
 import jp from 'jsonpath';
+
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation/SSI.types';
 
 export class JsonPathUtils {
   /**
@@ -44,8 +47,11 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  public static extractInputField(obj: unknown, paths: string[]): any[] {
-    let result = [];
+  public static extractInputField(
+    obj: VerifiablePresentation | VerifiableCredential | PresentationDefinition,
+    paths: string[]
+  ): any[] {
+    let result: any[] = [];
     if (paths) {
       for (const path of paths) {
         result = jp.nodes(obj, path);

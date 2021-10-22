@@ -1,12 +1,12 @@
 import { Constraints, Descriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status } from '../ConstraintUtils';
-import { JsonPathUtils } from '../utils/jsonPathUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { Status } from '../../ConstraintUtils';
+import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { VerifiablePresentation } from '../../verifiablePresentation';
+import { EvaluationClient } from '../evaluationClient';
+import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { EvaluationClient } from './evaluationClient';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
@@ -19,7 +19,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
 
   public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
     for (let i = 0; i < pd.input_descriptors.length; i++) {
-      const constraints: Constraints = pd.input_descriptors[i].constraints;
+      const constraints: Constraints | undefined = pd.input_descriptors[i].constraints;
       if (constraints && constraints.subject_is_issuer && constraints.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(pd.input_descriptors[i].id, p, i);
       }
@@ -28,12 +28,10 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
 
   private checkSubjectIsIssuer(inputDescriptorId: string, vp: VerifiablePresentation, idIdx: number) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.getPresentationSubmission().descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = this.verifiablePresentation.getPresentationSubmission().descriptor_map[i];
+    for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
+      const currentDescriptor: Descriptor = this.verifiablePresentation.presentation_submission.descriptor_map[i];
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation['presentation'], [
-          currentDescriptor.path,
-        ]);
+        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
         if (vc.length > 0 && vc[0].value.issuer === vc[0].value.credentialSubject.id) {
           this.generateSuccessResult(idIdx, vp, vc[0].value.id);
         } else {
@@ -65,26 +63,26 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private generateResult(idIdx: number, vp: VerifiablePresentation, vcId: string): HandlerCheckResult {
-    for (let i = 0; i < vp.getVerifiableCredentials().length; i++) {
-      if (vp.getVerifiableCredentials()[i].id === vcId) {
+  private generateResult(idIdx: number, vp: VerifiablePresentation, vcId: string): HandlerCheckResult | undefined {
+    for (let i = 0; i < vp.verifiableCredential.length; i++) {
+      if (vp.verifiableCredential[i]['id'] === vcId) {
         return new HandlerCheckResult(
           `$.input_descriptors[${idIdx}]`,
           `$.verifiableCredential[${i}]`,
           this.getName(),
-          undefined,
+          Status.INFO,
           undefined,
           undefined
         );
       }
     }
-    return null;
+    return undefined;
   }
 
-  private generateVcNotFoundError(idIdx: number, vp: VerifiablePresentation) {
+  private generateVcNotFoundError(idIdx: number, vp: VerifiablePresentation): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: undefined,
+      verifiable_credential_path: '',
       evaluator: this.getName(),
       status: Status.ERROR,
       message: "couldn't find the verifiableCredential corresponding to VC in final verifiablePresentation.",
