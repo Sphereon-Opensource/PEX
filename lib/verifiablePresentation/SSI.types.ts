@@ -34,8 +34,6 @@ export interface Credential {
 }
 
 export interface VerifiableCredential extends Credential {
-  issuer: string;
-  issuanceDate: string;
   proof: Proof;
 }
 
