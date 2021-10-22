@@ -112,7 +112,9 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   ) {
     for (const id of inputDescriptors.entries()) {
       if (info.input_descriptor_path === `$.input_descriptors[${id[0]}]`) {
-        const descriptor: Descriptor = { id: id[1].id, format: 'ldp_vc', path: `$.${path}[${vc[0]}]` };
+        const index = this.verifiablePresentation.verifiableCredential.length;
+        const descriptor: Descriptor = { id: id[1].id, format: 'ldp_vc', path: `$.${path}[${index}]` };
+        info.verifiable_credential_path = descriptor.path;
         this.pushToDescriptorsMap(descriptor, vc);
         this.pushToResults(info, id);
       }

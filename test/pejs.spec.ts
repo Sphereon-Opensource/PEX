@@ -37,13 +37,13 @@ describe('evaluate', () => {
 
   it('Evaluate submission requirements all from group A', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
     pejs.evaluate(pdSchema, vpSimple);
-    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple);
+    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
