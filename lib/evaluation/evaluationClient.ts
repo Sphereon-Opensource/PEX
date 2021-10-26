@@ -19,14 +19,7 @@ import {
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = {
-      '@context': [],
-      type: '',
-      holder: '',
-      verifiableCredential: [],
-      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
-      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
-    };
+    this._verifiablePresentation = {};
     this._did = '';
   }
 
@@ -38,17 +31,17 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiablePresentation: VerifiablePresentation;
+  private _verifiablePresentation: Partial<VerifiablePresentation>;
   private _did: string;
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
-    this._did = vp.holder;
-    let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp);
-    while (currentHandler.hasNext()) {
+  public evaluate(pd: PresentationDefinition, vp: Partial<VerifiablePresentation>): void {
+    this._did = (vp as VerifiablePresentation).holder;
+    let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
+    currentHandler.handle(pd, (vp as VerifiablePresentation));
+    while (!!currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler.handle(pd, vp);
+        currentHandler?.handle(pd, (vp as VerifiablePresentation));
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
@@ -70,7 +63,7 @@ export class EvaluationClient {
   }
 
   public get verifiablePresentation(): VerifiablePresentation {
-    return this._verifiablePresentation;
+    return this._verifiablePresentation as VerifiablePresentation;
   }
 
   public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {

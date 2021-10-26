@@ -33,12 +33,8 @@ export class EvaluationClientWrapper {
   ): SelectResults {
     let selectResults: SelectResults;
     this._client.evaluate(presentationDefinition, {
-      '@context': [],
-      type: '',
-      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
       verifiableCredential: selectableCredentials,
       holder: did,
-      proof: { verificationMethod: '', proofPurpose: '', jws: '', type: '', created: '' },
     });
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
@@ -56,7 +52,7 @@ export class EvaluationClientWrapper {
         (i) => this._client.verifiablePresentation.verifiableCredential[i]
       );
       selectResults = {
-        errors: marked.length > 0 ? [] : errors,
+        errors: errors,
         matches: [...matchSubmissionRequirements],
         verifiableCredentials: vcs,
         warnings,
@@ -67,7 +63,7 @@ export class EvaluationClientWrapper {
       );
 
       selectResults = {
-        errors: marked.length > 0 ? [] : errors,
+        errors: errors,
         matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
         verifiableCredentials: this._client.verifiablePresentation.verifiableCredential,
         warnings,
@@ -78,8 +74,7 @@ export class EvaluationClientWrapper {
 
   private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]): number[] {
     const indexes: number[] = [];
-    const matchesFlattened: string[] = [];
-    matchSubmissionRequirements.forEach((s) => matchesFlattened.push(...s.matches));
+    const matchesFlattened: string[] = matchSubmissionRequirements.map((s:SubmissionRequirementMatch) => s.matches).flat();
     indexes.push(...this.parseIndexes(matchesFlattened));
     if (!matchesFlattened || !matchesFlattened.length) {
       const srFlattened: SubmissionRequirementMatch[] = [];
@@ -159,7 +154,7 @@ export class EvaluationClientWrapper {
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch | null {
     const srm = this.createSubmissionRequirementMatch(sr);
-    if (srm && srm.from && sr.from) {
+    if (srm?.from && sr?.from) {
       if (!srm.from.includes(sr.from)) {
         srm.from.push(sr.from);
       }

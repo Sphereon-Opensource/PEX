@@ -118,7 +118,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
     return (inDesc: InputDescriptor) => {
-      if (inDesc && inDesc.constraints && inDesc.constraints.fields) {
+      if (inDesc?.constraints?.fields) {
         return inDesc.constraints.fields.filter(this.fieldExistsInInputDescriptor(searchableFieldIds)).length > 0;
       }
       return false;
@@ -127,7 +127,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private fieldExistsInInputDescriptor(searchableFieldIds: Array<string>): (field: Field) => boolean {
     return (field: Field) => {
-      if (field && field.id) {
+      if (field?.id) {
         return searchableFieldIds.includes(field.id);
       }
       return false;
