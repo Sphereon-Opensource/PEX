@@ -37,11 +37,11 @@ export class EvaluationClient {
   public evaluate(pd: PresentationDefinition, vp: Partial<VerifiablePresentation>): void {
     this._did = (vp as VerifiablePresentation).holder;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
-    currentHandler.handle(pd, (vp as VerifiablePresentation));
-    while (!!currentHandler?.hasNext()) {
+    currentHandler.handle(pd, vp as VerifiablePresentation);
+    while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler?.handle(pd, (vp as VerifiablePresentation));
+        currentHandler?.handle(pd, vp as VerifiablePresentation);
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
