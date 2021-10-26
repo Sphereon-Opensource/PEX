@@ -74,7 +74,9 @@ export class EvaluationClientWrapper {
 
   private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]): number[] {
     const indexes: number[] = [];
-    const matchesFlattened: string[] = matchSubmissionRequirements.map((s:SubmissionRequirementMatch) => s.matches).flat();
+    const matchesFlattened: string[] = matchSubmissionRequirements
+      .map((s: SubmissionRequirementMatch) => s.matches)
+      .flat();
     indexes.push(...this.parseIndexes(matchesFlattened));
     if (!matchesFlattened || !matchesFlattened.length) {
       const srFlattened: SubmissionRequirementMatch[] = [];
