@@ -36,7 +36,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this.client.verifiablePresentation;
   }
 
-  public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {
+  public set verifiablePresentation(verifiablePresentation: Partial<VerifiablePresentation>) {
     this.client.verifiablePresentation = verifiablePresentation;
   }
 

@@ -66,7 +66,7 @@ export class EvaluationClient {
     return this._verifiablePresentation as VerifiablePresentation;
   }
 
-  public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {
+  public set verifiablePresentation(verifiablePresentation: Partial<VerifiablePresentation>) {
     this._verifiablePresentation = verifiablePresentation;
   }
 

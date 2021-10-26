@@ -119,10 +119,12 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorId: string
   ) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = verifiablePresentation.presentation_submission.descriptor_map[i];
-      if (currentDescriptor.id === inputDescriptorId) {
-        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
+    if (verifiablePresentation.presentation_submission?.descriptor_map.length) {
+      for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
+        const currentDescriptor: Descriptor = verifiablePresentation.presentation_submission.descriptor_map[i];
+        if (currentDescriptor.id === inputDescriptorId) {
+          this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
+        }
       }
     }
   }

@@ -198,7 +198,7 @@ export class EvaluationClientWrapper {
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
-    if (this._client.verifiablePresentation.presentation_submission.descriptor_map.length) {
+    if (this._client.verifiablePresentation.presentation_submission?.descriptor_map.length) {
       result.value = this._client.verifiablePresentation.presentation_submission;
     }
     return result;
@@ -250,11 +250,13 @@ export class EvaluationClientWrapper {
       }
     });
     const desc: InputDescriptor[] = inDescIndexes.map((i: number) => pd.input_descriptors[i]);
-    const matchedDescriptors = this._client.verifiablePresentation.presentation_submission.descriptor_map.filter(
+    const matchedDescriptors = this._client.verifiablePresentation.presentation_submission?.descriptor_map.filter(
       (value) => desc.map((e) => e.id).includes(value.id)
     );
-    this._client.verifiablePresentation.presentation_submission.descriptor_map = matchedDescriptors;
-    return this._client.verifiablePresentation.presentation_submission;
+    if (this._client.verifiablePresentation.presentation_submission?.descriptor_map && matchedDescriptors) {
+      this._client.verifiablePresentation.presentation_submission.descriptor_map = matchedDescriptors;
+    }
+    return this._client.verifiablePresentation.presentation_submission as PresentationSubmission;
   }
 
   private matchUserSelectedVcs(

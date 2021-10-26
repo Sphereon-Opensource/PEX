@@ -19,8 +19,11 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
 
   public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
     this.verifiablePresentation = {
-      '@context': [],
-      type: '',
+      '@context': [
+        'https://www.w3.org/2018/credentials/v1',
+        'https://identity.foundation/presentation-exchange/submission/v1',
+      ],
+      type: ['VerifiablePresentation', 'PresentationSubmission'],
       presentation_submission: {
         id: nanoid(),
         definition_id: pd.id,
@@ -28,13 +31,6 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       },
       holder: p.holder,
       verifiableCredential: [],
-      proof: {
-        created: '',
-        verificationMethod: '',
-        type: '',
-        proofPurpose: '',
-        jws: '',
-      },
     };
     const results: HandlerCheckResult[] = [...this.getResults()];
     const errors: HandlerCheckResult[] = this.removeDuplicate(
@@ -96,7 +92,9 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     info: HandlerCheckResult[],
     path: string
   ) {
-    this.verifiablePresentation.presentation_submission.definition_id = pd.id;
+    if (this.verifiablePresentation.presentation_submission) {
+      this.verifiablePresentation.presentation_submission.definition_id = pd.id;
+    }
     const result = info.find((result) => result.verifiable_credential_path === `$.${path}[${vc[0]}]`);
     if (!result) {
       return;
@@ -133,19 +131,19 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   private pushToDescriptorsMap(newDescriptor: Descriptor, vc: [number, VerifiableCredential]) {
-    const descriptorMap: Descriptor[] = this.verifiablePresentation.presentation_submission.descriptor_map;
-    if (descriptorMap.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
+    const descriptorMap = this.verifiablePresentation.presentation_submission?.descriptor_map;
+    if (descriptorMap?.find((d) => d.id === newDescriptor.id && d.path !== newDescriptor.path)) {
       this.verifiablePresentation.verifiableCredential.push(vc[1]);
-      this.verifiablePresentation.presentation_submission.descriptor_map.forEach((d: Descriptor) =>
+      this.verifiablePresentation.presentation_submission?.descriptor_map.forEach((d: Descriptor) =>
         this.addPathNestedDescriptor(d, newDescriptor)
       );
     } else if (
-      !descriptorMap.find(
+      !descriptorMap?.find(
         (d) => d.id === newDescriptor.id && d.format === newDescriptor.format && d.path === newDescriptor.path
       )
     ) {
       this.verifiablePresentation.verifiableCredential.push(vc[1]);
-      this.verifiablePresentation.presentation_submission.descriptor_map.push(newDescriptor);
+      this.verifiablePresentation.presentation_submission?.descriptor_map.push(newDescriptor);
     }
   }
 

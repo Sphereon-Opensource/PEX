@@ -39,14 +39,14 @@ export interface VerifiableCredential extends Credential {
 
 export interface Presentation {
   '@context': string[];
-  type: string[] | string;
+  type: string[];
   verifiableCredential: VerifiableCredential[];
+  presentation_submission?: PresentationSubmission;
   holder: string;
-  proof?: Proof;
 }
 
 export interface VerifiablePresentation extends Presentation {
-  presentation_submission: PresentationSubmission;
+  proof: Proof;
 }
 
 export type CredentialSubjectJsonpathNode = { path: PathComponent[]; value: CredentialSubject };

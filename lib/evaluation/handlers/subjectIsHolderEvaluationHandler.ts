@@ -171,7 +171,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private findAllDescribedCredentialsPaths() {
-    this.vPresentation?.presentation_submission.descriptor_map.forEach(this.descriptorToPathMapper());
+    this.vPresentation?.presentation_submission?.descriptor_map.forEach(this.descriptorToPathMapper());
   }
 
   private descriptorToPathMapper(): (descriptor: Descriptor) => void {

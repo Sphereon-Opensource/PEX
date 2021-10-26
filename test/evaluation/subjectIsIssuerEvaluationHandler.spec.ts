@@ -50,12 +50,13 @@ describe('evaluate', () => {
       }
     ];
     subjectIsIssuerEvaluationHandler.verifiablePresentation =  {
-      '@context': [],
-      type: '',
+      '@context': [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://identity.foundation/presentation-exchange/submission/v1"
+      ],
+      type: ["VerifiablePresentation", "PresentationSubmission"],
       presentation_submission: presentationSubmission,
-      verifiableCredential,
-      holder: '',
-      proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
+      verifiableCredential
     };
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
@@ -105,12 +106,13 @@ describe('evaluate', () => {
     ];
     verifiableCredentials[0]['issuer'] = 'did:example:124';
     subjectIsIssuerEvaluationHandler.verifiablePresentation = {
-      '@context': [],
-      type: '',
+      '@context': [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://identity.foundation/presentation-exchange/submission/v1"
+      ],
+      type: ["VerifiablePresentation", "PresentationSubmission"],
       presentation_submission: presentationSubmission,
       verifiableCredential: verifiableCredentials,
-      holder: '',
-      proof: {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     };
 
     subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);

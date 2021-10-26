@@ -1,4 +1,4 @@
-import { Constraints, Descriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
@@ -28,14 +28,16 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
 
   private checkSubjectIsIssuer(inputDescriptorId: string, vp: VerifiablePresentation, idIdx: number) {
     const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = this.verifiablePresentation.presentation_submission.descriptor_map[i];
-      if (currentDescriptor.id === inputDescriptorId) {
-        const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
-        if (vc.length > 0 && vc[0].value.issuer === vc[0].value.credentialSubject.id) {
-          this.generateSuccessResult(idIdx, vp, vc[0].value.id);
-        } else {
-          this.generateErrorResult(idIdx, vp, vc[0].value.id);
+    if (verifiablePresentation.presentation_submission?.descriptor_map.length) {
+      for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
+        const currentDescriptor = this.verifiablePresentation.presentation_submission?.descriptor_map[i];
+        if (currentDescriptor?.id === inputDescriptorId) {
+          const vc = JsonPathUtils.extractInputField(this.verifiablePresentation, [currentDescriptor.path]);
+          if (vc.length > 0 && vc[0].value.issuer === vc[0].value.credentialSubject.id) {
+            this.generateSuccessResult(idIdx, vp, vc[0].value.id);
+          } else {
+            this.generateErrorResult(idIdx, vp, vc[0].value.id);
+          }
         }
       }
     }
