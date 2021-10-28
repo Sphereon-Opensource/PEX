@@ -1,7 +1,7 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -19,7 +19,8 @@ import {
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = {};
+    this._verifiableCredential = [];
+    this._presentationSubmission = {};
     this._did = '';
   }
 
@@ -31,17 +32,18 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiablePresentation: Partial<VerifiablePresentation>;
+  private _verifiableCredential: Partial<VerifiableCredential>[];
+  private _presentationSubmission: Partial<PresentationSubmission>;
   private _did: string;
 
   public evaluate(pd: PresentationDefinition, vp: Partial<VerifiablePresentation>): void {
     this._did = (vp as VerifiablePresentation).holder;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp as VerifiablePresentation);
+    currentHandler.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
     while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler?.handle(pd, vp as VerifiablePresentation);
+        currentHandler?.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
@@ -62,12 +64,20 @@ export class EvaluationClient {
     this._did = did;
   }
 
-  public get verifiablePresentation(): VerifiablePresentation {
-    return this._verifiablePresentation as VerifiablePresentation;
+  public get presentationSubmission(): PresentationSubmission {
+    return this._presentationSubmission as PresentationSubmission;
   }
 
-  public set verifiablePresentation(verifiablePresentation: Partial<VerifiablePresentation>) {
-    this._verifiablePresentation = verifiablePresentation;
+  public set presentationSubmission(presentationSubmission: Partial<PresentationSubmission>) {
+    this._presentationSubmission = presentationSubmission;
+  }
+
+  public get verifiableCredential(): VerifiableCredential[] {
+    return this._verifiableCredential as VerifiableCredential[];
+  }
+
+  public set verifiableCredential(verifiableCredential: Partial<VerifiableCredential>[]) {
+    this._verifiableCredential = verifiableCredential;
   }
 
   private initEvaluationHandlers() {

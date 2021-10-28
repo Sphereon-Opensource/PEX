@@ -1,7 +1,7 @@
 import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -16,10 +16,10 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: VerifiablePresentation): void {
+  public handle(d: PresentationDefinition, vcs: VerifiableCredential[]): void {
     d.input_descriptors.forEach((inDesc: InputDescriptor, i: number) => {
       const uris: string[] = inDesc.schema.map((so) => so.uri);
-      p.verifiableCredential.forEach((vc: VerifiableCredential, j: number) => {
+      vcs.forEach((vc: VerifiableCredential, j: number) => {
         this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
       });
     });
@@ -89,7 +89,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private createResult(idIdx: number, vcIdx: number): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: undefined,

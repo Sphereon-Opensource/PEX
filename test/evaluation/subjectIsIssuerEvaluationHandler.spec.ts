@@ -49,16 +49,10 @@ describe('evaluate', () => {
         'id': 'https://www.w3.org/TR/vc-data-model/#types'
       }
     ];
-    subjectIsIssuerEvaluationHandler.verifiablePresentation =  {
-      '@context': [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://identity.foundation/presentation-exchange/submission/v1"
-      ],
-      type: ["VerifiablePresentation", "PresentationSubmission"],
-      presentation_submission: presentationSubmission,
-      verifiableCredential
-    };
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
+    subjectIsIssuerEvaluationHandler.presentationSubmission = presentationSubmission;
+    subjectIsIssuerEvaluationHandler.verifiableCredential = verifiableCredential;
+
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
       'verifiable_credential_path': '$.verifiableCredential[0]',
@@ -105,17 +99,10 @@ describe('evaluate', () => {
       }
     ];
     verifiableCredentials[0]['issuer'] = 'did:example:124';
-    subjectIsIssuerEvaluationHandler.verifiablePresentation = {
-      '@context': [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://identity.foundation/presentation-exchange/submission/v1"
-      ],
-      type: ["VerifiablePresentation", "PresentationSubmission"],
-      presentation_submission: presentationSubmission,
-      verifiableCredential: verifiableCredentials,
-    };
+    subjectIsIssuerEvaluationHandler.presentationSubmission = presentationSubmission;
+    subjectIsIssuerEvaluationHandler.verifiableCredential = verifiableCredentials;
 
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       'evaluator': 'SubjectIsIssuerEvaluation',
       'input_descriptor_path': '$.input_descriptors[0]',

@@ -19,7 +19,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual(undefined);
   });
 
   it('should return ok if verifiablePresentation doesn\'t have the birthPlace field', function() {
@@ -29,6 +29,6 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['birthPlace']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0]['birthPlace']).toEqual(undefined);
   });
 });

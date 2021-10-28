@@ -22,89 +22,88 @@ describe('selectFrom tests', () => {
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
           }
         ],
         'matches': [
           {
-            'count': 3,
             'from': ['A'],
-            'matches': ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+            'matches': ['$[0]', '$[1]', '$[2]'],
             'name': 'Submission of educational transcripts',
             'rule': 'all'
           }
@@ -195,92 +194,92 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
+          'min': 2,
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
         }
@@ -345,82 +344,82 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
@@ -428,12 +427,11 @@ describe('selectFrom tests', () => {
           'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': ['A'],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -442,8 +440,8 @@ describe('selectFrom tests', () => {
               'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -540,92 +538,92 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
+          'max': 2,
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
         }
@@ -690,95 +688,93 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': ['A'],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -787,8 +783,8 @@ describe('selectFrom tests', () => {
               'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -884,95 +880,93 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': ['A'],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -981,14 +975,15 @@ describe('selectFrom tests', () => {
               'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
             }
           ],
           'matches': [],
+          'min': 1,
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'pick'
         }
@@ -1078,95 +1073,93 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': ['A'],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -1175,14 +1168,15 @@ describe('selectFrom tests', () => {
               'count': 2,
               'from': ['B'],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
             }
           ],
           'matches': [],
+          'max': 2,
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'pick'
         }
@@ -1272,92 +1266,92 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
+          'min': 3,
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
         }
@@ -1422,92 +1416,92 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
+          'max': 1,
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
         }
@@ -1572,91 +1566,91 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
+          'count': 1,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
           'name': 'Eligibility to Work Proof',
           'rule': 'pick'
@@ -1722,91 +1716,90 @@ describe('selectFrom tests', () => {
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "UriEvaluation",
           "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "FilterEvaluation",
           "status": "error",
-          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
         },
         {
           "tag": "MarkForSubmissionEvaluation",
           "status": "error",
-          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+          "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
         }
       ],
       'matches': [
         {
-          'count': 2,
           'from': ['B'],
           'matches': [
-            '$.verifiableCredential[1]',
-            '$.verifiableCredential[2]'
+            '$[1]',
+            '$[2]'
           ],
           'name': 'Submission of educational transcripts',
           'rule': 'all'
@@ -1872,97 +1865,95 @@ describe('selectFrom tests', () => {
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "UriEvaluation",
             "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]"
+            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "FilterEvaluation",
             "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
           },
           {
             "tag": "MarkForSubmissionEvaluation",
             "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]"
+            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
           },
       ],
       'matches': [
         {
-          'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': [
                 'A'
               ],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -1973,14 +1964,15 @@ describe('selectFrom tests', () => {
                 'B'
               ],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
             }
           ],
           'matches': [],
+          'min': 3,
           'name': 'Confirm banking relationship or employment and residence proofs',
           'rule': 'pick'
         }
@@ -2065,102 +2057,101 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    const result = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
+    expect(result).toEqual({
       'errors': [
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]',
+          'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]',
           'status': 'error',
           'tag': 'UriEvaluation'
         },
         {
-          'message': 'Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]',
+          'message': 'Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]',
           'status': 'error',
           'tag': 'FilterEvaluation'
         },
         {
-          'message': 'Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]',
+          'message': 'Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]',
           'status': 'error',
           'tag': 'FilterEvaluation'
         },
         {
-          'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+          'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
           'status': 'error',
           'tag': 'FilterEvaluation'
         },
         {
-          'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+          'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
           'status': 'error',
           'tag': 'FilterEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         },
         {
-          'message': 'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]',
+          'message': 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
           'status': 'error',
           'tag': 'MarkForSubmissionEvaluation'
         }
       ],
       'matches': [
         {
-          'count': 1,
           'from_nested': [
             {
-              'count': 3,
               'from': [
                 'A'
               ],
               'matches': [
-                '$.verifiableCredential[0]',
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[0]',
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'all'
@@ -2171,8 +2162,8 @@ describe('selectFrom tests', () => {
                 'B'
               ],
               'matches': [
-                '$.verifiableCredential[1]',
-                '$.verifiableCredential[2]'
+                '$[1]',
+                '$[2]'
               ],
               'name': undefined,
               'rule': 'pick'
@@ -2180,7 +2171,8 @@ describe('selectFrom tests', () => {
           ],
           'matches': [],
           'name': 'Confirm banking relationship or employment and residence proofs',
-          'rule': 'pick'
+          'rule': 'pick',
+          'max': 1
         }
       ],
       'verifiableCredentials': [
@@ -2265,7 +2257,13 @@ describe('selectFrom tests', () => {
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
     expect(result!.errors!.length).toEqual(1);
     expect(result!.matches![0]!.name).toEqual('EU Driver\'s License');
-    expect(result!.matches![0]!.count).toEqual(1);
+    expect(result!.matches![0]).toEqual({
+      "name": "EU Driver's License",
+      "rule": "all",
+      "matches": [
+        "$[0]"
+      ]
+    });
   });
 
   it('Evaluate driver license name result', () => {

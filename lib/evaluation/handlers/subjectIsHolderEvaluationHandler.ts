@@ -21,7 +21,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private pDefinition: PresentationDefinition | undefined;
-  private vPresentation: VerifiablePresentation | undefined;
+  private vPresentation: Partial<VerifiablePresentation> | undefined;
 
   private readonly fieldIdzInputDescriptorsIsHolderRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsIsHolderPreferred: Map<Set<string>, Set<string>>;
@@ -48,7 +48,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   public handle(pd: PresentationDefinition): void {
     this.pDefinition = pd;
-    this.vPresentation = this.client.verifiablePresentation;
+    this.vPresentation = {
+      presentation_submission: this.presentationSubmission,
+      verifiableCredential: this.verifiableCredential,
+    };
 
     this.findIsHolderFieldIdsToInputDescriptorsSets();
     this.findAllDescribedCredentialsPaths();

@@ -15,7 +15,7 @@ const success = {
   'value': expect.objectContaining({
     'definition_id': '31e2f0f1-6b70-411d-b239-56aed5321884',
     'descriptor_map': [
-      { 'format': 'ldp_vc', 'id': '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'path': '$.verifiableCredential[0]' }
+      { 'format': 'ldp_vc', 'id': '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'path': '$[0]' }
     ]
   }),
   'warnings': []
@@ -24,12 +24,12 @@ const success = {
 const error = {
   'errors': [
     {
-      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
       'status': 'error',
       'tag': 'UriEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     }
@@ -39,37 +39,37 @@ const error = {
 const error_2 = {
   'errors': [
     {
-      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
       'status': 'error',
       'tag': 'UriEvaluation'
     },
     {
-      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'UriEvaluation'
     },
     {
-      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
       'status': 'error',
       'tag': 'FilterEvaluation'
     },
     {
-      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'FilterEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[0]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     }],
@@ -79,32 +79,32 @@ const error_2 = {
 const success_error = {
   'errors': [
     {
-      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
       'status': 'error',
       'tag': 'UriEvaluation'
     },
     {
-      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'UriEvaluation'
     },
     {
-      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
       'status': 'error',
       'tag': 'FilterEvaluation'
     },
     {
-      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'FilterEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     },
     {
-      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+      'message': 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
       'status': 'error',
       'tag': 'MarkForSubmissionEvaluation'
     }
@@ -115,7 +115,7 @@ const success_error = {
       {
         'format': 'ldp_vc',
         'id': 'bankaccount_input',
-        'path': '$.verifiableCredential[0]'
+        'path': '$[0]'
       }
     ]
   }),
@@ -135,7 +135,7 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     expect(evaluationClient.results[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'verifiable_credential_path': '$[0]',
       'evaluator': 'UriEvaluation',
       'status': 'error',
       'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
@@ -150,7 +150,7 @@ describe('evaluate', () => {
     });
     expect(evaluationClient.results[3]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'verifiable_credential_path': '$[0]',
       'evaluator': 'MarkForSubmissionEvaluation',
       'status': 'error',
       'message': 'The input candidate is not eligible for submission',
@@ -190,7 +190,7 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     expect(evaluationClient.results[0]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'verifiable_credential_path': '$[0]',
       'evaluator': 'UriEvaluation',
       'status': 'error',
       'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
@@ -205,7 +205,7 @@ describe('evaluate', () => {
     });
     expect(evaluationClient.results[3]).toEqual({
       'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$.verifiableCredential[0]',
+      'verifiable_credential_path': '$[0]',
       'evaluator': 'MarkForSubmissionEvaluation',
       'status': 'error',
       'message': 'The input candidate is not eligible for submission',
@@ -286,7 +286,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
 
@@ -298,7 +298,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual('etc');
+    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual('etc');
     expect(evaluationResults).toEqual(success);
   });
 
@@ -310,7 +310,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['etc']).toEqual('etc');
+    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual('etc');
     expect(evaluationResults).toEqual(success);
   });
 
@@ -322,7 +322,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient.verifiablePresentation.verifiableCredential[0]['birthPlace']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0]['birthPlace']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
 
@@ -333,7 +333,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple!.holder = HOLDER_DID;
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    expect(evaluationClient!.verifiablePresentation!.verifiableCredential![0]!['etc']).toEqual(undefined);
+    expect(evaluationClient!.verifiableCredential![0]!['etc']).toEqual(undefined);
     expect(evaluationResults).toEqual(success);
   });
 
@@ -352,7 +352,7 @@ describe('evaluate', () => {
         {
           id: 'Educational transcripts',
           format: 'ldp_vc',
-          path: '$.verifiableCredential[0]'
+          path: '$[0]'
         }
       ]
     }));
@@ -370,8 +370,8 @@ describe('evaluate', () => {
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[0]' },
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[1]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[0]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$[1]' },
       ]
     }));
   });
@@ -388,7 +388,7 @@ describe('evaluate', () => {
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[0]' }
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[0]' }
       ]
     }));
   });
@@ -405,8 +405,8 @@ describe('evaluate', () => {
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[0]' },
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[1]' }
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[0]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$[1]' }
       ]
     }));
   });

@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
@@ -26,7 +26,8 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as VerifiablePresentation;
-    evaluationClient.verifiablePresentation = presentation;
+    evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
+    evaluationClient.verifiableCredential = presentation.verifiableCredential
     evaluationClient.did = HOLDER_DID;
     evaluationHandler.handle(presentationDefinition);
     expect(evaluationHandler.client.results).toEqual(results);

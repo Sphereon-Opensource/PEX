@@ -1,6 +1,6 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 
 export interface EvaluationHandler {
@@ -9,5 +9,5 @@ export interface EvaluationHandler {
   getNext(): EvaluationHandler | undefined;
   hasNext(): boolean;
   getName(): string;
-  handle(pd: PresentationDefinition, p: VerifiablePresentation): void;
+  handle(pd: PresentationDefinition, p: VerifiableCredential[]): void;
 }

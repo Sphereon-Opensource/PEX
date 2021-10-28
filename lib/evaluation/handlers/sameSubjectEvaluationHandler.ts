@@ -17,7 +17,7 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   private pDefinition: PresentationDefinition | undefined;
-  private vPresentation: VerifiablePresentation | undefined;
+  private vPresentation: Partial<VerifiablePresentation> | undefined;
 
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
@@ -48,7 +48,10 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   public handle(pd: PresentationDefinition): void {
     this.pDefinition = pd;
-    this.vPresentation = this.client.verifiablePresentation;
+    this.vPresentation = {
+      presentation_submission: this.presentationSubmission,
+      verifiableCredential: this.verifiableCredential,
+    };
 
     this.findSameSubjectFieldIdsToInputDescriptorsSets();
     this.findAllDescribedCredentialsPaths();

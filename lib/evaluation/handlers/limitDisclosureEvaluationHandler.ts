@@ -3,7 +3,7 @@ import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
@@ -19,55 +19,31 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
+  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
-      if (
-        inDesc.constraints &&
-        inDesc.constraints.limit_disclosure &&
-        inDesc.constraints.fields &&
-        inDesc.constraints.limit_disclosure === Optionality.Required
-      ) {
-        this.limitDisclosureShouldBeEnforced(p, inDesc.constraints.fields, index, inDesc.id);
+      if (inDesc.constraints?.fields && inDesc.constraints?.limit_disclosure === Optionality.Required) {
+        this.limitDisclosureShouldBeEnforced(vcs, inDesc.constraints.fields, index, inDesc.id);
       }
     });
   }
 
   private limitDisclosureShouldBeEnforced(
-    verifiablePresentation: VerifiablePresentation,
+    verifiableCredential: VerifiableCredential[],
     fields: Field[],
     idIdx: number,
     inputDescriptorId: string
   ): void {
-    for (let i = 0; i < verifiablePresentation.verifiableCredential.length; i++) {
-      const verifiableCredentialToSend: VerifiableCredential = this.createWithMandatoryFields(
-        verifiablePresentation.verifiableCredential[i]
-      );
-      this.determineNecessaryPaths(
-        verifiablePresentation.verifiableCredential[i],
-        verifiableCredentialToSend,
-        fields,
-        idIdx,
-        i
-      );
-      if (
-        this.verifiablePresentation.presentation_submission &&
-        this.verifiablePresentation.presentation_submission.descriptor_map
-      ) {
+    for (let i = 0; i < verifiableCredential.length; i++) {
+      const verifiableCredentialToSend: VerifiableCredential = this.createWithMandatoryFields(verifiableCredential[i]);
+      this.determineNecessaryPaths(verifiableCredential[i], verifiableCredentialToSend, fields, idIdx, i);
+      if (this.client.presentationSubmission.descriptor_map) {
         this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
       }
     }
   }
 
   private createWithMandatoryFields(verifiableCredential: VerifiableCredential): VerifiableCredential {
-    const verifiableCredentialToSend: VerifiableCredential = {
-      '@context': verifiableCredential['@context'],
-      issuer: verifiableCredential.issuer,
-      issuanceDate: verifiableCredential.issuanceDate,
-      proof: verifiableCredential.proof,
-      id: verifiableCredential.id,
-      credentialSubject: verifiableCredential.credentialSubject,
-      type: verifiableCredential.type,
-    };
+    const verifiableCredentialToSend: VerifiableCredential = { ...verifiableCredential };
     for (let i = 0; i < LimitDisclosureEvaluationHandler.mandatoryFields.length; i++) {
       verifiableCredentialToSend[LimitDisclosureEvaluationHandler.mandatoryFields[i]] =
         verifiableCredential[LimitDisclosureEvaluationHandler.mandatoryFields[i]];
@@ -118,10 +94,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     verifiableCredentialToSend: VerifiableCredential,
     inputDescriptorId: string
   ) {
-    const verifiablePresentation = this.verifiablePresentation;
-    if (verifiablePresentation.presentation_submission?.descriptor_map.length) {
-      for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
-        const currentDescriptor: Descriptor = verifiablePresentation.presentation_submission.descriptor_map[i];
+    if (this.client.presentationSubmission.descriptor_map.length) {
+      for (let i = 0; i < this.client.presentationSubmission.descriptor_map.length; i++) {
+        const currentDescriptor: Descriptor = this.client.presentationSubmission.descriptor_map[i];
         if (currentDescriptor.id === inputDescriptorId) {
           this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
         }
@@ -159,7 +134,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
    */
   private updateVcForPath(verifiableCredentialToSend: VerifiableCredential, path: string, idIdx: number): void {
     this.createSuccessResult(idIdx, path);
-    jp.apply(this.verifiablePresentation, path, (value: VerifiableCredential) => {
+    jp.apply(this.client, path, (value: VerifiableCredential) => {
       value = verifiableCredentialToSend;
       return value;
     });
