@@ -207,19 +207,20 @@ export class EvaluationClientWrapper {
     );
 
     if (pd.submission_requirements) {
-      const [updatedMarked, credentials] = this.matchUserSelectedVcs(marked, vcs);
+      const [updatedMarked, credentials, vcsMap] = this.matchUserSelectedVcs(marked, vcs);
       matched = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
       this._client.verifiableCredential = credentials;
-      return this.updatePresentationSubmission(matched[1], pd);
+      return this.updatePresentationSubmission(matched[1], pd, vcsMap);
     }
-    const [updatedMarked, credentials] = this.matchUserSelectedVcs(marked, vcs);
+    const [updatedMarked, credentials, vcsMap] = this.matchUserSelectedVcs(marked, vcs);
     this._client.verifiableCredential = credentials;
-    return this.updatePresentationSubmission(updatedMarked, pd);
+    return this.updatePresentationSubmission(updatedMarked, pd, vcsMap);
   }
 
   private updatePresentationSubmission(
     marked: HandlerCheckResult[],
-    pd: PresentationDefinition
+    pd: PresentationDefinition,
+    vcsMap: [string, string][]
   ): PresentationSubmission {
     const inDescIndexes: number[] = [];
     marked.forEach((e: HandlerCheckResult) => {
@@ -232,6 +233,18 @@ export class EvaluationClientWrapper {
     const matchedDescriptors = this._client.presentationSubmission?.descriptor_map.filter((value) =>
       desc.map((e) => e.id).includes(value.id)
     );
+
+    matchedDescriptors
+      .map((d) =>
+        vcsMap.map((m) => {
+          if (m[0] === d.path) {
+            d.path = m[1];
+          }
+          return d;
+        })
+      )
+      .flat();
+
     if (this._client.presentationSubmission?.descriptor_map && matchedDescriptors) {
       this._client.presentationSubmission.descriptor_map = matchedDescriptors;
     }
@@ -241,20 +254,29 @@ export class EvaluationClientWrapper {
   private matchUserSelectedVcs(
     marked: HandlerCheckResult[],
     vcs: VerifiableCredential[]
-  ): [HandlerCheckResult[], VerifiableCredential[]] {
-    const tmpMarkedVcs: [string, string][] = [];
-    const allCredentials: VerifiableCredential[] = this._client.verifiableCredential;
-
-    marked.map((e: HandlerCheckResult) => {
-      const index = e.verifiable_credential_path.match(/\d+/);
-      if (index) {
-        tmpMarkedVcs.push([e.verifiable_credential_path, JSON.stringify(allCredentials[parseInt(index[0])])]);
-      }
+  ): [HandlerCheckResult[], VerifiableCredential[], [string, string][]] {
+    const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
+    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
+      index,
+      JSON.stringify(vc),
+    ]);
+    const updatedIndexes: [string, string][] = [];
+    userSelected.forEach((us, i) => {
+      allCredentials.forEach((ac, j) => {
+        if (ac[1] === us[1]) {
+          updatedIndexes.push([`$[${j}]`, `$[${i}]`]);
+        }
+      });
     });
 
-    const userSelected = tmpMarkedVcs.filter((e) => vcs.map((vc) => JSON.stringify(vc)).includes(e[1]));
-    const credentials = userSelected.map((e) => JSON.parse(e[1])) as VerifiableCredential[];
-    return [marked.filter((e) => userSelected.map((f) => f[0]).includes(e.verifiable_credential_path)), credentials];
+    marked = marked.map((m) => {
+      const index = updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path);
+      if (index) {
+        m.verifiable_credential_path = index[1];
+      }
+      return m;
+    });
+    return [marked, vcs, updatedIndexes];
   }
 
   private evaluateRequirements(

@@ -42,10 +42,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       definition_id: pd.id,
       descriptor_map: descriptorMap,
     };
-    new Set(descriptorMap.map((e) => e.path)).forEach((d) => {
-      const vc = jp.nodes(vcs, d);
-      this.verifiableCredential.push(vc[0].value);
-    });
+    this.client.verifiableCredential = vcs;
 
     this.produceErrorResults(errors);
     this.produceSuccessResults(infos, pd);

@@ -1,4 +1,5 @@
-import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
@@ -23,6 +24,19 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(pd.input_descriptors[i].id, vcs, i);
       }
+    }
+    if (this.getResults().filter((r) => r.evaluator === 'SubjectIsIssuerEvaluation').length) {
+      this.presentationSubmission.descriptor_map = this.getResults()
+        .filter((r) => r.status === Status.ERROR && r.evaluator === 'SubjectIsIssuerEvaluation')
+        .flatMap((r) => {
+          /**
+           * TODO map the nested credential
+           */
+          const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
+          return this.presentationSubmission.descriptor_map.filter(
+            (ps) => ps.path !== r.verifiable_credential_path && ps.id !== inputDescriptor.id
+          );
+        });
     }
   }
 

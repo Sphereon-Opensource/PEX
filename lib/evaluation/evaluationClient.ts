@@ -86,11 +86,11 @@ export class EvaluationClient {
     uriEvaluation
       .setNext(new InputDescriptorFilterEvaluationHandler(this))
       .setNext(new PredicateRelatedFieldEvaluationHandler(this))
-      .setNext(new MarkForSubmissionEvaluationHandler(this))
       .setNext(new LimitDisclosureEvaluationHandler(this))
       .setNext(new SubjectIsIssuerEvaluationHandler(this))
       .setNext(new SubjectIsHolderEvaluationHandler(this))
-      .setNext(new SameSubjectEvaluationHandler(this));
+      .setNext(new SameSubjectEvaluationHandler(this))
+      .setNext(new MarkForSubmissionEvaluationHandler(this));
 
     return uriEvaluation;
   }

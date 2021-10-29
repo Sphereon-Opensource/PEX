@@ -1,4 +1,6 @@
-import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import jp from 'jsonpath';
+import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../verifiablePresentation';
@@ -23,6 +25,21 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
       });
     });
+    const descriptorMap: Descriptor[] = this.getResults()
+      .filter((e) => e.status === Status.INFO)
+      .map((e) => {
+        const inputDescriptor: InputDescriptor = jp.nodes(d, e.input_descriptor_path)[0].value;
+        return {
+          id: inputDescriptor.id,
+          format: 'ldp_vc',
+          path: e.verifiable_credential_path,
+        };
+      });
+    this.presentationSubmission = {
+      id: nanoid(),
+      definition_id: d.id,
+      descriptor_map: descriptorMap,
+    };
   }
 
   private static getPresentationURI(vc: VerifiableCredential): string[] {

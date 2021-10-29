@@ -59,6 +59,18 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.ERROR);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
+    //TODO the credential needs to be mapped to an input descriptor
+    this.presentationSubmission.descriptor_map = this.getResults()
+      .filter((r) => r.status === Status.ERROR && r.evaluator === 'SameSubjectEvaluationHandler')
+      .flatMap((r) => {
+        /**
+         * TODO map the nested credential
+         */
+        const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
+        return this.presentationSubmission.descriptor_map.filter(
+          (ps) => ps.path !== r.verifiable_credential_path && ps.id !== inputDescriptor.id
+        );
+      });
   }
 
   /**

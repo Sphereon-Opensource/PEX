@@ -59,12 +59,23 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
     this.confirmAllFieldSetHasSameHolder(this.fieldIdzInputDescriptorsIsHolderRequired, Status.ERROR);
     this.confirmAllFieldSetHasSameHolder(this.fieldIdzInputDescriptorsIsHolderPreferred, Status.WARN);
+    if (this.getResults().filter((r) => r.evaluator === 'IsHolderEvaluation').length) {
+      this.presentationSubmission.descriptor_map = this.getResults()
+        .filter((r) => r.status === Status.ERROR && r.evaluator === 'IsHolderEvaluation')
+        .flatMap((r) => {
+          /**
+           * TODO map the nested credential
+           */
+          const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
+          return this.presentationSubmission.descriptor_map.filter(
+            (ps) => ps.path !== r.verifiable_credential_path && ps.id !== inputDescriptor.id
+          );
+        });
+    }
   }
 
   private findIsHolderFieldIdsToInputDescriptorsSets() {
-    if (this.pDefinition && this.pDefinition.input_descriptors) {
-      this.pDefinition.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
-    }
+    this.pDefinition?.input_descriptors.forEach(this.mapFieldIdsToInputDescriptors());
   }
 
   private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {

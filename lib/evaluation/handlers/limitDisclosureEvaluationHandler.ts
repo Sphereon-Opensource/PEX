@@ -25,6 +25,20 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         this.limitDisclosureShouldBeEnforced(vcs, inDesc.constraints.fields, index, inDesc.id);
       }
     });
+
+    if (this.getResults().filter((r) => r.evaluator === 'LimitDisclosureEvaluation').length) {
+      this.presentationSubmission.descriptor_map = this.getResults()
+        .filter((r) => r.status === Status.ERROR && r.evaluator === 'LimitDisclosureEvaluation')
+        .flatMap((r) => {
+          /**
+           * TODO Map nested credentials
+           */
+          const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
+          return this.presentationSubmission.descriptor_map.filter(
+            (ps) => ps.path !== r.verifiable_credential_path && ps.id !== inputDescriptor.id
+          );
+        });
+    }
   }
 
   private limitDisclosureShouldBeEnforced(
