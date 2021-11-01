@@ -11,10 +11,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
   }
 
-  public evaluate(
-    presentationDefinition: PresentationDefinition,
-    presentation: Presentation
-  ): EvaluationResults {
+  public evaluate(presentationDefinition: PresentationDefinition, presentation: Presentation): EvaluationResults {
     return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation);
   }
 
