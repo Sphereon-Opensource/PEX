@@ -56,7 +56,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
          */
         const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
         return this.presentationSubmission.descriptor_map.filter(
-          (ps) => ps.path !== r.verifiable_credential_path && ps.id !== inputDescriptor.id
+          (ps) => ps.path === r.verifiable_credential_path && ps.id === inputDescriptor.id
         );
       });
   }
@@ -69,28 +69,25 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     const isHolder: { path: PathComponent[], value: HolderSubject }[] = jp.nodes(pd, '$..is_holder[*]');
     const fields: [string, string][] = fieldIds.map(n => [jp.stringify(n.path.slice(0, 3)), n.value]);
 
-    //Validation case when input descriptor does not match fields with is_holder???
-    isHolder.filter(d => d.value.directive === Optionality.Preferred)
-      //.filter(e => e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
-      .forEach(p => {
-        const field = fields.filter(f => !p.value.field_id.includes(f[1]));
-        if (!field.length) {
-          this.fieldIdzInputDescriptorsSameSubjectPreferred.set(jp.stringify(p.path.slice(0,3)), p.value.field_id);
-        } else {
-          this.getResults().push(this.createResult(field[1], field.map(f => f[0])[0], ['', {}], Status.ERROR))
-        }
-      });
+    let error: [string, string[]][] = [];
 
-    isHolder.filter(d => d.value.directive === Optionality.Required)
-      //.filter(e => e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
-      .forEach(p => {
-        const field = fields.filter(f => !p.value.field_id.includes(f[1]));
-        if (!field.length) {
-          this.fieldIdzInputDescriptorsSameSubjectRequired.set(jp.stringify(p.path.slice(0, 3)), p.value.field_id)
-        } else {
-          this.getResults().push(this.createResult(field[1], field.map(f => f[0])[0], ['', {}], Status.ERROR))
-        }
-      });
+    //Validation case when input descriptor does not match fields with is_holder???
+    error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectPreferred, isHolder, fields, Optionality.Preferred));
+    error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectRequired, isHolder, fields, Optionality.Required));
+
+    error.forEach(q => this.getResults().push(this.createResult(q[1], q[0], ['', {}], Status.ERROR)));
+  }
+
+  private evaluateFields(fieldsMapping: Map<string, string[]>, isHolder: { path: PathComponent[]; value: HolderSubject }[], fields: [string, string][], directive: Optionality) {
+    const error: [string, string[]][] = [];
+    isHolder.filter(d => d.value.directive === directive)
+      .filter(e => e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
+      .forEach(p => fieldsMapping.set(jp.stringify(p.path.slice(0, 3)), p.value.field_id));
+
+    isHolder.filter(d => d.value.directive === directive)
+      .filter(e => !e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
+      .forEach(p => error.push([jp.stringify(p.path.slice(0, 3)), p.value.field_id]));
+    return error;
   }
 
   private findAllCredentialSubjects(vcs: VerifiableCredential[]) {
