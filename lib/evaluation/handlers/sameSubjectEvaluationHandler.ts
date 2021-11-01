@@ -1,27 +1,24 @@
 import {
-  Descriptor,
-  Field,
   HolderSubject,
-  InputDescriptor,
-  Optionality,
-  PresentationDefinition,
+  InputDescriptor, Optionality,
+  PresentationDefinition
 } from '@sphereon/pe-models';
-import jp from 'jsonpath';
+import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { CredentialSubject, CredentialSubjectJsonpathNode, VerifiablePresentation } from '../../verifiablePresentation';
+import {
+  CredentialSubject,
+  VerifiableCredential
+} from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
-  private pDefinition: PresentationDefinition | undefined;
-  private vPresentation: Partial<VerifiablePresentation> | undefined;
 
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<Set<string>, Set<string>>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<Set<string>, Set<string>>;
-  private readonly allDescribedCredentialsPaths: Map<string, string>;
 
   private credentialsSubjects: Map<string, CredentialSubject>;
 
@@ -32,13 +29,12 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
     this.fieldIdzInputDescriptorsSameSubjectRequired = new Map<Set<string>, Set<string>>();
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<Set<string>, Set<string>>();
-    this.allDescribedCredentialsPaths = new Map<string, string>();
 
     this.credentialsSubjects = new Map<string, CredentialSubject>();
 
     this.messages = new Map<Status, string>();
-    this.messages.set(Status.INFO, 'The field ids requiring the same subject belong to same subject');
-    this.messages.set(Status.WARN, 'The field ids preferring the same subject do not belong to same subject');
+    this.messages.set(Status.INFO, 'The field ids requiring the same subject to belong to same subject');
+    this.messages.set(Status.WARN, 'The field ids preferring the same subject to belong to same subject');
     this.messages.set(Status.ERROR, 'The field ids requiring the same subject do not belong to same subject');
   }
 
@@ -46,19 +42,11 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return 'SameSubjectEvaluationHandler';
   }
 
-  public handle(pd: PresentationDefinition): void {
-    this.pDefinition = pd;
-    this.vPresentation = {
-      presentation_submission: this.presentationSubmission,
-      verifiableCredential: this.verifiableCredential,
-    };
-
-    this.findSameSubjectFieldIdsToInputDescriptorsSets();
-    this.findAllDescribedCredentialsPaths();
-    this.findAllCredentialSubjects();
-
-    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.ERROR);
-    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
+  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+    this.findSameSubjectFieldIdsToInputDescriptorsSets(pd);
+    this.findAllCredentialSubjects(vcs);
+    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Optionality.Required);
+    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Optionality.Preferred);
     //TODO the credential needs to be mapped to an input descriptor
     this.presentationSubmission.descriptor_map = this.getResults()
       .filter((r) => r.status === Status.ERROR && r.evaluator === 'SameSubjectEvaluationHandler')
@@ -76,192 +64,64 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   /**
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
-  private findSameSubjectFieldIdsToInputDescriptorsSets() {
-    this.pDefinition?.input_descriptors?.forEach(this.mapFieldIdsToInputDescriptors());
+  private findSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
+    const fieldIds: { path: PathComponent[], value: string }[] = jp.nodes(pd, '$..fields[*].id');
+    const sameSubject: { path: PathComponent[], value: HolderSubject }[] = jp.nodes(pd, '$..same_subject[*]');
+    const fields: [string, string][] = fieldIds.map(n => [jp.stringify(n.path.slice(0, 3)), n.value]);
+
+    sameSubject.filter(d => d.value.directive === Optionality.Preferred)
+      .filter(e => e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
+    .forEach(p => this.fieldIdzInputDescriptorsSameSubjectPreferred.set(new Set(p.value.field_id), new Set([jp.stringify(p.path.slice(0,3))])));
+
+    sameSubject.filter(d => d.value.directive === Optionality.Required)
+      .filter(e => e.value.field_id.every(id => fields.map(f => f[1]).includes(id)))
+    .forEach(p => this.fieldIdzInputDescriptorsSameSubjectRequired.set(new Set(p.value.field_id), new Set([jp.stringify(p.path.slice(0,3))])));
   }
 
-  private mapFieldIdsToInputDescriptors(): (inputDescriptor: InputDescriptor) => void {
-    return (inputDescriptor: InputDescriptor) => {
-      inputDescriptor.constraints?.same_subject?.forEach(this.mapSameSubjectsToInputDescriptors(inputDescriptor));
-    };
-  }
-
-  private mapSameSubjectsToInputDescriptors(inDesc: InputDescriptor): (sameSubjectGroup: HolderSubject) => void {
-    return (sameSubjectGroup: HolderSubject) => {
-      let fieldIdzInputDescriptors: Map<Set<string>, Set<string>> = new Map<Set<string>, Set<string>>();
-      if (sameSubjectGroup.directive === Optionality.Required) {
-        fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectRequired;
-      } else if (sameSubjectGroup.directive === Optionality.Preferred) {
-        fieldIdzInputDescriptors = this.fieldIdzInputDescriptorsSameSubjectPreferred;
-      }
-      this.upsertFieldIdToInputDescriptorMapping(fieldIdzInputDescriptors, sameSubjectGroup.field_id, inDesc.id);
-    };
-  }
-
-  /**
-   * Update or insert the value in the map.
-   *
-   * @param fieldIdzInputDescriptors the map among which the value will be upserted.
-   * @param searchableFieldIds the fields which are being added now
-   * @param inDescId the input descriptor ids which is being mapped by the field ids
-   *
-   * @private
-   */
-  private upsertFieldIdToInputDescriptorMapping(
-    fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
-    searchableFieldIds: Array<string>,
-    inDescId: string
-  ) {
-    const inputDescriptorIds: Array<string> = this.getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds);
-    inputDescriptorIds.push(inDescId);
-
-    if (!this.getValue(fieldIdzInputDescriptors, searchableFieldIds)) {
-      SameSubjectEvaluationHandler.addEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
-    } else {
-      this.updateEntry(fieldIdzInputDescriptors, searchableFieldIds, inputDescriptorIds);
-    }
-  }
-
-  getAllInputDescriptorsWithAnyOfTheseFields(searchableFieldIds: Array<string>): Array<string> {
-    if (this.pDefinition?.input_descriptors) {
-      return this.pDefinition?.input_descriptors
-        .filter(this.inputDescriptorsWithSameFields(searchableFieldIds))
-        .map((filteredInDesces) => filteredInDesces.id);
-    }
-    return [];
-  }
-
-  private inputDescriptorsWithSameFields(searchableFieldIds: Array<string>): (inDesc: InputDescriptor) => boolean {
-    return (inDesc: InputDescriptor) => {
-      if (inDesc?.constraints?.fields) {
-        return inDesc.constraints.fields.filter(this.fieldExistsInInputDescriptor(searchableFieldIds)).length > 0;
-      }
-      return false;
-    };
-  }
-
-  private fieldExistsInInputDescriptor(searchableFieldIds: Array<string>): (field: Field) => boolean {
-    return (field: Field) => {
-      if (field?.id) {
-        return searchableFieldIds.includes(field.id);
-      }
-      return false;
-    };
-  }
-
-  getValue(
-    fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
-    searchableFieldIds: Array<string>
-  ): { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined {
-    let entry: { mappedFieldIds: Set<string>; mappedInputDescriptorIds: Set<string> } | undefined;
-    for (const [mappedFieldIds, mappedInputDescriptorIds] of fieldIdzInputDescriptors.entries()) {
-      if (Array.from(mappedFieldIds.values()).filter((value) => searchableFieldIds.includes(value)).length > 0) {
-        entry = { mappedFieldIds, mappedInputDescriptorIds };
-      }
-    }
-
-    return entry;
-  }
-
-  private static addEntry(
-    fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
-    fieldIds: Array<string>,
-    inputDescriptorIds: Array<string>
-  ) {
-    const addableFieldIds = new Set<string>(fieldIds);
-    const addableInputDescriptors = new Set<string>(inputDescriptorIds);
-
-    fieldIdzInputDescriptors.set(addableFieldIds, addableInputDescriptors);
-  }
-
-  private updateEntry(
-    fieldIdzInputDescriptors: Map<Set<string>, Set<string>>,
-    searchableFieldIds: Array<string>,
-    inputDescriptorIds: Array<string>
-  ): void {
-    const entry = this.getValue(fieldIdzInputDescriptors, searchableFieldIds);
-
-    if (entry) {
-      searchableFieldIds.forEach((searchableFieldId) => entry.mappedFieldIds.add(searchableFieldId));
-      inputDescriptorIds.forEach((inputDescriptorId) => entry.mappedInputDescriptorIds.add(inputDescriptorId));
-    }
-  }
-
-  private findAllDescribedCredentialsPaths() {
-    this.vPresentation?.presentation_submission?.descriptor_map.forEach(this.descriptorToPathMapper());
-  }
-
-  private descriptorToPathMapper(): (descriptor: Descriptor) => void {
-    return (descriptor: Descriptor) => this.findDescribedCredentialPaths(descriptor);
-  }
-
-  private findDescribedCredentialPaths(descriptor: Descriptor): void {
-    this.allDescribedCredentialsPaths.set(descriptor.id, descriptor.path);
-
-    if (descriptor.path_nested) {
-      this.findDescribedCredentialPaths(descriptor.path_nested);
-    }
-  }
-
-  private findAllCredentialSubjects() {
-    this.allDescribedCredentialsPaths.forEach(this.mapCredentialPathToCredentialSubject());
-  }
-
-  private mapCredentialPathToCredentialSubject() {
-    return (path: string, inDescId: string) => {
-      const subjectNode: CredentialSubjectJsonpathNode[] = jp.nodes(
-        this.vPresentation,
-        path.concat('.credentialSubject')
-      );
-      if (subjectNode.length) {
-        this.credentialsSubjects.set(inDescId, subjectNode[0].value);
-      }
-    };
+  private findAllCredentialSubjects(vcs: VerifiableCredential[]) {
+    //TODO handle nested path
+    const credentialSubject: { path: PathComponent[], value: CredentialSubject }[] = jp.nodes(vcs, '$..credentialSubject');
+    credentialSubject.forEach(cs => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));
   }
 
   private confirmAllFieldSetHasSameSubject(
     fieldIdzInputDescriptorsGroups: Map<Set<string>, Set<string>>,
-    status: Status
+    directive: Optionality
   ) {
-    fieldIdzInputDescriptorsGroups.forEach(this.confirmFieldSetHasSameSubject(status));
-  }
+    //Return the vcs matching the field_id
+    const subjectsMatchingFields = Array.from(fieldIdzInputDescriptorsGroups.keys()).flatMap(k =>
+      Array.from(this.credentialsSubjects).filter(a => Array.from(k).find(c => Object.keys(a[1]).includes(c))));
 
-  private confirmFieldSetHasSameSubject(
-    status: 'info' | 'warn' | 'error'
-  ): (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => void {
-    return (inputDescriptorIds: Set<string>, fieldIdSet: Set<string>) => {
-      const credentialSubjectsSet: Set<string> = new Set<string>();
-      inputDescriptorIds.forEach((inDescId: string) => {
-        const credentialSubject = this.credentialsSubjects.get(inDescId);
-        if (!!credentialSubject && !!credentialSubject.id) {
-          credentialSubjectsSet.add(credentialSubject.id);
-        }
-      });
-      this.addResult(credentialSubjectsSet, fieldIdSet, status);
-    };
-  }
+    //Retrieve a list with all the fields from the vcs less the id
+    const fields = Array.from(subjectsMatchingFields).flatMap(s => Object.keys(s[1]).filter(w => w !== 'id'));
 
-  private addResult(credentialSubjectsSet: Set<string>, fieldIdSet: Set<string>, status: Status) {
-    let myStatus: Status = Status.INFO;
+    //Check if they match together all the fields
+    const allMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.keys()).flatMap(k => Array.from(k).every(e => fields.includes(e)))[0];
 
-    if (credentialSubjectsSet.size > 1) {
-      // not same subject
-      myStatus = status;
+    //Check if subject is the same
+    const isSameSubject: boolean = new Set(Array.from(subjectsMatchingFields).flatMap(s => Object.keys(s[1]).filter(w => w === 'id'))).size === 1;
+    const inDescPaths = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap(e => Array.from(e));
+    if (allMatched && isSameSubject) {
+      if (directive === Optionality.Required) {
+        this.getResults().push(this.createResult(fields, inDescPaths , subjectsMatchingFields, Status.INFO))
+      } else if (directive === Optionality.Preferred) {
+        this.getResults().push(this.createResult(fields, inDescPaths , subjectsMatchingFields, Status.WARN))
+      }
+    } else {
+      this.getResults().push(this.createResult(fields, inDescPaths , subjectsMatchingFields, Status.ERROR))
     }
-
-    this.getResults().push(this.getResult(fieldIdSet, credentialSubjectsSet, myStatus));
   }
 
-  private getResult(fieldIdSet: Set<string>, credentialSubjectsSet: Set<string>, myStatus: Status): HandlerCheckResult {
-    const inputDescriptorPath = '[' + Array.from(fieldIdSet).join(',') + ']';
-    const verifiableCredentialPath = '[' + Array.from(credentialSubjectsSet).join(',') + ']';
+
+  private createResult(fieldIdSet: string[], inputDescriptorPaths: string[], credentialSubs: [string, CredentialSubject][], myStatus: Status): HandlerCheckResult {
+    const credentialSubjects = credentialSubs.flatMap(e => e[1]);
     return {
-      input_descriptor_path: inputDescriptorPath,
-      verifiable_credential_path: verifiableCredentialPath,
+      input_descriptor_path: Array.from(inputDescriptorPaths).join(','),
+      verifiable_credential_path: '[' + Array.from(credentialSubs.map(e => e[0])).join(',') + ']',
       evaluator: this.getName(),
       status: myStatus,
-      payload: { fieldIdSet: inputDescriptorPath, credentialSubjectsSet: verifiableCredentialPath },
-      message: this.messages.get(myStatus),
+      payload: { fieldIdSet: Array.from(fieldIdSet), credentialSubjects },
+      message: this.messages.get(myStatus)
     };
   }
 }

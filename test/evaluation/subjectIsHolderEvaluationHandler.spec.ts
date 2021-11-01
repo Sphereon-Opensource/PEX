@@ -29,7 +29,7 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     evaluationClient.verifiableCredential = presentation.verifiableCredential
     evaluationClient.did = HOLDER_DID;
-    evaluationHandler.handle(presentationDefinition);
+    evaluationHandler.handle(presentationDefinition, presentation.verifiableCredential);
     expect(evaluationHandler.client.results).toEqual(results);
   });
 });

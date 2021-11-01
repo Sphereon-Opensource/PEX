@@ -108,7 +108,7 @@ describe('sameSubjectEvaluationHandler', () => {
         "proof": { type: '', verificationMethod: '', proofPurpose: '', jws: '', created: ''}
       }
     ];
-    evaluationHandler.handle(pd);
+    evaluationHandler.handle(pd, evaluationClient.verifiableCredential);
     expect(evaluationHandler.client.results).toEqual(results);
   });
 });
