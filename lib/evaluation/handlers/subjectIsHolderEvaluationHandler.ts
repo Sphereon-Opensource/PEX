@@ -11,6 +11,7 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler {
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<string, string[]>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<string, string[]>;
+  private fieldIds: { path: PathComponent[]; value: string }[] | undefined;
 
   private credentialsSubjects: Map<string, CredentialSubject>;
 
@@ -27,7 +28,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
     this.messages.set(Status.WARN, 'The field ids preferring the subject to be the holder');
-    this.messages.set(Status.ERROR, 'The field ids requiring the subject to be the holder');
+    this.messages.set(Status.ERROR, 'The field id missing');
   }
 
   public getName(): string {
@@ -57,9 +58,9 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
   private findSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
-    const fieldIds: { path: PathComponent[]; value: string }[] = jp.nodes(pd, '$..fields[*].id');
+    this.fieldIds = jp.nodes(pd, '$..fields[*].id');
     const isHolder: { path: PathComponent[]; value: HolderSubject }[] = jp.nodes(pd, '$..is_holder[*]');
-    const fields: [string, string][] = fieldIds.map((n) => [jp.stringify(n.path.slice(0, 3)), n.value]);
+    const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
 
     const error: [string, string[]][] = [];
 
@@ -77,18 +78,18 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private evaluateFields(
     fieldsMapping: Map<string, string[]>,
     isHolder: { path: PathComponent[]; value: HolderSubject }[],
-    fields: [string, string][],
+    fields: string[],
     directive: Optionality
   ) {
     const error: [string, string[]][] = [];
     isHolder
       .filter((d) => d.value.directive === directive)
-      .filter((e) => e.value.field_id.every((id) => fields.map((f) => f[1]).includes(id)))
+      .filter((e) => e.value.field_id.every((id) => fields.includes(id)))
       .forEach((p) => fieldsMapping.set(jp.stringify(p.path.slice(0, 3)), p.value.field_id));
 
     isHolder
       .filter((d) => d.value.directive === directive)
-      .filter((e) => !e.value.field_id.every((id) => fields.map((f) => f[1]).includes(id)))
+      .filter((e) => !e.value.field_id.every((id) => fields.includes(id)))
       .forEach((p) => error.push([jp.stringify(p.path.slice(0, 3)), p.value.field_id]));
     return error;
   }
@@ -107,23 +108,34 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
       Array.from(this.credentialsSubjects).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
     );
 
-    const credentialsToInputDescriptors: Map<string, [string, string[]]> = new Map<string, [string, string[]]>();
-    Array.from(fieldIdzInputDescriptorsGroups).forEach((k) =>
-      Array.from(this.credentialsSubjects)
-        .filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
-        .forEach((e) => credentialsToInputDescriptors.set(e[0], k))
-    );
+    const credentialsToInputDescriptors = this.mapCredentialsToInputDescriptors();
 
     const fields = Array.from(subjectsMatchingFields).flatMap((s) => Object.keys(s[1]).filter((w) => w !== 'id'));
 
+    const allFieldsMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap((v) =>
+      v.every((e) => fields.includes(e))
+    )[0];
+
     subjectsMatchingFields.forEach((subject) => {
-      const inDescPath = credentialsToInputDescriptors.get(subject[0]) as [string, string[]];
-      if (subject[1].id === this.client.did) {
-        this.getResults().push(this.createResult(fields, inDescPath[0], subject, status));
+      const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
+      if (allFieldsMatched && subject[1].id === this.client.did) {
+        this.getResults().push(this.createResult(Object.keys(subject[1]).filter(k => k !== 'id'), inDescPath, subject, status));
       } else {
-        this.getResults().push(this.createResult(fields, inDescPath[0], subject, Status.ERROR));
+        this.getResults().push(this.createResult(Object.keys(subject[1]).filter(k => k !== 'id'), inDescPath, subject, Status.ERROR));
       }
     });
+  }
+
+  private mapCredentialsToInputDescriptors(): Map<string, string> {
+    const credentialsToInputDescriptors: Map<string, string> = new Map<string, string>();
+    this.fieldIds?.forEach((id: { path: PathComponent[], value: string }) => {
+      this.credentialsSubjects.forEach((cs: CredentialSubject, credentialPath: string) => {
+        if (Object.keys(cs).includes(id.value)) {
+          credentialsToInputDescriptors.set(credentialPath, jp.stringify(id.path.slice(0, 3)));
+        }
+      })
+    })
+    return credentialsToInputDescriptors;
   }
 
   private createResult(
@@ -137,7 +149,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: credentialSub[0],
       evaluator: this.getName(),
       status: myStatus,
-      payload: { fieldIdSet: Array.from(fieldIdSet), credentialSubject: credentialSub[1] },
+      payload: { fieldIdSet, credentialSubject: credentialSub[1] },
       message: this.messages.get(myStatus),
     };
   }

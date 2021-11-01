@@ -2,7 +2,7 @@
   {
     "evaluator": "IsHolderEvaluation",
     "input_descriptor_path": "$.input_descriptors[2]",
-    "message": "The field ids requiring the subject to be the holder",
+    "message": "The field id missing",
     "payload": {
       "credentialSubject": {},
       "fieldIdSet": [
@@ -32,8 +32,7 @@
         ]
       },
       "fieldIdSet": [
-        "accounts",
-        "active"
+        "accounts"
       ]
     },
     "status": "info",
@@ -42,14 +41,13 @@
   {
     "evaluator": "IsHolderEvaluation",
     "input_descriptor_path": "$.input_descriptors[1]",
-    "message": "The field ids requiring the subject to be the holder",
+    "message": "The field id missing",
     "payload": {
       "credentialSubject": {
         "active": true,
         "id": "did:example:ebfeb1f712ebc6f1c276e12ec22"
       },
       "fieldIdSet": [
-        "accounts",
         "active"
       ]
     },

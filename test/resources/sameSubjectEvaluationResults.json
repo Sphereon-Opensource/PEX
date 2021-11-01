@@ -18,7 +18,7 @@
   },
   {
     "evaluator": "SameSubjectEvaluation",
-    "input_descriptor_path": "$.input_descriptors[0]",
+    "input_descriptor_path": "$.input_descriptors[1]",
     "message": "The field ids requiring the same subject to belong to same subject",
     "payload": {
       "credentialSubject": {
@@ -52,7 +52,7 @@
   },
   {
     "evaluator": "SameSubjectEvaluation",
-    "input_descriptor_path": "$.input_descriptors[2]",
+    "input_descriptor_path": "$.input_descriptors[3]",
     "message": "The field ids preferring the same subject to belong to same subject",
     "payload": {
       "credentialSubject": {
