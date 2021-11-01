@@ -26,7 +26,7 @@ export interface Credential {
   type: string[] | string;
   credentialSubject: CredentialSubject;
   issuer: unknown;
-  issuanceDate?: string;
+  issuanceDate: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
   vc?: VerifiableCredential;
