@@ -130,7 +130,7 @@ export class EvaluationClientWrapper {
         submissionRequirementMatches.push(submissionRequirementMatch);
       }
     }
-    return submissionRequirementMatches;
+    return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
   }
 
   private mapMatchingDescriptors(
@@ -374,5 +374,14 @@ export class EvaluationClientWrapper {
       partitionedResults.set(idPath, vcPaths);
     }
     return partitionedResults;
+  }
+
+  private removeDuplicateSubmissionRequirementMatches(matches: SubmissionRequirementMatch[]) {
+    return  matches.filter((match, index) => {
+      const _match = JSON.stringify(match);
+      return index === matches.findIndex(obj => {
+        return JSON.stringify(obj) === _match;
+      });
+    });
   }
 }
