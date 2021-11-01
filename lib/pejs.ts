@@ -12,6 +12,7 @@ export class PEJS {
   }
 
   public evaluate(presentationDefinition: PresentationDefinition, presentation: Presentation): EvaluationResults {
+    this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation);
   }
 
@@ -20,6 +21,7 @@ export class PEJS {
     selectedCredentials: VerifiableCredential[],
     holderDid: string
   ) {
+    this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(presentationDefinition, selectedCredentials, holderDid);
   }
 
