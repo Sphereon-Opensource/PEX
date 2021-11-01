@@ -237,7 +237,7 @@ function getPresentationDefinition(): PresentationDefinition {
               ],
               'filter': {
                 'type': 'string',
-                'pattern': 'did:web:vc.transmute.world'
+                'pattern': 'BachelorDegree'
               }
             }
           ]
