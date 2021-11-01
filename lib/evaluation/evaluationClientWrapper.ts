@@ -9,7 +9,7 @@ import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { Presentation, VerifiableCredential } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -172,8 +172,8 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
-    this._client.evaluate(pd, vp);
+  public evaluate(pd: PresentationDefinition, p: Presentation): EvaluationResults {
+    this._client.evaluate(pd, p);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
