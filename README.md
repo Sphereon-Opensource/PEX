@@ -188,12 +188,12 @@ evaluate(presentationDefinition, verifiablePresentation)
 ```
 ##### Description
 Evaluates whether a presentation submission meets the requested presentation definition
-
+Since this method will be used both **before** and **after** creating a VerifiablePresentation, we accept both _signed_ and _unsigned_ version of a presentation here. 
 #### Parameters
 | name | type | description|
 |------|------|------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
-| `verifiablePresentation` | `VerifiablePresentation` | the VP containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
+| `presentation` | `Presentation` | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
 
 #### Return value
 If evaluation is successful, `value` will be a non-null `PresentationSubmission` mapping the submitted credentials to the requested inputs.
