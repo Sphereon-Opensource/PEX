@@ -1,20 +1,14 @@
-import {
-  InputDescriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import {InputDescriptor, PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
-import { Checked, Status } from '../ConstraintUtils';
-import { JsonPathUtils } from '../utils';
-import { Presentation, VerifiableCredential } from '../verifiablePresentation';
+import {Checked, Status} from '../ConstraintUtils';
+import {JsonPathUtils} from '../utils';
+import {Presentation, VerifiableCredential} from '../verifiablePresentation';
 
-import { SelectResults, SubmissionRequirementMatch } from './core';
-import { EvaluationClient } from './evaluationClient';
-import { EvaluationResults } from './evaluationResults';
-import { HandlerCheckResult } from './handlerCheckResult';
+import {SelectResults, SubmissionRequirementMatch} from './core';
+import {EvaluationClient} from './evaluationClient';
+import {EvaluationResults} from './evaluationResults';
+import {HandlerCheckResult} from './handlerCheckResult';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -28,17 +22,20 @@ export class EvaluationClientWrapper {
   }
 
   public selectFrom(
-    presentationDefinition: PresentationDefinition,
-    selectableCredentials: VerifiableCredential[],
-    did: string
+      presentationDefinition: PresentationDefinition,
+      verifiableCredentials: VerifiableCredential[],
+      did: string
   ): SelectResults {
+
     let selectResults: SelectResults;
+
     this._client.evaluate(presentationDefinition, {
-      verifiableCredential: selectableCredentials,
+      verifiableCredential: verifiableCredentials,
       holder: did,
     });
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
+
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
@@ -71,6 +68,9 @@ export class EvaluationClientWrapper {
         warnings,
       };
     }
+
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+
     return selectResults;
   }
 
@@ -386,5 +386,17 @@ export class EvaluationClientWrapper {
         })
       );
     });
+  }
+
+  private fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+    if (selectResults != null) {
+      selectResults
+        .verifiableCredentials
+        ?.forEach(
+          (selectableCredential:VerifiableCredential) => {
+            const foundIndex: number = verifiableCredentials.findIndex(verifiableCredential => selectableCredential.id === verifiableCredential.id);
+            selectResults.vcIndexes?.push(foundIndex);
+          });
+    }
   }
 }
