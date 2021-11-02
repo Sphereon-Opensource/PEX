@@ -145,8 +145,8 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
         if (Object.keys(cs).includes(id.value)) {
           credentialsToInputDescriptors.set(credentialPath, jp.stringify(id.path.slice(0, 3)));
         }
-      })
-    })
+      });
+    });
     return credentialsToInputDescriptors;
   }
 

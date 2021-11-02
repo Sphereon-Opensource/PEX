@@ -377,11 +377,14 @@ export class EvaluationClientWrapper {
   }
 
   private removeDuplicateSubmissionRequirementMatches(matches: SubmissionRequirementMatch[]) {
-    return  matches.filter((match, index) => {
+    return matches.filter((match, index) => {
       const _match = JSON.stringify(match);
-      return index === matches.findIndex(obj => {
-        return JSON.stringify(obj) === _match;
-      });
+      return (
+        index ===
+        matches.findIndex((obj) => {
+          return JSON.stringify(obj) === _match;
+        })
+      );
     });
   }
 }

@@ -56,7 +56,7 @@ describe('sameSubjectEvaluationHandler', () => {
         "id": "867bfe7a-5b91-46b2-aaaa-70028b8d9aaa",
         "issuer": "VC1Issuer",
         "issuanceDate": '',
-        "type": "VerifiableCredential",
+        "type": ["VerifiableCredential"],
         "proof": { type: '', verificationMethod: '', proofPurpose: '', jws: '', created: ''}
       },
       {
@@ -72,7 +72,7 @@ describe('sameSubjectEvaluationHandler', () => {
         "id": "867bfe7a-5b91-46b2-bbbb-70028b8d9bbb",
         "issuer": "VC2Issuer",
         "issuanceDate": '',
-        "type": "VerifiableCredential",
+        "type": ["VerifiableCredential"],
         "proof": { type: '', verificationMethod: '', proofPurpose: '', jws: '', created: ''}
       },
       {
@@ -88,7 +88,7 @@ describe('sameSubjectEvaluationHandler', () => {
         "id": "867bfe7a-5b91-46b2-cccc-70028b8d9ccc",
         "issuer": "VC3Issuer",
         "issuanceDate": '',
-        "type": "VerifiableCredential",
+        "type": ["VerifiableCredential"],
         "proof": { type: '', verificationMethod: '', proofPurpose: '', jws: '', created: ''}
       },
       {
@@ -104,7 +104,7 @@ describe('sameSubjectEvaluationHandler', () => {
         "id": "867bfe7a-5b91-46b2-dddd-70028b8d9ddd",
         "issuer": "VC4Issuer",
         "issuanceDate": '',
-        "type": "VerifiableCredential",
+        "type": ["VerifiableCredential"],
         "proof": { type: '', verificationMethod: '', proofPurpose: '', jws: '', created: ''}
       }
     ];

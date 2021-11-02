@@ -23,7 +23,7 @@ export interface CredentialStatus {
 export interface Credential {
   '@context': string[];
   id: string;
-  type: string[] | string;
+  type: string[];
   credentialSubject: CredentialSubject;
   issuer: unknown;
   issuanceDate: string;

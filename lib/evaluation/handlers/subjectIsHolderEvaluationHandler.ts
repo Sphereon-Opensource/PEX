@@ -40,7 +40,6 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
-    //TODO the credential needs to be mapped to an input descriptor
     this.presentationSubmission.descriptor_map = this.getResults()
       .filter((r) => r.status !== Status.ERROR && r.evaluator === 'IsHolderEvaluation')
       .flatMap((r) => {
@@ -119,9 +118,23 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     subjectsMatchingFields.forEach((subject) => {
       const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
       if (allFieldsMatched && subject[1].id === this.client.did) {
-        this.getResults().push(this.createResult(Object.keys(subject[1]).filter(k => k !== 'id'), inDescPath, subject, status));
+        this.getResults().push(
+          this.createResult(
+            Object.keys(subject[1]).filter((k) => k !== 'id'),
+            inDescPath,
+            subject,
+            status
+          )
+        );
       } else {
-        this.getResults().push(this.createResult(Object.keys(subject[1]).filter(k => k !== 'id'), inDescPath, subject, Status.ERROR));
+        this.getResults().push(
+          this.createResult(
+            Object.keys(subject[1]).filter((k) => k !== 'id'),
+            inDescPath,
+            subject,
+            Status.ERROR
+          )
+        );
       }
     });
   }
@@ -133,8 +146,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
         if (Object.keys(cs).includes(id.value)) {
           credentialsToInputDescriptors.set(credentialPath, jp.stringify(id.path.slice(0, 3)));
         }
-      })
-    })
+      });
+    });
     return credentialsToInputDescriptors;
   }
 
