@@ -18,7 +18,7 @@ describe('evaluate', () => {
     evaluationClient.results.push(
       {
         "input_descriptor_path": "$.input_descriptors[0]",
-        "verifiable_credential_path": "$.verifiableCredential[0]",
+        "verifiable_credential_path": "$[0]",
         "evaluator": "UriEvaluation",
         "status": "info",
         "message": "presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.",
@@ -33,7 +33,7 @@ describe('evaluate', () => {
       });
     evaluationClient.results.push({
         "input_descriptor_path": "$.input_descriptors[0]",
-        "verifiable_credential_path": "$.verifiableCredential[0]",
+        "verifiable_credential_path": "$[0]",
         "evaluator": "FilterEvaluation",
         "status": "info",
         "message": "Input candidate valid for presentation submission",
@@ -42,6 +42,7 @@ describe('evaluate', () => {
             "value": 19,
             "path": [
               "$",
+              "credentialSubject",
               "age"
             ]
           },
@@ -50,8 +51,8 @@ describe('evaluate', () => {
       });
     const evaluationHandler = new PredicateRelatedFieldEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition);
-    expect(evaluationClient.results[2]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
-      "path": ["$", "age"],
+    expect(evaluationClient.results[2]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
+      "path": ["$", "credentialSubject", "age"],
       "value": 19
     }));
   });
@@ -62,7 +63,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
         "input_descriptor_path": "$.input_descriptors[0]",
-        "verifiable_credential_path": "$.verifiableCredential[0]",
+        "verifiable_credential_path": "$[0]",
         "evaluator": "UriEvaluation",
         "status": "info",
         "message": "presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.",
@@ -77,7 +78,7 @@ describe('evaluate', () => {
       });
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "FilterEvaluation",
       "status": "info",
       "message": "Input candidate valid for presentation submission",
@@ -86,6 +87,7 @@ describe('evaluate', () => {
           "value": 19,
           "path": [
             "$",
+            "credentialSubject",
             "age"
           ]
         },
@@ -94,8 +96,8 @@ describe('evaluate', () => {
     });
     const evaluationHandler = new PredicateRelatedFieldEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition);
-    expect(evaluationClient.results[2]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
-      "path": ["$", "age"],
+    expect(evaluationClient.results[2]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
+      "path": ["$", "credentialSubject", "age"],
       "value": true
     }));
   });
@@ -106,7 +108,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "UriEvaluation",
       "status": "info",
       "message": "presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.",
@@ -121,7 +123,7 @@ describe('evaluate', () => {
     });
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "FilterEvaluation",
       "status": "error",
       "message": "Input candidate does not contain property",
@@ -141,7 +143,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "UriEvaluation",
       "status": "info",
       "message": "presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.",
@@ -156,7 +158,7 @@ describe('evaluate', () => {
     });
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "FilterEvaluation",
       "status": "info",
       "message": "Input candidate valid for presentation submission",
@@ -165,6 +167,7 @@ describe('evaluate', () => {
           "value": 19,
           "path": [
             "$",
+            "credentialSubject",
             "age"
           ]
         },
@@ -173,7 +176,7 @@ describe('evaluate', () => {
     });
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "FilterEvaluation",
       "status": "info",
       "message": "Input candidate valid for presentation submission",
@@ -181,6 +184,7 @@ describe('evaluate', () => {
         "result": {
           "path": [
             "$",
+            "credentialSubject",
             "details",
             "citizenship",
             0
@@ -192,7 +196,7 @@ describe('evaluate', () => {
     });
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
-      "verifiable_credential_path": "$.verifiableCredential[0]",
+      "verifiable_credential_path": "$[0]",
       "evaluator": "FilterEvaluation",
       "status": "info",
       "message": "Input candidate valid for presentation submission",
@@ -201,6 +205,7 @@ describe('evaluate', () => {
           "value": "NLD",
           "path": [
             "$",
+            "credentialSubject",
             "country",
             0,
             "abbr"
@@ -211,12 +216,13 @@ describe('evaluate', () => {
     });
     const evaluationHandler = new PredicateRelatedFieldEvaluationHandler(evaluationClient);
     evaluationHandler.handle(presentationDefinition);
-    expect(evaluationClient.results[4]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":true, "path":["$","age"]}));
-    expect(evaluationClient.results[5]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":"eu", "path":["$","details","citizenship",0]}));
-    expect(evaluationClient.results[6]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$.verifiableCredential[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
+    expect(evaluationClient.results[4]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":true, "path":["$", "credentialSubject", "age"]}));
+    expect(evaluationClient.results[5]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {"value":"eu", "path":["$", "credentialSubject", "details","citizenship",0]}));
+    expect(evaluationClient.results[6]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
       "value": "NLD",
       "path": [
         "$",
+        "credentialSubject",
         "country",
         0,
         "abbr"

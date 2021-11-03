@@ -17,8 +17,8 @@
           "fields": [
             {
               "path": [
-                "$.age",
-                "$.details.age"
+                "$.credentialSubject.age",
+                "$.credentialSubject.details.age"
               ],
               "filter": {
                 "type": "integer",
@@ -27,8 +27,8 @@
               "predicate": "required"
             }, {
               "path": [
-                "$.citizenship[*]",
-                "$.details.citizenship[*]"
+                "$.credentialSubject.citizenship[*]",
+                "$.credentialSubject.details.citizenship[*]"
               ],
               "filter": {
                 "type": "string",
@@ -41,8 +41,8 @@
               "predicate": "required"
             }, {
               "path": [
-                "$.country[*].abbr",
-                "$.details.country[*].abbr"
+                "$.credentialSubject.country[*].abbr",
+                "$.credentialSubject.details.country[*].abbr"
               ],
               "filter": {
                 "type": "string",
