@@ -29,16 +29,18 @@ export class EvaluationClientWrapper {
 
   public selectFrom(
     presentationDefinition: PresentationDefinition,
-    selectableCredentials: VerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     did: string
   ): SelectResults {
     let selectResults: SelectResults;
+
     this._client.evaluate(presentationDefinition, {
-      verifiableCredential: selectableCredentials,
+      verifiableCredential: verifiableCredentials,
       holder: did,
     });
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
+
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
@@ -71,6 +73,9 @@ export class EvaluationClientWrapper {
         warnings,
       };
     }
+
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+
     return selectResults;
   }
 
@@ -386,5 +391,19 @@ export class EvaluationClientWrapper {
         })
       );
     });
+  }
+
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(
+    selectResults: SelectResults,
+    verifiableCredentials: VerifiableCredential[]
+  ) {
+    if (selectResults != null) {
+      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+        const foundIndex: number = verifiableCredentials.findIndex(
+          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        );
+        selectResults.vcIndexes?.push(foundIndex);
+      });
+    }
   }
 }
