@@ -123,7 +123,7 @@ describe('evaluate', () => {
     vpSimple.holder = evaluationClientWrapperData.getHolderDID();
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
-    expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
+    expect(evaluationResults).toContain(evaluationClientWrapperData.getSuccess());
   });
 
   it('should return ok if vc[0] doesn\'t have the etc field', function() {
@@ -146,7 +146,8 @@ describe('evaluate', () => {
     vpSimple.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
-    expect(result).toEqual(expect.objectContaining(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0()));
+    expect(result.descriptor_map).toEqual(expect.objectContaining(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().descriptor_map));
+    expect(result.definition_id).toEqual(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().definition_id);
   });
 
   it('Evaluate submission requirements pick rule', () => {
