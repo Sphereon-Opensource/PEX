@@ -1,8 +1,8 @@
-import {PresentationDefinition, PresentationSubmission} from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import {EvaluationClientWrapper, EvaluationResults, SelectResults} from './evaluation';
-import {PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine} from './validation';
-import {Presentation, VerifiableCredential} from './verifiablePresentation';
+import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import { Presentation, VerifiableCredential } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -58,8 +58,8 @@ export class PEJS {
    * @return the presentation submission.
    */
   public submissionFrom(
-      presentationDefinition: PresentationDefinition,
-      selectedCredential: VerifiableCredential[]
+    presentationDefinition: PresentationDefinition,
+    selectedCredential: VerifiableCredential[]
   ): PresentationSubmission {
     return this._evaluationClientWrapper.submissionFrom(presentationDefinition, selectedCredential);
   }

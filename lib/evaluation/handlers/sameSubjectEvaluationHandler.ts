@@ -140,7 +140,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapCredentialsToInputDescriptors(): Map<string, string> {
     const credentialsToInputDescriptors: Map<string, string> = new Map<string, string>();
-    this.fieldIds?.forEach((id: { path: PathComponent[], value: string }) => {
+    this.fieldIds?.forEach((id: { path: PathComponent[]; value: string }) => {
       this.credentialsSubjects.forEach((cs: CredentialSubject, credentialPath: string) => {
         if (Object.keys(cs).includes(id.value)) {
           credentialsToInputDescriptors.set(credentialPath, jp.stringify(id.path.slice(0, 3)));

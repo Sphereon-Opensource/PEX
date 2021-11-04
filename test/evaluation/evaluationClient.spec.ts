@@ -33,22 +33,6 @@ describe('evaluate', () => {
         ]
       }
     });
-    expect(evaluationClient.results[3]).toEqual({
-      'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$[0]',
-      'evaluator': 'MarkForSubmissionEvaluation',
-      'status': 'error',
-      'message': 'The input candidate is not eligible for submission',
-      'payload': {
-        'evaluator': 'UriEvaluation',
-        'inputDescriptorsUris': [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ],
-        'presentationDefinitionUris': [
-          'https://www.w3.org/2018/credentials/v1'
-        ]
-      }
-    });
   });
 
   it('should return ok if uri in vp matches at least one of input_descriptor\'s uris', function () {
@@ -83,22 +67,6 @@ describe('evaluate', () => {
         ]
       }
     });
-    expect(evaluationClient.results[3]).toEqual({
-      'input_descriptor_path': '$.input_descriptors[0]',
-      'verifiable_credential_path': '$[0]',
-      'evaluator': 'MarkForSubmissionEvaluation',
-      'status': 'error',
-      'message': 'The input candidate is not eligible for submission',
-      'payload': {
-        'evaluator': 'UriEvaluation',
-        'inputDescriptorsUris': [
-          'https://www.w3.org/2018/credentials/v1'
-        ],
-        'presentationDefinitionUris': [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ]
-      }
-    });
   });
 
   it('should return error if all the uris in vp don\'t match at least one of input_descriptor\'s uris', function () {
@@ -121,47 +89,13 @@ describe('evaluate', () => {
     expect(errorResults.length).toEqual(0);
   });
 
-  it('Mark for submission should mark not eligible an entry not eligible if all the past steps for that entry are Status.Error', () => {
-    const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_simple_example.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    presentationDefinition.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
-    const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.holder = HOLDER_DID;
-    evaluationClient.evaluate(presentationDefinition, vpSimple);
-    const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
-    const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
-    expect(errorResults.length).toEqual(7);
-    expect(infoResults.length).toEqual(2);
-  });
-
-  it('Mark for submission should return one vc as eligible', () => {
-    const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_simple_example.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    presentationDefinition.input_descriptors[0].schema[0].uri = 'https://eu.com/claims/DriversLicense';
-    const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.holder = HOLDER_DID;
-    evaluationClient.evaluate(presentationDefinition, vpSimple);
-
-    let errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
-    let infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
-    expect(infoResults.length).toEqual(6);
-    expect(errorResults.length).toEqual(6);
-    errorResults = errorResults.filter(result => result.evaluator === 'MarkForSubmissionEvaluation');
-    infoResults = infoResults.filter(result => result.evaluator === 'MarkForSubmissionEvaluation');
-    expect(infoResults.length).toEqual(1);
-    expect(errorResults.length).toEqual(2);
-    expect(evaluationClient.verifiableCredential.length).toEqual(1);
-    expect(Object.keys(evaluationClient.verifiableCredential[0]).length).toEqual(8);
-  });
-
-
   it('should return ok if limit_disclosure deletes the etc field', function() {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
-    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
   });
 
   it('should return error if limit_disclosure deletes the etc field', function() {
@@ -171,7 +105,7 @@ describe('evaluate', () => {
     delete presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure;
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
-    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual('etc');
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
   });
 
   it('should return error if limit_disclosure deletes the etc field', function() {
@@ -181,7 +115,7 @@ describe('evaluate', () => {
     presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
-    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual('etc');
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
   });
 
   it('should return ok if vc[0] doesn\'t have the birthPlace field', function() {
@@ -191,7 +125,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
-    expect(evaluationClient.verifiableCredential[0]['birthPlace']).toBeUndefined();
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
   });
 
   it('should return ok if vc[0] doesn\'t have the etc field', function() {
@@ -201,6 +135,6 @@ describe('evaluate', () => {
     presentationDefinition.input_descriptors;
     vpSimple.holder = HOLDER_DID;
     evaluationClient.evaluate(presentationDefinition, vpSimple);
-    expect(evaluationClient.verifiableCredential[0]['etc']).toEqual(undefined);
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
   });
 });
