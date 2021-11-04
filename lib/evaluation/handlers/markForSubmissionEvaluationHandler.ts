@@ -20,7 +20,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     const results: HandlerCheckResult[] = [...this.getResults()];
     const errors: HandlerCheckResult[] = results.filter((result: HandlerCheckResult) => result.status === Status.ERROR);
-    const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors); //Need to have the whole chain to this point
+    const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors);
     this.client.verifiableCredential = vcs;
 
     this.produceErrorResults(errors);

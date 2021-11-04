@@ -60,7 +60,15 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     );
     indexes.forEach((i) =>
       vcs.forEach((_, index) =>
-        this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))
+        this.getResults().push(
+          this.createResult(
+            [],
+            `$.input_descriptors[${i}]`,
+            [`$[${index}]`, {}],
+            Status.INFO,
+            'is holder is not required'
+          )
+        )
       )
     );
   }
@@ -181,7 +189,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     fieldIdSet: string[],
     inputDescriptorPath: string,
     credentialSub: [string, CredentialSubject],
-    myStatus: Status
+    myStatus: Status,
+    message?: string
   ): HandlerCheckResult {
     return {
       input_descriptor_path: inputDescriptorPath,
@@ -189,7 +198,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
       evaluator: this.getName(),
       status: myStatus,
       payload: { fieldIdSet, credentialSubject: credentialSub[1] },
-      message: this.messages.get(myStatus),
+      message: message ?? this.messages.get(myStatus),
     };
   }
 }

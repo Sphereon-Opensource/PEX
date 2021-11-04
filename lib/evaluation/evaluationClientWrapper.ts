@@ -1,5 +1,5 @@
 import {
-  InputDescriptor,
+  Descriptor,
   PresentationDefinition,
   PresentationSubmission,
   Rules,
@@ -211,48 +211,34 @@ export class EvaluationClientWrapper {
         result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
     );
 
+    //TODO what happens if the user
     if (pd.submission_requirements) {
-      const [updatedMarked, credentials, vcsMap] = this.matchUserSelectedVcs(marked, vcs);
+      const [updatedMarked] = this.matchUserSelectedVcs(marked, vcs);
       matched = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      this._client.verifiableCredential = credentials;
-      return this.updatePresentationSubmission(matched[1], pd, vcsMap);
+      return this.updatePresentationSubmission(matched[1], pd);
     }
-    const [updatedMarked, credentials, vcsMap] = this.matchUserSelectedVcs(marked, vcs);
-    this._client.verifiableCredential = credentials;
-    return this.updatePresentationSubmission(updatedMarked, pd, vcsMap);
+    const [updatedMarked] = this.matchUserSelectedVcs(marked, vcs);
+    return this.updatePresentationSubmission(updatedMarked, pd);
   }
 
   private updatePresentationSubmission(
     marked: HandlerCheckResult[],
-    pd: PresentationDefinition,
-    vcsMap: [string, string][]
+    pd: PresentationDefinition
   ): PresentationSubmission {
-    const inDescIndexes: number[] = [];
-    marked.forEach((e: HandlerCheckResult) => {
-      const index: RegExpMatchArray | null = e.input_descriptor_path.match(/\d+/);
-      if (index) {
-        inDescIndexes.push(parseInt(index[0]));
-      }
-    });
-    const desc: InputDescriptor[] = inDescIndexes.map((i: number) => pd.input_descriptors[i]);
-    const matchedDescriptors = this._client.presentationSubmission?.descriptor_map.filter((value) =>
-      desc.map((e) => e.id).includes(value.id)
+    this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map.reduce(
+      (p: Descriptor[], a: Descriptor) => {
+        const result = marked.find((m) => {
+          const inputDescriptor = jp.query(pd, m.input_descriptor_path)[0];
+          return m.verifiable_credential_path === a.path && inputDescriptor.id === a.id;
+        });
+        if (result) {
+          return p.concat([a]);
+        } else {
+          return p;
+        }
+      },
+      []
     );
-
-    matchedDescriptors
-      .map((d) =>
-        vcsMap.map((m) => {
-          if (m[0] === d.path) {
-            d.path = m[1];
-          }
-          return d;
-        })
-      )
-      .flat();
-
-    if (this._client.presentationSubmission?.descriptor_map && matchedDescriptors) {
-      this._client.presentationSubmission.descriptor_map = matchedDescriptors;
-    }
     return this._client.presentationSubmission as PresentationSubmission;
   }
 

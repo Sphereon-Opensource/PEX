@@ -53,7 +53,15 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     );
     indexes.forEach((i) =>
       vcs.forEach((_, index) =>
-        this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))
+        this.getResults().push(
+          this.createResult(
+            [],
+            `$.input_descriptors[${i}]`,
+            [`$[${index}]`, {}],
+            Status.INFO,
+            'same subject is not required'
+          )
+        )
       )
     );
   }
@@ -159,7 +167,8 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     fieldIdSet: string[],
     inputDescriptorPath: string,
     credentialSub: [string, CredentialSubject],
-    myStatus: Status
+    myStatus: Status,
+    message?: string
   ): HandlerCheckResult {
     return {
       input_descriptor_path: inputDescriptorPath,
@@ -167,7 +176,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
       evaluator: this.getName(),
       status: myStatus,
       payload: { fieldIdSet: Array.from(fieldIdSet), credentialSubject: credentialSub[1] },
-      message: this.messages.get(myStatus),
+      message: message ?? this.messages.get(myStatus),
     };
   }
 }

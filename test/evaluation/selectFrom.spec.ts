@@ -2255,7 +2255,7 @@ describe('selectFrom tests', () => {
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
-    expect(result!.errors!.length).toEqual(1);
+    expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual('EU Driver\'s License');
     expect(result!.matches![0]).toEqual({
       "name": "EU Driver's License",
@@ -2271,7 +2271,7 @@ describe('selectFrom tests', () => {
     const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as VerifiableCredential;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
-    expect(result!.errors!.length).toEqual(1);
+    expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual(pdSchema!.submission_requirements![0]!.name);
   });
 });

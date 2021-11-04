@@ -62,12 +62,12 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
          */
       let inputDescriptor: InputDescriptor;
       const result = this.getResults()
-        .filter((r) => r.status !== Status.ERROR && r.evaluator === this.getName())
+        .filter((r) => r.status === Status.ERROR && r.evaluator === this.getName())
         .find((result) => {
           inputDescriptor = jp.query(pd, result.input_descriptor_path)[0];
           return result.verifiable_credential_path === descriptor.path && inputDescriptor?.id === descriptor.id;
         });
-      if (!result) {
+      if (result) {
         delete descriptorMap[index];
       }
     });
