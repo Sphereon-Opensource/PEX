@@ -165,28 +165,6 @@ describe('1st scenario', () => {
     const submissionFromResult1 = pejs.submissionFrom(pd, [holderWallet.verifiableCredentials[1]]);
     console.log('wrong VC passed >>');
     console.log('  - submissionFromResult: ', JSON.stringify(submissionFromResult1, null, 2));
-
-    /**
-     * So, what happens if we call the submissionFrom without calling the "selectFrom" or "evaluate" first?
-     in this case we're getting the following Error:
-     /home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/@sphereon/pe-js/lib/evaluation/evaluationClientWrapper.ts:245
-     ...this._client.verifiablePresentation.getPresentationSubmission(),
-     ^
-     TypeError: Cannot read property 'getPresentationSubmission' of null
-     at EvaluationClientWrapper.remapVcs (/home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/@sphereon/pe-js/lib/evaluation/evaluationClientWrapper.ts:245:46)
-     at EvaluationClientWrapper.submissionFrom (/home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/@sphereon/pe-js/lib/evaluation/evaluationClientWrapper.ts:178:17)
-     at PEJS.submissionFrom (/home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/@sphereon/pe-js/lib/pejs.ts:33:42)
-     at aliceSendsBobSimpleVCs (/home/sadjad/webstormSpace/pe-js-consumer-example/scripts/check-scenario-1.spec.ts:165:58)
-     at Object.<anonymous> (/home/sadjad/webstormSpace/pe-js-consumer-example/scripts/check-scenario-1.spec.ts:226:1)
-     at Module._compile (internal/modules/cjs/loader.js:1072:14)
-     at Module.m._compile (/home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/ts-node/src/index.ts:1310:23)
-     at Module._extensions..js (internal/modules/cjs/loader.js:1101:10)
-     at Object.require.extensions.<computed> [as .ts] (/home/sadjad/webstormSpace/pe-js-consumer-example/node_modules/ts-node/src/index.ts:1313:12)
-     */
-    const pejs2: PEJS = new PEJS();
-    const submissionFromResultWithoutCallToEvaluae = pejs2.submissionFrom(pd, holderWallet.verifiableCredentials);
-    console.log('wrong first call >>');
-    console.log('  - submissionFromResultWithoutCallToEvaluae: ', JSON.stringify(submissionFromResultWithoutCallToEvaluae, null, 2));
   });
 
 });
