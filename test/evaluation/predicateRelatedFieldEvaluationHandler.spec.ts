@@ -50,6 +50,17 @@ describe('evaluate', () => {
         }
       });
     const evaluationHandler = new PredicateRelatedFieldEvaluationHandler(evaluationClient);
+    evaluationClient.presentationSubmission = {
+      "id": "ftc3QsJT-gZ_JNKpusT-I",
+      "definition_id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+      "descriptor_map": [
+        {
+          "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+          "format": "ldp_vc",
+          "path": "$[0]"
+        }
+      ]
+    };
     evaluationHandler.handle(presentationDefinition);
     expect(evaluationClient.results[2]).toEqual(new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'PredicateRelatedFieldEvaluation', Status.INFO, "Input candidate valid for presentation submission", {
       "path": ["$", "credentialSubject", "age"],
@@ -61,6 +72,17 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.presentationSubmission = {
+      "id": "ftc3QsJT-gZ_JNKpusT-I",
+      "definition_id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+      "descriptor_map": [
+        {
+          "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+          "format": "ldp_vc",
+          "path": "$[0]"
+        }
+      ]
+    };
     evaluationClient.results.push({
         "input_descriptor_path": "$.input_descriptors[0]",
         "verifiable_credential_path": "$[0]",
@@ -106,6 +128,17 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.presentationSubmission = {
+      "id": "ftc3QsJT-gZ_JNKpusT-I",
+      "definition_id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+      "descriptor_map": [
+        {
+          "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+          "format": "ldp_vc",
+          "path": "$[0]"
+        }
+      ]
+    };
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$[0]",
@@ -141,6 +174,17 @@ describe('evaluate', () => {
     const presentationDefinition: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-schema-multiple-constraints.json').presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.presentationSubmission = {
+      "id": "ftc3QsJT-gZ_JNKpusT-I",
+      "definition_id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+      "descriptor_map": [
+        {
+          "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+          "format": "ldp_vc",
+          "path": "$[0]"
+        }
+      ]
+    };
     evaluationClient.results.push({
       "input_descriptor_path": "$.input_descriptors[0]",
       "verifiable_credential_path": "$[0]",

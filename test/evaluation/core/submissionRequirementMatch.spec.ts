@@ -12,7 +12,7 @@ describe('submissionRequirementMatch', () => {
       matches: ["$.verifiableCredential[1]"],
       from: ["A"]
     };
-    expect(submissionRequirementMatch.count).toBe(1);
+    expect(submissionRequirementMatch.from).toContain("A");
     expect(submissionRequirementMatch.rule).toBe(Rules.All);
     expect(submissionRequirementMatch.matches[0]).toBe("$.verifiableCredential[1]");
   });
