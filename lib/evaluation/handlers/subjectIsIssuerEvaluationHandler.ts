@@ -24,7 +24,9 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
       } else {
-        this.getResults().push(...vcs.map((_, vcIndex) => this.generateSuccessResult(index, `$[${vcIndex}]`, 'not applicable')))
+        this.getResults().push(
+          ...vcs.map((_, vcIndex) => this.generateSuccessResult(index, `$[${vcIndex}]`, 'not applicable'))
+        );
       }
     });
     this.updatePresentationSubmission(pd);

@@ -12,7 +12,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<string, string[]>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<string, string[]>;
   private fieldIds: { path: PathComponent[]; value: string }[];
-  private sameSubject: { path: PathComponent[]; value: HolderSubject }[]
+  private sameSubject: { path: PathComponent[]; value: HolderSubject }[];
 
   private credentialsSubjects: Map<string, CredentialSubject>;
 
@@ -48,8 +48,14 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private generateSameSubjectNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
-    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(s => !this.sameSubject.map(e => e.path[2]).includes(s));
-    indexes.forEach(i => vcs.forEach((_, index) => this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))));
+    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(
+      (s) => !this.sameSubject.map((e) => e.path[2]).includes(s)
+    );
+    indexes.forEach((i) =>
+      vcs.forEach((_, index) =>
+        this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))
+      )
+    );
   }
 
   /**

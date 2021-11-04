@@ -55,8 +55,14 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private generateIsHolderNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
-    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(s => !this.isHolder.map(e => e.path[2]).includes(s));
-    indexes.forEach(i => vcs.forEach((_, index) => this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))));
+    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(
+      (s) => !this.isHolder.map((e) => e.path[2]).includes(s)
+    );
+    indexes.forEach((i) =>
+      vcs.forEach((_, index) =>
+        this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))
+      )
+    );
   }
 
   /**

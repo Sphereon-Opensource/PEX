@@ -67,7 +67,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
           inputDescriptor = jp.query(pd, result.input_descriptor_path)[0];
           return result.verifiable_credential_path === descriptor.path && inputDescriptor?.id === descriptor.id;
         });
-      if(!result) {
+      if (!result) {
         delete descriptorMap[index];
       }
     });
@@ -88,4 +88,3 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     }, []);
   }
 }
-
