@@ -85,17 +85,17 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private evaluateFields(
     fieldsMapping: Map<string, string[]>,
-    isHolder: { path: PathComponent[]; value: HolderSubject }[],
+    sameSubject: { path: PathComponent[]; value: HolderSubject }[],
     fields: string[],
     directive: Optionality
   ) {
     const error: [string, string[]][] = [];
-    isHolder
+    sameSubject
       .filter((d) => d.value.directive === directive)
       .filter((e) => e.value.field_id.every((id) => fields.includes(id)))
       .forEach((p) => fieldsMapping.set(jp.stringify(p.path.slice(0, 3)), p.value.field_id));
 
-    isHolder
+    sameSubject
       .filter((d) => d.value.directive === directive)
       .filter((e) => !e.value.field_id.every((id) => fields.includes(id)))
       .forEach((p) => error.push([jp.stringify(p.path.slice(0, 3)), p.value.field_id]));
