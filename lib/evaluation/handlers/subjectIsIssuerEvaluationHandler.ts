@@ -23,6 +23,8 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       const constraints: Constraints | undefined = inputDescriptor.constraints;
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
+      } else {
+        this.getResults().push(...vcs.map((_, vcIndex) => this.generateSuccessResult(index, `$[${vcIndex}]`, 'not applicable')))
       }
     });
     this.updatePresentationSubmission(pd);
@@ -53,12 +55,12 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private generateSuccessResult(idIdx: number, vcPath: string): HandlerCheckResult {
+  private generateSuccessResult(idIdx: number, vcPath: string, message?: string): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: 'subject is issuer',
+      message: message ?? 'subject is issuer',
       verifiable_credential_path: vcPath,
     };
   }

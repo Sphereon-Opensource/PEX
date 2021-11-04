@@ -1,7 +1,7 @@
 import { InputDescriptor, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 import jp from 'jsonpath';
-import { Status } from '../../ConstraintUtils';
 
+import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -55,20 +55,37 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   }
 
   public updatePresentationSubmission(pd: PresentationDefinition) {
-    this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptor_map) => {
-        /**
+    this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
+      /**
          * TODO map the nested credential
          let vcPath = jp.stringify(e.payload.result.path)
          */
-        const result = this.getResults().find(result => {
-          const inputDescriptor: InputDescriptor = jp.query(pd, result.input_descriptor_path)[0];
-          return result.verifiable_credential_path === descriptor.path && inputDescriptor?.id === descriptor.id
-            && result.status !== Status.ERROR && result.evaluator === this.getName();
+      let inputDescriptor: InputDescriptor;
+      const result = this.getResults()
+        .filter((r) => r.status !== Status.ERROR && r.evaluator === this.getName())
+        .find((result) => {
+          inputDescriptor = jp.query(pd, result.input_descriptor_path)[0];
+          return result.verifiable_credential_path === descriptor.path && inputDescriptor?.id === descriptor.id;
         });
-        if (result) {
-          descriptor_map[index] = descriptor;
-        }
+      if(!result) {
+        delete descriptorMap[index];
       }
-    );
+    });
+  }
+
+  public removeDuplicate(results: HandlerCheckResult[]) {
+    return results.reduce((arr: HandlerCheckResult[], cur: HandlerCheckResult) => {
+      const result = arr.find(
+        (i) =>
+          i.input_descriptor_path === cur.input_descriptor_path &&
+          i.verifiable_credential_path === cur.verifiable_credential_path
+      );
+      if (!result) {
+        return arr.concat([cur]);
+      } else {
+        return arr;
+      }
+    }, []);
   }
 }
+

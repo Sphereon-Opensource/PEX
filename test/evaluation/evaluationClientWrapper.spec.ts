@@ -123,7 +123,7 @@ describe('evaluate', () => {
     vpSimple.holder = evaluationClientWrapperData.getHolderDID();
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
-    expect(evaluationResults).toContain(evaluationClientWrapperData.getSuccess());
+    expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
   it('should return ok if vc[0] doesn\'t have the etc field', function() {

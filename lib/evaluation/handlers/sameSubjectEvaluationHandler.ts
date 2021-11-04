@@ -11,7 +11,8 @@ import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<string, string[]>;
   private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<string, string[]>;
-  private fieldIds: { path: PathComponent[]; value: string }[] | undefined;
+  private fieldIds: { path: PathComponent[]; value: string }[];
+  private sameSubject: { path: PathComponent[]; value: HolderSubject }[]
 
   private credentialsSubjects: Map<string, CredentialSubject>;
 
@@ -22,6 +23,8 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
     this.fieldIdzInputDescriptorsSameSubjectRequired = new Map<string, string[]>();
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<string, string[]>();
+    this.fieldIds = [];
+    this.sameSubject = [];
 
     this.credentialsSubjects = new Map<string, CredentialSubject>();
 
@@ -37,18 +40,24 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     this.findSameSubjectFieldIdsToInputDescriptorsSets(pd);
+    this.generateSameSubjectNotRequiredResults(pd, vcs);
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
     this.updatePresentationSubmission(pd);
   }
 
+  private generateSameSubjectNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
+    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(s => !this.sameSubject.map(e => e.path[2]).includes(s));
+    indexes.forEach(i => vcs.forEach((_, index) => this.getResults().push(this.createResult([], `$.input_descriptors[${i}]`, [`$[${index}]`, {}], Status.INFO))));
+  }
+
   /**
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
   private findSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
-    this.fieldIds = jp.nodes(pd, '$..fields[*].id');
-    const sameSubject: { path: PathComponent[]; value: HolderSubject }[] = jp.nodes(pd, '$..same_subject[*]');
+    this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
+    this.sameSubject.push(...jp.nodes(pd, '$..same_subject[*]'));
     const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
 
     const error: [string, string[]][] = [];
@@ -56,7 +65,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     error.push(
       ...this.evaluateFields(
         this.fieldIdzInputDescriptorsSameSubjectPreferred,
-        sameSubject,
+        this.sameSubject,
         fields,
         Optionality.Preferred
       )
@@ -64,7 +73,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     error.push(
       ...this.evaluateFields(
         this.fieldIdzInputDescriptorsSameSubjectRequired,
-        sameSubject,
+        this.sameSubject,
         fields,
         Optionality.Required
       )
