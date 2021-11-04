@@ -21,6 +21,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
         this.examinePredicateRelatedField(index, inDesc.constraints);
       }
     });
+    this.updatePresentationSubmission(pd);
   }
 
   private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {

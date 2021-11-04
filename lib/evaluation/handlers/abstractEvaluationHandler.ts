@@ -1,4 +1,6 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { InputDescriptor, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import jp from 'jsonpath';
+import { Status } from '../../ConstraintUtils';
 
 import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
@@ -50,5 +52,23 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
 
   public getResults(): HandlerCheckResult[] {
     return this._client.results;
+  }
+
+  public updatePresentationSubmission(pd: PresentationDefinition) {
+    this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptor_map) => {
+        /**
+         * TODO map the nested credential
+         let vcPath = jp.stringify(e.payload.result.path)
+         */
+        const result = this.getResults().find(result => {
+          const inputDescriptor: InputDescriptor = jp.query(pd, result.input_descriptor_path)[0];
+          return result.verifiable_credential_path === descriptor.path && inputDescriptor?.id === descriptor.id
+            && result.status !== Status.ERROR && result.evaluator === this.getName();
+        });
+        if (result) {
+          descriptor_map[index] = descriptor;
+        }
+      }
+    );
   }
 }

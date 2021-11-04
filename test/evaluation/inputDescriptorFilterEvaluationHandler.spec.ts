@@ -36,6 +36,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message0 = {...message};
     message0.input_descriptor_path = '$.input_descriptors[0]';
     message0.payload = {"result": [], "valid": true};
@@ -55,6 +56,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[1]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message0 = {...message};
     message0.input_descriptor_path = '$.input_descriptors[0]';
     message0.payload = {"result": [], "valid": true};
@@ -74,6 +76,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[2]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message0 = {...message};
     message0.input_descriptor_path = '$.input_descriptors[0]';
     message0.payload = {"result": [], "valid": true};
@@ -93,6 +96,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[3]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message0 = {
       ...message,
       ['status']: Status.ERROR,
@@ -115,6 +119,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message0 = {...message, ['status']: Status.ERROR, ['message']: 'Input candidate failed filter evaluation'};
     message0.payload = {"result": {"path": ["$", "vc", "issuer"], "value": "did:example:123"}, "valid": false};
     const message1 = {...message0, ['verifiable_credential_path']: '$[1]'};
@@ -133,6 +138,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
+    presentation.presentation_submission?.descriptor_map.forEach((d, i, dm) => dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'));
     const message1 = { ...message, ['verifiable_credential_path']: '$[1]' };
     message1.payload = { 'result': { 'path': ['$', 'issuer'], 'value': 'did:foo:123' }, 'valid': true };
     const message2 = { ...message, ['verifiable_credential_path']: '$[2]' };

@@ -1,5 +1,5 @@
 import { Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
-import jp, { PathComponent } from 'jsonpath';
+import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
@@ -23,20 +23,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         this.limitDisclosureShouldBeEnforced(vcs, inDesc.constraints.fields, index);
       }
     });
-
-    if (this.getResults().filter((r) => r.evaluator === 'LimitDisclosureEvaluation').length) {
-      this.presentationSubmission.descriptor_map = this.getResults()
-        .filter((r) => r.status !== Status.ERROR && r.evaluator === 'LimitDisclosureEvaluation')
-        .flatMap((r) => {
-          /**
-           * TODO Map nested credentials
-           */
-          const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
-          return this.presentationSubmission.descriptor_map.filter(
-            (ps) => ps.path === r.verifiable_credential_path && ps.id === inputDescriptor.id
-          );
-        });
-    }
+    this.updatePresentationSubmission(pd);
   }
 
   private limitDisclosureShouldBeEnforced(

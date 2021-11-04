@@ -1,4 +1,4 @@
-import { HolderSubject, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { HolderSubject, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -40,17 +40,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
-    this.presentationSubmission.descriptor_map = this.getResults()
-      .filter((r) => r.status !== Status.ERROR && r.evaluator === 'SameSubjectEvaluation')
-      .flatMap((r) => {
-        /**
-         * TODO map the nested credential
-         */
-        const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
-        return this.presentationSubmission.descriptor_map.filter(
-          (ps) => ps.path === r.verifiable_credential_path && ps.id === inputDescriptor.id
-        );
-      });
+    this.updatePresentationSubmission(pd);
   }
 
   /**

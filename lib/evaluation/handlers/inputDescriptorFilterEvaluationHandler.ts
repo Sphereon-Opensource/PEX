@@ -1,4 +1,4 @@
-import { Field, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { Field, PresentationDefinition } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
@@ -42,18 +42,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
       });
     });
-    this.presentationSubmission.descriptor_map = this.getResults()
-      .filter((r) => r.status === Status.INFO && r.evaluator === 'FilterEvaluation')
-      .flatMap((r) => {
-        /**
-         * TODO map the nested credential
-         let vcPath = jp.stringify(e.payload.result.path)
-         */
-        const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
-        return this.presentationSubmission.descriptor_map.filter(
-          (ps) => ps.path === r.verifiable_credential_path && ps.id === inputDescriptor.id
-        );
-      });
+    this.updatePresentationSubmission(pd);
   }
 
   private createNoFieldResults(pd: PresentationDefinition, vcIndex: number) {
