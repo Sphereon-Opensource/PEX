@@ -1,14 +1,20 @@
-import {InputDescriptor, PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement} from '@sphereon/pe-models';
+import {
+  InputDescriptor,
+  PresentationDefinition,
+  PresentationSubmission,
+  Rules,
+  SubmissionRequirement,
+} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
-import {Checked, Status} from '../ConstraintUtils';
-import {JsonPathUtils} from '../utils';
-import {Presentation, VerifiableCredential} from '../verifiablePresentation';
+import { Checked, Status } from '../ConstraintUtils';
+import { JsonPathUtils } from '../utils';
+import { Presentation, VerifiableCredential } from '../verifiablePresentation';
 
-import {SelectResults, SubmissionRequirementMatch} from './core';
-import {EvaluationClient} from './evaluationClient';
-import {EvaluationResults} from './evaluationResults';
-import {HandlerCheckResult} from './handlerCheckResult';
+import { SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationClient } from './evaluationClient';
+import { EvaluationResults } from './evaluationResults';
+import { HandlerCheckResult } from './handlerCheckResult';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -22,11 +28,10 @@ export class EvaluationClientWrapper {
   }
 
   public selectFrom(
-      presentationDefinition: PresentationDefinition,
-      verifiableCredentials: VerifiableCredential[],
-      did: string
+    presentationDefinition: PresentationDefinition,
+    verifiableCredentials: VerifiableCredential[],
+    did: string
   ): SelectResults {
-
     let selectResults: SelectResults;
 
     this._client.evaluate(presentationDefinition, {
@@ -388,15 +393,17 @@ export class EvaluationClientWrapper {
     });
   }
 
-  private fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(
+    selectResults: SelectResults,
+    verifiableCredentials: VerifiableCredential[]
+  ) {
     if (selectResults != null) {
-      selectResults
-        .verifiableCredentials
-        ?.forEach(
-          (selectableCredential:VerifiableCredential) => {
-            const foundIndex: number = verifiableCredentials.findIndex(verifiableCredential => selectableCredential.id === verifiableCredential.id);
-            selectResults.vcIndexes?.push(foundIndex);
-          });
+      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+        const foundIndex: number = verifiableCredentials.findIndex(
+          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        );
+        selectResults.vcIndexes?.push(foundIndex);
+      });
     }
   }
 }
