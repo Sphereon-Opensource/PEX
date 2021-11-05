@@ -39,7 +39,7 @@ export class EvaluationClient {
   public evaluate(pd: PresentationDefinition, vp: Partial<VerifiablePresentation>): void {
     this._did = (vp as VerifiablePresentation).holder;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
+    currentHandler?.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
     while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
