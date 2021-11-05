@@ -39,7 +39,7 @@ describe('evaluate', () => {
       'credentialSchema': [{
         'id': 'https://www.w3.org/TR/vc-data-model/#types'
       }],
-      'issuanceDate': '02/11/2021',
+      'issuanceDate': '2021-04-12T23:20:50.52Z',
       'proof': {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     }];
 
@@ -80,7 +80,7 @@ describe('evaluate', () => {
       'credentialSchema': [{
         'id': 'https://www.w3.org/TR/vc-data-model/#types'
       }],
-      'issuanceDate': '02/11/2021',
+      'issuanceDate': '2021-04-12T23:20:50.52Z',
       'proof': {proofPurpose: '', type: '', jws: '', created: '', verificationMethod: ''}
     }];
 

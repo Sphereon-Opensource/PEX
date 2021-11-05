@@ -20,17 +20,12 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
       if (inDesc.constraints?.fields && inDesc.constraints?.limit_disclosure === Optionality.Required) {
-        this.limitDisclosureShouldBeEnforced(vcs, inDesc.constraints.fields, index);
+        this.enforceLimitDisclosure(vcs, inDesc.constraints.fields, index);
       }
     });
-    // this.updatePresentationSubmission(pd);
   }
 
-  private limitDisclosureShouldBeEnforced(
-    verifiableCredential: VerifiableCredential[],
-    fields: Field[],
-    idIdx: number
-  ): void {
+  private enforceLimitDisclosure(verifiableCredential: VerifiableCredential[], fields: Field[], idIdx: number): void {
     verifiableCredential.forEach((vc, index) => {
       const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
       if (verifiableCredentialToSend) {

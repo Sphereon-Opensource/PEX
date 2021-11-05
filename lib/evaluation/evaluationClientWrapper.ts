@@ -219,8 +219,8 @@ export class EvaluationClientWrapper {
       this.updatePresentationSubmission(upIdx);
       return this._client.presentationSubmission;
     }
-    const [_, updatedIndexes] = this.matchUserSelectedVcs(marked, vcs);
-    this.updatePresentationSubmission(updatedIndexes);
+    const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
+    this.updatePresentationSubmission(updatedIndexes[1]);
     return this._client.presentationSubmission;
   }
 
