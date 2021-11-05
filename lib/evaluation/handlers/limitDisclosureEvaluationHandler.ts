@@ -23,7 +23,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         this.limitDisclosureShouldBeEnforced(vcs, inDesc.constraints.fields, index);
       }
     });
-    this.updatePresentationSubmission(pd);
+    // this.updatePresentationSubmission(pd);
   }
 
   private limitDisclosureShouldBeEnforced(
