@@ -1,11 +1,8 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
+import {PresentationDefinition} from '@sphereon/pe-models';
 
-import { VerifiableCredential, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
-import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers/markForSubmissionEvaluationHandler';
+import {EvaluationClient, HandlerCheckResult, MarkForSubmissionEvaluationHandler, VerifiableCredential, VerifiablePresentation} from '../../lib';
 
 const results: HandlerCheckResult[] = [
   {
@@ -74,12 +71,8 @@ function getFile(path: string): PresentationDefinition | VerifiablePresentation 
 
 describe('markForSubmissionEvaluationHandler tests', () => {
   it(`Mark input candidates for presentation submission`, () => {
-    const presentation: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pdInputDescriptorFilter.ts') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
@@ -90,19 +83,15 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       evaluator: 'MarkForSubmissionEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
       message: 'The input candidate is eligible for submission',
-      payload: { group: ['A'] },
+      payload: {group: ['A']},
       status: 'info',
       verifiable_credential_path: '$[0]',
     });
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
-    const presentation: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pdInputDescriptorFilter.ts') as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);
@@ -115,7 +104,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       message: 'The input candidate is not eligible for submission',
       payload: { evaluator: 'PredicateRelatedField', path: ['$', 'age'], value: false },
       status: 'error',
-      verifiable_credential_path: '$[0]',
+      verifiable_credential_path: '$[0]'
     });
   });
 });

@@ -2,7 +2,7 @@ import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-m
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { JsonPathUtils } from '../../utils';
 import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';

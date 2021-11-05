@@ -2,10 +2,11 @@
 import jp from 'jsonpath';
 
 import { InputFieldType } from '../verifiablePresentation/SSI.types';
+import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
 
 export class JsonPathUtils {
   /**
-   * @param verifiableCredential: a vc object can be found in verifiablePresentation.verifiableCredential[i]
+   * @param obj: a vc object can be found in verifiablePresentation.verifiableCredential[i]
    * @param paths: paths that can be found in Field object
    * @return a result object containing value of the correct path in the verifiableCredential and the correct path
    * @example(success result): if you call this method with 1. verifiableCredential:

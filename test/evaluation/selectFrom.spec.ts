@@ -2,8 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiableCredential } from '../../lib';
-import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
+import { EvaluationClientWrapper, VerifiableCredential } from '../../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -13,8 +12,8 @@ const dids = ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
 
 describe('selectFrom tests', () => {
   it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -183,8 +182,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -331,8 +330,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements either all from group A or 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -516,8 +515,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -664,8 +663,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group A and 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -848,8 +847,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 1: (all from group A or 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1033,8 +1032,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1218,8 +1217,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1366,8 +1365,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1514,8 +1513,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements exactly 1 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1662,8 +1661,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1809,8 +1808,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
@@ -1994,8 +1993,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids);
@@ -2180,10 +2179,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate case without presentation submission', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
-    ).presentation_definition;
-    const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdPermanentResidentCardExample.ts').presentation_definition;
+    const vc = getFile('./test/dif_pe_examples/vc/vcPermanentResidentCardExample.ts');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(0);
@@ -2196,9 +2193,8 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate driver license name result', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
-      .presentation_definition as PresentationDefinition;
-    const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as VerifiableCredential;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdDriverLicenseNameExample.ts').presentation_definition as PresentationDefinition;
+    const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vcDriverLicenseExample.ts') as VerifiableCredential;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(0);

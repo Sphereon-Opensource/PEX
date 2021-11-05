@@ -25,7 +25,7 @@ describe('validate', () => {
   });
 
   it('should return error for empty id', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD.id = '';
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -35,7 +35,7 @@ describe('validate', () => {
   });
 
   it('should not return error for missing name', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     delete basicPD.name;
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -45,7 +45,7 @@ describe('validate', () => {
   });
 
   it('should return error for empty name', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD.name = '';
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -57,7 +57,7 @@ describe('validate', () => {
   });
 
   it('should not return error for missing purpose', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     delete basicPD.purpose;
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -67,7 +67,7 @@ describe('validate', () => {
   });
 
   it('should return error for empty purpose', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD.purpose = '';
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -79,7 +79,7 @@ describe('validate', () => {
   });
 
   it('should not return error for missing format', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     delete basicPD.format;
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -89,7 +89,7 @@ describe('validate', () => {
   });
 
   it('should not return error for empty format', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD.format = {};
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -99,7 +99,7 @@ describe('validate', () => {
   });
 
   it('should return error for empty algo', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD!.format = { jwt: { alg: [] } };
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -111,7 +111,7 @@ describe('validate', () => {
   });
 
   it('should return error for empty algo value', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdBasicExample.ts');
     basicPD!.format!.jwt!.alg = [''];
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
@@ -127,9 +127,7 @@ describe('validate', () => {
   });
 
   it('should report error for duplicate id', () => {
-    const basicPD: PresentationDefinition = getFile(
-      './test/resources/pd_require_is_holder.json'
-    ).presentation_definition;
+    const basicPD: PresentationDefinition = getFile('./test/resources/pdRequireIsHolder.ts').presentation_definition;
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
     const ve = new ValidationEngine();
     basicPD.input_descriptors[0].constraints!.fields![0]!.id = 'uuid2021-05-04 00';

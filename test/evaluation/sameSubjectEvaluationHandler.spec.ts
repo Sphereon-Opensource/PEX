@@ -6,6 +6,9 @@ import { SameSubjectVerifiableCredential } from '../test_data/sameSubjectEvaluat
 
 describe('sameSubjectEvaluationHandler', () => {
   it('Should record as success when the fields requiring same subject belong to same subjects', () => {
+    const pd: PresentationDefinition = getFile('./test/resources/pdRequireSameSubject.ts').presentation_definition;
+    const results = getFile('./test/resources/sameSubjectEvaluationResults.ts');
+
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.presentationSubmission = new SameSubjectPresentationSubmission().getPresentationSubmission();
     evaluationClient.verifiableCredential = new SameSubjectVerifiableCredential().getVerifiableCredential();

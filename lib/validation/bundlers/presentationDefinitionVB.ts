@@ -230,8 +230,7 @@ export class PresentationDefinitionVB extends ValidationBundler<
     return (presentationDefinition: PresentationDefinition): boolean => {
       const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
       const validate = this.ajv.compile(presentationDefinitionSchema);
-      const valid = validate(presentationDefinition);
-      return valid;
+      return validate(presentationDefinition);
     };
   }
 }

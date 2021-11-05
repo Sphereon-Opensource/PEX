@@ -3,7 +3,7 @@ import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { JsonPathUtils } from '../../utils';
 import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';

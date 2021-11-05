@@ -1009,10 +1009,9 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sphereon/pe-models@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@sphereon/pe-models/-/pe-models-0.0.5.tgz#a096bc2ecde7190253d0e4d27538f017f75e7190"
-  integrity sha512-r7JFgAK9fhc1MN+qnON3NLqj0n5Lekz+K0CCvsSh/87YLe6iARiun1hvM3ZMd6Mbe1ukGDMTnwRauUgl8xUOFg==
+"@sphereon/pe-models@file:sphereon-pe-models-0.0.7.tgz":
+  version "0.0.7"
+  resolved "file:sphereon-pe-models-0.0.7.tgz#902f0d1138793f990228b1321ac533b7196c9bf0"
 
 "@tokenizer/token@^0.3.0":
   version "0.3.0"

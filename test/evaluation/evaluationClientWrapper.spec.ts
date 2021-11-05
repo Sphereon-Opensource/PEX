@@ -10,14 +10,11 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const evaluationClientWrapperData: EvaluationClientWrapperData = new EvaluationClientWrapperData();
-
 describe('evaluate', () => {
-  it("should return error if uri in inputDescriptors doesn't match", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+
+  it('should return error if uri in inputDescriptors doesn\'t match', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -31,11 +28,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getError());
   });
 
-  it("should return ok if uri in vp matches at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return ok if uri in vp matches at least one of input_descriptor\'s uris', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -49,6 +44,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
+  it('should return error if uri in verifiableCredential doesn\'t match', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
   it("should return error if uri in verifiableCredential doesn't match", function () {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
@@ -71,11 +69,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getError());
   });
 
-  it("should return error if all the uris in vp don't match at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return error if all the uris in vp don\'t match at least one of input_descriptor\'s uris', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -89,29 +85,25 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getError());
   });
 
-  it("should return ok if all the uris in vp match at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return ok if all the uris in vp match at least one of input_descriptor\'s uris', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
-      vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
-    );
-    const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
+    const evaluationClientWrapperData: EvaluationClientWrapperData = new EvaluationClientWrapperData();
+    vpSimple.holder = evaluationClientWrapperData.getHolderDID();
+
+    const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple);
+
+    const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return ok if limit_disclosure deletes the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return ok if limit_disclosure deletes the etc field', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -123,11 +115,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return error if limit_disclosure deletes the etc field', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -140,11 +130,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+  it('should return error if limit_disclosure deletes the etc field', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -157,11 +145,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it("should return ok if vc[0] doesn't have the birthPlace field", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+  it('should return ok if vc[0] doesn\'t have the birthPlace field', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSchemaMultipleConstraintsExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpMultipleConstraintsExample.ts');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -174,13 +160,9 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it("should return ok if vc[0] doesn't have the etc field", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp-simple-age-predicate.json'
-    ) as VerifiablePresentation;
+  it('should return ok if vc[0] doesn\'t have the etc field', function() {
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts') as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
@@ -194,10 +176,8 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements all rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -219,10 +199,8 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements pick rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -256,10 +234,8 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission from user selected credentials (max 1 from B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -281,10 +257,8 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission without submission requirements', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as VerifiablePresentation;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
     delete pdSchema!.submission_requirements;
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -316,14 +290,16 @@ describe('evaluate', () => {
       })
     );
   });
+
   it('should map successfully the links from selectable credentials to verifiable credentials.', () => {
+    const evaluationClientWrapperData: EvaluationClientWrapperData = new EvaluationClientWrapperData();
     const selectResults = evaluationClientWrapperData.getSelectResults();
-    new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(
-      selectResults,
-      evaluationClientWrapperData.getVerifiableCredential()
-    );
+    new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, evaluationClientWrapperData.getVerifiableCredential());
+
     const verifiableCredential = selectResults.verifiableCredentials![0];
     const indexInResults = selectResults.vcIndexes![0];
+
     expect(verifiableCredential.id).toEqual(evaluationClientWrapperData.getVerifiableCredential()[indexInResults].id);
   });
+
 });

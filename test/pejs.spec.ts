@@ -16,10 +16,8 @@ describe('evaluate', () => {
 
   it('Evaluate case with error result', () => {
     const pejs: PEJS = new PEJS();
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
-    ).presentation_definition;
-    const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdPermanentResidentCardExample.ts').presentation_definition;
+    const vc = getFile('./test/dif_pe_examples/vc/vcPermanentResidentCardExample.ts');
     pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
     const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(2);
@@ -27,10 +25,8 @@ describe('evaluate', () => {
   });
 
   it('Evaluate case without any error', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
     const evaluationResults = pejs.evaluate(pdSchema, vpSimple);
@@ -39,8 +35,8 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts') as VerifiablePresentation;
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
@@ -59,23 +55,23 @@ describe('evaluate', () => {
     );
   });
 
-  it('Evaluate pd schema of our sr_rules.json pd', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+  it('Evaluate pd schema of our srRules.ts pd', () => {
+    const pdSchema: PresentationDefinition = getFile('./test/resources/srRules.ts').presentation_definition;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+  it('Evaluate presentation submission of our vp_general\'s presentation_submission', () => {
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('Evaluate pd schema of our pd_driver_license_name.json pd', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+  it('Evaluate pd schema of our pdDriverLicenseNameExample.ts pd', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pdDriverLicenseNameExample.ts');
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);

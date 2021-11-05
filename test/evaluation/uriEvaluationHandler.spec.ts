@@ -1,7 +1,9 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
+import {PresentationDefinition} from '@sphereon/pe-models';
 
+import {EvaluationClient, HandlerCheckResult, Status, UriEvaluationHandler, VerifiablePresentation} from '../../lib';
+import {InputDescriptorFilterExample} from "../dif_pe_examples/pd/inputDescriptorFilterExample";
 import { Status, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
@@ -13,10 +15,8 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
   it('should return ok if uris match in vpSimple.verifiableCredential[0].credentialSchema[0].id', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
@@ -25,11 +25,9 @@ describe('evaluate', () => {
   });
 
   it('should return error for not matching (exactly) any URI for the schema of the candidate input with one of the Input Descriptor schema object uri values.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0]['@context'][0] = 'https://www.test.org/mock';
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
+    vpSimple.verifiableCredential[0]['@context'][0] = "https://www.test.org/mock"
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
@@ -49,10 +47,8 @@ describe('evaluate', () => {
   });
 
   it('should generate 6 error result fo this test case.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const pdSchema: PresentationDefinition = new InputDescriptorFilterExample().getPresentationDefinition();
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
@@ -61,11 +57,9 @@ describe('evaluate', () => {
   });
 
   it('should generate 5 error result and 1 info.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
+    const pdSchema: PresentationDefinition = new InputDescriptorFilterExample().getPresentationDefinition();
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpGeneralExample.ts')
+    pdSchema.input_descriptors[0].schema[0].uri = "https://business-standards.org/schemas/employment-history.json";
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);

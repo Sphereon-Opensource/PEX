@@ -3,7 +3,8 @@ import fs from 'fs';
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
+import { EvaluationClient } from '../../lib';
+import {IsHolderEvaluationResults} from "../resources/isHolderEvaluationResults";
 
 function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -20,19 +21,15 @@ const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 
 describe('SubjectIsHolderEvaluationHandler tests', () => {
   it(`input descriptor's constraints.is_holder is present`, () => {
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/resources/pd_require_is_holder.json'
-    ) as PresentationDefinition;
-    const results = getFile('./test/resources/isHolderEvaluationResults.json');
+    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pdRequireIsHolder.ts') as PresentationDefinition;
+    const isHolderEvaluationResults = new IsHolderEvaluationResults();
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    const presentation: VerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_subject_is_holder.json'
-    ) as VerifiablePresentation;
+    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSubjectIsHolderExample.ts') as VerifiablePresentation;
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     evaluationClient.verifiableCredential = presentation.verifiableCredential;
     evaluationClient.dids = [HOLDER_DID];
     evaluationHandler.handle(presentationDefinition, presentation.verifiableCredential);
-    expect(evaluationHandler.client.results).toEqual(results);
+    expect(evaluationHandler.client.results).toEqual(isHolderEvaluationResults.getIsHolderEvaluationResults());
   });
 });
