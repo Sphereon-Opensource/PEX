@@ -183,6 +183,14 @@ export class EvaluationClientWrapper {
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
     if (this._client.presentationSubmission?.descriptor_map.length) {
+      const len = this._client.presentationSubmission?.descriptor_map.length;
+      for (let i = 0; i < len; i++) {
+        this._client.presentationSubmission.descriptor_map[i] &&
+          this._client.presentationSubmission.descriptor_map.push(
+            this._client.presentationSubmission.descriptor_map[i]
+          );
+      }
+      this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
       result.value = this._client.presentationSubmission;
     }
     return result;
