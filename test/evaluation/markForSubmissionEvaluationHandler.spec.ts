@@ -89,15 +89,6 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: 'info',
       verifiable_credential_path: '$[0]'
     });
-    expect(evaluationHandler.presentationSubmission).toEqual(
-      expect.objectContaining({
-        definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-        descriptor_map: [{
-          format: 'ldp_vc',
-          id: 'banking_input_1',
-          path: '$[0]'
-        }]
-      }));
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
