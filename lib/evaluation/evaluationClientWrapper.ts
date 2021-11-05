@@ -1,10 +1,4 @@
-import {
-  Descriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
@@ -220,51 +214,32 @@ export class EvaluationClientWrapper {
     );
 
     if (pd.submission_requirements) {
-      const [updatedMarked, _, upIdx] = this.matchUserSelectedVcs(marked, vcs);
-      const matched = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      this.removeEntryFromPresentationSubmission(matched[1], pd);
+      const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
+      this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
       this.updatePresentationSubmission(upIdx);
       return this._client.presentationSubmission;
     }
-    const [_, __, updatedIndexes] = this.matchUserSelectedVcs(marked, vcs);
+    const [_, updatedIndexes] = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes);
     return this._client.presentationSubmission;
   }
 
   private updatePresentationSubmission(updatedIndexes: [string, string][]) {
-    this._client.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
-      const result = updatedIndexes.find((ui) => ui[0] === descriptor.path);
-      if (result) {
-        descriptorMap[index].path = result[1];
-      }
-    });
-  }
-
-  private removeEntryFromPresentationSubmission(
-    marked: HandlerCheckResult[],
-    pd: PresentationDefinition
-  ): PresentationSubmission {
-    this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map.reduce(
-      (p: Descriptor[], a: Descriptor) => {
-        const result = marked.find((m) => {
-          const inputDescriptor = jp.query(pd, m.input_descriptor_path)[0];
-          return m.verifiable_credential_path === a.path && inputDescriptor.id === a.id;
-        });
+    this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map
+      .filter((descriptor) => updatedIndexes.find((ui) => ui[0] === descriptor.path))
+      .map((descriptor) => {
+        const result = updatedIndexes.find((ui) => ui[0] === descriptor.path);
         if (result) {
-          return p.concat([a]);
-        } else {
-          return p;
+          descriptor.path = result[1];
         }
-      },
-      []
-    );
-    return this._client.presentationSubmission as PresentationSubmission;
+        return descriptor;
+      });
   }
 
   private matchUserSelectedVcs(
     marked: HandlerCheckResult[],
     vcs: VerifiableCredential[]
-  ): [HandlerCheckResult[], VerifiableCredential[], [string, string][]] {
+  ): [HandlerCheckResult[], [string, string][]] {
     const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
     const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
       index,
@@ -279,14 +254,16 @@ export class EvaluationClientWrapper {
       });
     });
 
-    marked = marked.map((m) => {
-      const index = updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path);
-      if (index) {
-        m.verifiable_credential_path = index[1];
-      }
-      return m;
-    });
-    return [marked, vcs, updatedIndexes];
+    marked = marked
+      .filter((m) => updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path))
+      .map((m) => {
+        const index = updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path);
+        if (index) {
+          m.verifiable_credential_path = index[1];
+        }
+        return m;
+      });
+    return [marked, updatedIndexes];
   }
 
   private evaluateRequirements(

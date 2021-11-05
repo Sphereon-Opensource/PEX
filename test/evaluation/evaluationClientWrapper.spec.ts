@@ -4,7 +4,7 @@ import { Optionality, PresentationDefinition, PresentationSubmission } from '@sp
 
 import {EvaluationClient, EvaluationClientWrapper, Status, VerifiablePresentation} from '../../lib';
 
-import {EvaluationClientWrapperData} from "./EvaluationClientWrapperData";
+import {EvaluationClientWrapperData} from './EvaluationClientWrapperData';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -154,23 +154,23 @@ describe('evaluate', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = "did:foo:123";
+    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
-      "definition_id": "32f54163-7166-48f1-93d8-ff217bdb0653",
-      "descriptor_map": [
+      'definition_id': '32f54163-7166-48f1-93d8-ff217bdb0653',
+      'descriptor_map': [
         {
-          "format": "ldp_vc",
-          "id": "Educational transcripts 1",
-          "path": "$[1]"
+          'format': 'ldp_vc',
+          'id': 'Educational transcripts 1',
+          'path': '$[1]'
         },
         {
-          "format": "ldp_vc",
-          "id": "Educational transcripts 2",
-          "path": "$[2]"
+          'format': 'ldp_vc',
+          'id': 'Educational transcripts 2',
+          'path': '$[2]'
         }
       ],
     }));
@@ -180,19 +180,24 @@ describe('evaluate', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = "did:foo:123";
+    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [{...vpSimple.verifiableCredential[1]}]);
-    expect(result).toEqual(expect.objectContaining(evaluationClientWrapperData.getMax1FromBResult0()));
+    expect(result).toEqual(expect.objectContaining({
+      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+      descriptor_map: [
+        {'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[0]'}
+      ]
+    }));
   });
 
   it('Create Presentation Submission without submission requirements', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     delete pdSchema!.submission_requirements;
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = "did:foo:123";
+    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
