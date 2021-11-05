@@ -213,23 +213,34 @@ export class EvaluationClientWrapper {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
 
-    let matched: [number, HandlerCheckResult[]];
+    //let matched: [number, HandlerCheckResult[]];
     const marked: HandlerCheckResult[] = this._client.results.filter(
       (result) =>
         result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
     );
 
-    //TODO what happens if the user
     if (pd.submission_requirements) {
-      const [updatedMarked] = this.matchUserSelectedVcs(marked, vcs);
-      matched = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      return this.updatePresentationSubmission(matched[1], pd);
+      const [updatedMarked, _, upIdx] = this.matchUserSelectedVcs(marked, vcs);
+      const matched = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
+      this.removeEntryFromPresentationSubmission(matched[1], pd);
+      this.updatePresentationSubmission(upIdx);
+      return this._client.presentationSubmission;
     }
-    const [updatedMarked] = this.matchUserSelectedVcs(marked, vcs);
-    return this.updatePresentationSubmission(updatedMarked, pd);
+    const [_, __, updatedIndexes] = this.matchUserSelectedVcs(marked, vcs);
+    this.updatePresentationSubmission(updatedIndexes);
+    return this._client.presentationSubmission;
   }
 
-  private updatePresentationSubmission(
+  private updatePresentationSubmission(updatedIndexes: [string, string][]) {
+    this._client.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
+      const result = updatedIndexes.find((ui) => ui[0] === descriptor.path);
+      if (result) {
+        descriptorMap[index].path = result[1];
+      }
+    });
+  }
+
+  private removeEntryFromPresentationSubmission(
     marked: HandlerCheckResult[],
     pd: PresentationDefinition
   ): PresentationSubmission {

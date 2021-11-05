@@ -159,7 +159,21 @@ describe('evaluate', () => {
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
-    expect(result).toEqual(expect.objectContaining(evaluationClientWrapperData.getgetForSubmissionRequirementsPickRuleResult0()));
+    expect(result).toEqual(expect.objectContaining({
+      "definition_id": "32f54163-7166-48f1-93d8-ff217bdb0653",
+      "descriptor_map": [
+        {
+          "format": "ldp_vc",
+          "id": "Educational transcripts 1",
+          "path": "$[1]"
+        },
+        {
+          "format": "ldp_vc",
+          "id": "Educational transcripts 2",
+          "path": "$[2]"
+        }
+      ],
+    }));
   });
 
   it('Create Presentation Submission from user selected credentials (max 1 from B)', () => {
@@ -182,8 +196,22 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
     evaluationClientWrapper.evaluate(pdSchema, vpSimple);
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [{...vpSimple.verifiableCredential[1]}, {...vpSimple.verifiableCredential[2]}]);
-    expect(result).toEqual(expect.objectContaining(evaluationClientWrapperData.getgetForSubmissionRequirementsPickRuleResult0()));
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [{ ...vpSimple.verifiableCredential[1] }, { ...vpSimple.verifiableCredential[2] }]);
+    expect(result).toEqual(expect.objectContaining({
+      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+      descriptor_map: [
+        {
+          format: 'ldp_vc',
+          id: 'Educational transcripts 1',
+          path: '$[0]'
+        },
+        {
+          format: 'ldp_vc',
+          id: 'Educational transcripts 2',
+          path: '$[1]'
+        },
+      ]
+    }));
   });
 
   it('should map successfully the links from selectable credentials to verifiable credentials.', () => {

@@ -22,7 +22,6 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     const errors: HandlerCheckResult[] = results.filter((result: HandlerCheckResult) => result.status === Status.ERROR);
     const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors);
     this.client.verifiableCredential = vcs;
-
     this.produceErrorResults(errors);
     this.produceSuccessResults(infos, pd);
   }
