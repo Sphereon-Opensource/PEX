@@ -379,7 +379,7 @@ export class EvaluationClientWrapper {
     selectResults: SelectResults,
     verifiableCredentials: VerifiableCredential[]
   ) {
-    if (selectResults != null) {
+    if (selectResults) {
       selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
