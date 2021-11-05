@@ -1,0 +1,36 @@
+@startuml
+
+header PE-JS
+
+title
+PE-JS
+Data Flow Diagram - version 0.1.0
+end title
+
+
+autonumber
+
+participant "Verifier" as V order 0 #ORANGE
+participant "Alice" as A order 1 #YELLOW
+participant "Wallet" as W order 2 #YELLOW
+participant "PE-JS" as PE order 3 #YELLOW
+
+V -> W: PresentationDefinition
+W -> A: Notification
+A -> W: Accepts PresentationDefinition
+W -> A: ShowSelectableCredentials
+A -> W: selects a subset of credentials
+W -> PE: evaluate(presentationDefinition, selectedCredentials[])
+PE -> W: evaluation results
+W -> A: from the credentials that you've selected, \na combination of these are acceptable
+A -> W: selects a combination of credentials
+W -> PE: selectFrom(2ndSetOfCredentials[])
+PE -> W: submissionFrom(selectableCredentials)
+
+W -> W: createPresentation(selectFromResult)
+
+W -> W: signPresentation(presentation)
+
+W -> V: VerifiablePresentation
+
+V -> V: evaluate(VerifiableCredential)
