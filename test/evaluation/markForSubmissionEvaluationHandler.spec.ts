@@ -117,10 +117,5 @@ describe('markForSubmissionEvaluationHandler tests', () => {
       status: 'error',
       verifiable_credential_path: '$[0]'
     });
-    expect(evaluationHandler.presentationSubmission).toEqual(
-      expect.objectContaining({
-        definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-        descriptor_map: []
-      }));
   });
 });
