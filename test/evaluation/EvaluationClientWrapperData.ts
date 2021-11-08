@@ -4,8 +4,8 @@ import {HandlerCheckResult, SelectResults, VerifiableCredential} from "../../lib
 
 export class EvaluationClientWrapperData {
 
-  public getHolderDID(): string {
-    return 'did:example:ebfeb1f712ebc6f1c276e12ec21';
+  public getHolderDID(): string[] {
+    return ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
   }
 
   public getInputDescriptorsDoesNotMatchResult0(): HandlerCheckResult {

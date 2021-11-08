@@ -28,7 +28,7 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as VerifiablePresentation;
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     evaluationClient.verifiableCredential = presentation.verifiableCredential
-    evaluationClient.did = HOLDER_DID;
+    evaluationClient.dids = [HOLDER_DID];
     evaluationHandler.handle(presentationDefinition, presentation.verifiableCredential);
     expect(evaluationHandler.client.results).toEqual(results);
   });

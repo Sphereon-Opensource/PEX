@@ -149,7 +149,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
     subjectsMatchingFields.forEach((subject) => {
       const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
-      if (allFieldsMatched && subject[1].id === this.client.did) {
+      if (allFieldsMatched && subject[1].id && this.client.dids.includes(subject[1].id)) {
         this.getResults().push(
           this.createResult(
             Object.keys(subject[1]).filter((k) => k !== 'id'),

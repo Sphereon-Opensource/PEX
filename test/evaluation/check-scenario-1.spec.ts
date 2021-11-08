@@ -96,13 +96,7 @@ describe('1st scenario', () => {
   }
 }
      */
-    const evaluationResult = pejs.evaluate(pd, {
-        '@context': [],
-        holder: holderWallet.holder,
-        type: [],
-        verifiableCredential: holderWallet.verifiableCredentials
-      }
-    );
+    const evaluationResult = pejs.evaluate(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
     console.log('evaluationResult: ', JSON.stringify(evaluationResult, null, 2));
 
     /**
@@ -124,7 +118,7 @@ describe('1st scenario', () => {
   "warnings": []
 }
      */
-    const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, holderWallet.holder);
+    const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
     console.log('selectFromResult: ', JSON.stringify(selectFromResult, null, 2));
 
     /**
