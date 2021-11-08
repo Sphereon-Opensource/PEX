@@ -40,30 +40,10 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     this.findSameSubjectFieldIdsToInputDescriptorsSets(pd);
-    this.generateSameSubjectNotRequiredResults(pd, vcs);
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO);
     this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
     this.updatePresentationSubmission(pd);
-  }
-
-  private generateSameSubjectNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
-    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(
-      (s) => !this.sameSubject.map((e) => e.path[2]).includes(s)
-    );
-    indexes.forEach((i) =>
-      vcs.forEach((_, index) =>
-        this.getResults().push(
-          this.createResult(
-            [],
-            `$.input_descriptors[${i}]`,
-            [`$[${index}]`, {}],
-            Status.INFO,
-            'same subject is not required'
-          )
-        )
-      )
-    );
   }
 
   /**
