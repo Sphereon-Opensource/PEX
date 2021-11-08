@@ -10,10 +10,11 @@ end title
 
 autonumber
 
-participant "Verifier" as V order 0 #ORANGE
-participant "Alice" as A order 1 #YELLOW
-participant "Wallet" as W order 2 #YELLOW
-participant "PE-JS" as PE order 3 #YELLOW
+participant "PE-JS-Verifier" as PE2 order 0 #ORANGE
+participant "Verifier" as V order 1 #ORANGE
+participant "Alice" as A order 2 #PINK
+participant "Wallet" as W order 3 #YELLOW
+participant "PE-JS" as PE order 4 #YELLOW
 
 V -> W: PresentationDefinition
 W -> A: Notification
@@ -35,5 +36,8 @@ W -> W: signPresentation(presentation)
 
 W -> V: VerifiablePresentation
 
-V -> V: evaluate(VerifiableCredential)
+V -> PE2: evaluate(VerifiableCredential)
+PE2 -> V: evaluation result
+V -> W: Pass/Fail response
+W -> A: Pass/Fail notification
 @enduml
