@@ -60,10 +60,15 @@ export class EvaluationClientWrapper {
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
 
+      const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+      const matches = this.extractMatches(matchSubmissionRequirements);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      );
       selectResults = {
         errors: errors,
-        matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
-        verifiableCredentials: [...this._client.verifiableCredential],
+        matches: [...matchSubmissionRequirements],
+        verifiableCredentials: [...credentials],
         warnings,
       };
     }
