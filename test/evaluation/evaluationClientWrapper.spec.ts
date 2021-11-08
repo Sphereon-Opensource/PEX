@@ -22,7 +22,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult0());
-    //expect(evaluationClient.results[3]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
+    expect(evaluationClient.results[5]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getError());
   });  
   
@@ -46,7 +46,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0());
-    //expect(evaluationClient.results[3]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
+    expect(evaluationClient.results[5]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getError());
   });  
   
