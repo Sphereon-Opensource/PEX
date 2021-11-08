@@ -25,12 +25,15 @@ PE -> W: evaluation results
 W -> A: from the credentials that you've selected, \na combination of these are acceptable
 A -> W: selects a combination of credentials
 W -> PE: selectFrom(2ndSetOfCredentials[])
-PE -> W: submissionFrom(selectableCredentials)
+PE -> W: selectFrom response
+W -> PE: submissionFrom(selectableCredentials)
+PE -> W: submissionFrom response
 
-W -> W: createPresentation(selectFromResult)
-
+W -> PE: createPresentation(selectFromResult)
+PE -> W: get an actual Presentation object
 W -> W: signPresentation(presentation)
 
 W -> V: VerifiablePresentation
 
 V -> V: evaluate(VerifiableCredential)
+@enduml
