@@ -48,4 +48,8 @@ export interface VerifiablePresentation extends Presentation {
   proof: Proof;
 }
 
-export type InputFieldType = VerifiablePresentation | VerifiableCredential | VerifiableCredential[] | PresentationDefinition;
+export type InputFieldType =
+  | VerifiablePresentation
+  | VerifiableCredential
+  | VerifiableCredential[]
+  | PresentationDefinition;
