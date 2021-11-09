@@ -188,12 +188,12 @@ evaluate(presentationDefinition, verifiablePresentation)
 ```
 ##### Description
 Evaluates whether a presentation submission meets the requested presentation definition
-
+Since this method will be used both **before** and **after** creating a VerifiablePresentation, we accept both _signed_ and _unsigned_ version of a presentation here. 
 #### Parameters
 | name | type | description|
 |------|------|------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
-| `verifiablePresentation` | `VerifiablePresentation` | the VP containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
+| `presentation` | `Presentation` | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
 
 #### Return value
 If evaluation is successful, `value` will be a non-null `PresentationSubmission` mapping the submitted credentials to the requested inputs.
@@ -289,8 +289,22 @@ interface Checked {
 ```
 status can have following values `'info' | 'warn' | 'error'`
 
-## Further work:
-1. Based on the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation)
->*4.3.1- If the Input Descriptor schema object uri is a hashlink or similar value that points to immutable content, then the content of the retrieved schema must also match* This hashlink validation is currently not included.
 
+## Workflow Diagram
+![Flow diagram](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Sphereon-Opensource/pe-js/develop/docs/simple-scenario.puml)
+# Glossary
+
+Term | Definition |
+---- | ---------- |
+Credential | A set of one or more claims made by an issuer. |
+Verifiable Credential |  Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
+Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires. |
+Holder | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a Presentation Definition.
+Verifier | Verifiers are entities that define what proofs they require from a Holder (via a Presentation Definition) in order to proceed with an interaction. |
+Issuer | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder. |
+Presentation | Data derived from one or more verifiable credentials, issued by one or more issuers |
+Verifiable Presentation | Is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification.
+
+## Further work:
+1. Implementation of presentation-exchange v2
 2. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are addressing `nested credentials` and `nested paths` these are currently not fully support yet.

@@ -1,16 +1,14 @@
-import { Descriptor, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
-import jp from 'jsonpath';
+import { Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
-  static mandatoryFields: string[] = ['@context', 'credentialSchema'];
-
   constructor(client: EvaluationClient) {
     super(client);
   }
@@ -19,112 +17,59 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, p: VerifiablePresentation): void {
+  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
-      if (
-        inDesc.constraints &&
-        inDesc.constraints.limit_disclosure &&
-        inDesc.constraints.fields &&
-        inDesc.constraints.limit_disclosure === Optionality.Required
-      ) {
-        this.limitDisclosureShouldBeEnforced(p, inDesc.constraints.fields, index, inDesc.id);
+      if (inDesc.constraints?.fields && inDesc.constraints?.limit_disclosure === Optionality.Required) {
+        this.enforceLimitDisclosure(vcs, inDesc.constraints.fields, index);
       }
     });
   }
 
-  private limitDisclosureShouldBeEnforced(
-    verifiablePresentation: VerifiablePresentation,
-    fields: Field[],
-    idIdx: number,
-    inputDescriptorId: string
-  ): void {
-    for (let i = 0; i < verifiablePresentation.verifiableCredential.length; i++) {
-      const verifiableCredentialToSend: VerifiableCredential = this.createWithMandatoryFields(
-        verifiablePresentation.verifiableCredential[i]
-      );
-      this.determineNecessaryPaths(
-        verifiablePresentation.verifiableCredential[i],
-        verifiableCredentialToSend,
-        fields,
-        idIdx,
-        i
-      );
-      if (
-        this.verifiablePresentation.presentation_submission &&
-        this.verifiablePresentation.presentation_submission.descriptor_map
-      ) {
-        this.copyModifiedVerifiableCredentialToExisting(verifiableCredentialToSend, inputDescriptorId);
+  private enforceLimitDisclosure(verifiableCredential: VerifiableCredential[], fields: Field[], idIdx: number): void {
+    verifiableCredential.forEach((vc, index) => {
+      const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+      if (verifiableCredentialToSend) {
+        verifiableCredential[index] = verifiableCredentialToSend;
+        this.createSuccessResult(idIdx, `$[${index}]`);
       }
-    }
+    });
   }
 
-  private createWithMandatoryFields(verifiableCredential: VerifiableCredential): VerifiableCredential {
-    const verifiableCredentialToSend: VerifiableCredential = {
-      '@context': verifiableCredential['@context'],
-      issuer: verifiableCredential.issuer,
-      issuanceDate: verifiableCredential.issuanceDate,
-      proof: verifiableCredential.proof,
-      id: verifiableCredential.id,
-      credentialSubject: verifiableCredential.credentialSubject,
-      type: verifiableCredential.type,
-    };
-    for (let i = 0; i < LimitDisclosureEvaluationHandler.mandatoryFields.length; i++) {
-      verifiableCredentialToSend[LimitDisclosureEvaluationHandler.mandatoryFields[i]] =
-        verifiableCredential[LimitDisclosureEvaluationHandler.mandatoryFields[i]];
-    }
-    return verifiableCredentialToSend;
-  }
-
-  private determineNecessaryPaths(
+  private createVcWithRequiredFields(
     vc: VerifiableCredential,
-    vcToSend: VerifiableCredential,
     fields: Field[],
     idIdx: number,
     vcIdx: number
-  ): void {
-    for (let i = 0; i < fields.length; i++) {
-      const field: Field = fields[i];
-      if (field && field.path) {
+  ): VerifiableCredential | undefined {
+    let vcToSend: VerifiableCredential = { ...vc, credentialSubject: {} };
+    fields.forEach((field) => {
+      if (field.path) {
         const inputField = JsonPathUtils.extractInputField(vc, field.path);
         if (inputField.length > 0) {
-          this.copyResultPathToDestinationCredential(inputField[0].path, vc, vcToSend);
+          vcToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, vcToSend);
         } else {
           this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
         }
       }
-    }
+    });
+    return vcToSend;
   }
 
   private copyResultPathToDestinationCredential(
-    pathDetails: (string | number)[],
+    requiredField: { path: PathComponent[]; value: unknown },
     verifiableCredential: VerifiableCredential,
     verifiableCredentialToSend: VerifiableCredential
-  ): void {
-    let objectCursor: { [x: string]: unknown } = { ...verifiableCredential };
-    let currentCursorInToSendObj: { [x: string]: unknown } = { ...verifiableCredentialToSend };
-    for (let i = 1; i < pathDetails.length; i++) {
-      objectCursor = objectCursor[pathDetails[i]] as { [x: string]: unknown };
-      if (pathDetails.length == i + 1) {
-        currentCursorInToSendObj[pathDetails[i]] = objectCursor;
-      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] !== 'string') {
-        currentCursorInToSendObj = Object.assign(currentCursorInToSendObj, [{}]);
-      } else {
-        currentCursorInToSendObj = {};
+  ): VerifiableCredential {
+    let credentialSubject = { ...verifiableCredential?.credentialSubject };
+    requiredField.path.forEach((e) => {
+      if (credentialSubject[e]) {
+        credentialSubject = { [e]: credentialSubject[e] } as { [x: string]: unknown };
       }
-    }
-  }
-
-  private copyModifiedVerifiableCredentialToExisting(
-    verifiableCredentialToSend: VerifiableCredential,
-    inputDescriptorId: string
-  ) {
-    const verifiablePresentation = this.verifiablePresentation;
-    for (let i = 0; i < verifiablePresentation.presentation_submission.descriptor_map.length; i++) {
-      const currentDescriptor: Descriptor = verifiablePresentation.presentation_submission.descriptor_map[i];
-      if (currentDescriptor.id === inputDescriptorId) {
-        this.updateVcForPath(verifiableCredentialToSend, currentDescriptor.path, i);
-      }
-    }
+    });
+    return {
+      ...verifiableCredentialToSend,
+      credentialSubject: { ...verifiableCredentialToSend.credentialSubject, ...credentialSubject },
+    };
   }
 
   private createSuccessResult(idIdx: number, path: string) {
@@ -141,25 +86,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
       message: 'mandatory field not present in the verifiableCredential',
       payload: path,
-    });
-  }
-
-  /**
-   * updates existing VC in the verifiablePresentation object with the new one, that is generated with limit_disclosure
-   * @param verifiableCredentialToSend: the VC object created with limit_disclosure constraints
-   * @param path example: "$.verifiableCredential[0]"
-   * @param idIdx
-   */
-  private updateVcForPath(verifiableCredentialToSend: VerifiableCredential, path: string, idIdx: number): void {
-    this.createSuccessResult(idIdx, path);
-    jp.apply(this.verifiablePresentation, path, (value: VerifiableCredential) => {
-      value = verifiableCredentialToSend;
-      return value;
     });
   }
 }

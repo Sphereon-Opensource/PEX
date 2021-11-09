@@ -23,14 +23,15 @@
       "@context": [
         "https://www.w3.org/2018/credentials/v1"
       ],
-      "age": 19,
-      "etc": "etc",
       "credentialSchema": [
         {
           "id": "https://www.w3.org/TR/vc-data-model/#types"
         }
       ],
-      "credentialSubject": null,
+      "credentialSubject": {
+        "age": 19,
+        "etc": "etc"
+      },
       "id": "2dc74354-e965-4883-be5e-bfec48bf60c7",
       "issuer": "",
       "type": "VerifiableCredential"

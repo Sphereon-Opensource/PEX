@@ -1,14 +1,9 @@
-import {
-  InputDescriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pe-models';
+import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -28,20 +23,15 @@ export class EvaluationClientWrapper {
 
   public selectFrom(
     presentationDefinition: PresentationDefinition,
-    selectableCredentials: VerifiableCredential[],
-    did: string
+    verifiableCredentials: VerifiableCredential[],
+    holderDids: string[]
   ): SelectResults {
     let selectResults: SelectResults;
-    this._client.evaluate(presentationDefinition, {
-      '@context': [],
-      type: '',
-      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
-      verifiableCredential: selectableCredentials,
-      holder: did,
-      proof: { verificationMethod: '', proofPurpose: '', jws: '', type: '', created: '' },
-    });
+
+    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
+
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
         (result) =>
@@ -52,13 +42,14 @@ export class EvaluationClientWrapper {
         presentationDefinition.submission_requirements,
         marked
       );
-      const vcs = this.extractVCIndexes(matchSubmissionRequirements).map(
-        (i) => this._client.verifiablePresentation.verifiableCredential[i]
+      const matches = this.extractMatches(matchSubmissionRequirements);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
       selectResults = {
-        errors: marked.length > 0 ? [] : errors,
+        errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: vcs,
+        verifiableCredentials: [...credentials],
         warnings,
       };
     } else {
@@ -66,44 +57,33 @@ export class EvaluationClientWrapper {
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
 
+      const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+      const matches = this.extractMatches(matchSubmissionRequirements);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      );
       selectResults = {
-        errors: marked.length > 0 ? [] : errors,
-        matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
-        verifiableCredentials: this._client.verifiablePresentation.verifiableCredential,
+        errors: errors,
+        matches: [...matchSubmissionRequirements],
+        verifiableCredentials: [...credentials],
         warnings,
       };
     }
+
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+
     return selectResults;
   }
 
-  private extractVCIndexes(matchSubmissionRequirements: SubmissionRequirementMatch[]): number[] {
-    const indexes: number[] = [];
-    const matchesFlattened: string[] = [];
-    matchSubmissionRequirements.forEach((s) => matchesFlattened.push(...s.matches));
-    indexes.push(...this.parseIndexes(matchesFlattened));
-    if (!matchesFlattened || !matchesFlattened.length) {
-      const srFlattened: SubmissionRequirementMatch[] = [];
-      matchSubmissionRequirements.forEach((e) => {
-        if (e.from_nested) {
-          srFlattened.push(...e.from_nested);
-        }
-      });
-      if (srFlattened && srFlattened.length) {
-        indexes.push(...this.extractVCIndexes(srFlattened));
-      }
-    }
-    return indexes;
-  }
-
-  private parseIndexes(matchesFlattened: string[]): number[] {
-    const withoutDoubles: Set<number> = new Set<number>();
-    matchesFlattened.forEach((s: string) => {
-      const m = s.match(/\d+/);
-      if (m) {
-        withoutDoubles.add(parseInt(m[0]));
+  private extractMatches(matchSubmissionRequirements: SubmissionRequirementMatch[]): string[] {
+    const matches: string[] = [];
+    matchSubmissionRequirements.forEach((e) => {
+      matches.push(...e.matches);
+      if (e.from_nested) {
+        matches.push(...this.extractMatches(e.from_nested));
       }
     });
-    return Array.from(withoutDoubles);
+    return Array.from(new Set(matches));
   }
 
   private matchSubmissionRequirements(
@@ -113,16 +93,19 @@ export class EvaluationClientWrapper {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     for (const sr of submissionRequirements) {
       if (sr.from) {
-        if (sr.rule === Rules.All || sr.rule === Rules.Pick) {
-          const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
-          if (matchingDescriptors) {
-            submissionRequirementMatches.push(matchingDescriptors);
-          }
+        const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
+        if (matchingDescriptors) {
+          sr.min ? (matchingDescriptors.min = sr.min) : undefined;
+          sr.max ? (matchingDescriptors.max = sr.max) : undefined;
+          sr.count ? (matchingDescriptors.count = sr.count) : undefined;
+          submissionRequirementMatches.push(matchingDescriptors);
         }
       } else if (sr.from_nested) {
         const srm = this.createSubmissionRequirementMatch(sr);
         if (srm && srm.from_nested) {
-          srm.count++;
+          sr.min ? (srm.min = sr.min) : undefined;
+          sr.max ? (srm.max = sr.max) : undefined;
+          sr.count ? (srm.count = sr.count) : undefined;
           srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
           submissionRequirementMatches.push(srm);
         }
@@ -140,18 +123,15 @@ export class EvaluationClientWrapper {
     for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
-        const submissionRequirementMatch: SubmissionRequirementMatch = new SubmissionRequirementMatch(
-          idRes[0].value.name,
-          Rules.All,
-          1,
-          sameIdVCs,
-          [],
-          []
-        );
+        const submissionRequirementMatch: SubmissionRequirementMatch = {
+          name: idRes[0].value.name,
+          rule: Rules.All,
+          matches: sameIdVCs,
+        };
         submissionRequirementMatches.push(submissionRequirementMatch);
       }
     }
-    return submissionRequirementMatches;
+    return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
   }
 
   private mapMatchingDescriptors(
@@ -159,13 +139,12 @@ export class EvaluationClientWrapper {
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch | null {
     const srm = this.createSubmissionRequirementMatch(sr);
-    if (srm && srm.from && sr.from) {
+    if (srm?.from && sr?.from) {
       if (!srm.from.includes(sr.from)) {
         srm.from.push(sr.from);
       }
       for (const m of marked) {
         if (m.payload.group.includes(sr.from)) {
-          srm.count++;
           if (srm.matches.indexOf(m.verifiable_credential_path) === -1) {
             srm.matches.push(m.verifiable_credential_path);
           }
@@ -179,7 +158,6 @@ export class EvaluationClientWrapper {
     if (sr.from) {
       return {
         rule: sr.rule,
-        count: 0,
         matches: [],
         from: [],
         name: sr?.name,
@@ -187,7 +165,6 @@ export class EvaluationClientWrapper {
     } else if (sr.from_nested) {
       return {
         rule: sr.rule,
-        count: 0,
         matches: [],
         from_nested: [],
         name: sr?.name,
@@ -196,13 +173,21 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): EvaluationResults {
-    this._client.evaluate(pd, vp);
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
+    this._client.evaluate(pd, vcs, holderDids);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
-    if (this._client.verifiablePresentation.presentation_submission.descriptor_map.length) {
-      result.value = this._client.verifiablePresentation.presentation_submission;
+    if (this._client.presentationSubmission?.descriptor_map.length) {
+      const len = this._client.presentationSubmission?.descriptor_map.length;
+      for (let i = 0; i < len; i++) {
+        this._client.presentationSubmission.descriptor_map[i] &&
+          this._client.presentationSubmission.descriptor_map.push(
+            this._client.presentationSubmission.descriptor_map[i]
+          );
+      }
+      this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
+      result.value = this._client.presentationSubmission;
     }
     return result;
   }
@@ -220,33 +205,67 @@ export class EvaluationClientWrapper {
   }
 
   public submissionFrom(pd: PresentationDefinition, vcs: VerifiableCredential[]): PresentationSubmission {
-    console.log(vcs);
-    if (!this._client.results) {
+    if (!this._client.results.length) {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
 
-    let matched: [number, HandlerCheckResult[]];
+    //let matched: [number, HandlerCheckResult[]];
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) =>
+        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+    );
+
     if (pd.submission_requirements) {
-      const marked: HandlerCheckResult[] = this._client.results.filter(
-        (result) =>
-          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
-      );
-      //TODO match the submitted vcs with the input_descriptors;
-      matched = this.evaluateRequirements(pd.submission_requirements, marked, 0);
-      const inDescIndexes: number[] = [];
-      matched[1].forEach((e: HandlerCheckResult) => {
-        const index: RegExpMatchArray | null = e.input_descriptor_path.match(/\d+/);
-        if (index) {
-          inDescIndexes.push(parseInt(index[0]));
+      const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
+      this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
+      this.updatePresentationSubmission(upIdx);
+      return this._client.presentationSubmission;
+    }
+    const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
+    this.updatePresentationSubmission(updatedIndexes[1]);
+    return this._client.presentationSubmission;
+  }
+
+  private updatePresentationSubmission(updatedIndexes: [string, string][]) {
+    this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map
+      .filter((descriptor) => updatedIndexes.find((ui) => ui[0] === descriptor.path))
+      .map((descriptor) => {
+        const result = updatedIndexes.find((ui) => ui[0] === descriptor.path);
+        if (result) {
+          descriptor.path = result[1];
+        }
+        return descriptor;
+      });
+  }
+
+  private matchUserSelectedVcs(
+    marked: HandlerCheckResult[],
+    vcs: VerifiableCredential[]
+  ): [HandlerCheckResult[], [string, string][]] {
+    const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
+    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
+      index,
+      JSON.stringify(vc),
+    ]);
+    const updatedIndexes: [string, string][] = [];
+    userSelected.forEach((us, i) => {
+      allCredentials.forEach((ac, j) => {
+        if (ac[1] === us[1]) {
+          updatedIndexes.push([`$[${j}]`, `$[${i}]`]);
         }
       });
-      const desc: InputDescriptor[] = inDescIndexes.map((i: number) => pd.input_descriptors[i]);
-      const matchedDescriptors = this._client.verifiablePresentation.presentation_submission.descriptor_map.filter(
-        (value) => desc.map((e) => e.id).includes(value.id)
-      );
-      this._client.verifiablePresentation.presentation_submission.descriptor_map = matchedDescriptors;
-    }
-    return this._client.verifiablePresentation.presentation_submission;
+    });
+
+    marked = marked
+      .filter((m) => updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path))
+      .map((m) => {
+        const index = updatedIndexes.find((ui) => ui[0] === m.verifiable_credential_path);
+        if (index) {
+          m.verifiable_credential_path = index[1];
+        }
+        return m;
+      });
+    return [marked, updatedIndexes];
   }
 
   private evaluateRequirements(
@@ -344,5 +363,31 @@ export class EvaluationClientWrapper {
       partitionedResults.set(idPath, vcPaths);
     }
     return partitionedResults;
+  }
+
+  private removeDuplicateSubmissionRequirementMatches(matches: SubmissionRequirementMatch[]) {
+    return matches.filter((match, index) => {
+      const _match = JSON.stringify(match);
+      return (
+        index ===
+        matches.findIndex((obj) => {
+          return JSON.stringify(obj) === _match;
+        })
+      );
+    });
+  }
+
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(
+    selectResults: SelectResults,
+    verifiableCredentials: VerifiableCredential[]
+  ) {
+    if (selectResults) {
+      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+        const foundIndex: number = verifiableCredentials.findIndex(
+          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        );
+        selectResults.vcIndexes?.push(foundIndex);
+      });
+    }
   }
 }

@@ -1,5 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pe-models';
-import { PathComponent } from 'jsonpath';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 export interface CredentialSubject {
   id?: string;
@@ -23,10 +22,10 @@ export interface CredentialStatus {
 export interface Credential {
   '@context': string[];
   id: string;
-  type: string[] | string;
+  type: string[];
   credentialSubject: CredentialSubject;
   issuer: unknown;
-  issuanceDate?: string;
+  issuanceDate: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
   vc?: VerifiableCredential;
@@ -39,14 +38,18 @@ export interface VerifiableCredential extends Credential {
 
 export interface Presentation {
   '@context': string[];
-  type: string[] | string;
+  type: string[];
   verifiableCredential: VerifiableCredential[];
-  holder: string;
-  proof?: Proof;
+  presentation_submission?: PresentationSubmission;
+  holder: string[];
 }
 
 export interface VerifiablePresentation extends Presentation {
-  presentation_submission: PresentationSubmission;
+  proof: Proof;
 }
 
-export type CredentialSubjectJsonpathNode = { path: PathComponent[]; value: CredentialSubject };
+export type InputFieldType =
+  | VerifiablePresentation
+  | VerifiableCredential
+  | VerifiableCredential[]
+  | PresentationDefinition;
