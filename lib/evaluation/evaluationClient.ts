@@ -76,7 +76,7 @@ export class EvaluationClient {
     return this._verifiableCredential as VerifiableCredential[];
   }
 
-  public set verifiableCredential(verifiableCredential: Partial<VerifiableCredential>[]) {
+  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
     this._verifiableCredential = verifiableCredential;
   }
 
