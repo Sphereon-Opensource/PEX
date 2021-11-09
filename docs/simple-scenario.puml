@@ -19,9 +19,7 @@ participant "PE-JS" as PE order 4 #YELLOW
 V -> W: PresentationDefinition
 W -> A: Notification
 A -> W: Accepts PresentationDefinition
-W -> A: ShowSelectableCredentials
-A -> W: selects a subset of credentials
-W -> PE: evaluate(presentationDefinition, selectedCredentials[])
+W -> PE: evaluate(presentationDefinition, allAvailableCredentials[])
 PE -> W: evaluation results
 W -> A: from the credentials that you've selected, \na combination of these are acceptable
 A -> W: selects a combination of credentials
