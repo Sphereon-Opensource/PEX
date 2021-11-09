@@ -30,7 +30,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluate(pdSchema, vpSimple.verifiableCredential, vpSimple.holder);
+    const evaluationResults = pejs.evaluate(pdSchema, vpSimple);
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -41,8 +41,8 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
-    vpSimple.holder = [HOLDER_DID];
-    pejs.evaluate(pdSchema, vpSimple.verifiableCredential, []);
+    vpSimple.holder = HOLDER_DID;
+    pejs.evaluate(pdSchema, vpSimple);
     const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',

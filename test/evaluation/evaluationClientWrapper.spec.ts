@@ -122,7 +122,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
+    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     const evaluationResults = evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
@@ -146,7 +146,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
+    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
@@ -172,7 +172,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
+    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [{...vpSimple.verifiableCredential[1]}]);
     expect(result).toEqual(expect.objectContaining({
@@ -189,7 +189,7 @@ describe('evaluate', () => {
     delete pdSchema!.submission_requirements;
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID();
+    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(pdSchema, vpSimple.verifiableCredential, evaluationClientWrapperData.getHolderDID());
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [{ ...vpSimple.verifiableCredential[1] }, { ...vpSimple.verifiableCredential[2] }]);
     expect(result).toEqual(expect.objectContaining({

@@ -91,7 +91,13 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluate(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
+    const evaluationResult = pejs.evaluate(pd, {
+        '@context': [],
+        holder: holderWallet.holder,
+        type: [],
+        verifiableCredential: holderWallet.verifiableCredentials
+      }
+    );
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
     expect(evaluationResult.value?.descriptor_map.length).toEqual(2);
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');

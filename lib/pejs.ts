@@ -2,7 +2,7 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { VerifiableCredential } from './verifiablePresentation';
+import { Presentation, VerifiableCredential } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -23,13 +23,11 @@ export class PEJS {
    * @return the evaluation results specify what was expected and was fulfilled and also specifies what requirement described in the input descriptor
    * was not fulfilled by the presentation.
    */
-  public evaluate(
-    presentationDefinition: PresentationDefinition,
-    verifiableCredential: VerifiableCredential[],
-    holderDids: string[]
-  ): EvaluationResults {
+  public evaluate(presentationDefinition: PresentationDefinition, presentation: Presentation): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredential, holderDids);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation.verifiableCredential, [
+      presentation.holder,
+    ]);
   }
 
   /**
