@@ -219,7 +219,7 @@ export class SameSubjectVerifiableCredential {
         ],
         credentialSubject: {
           id: "VCSubject2021110803",
-          field7Key: "field11Value"
+          field11Key: "field11Value"
         },
         id: "867bfe7a-5b91-46b2-cccc-70028b8d9iii",
         issuer: "VC11Issuer",
@@ -244,7 +244,7 @@ export class SameSubjectVerifiableCredential {
         ],
         credentialSubject: {
           id: "VCSubject2021110804",
-          field8Key: "field12Value"
+          field12Key: "field12Value"
         },
         id: "867bfe7a-5b91-46b2-dddd-70028b8d9jjj",
         issuer: "VC12Issuer",

@@ -111,7 +111,7 @@ export class SameSubjectHandlerCheckResults {
         input_descriptor_path: "$.input_descriptors[6]",
         verifiable_credential_path: "$[6]",
         evaluator: "SameSubjectEvaluation",
-        status: "warn",
+        status: "error",
         payload: {
           fieldIdSet: [
             "field7Key",
@@ -122,13 +122,13 @@ export class SameSubjectHandlerCheckResults {
             field7Key: "field7Value"
           }
         },
-        message: "The field ids preferring the same subject do not belong to same subject"
+        message: "The fields ids not belong to the same subject"
       },
       {
         input_descriptor_path: "$.input_descriptors[7]",
         verifiable_credential_path: "$[7]",
         evaluator: "SameSubjectEvaluation",
-        status: "warn",
+        status: "error",
         payload: {
           fieldIdSet: [
             "field7Key",
@@ -139,13 +139,13 @@ export class SameSubjectHandlerCheckResults {
             field8Key: "field8Value"
           }
         },
-        message: "The field ids preferring the same subject do not belong to same subject"
+        message: "The fields ids not belong to the same subject"
       },
       {
-        input_descriptor_path: "$.input_descriptors[8]",
+        input_descriptor_path: "$.input_descriptors[10]",
         verifiable_credential_path: "$[8]",
         evaluator: "SameSubjectEvaluation",
-        status: "warn",
+        status: "error",
         payload: {
           fieldIdSet: [
             "field11Key",
@@ -153,27 +153,27 @@ export class SameSubjectHandlerCheckResults {
           ],
           credentialSubject: {
             id: "VCSubject2021110803",
-            field7Key: "field11Value"
+            field11Key: "field11Value"
           }
         },
-        message: "The field ids requiring the same subject do not belong to same subject"
+        message: "The fields ids not belong to the same subject"
       },
       {
-        input_descriptor_path: "$.input_descriptors[9]",
+        input_descriptor_path: "$.input_descriptors[11]",
         verifiable_credential_path: "$[9]",
         evaluator: "SameSubjectEvaluation",
-        status: "warn",
+        status: "error",
         payload: {
           fieldIdSet: [
-            "field12Key",
+            "field11Key",
             "field12Key"
           ],
           credentialSubject: {
             id: "VCSubject2021110804",
-            field8Key: "field12Value"
+            field12Key: "field12Value"
           }
         },
-        message: "The field ids requiring the same subject do not belong to same subject"
+        message: "The fields ids not belong to the same subject"
       }
     ];
   }

@@ -2,7 +2,7 @@ import {VerifiablePresentation} from "../../../lib";
 
 export class SrRules {
 
-  public getVerifiablePresentation(): VerifiablePresentation {
+  public getVerifiablePresentation(): Partial<VerifiablePresentation> {
     return {
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
@@ -59,6 +59,7 @@ export class SrRules {
           ],
           issuanceDate: "2010-11-08T19:73:24Z",
           proof: {
+            jws: '',
             type: "Ed25519Signature2020",
             created: "2021-11-08T19:18:08Z",
             verificationMethod: "did:key:2021110800",
@@ -86,6 +87,7 @@ export class SrRules {
           ],
           issuanceDate: "2010-11-08T19:73:24Z",
           proof: {
+            jws: '',
             type: "Ed25519Signature2020",
             created: "2021-11-08T19:18:08Z",
             verificationMethod: "did:key:2021110800",
@@ -113,6 +115,7 @@ export class SrRules {
           ],
           issuanceDate: "2010-11-08T19:73:01Z",
           proof: {
+            jws: '',
             type: "Ed25519Signature2020",
             created: "2021-11-08T19:18:08Z",
             verificationMethod: "did:key:2021110800",
@@ -140,6 +143,7 @@ export class SrRules {
           ],
           issuanceDate: "2010-11-08T19:73:02Z",
           proof: {
+            jws: '',
             type: "Ed25519Signature2020",
             created: "2021-11-08T19:18:08Z",
             verificationMethod: "did:key:2021110803",
