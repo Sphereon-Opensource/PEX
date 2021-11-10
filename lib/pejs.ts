@@ -36,7 +36,7 @@ export class PEJS {
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param holderDid the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param holderDids the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
    *
    * @return the selectable credentials.
    */

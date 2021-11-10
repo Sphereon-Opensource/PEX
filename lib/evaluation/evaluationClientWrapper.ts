@@ -58,17 +58,17 @@ export class EvaluationClientWrapper {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
-      const submissionReqMatch = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+      const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: VerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
-      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(submissionReqMatch);
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
         errors: errors,
-        matches: [...submissionReqMatch],
+        matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent,
-        selectableVerifiableCredentials: [...this._client.verifiableCredential],
+        selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     }

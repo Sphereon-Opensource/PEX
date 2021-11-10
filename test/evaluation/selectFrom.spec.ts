@@ -2,8 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status, VerifiableCredential } from '../../lib';
-import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
+import { EvaluationClientWrapper, Status, VerifiableCredential } from '../../lib';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -17,172 +16,170 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      "errors": [
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
-          },
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]"
-          },
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]"
-          },
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]"
-          },
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]"
-          },
-          {
-            "tag": "UriEvaluation",
-            "status": "error",
-            "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]"
-          },
-          {
-            "tag": "FilterEvaluation",
-            "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]"
-          },
-          {
-            "tag": "FilterEvaluation",
-            "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]"
-          },
-          {
-            "tag": "FilterEvaluation",
-            "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]"
-          },
-          {
-            "tag": "FilterEvaluation",
-            "status": "error",
-            "message": "Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]"
-          },
-          {
-            "tag": "MarkForSubmissionEvaluation",
-            "status": "error",
-            "message": "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
-          }
-        ],
-        'matches': [
-          {
-            'from': ['A'],
-            'matches': ['$[0]', '$[1]', '$[2]'],
-            'name': 'Submission of educational transcripts',
-            'rule': 'all'
-          }
-        ],
-        'selectableVerifiableCredentials': [
-          {
-            'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-            'vc': {
-              '@context': 'https://eu.com/claims/DriversLicense',
-              'credentialSubject': {
-                'accounts': [
-                  {
-                    'id': '1234567890',
-                    'route': 'DE-9876543210'
-                  },
-                  {
-                    'id': '2457913570',
-                    'route': 'DE-0753197542'
-                  }
-                ],
-                'id': 'did:example:ebfeb1f712ebc6f1c276e12ec21'
-              },
-              'id': 'https://eu.com/claims/DriversLicense',
-              'issuanceDate': '2010-01-01T19:73:24Z',
-              'issuer': 'did:example:123',
-              'type': [
-                'EUDriversLicense'
-              ]
-            }
-          },
-          {
-            '@context': 'https://business-standards.org/schemas/employment-history.json',
-            'credentialSubject': {
-              'active': true,
-              'id': 'did:example:ebfeb1f712ebc6f1c276e12ec21'
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
+        },
+      ],
+      matches: [
+        {
+          from: ['A'],
+          matches: ['$[0]', '$[1]', '$[2]'],
+          name: 'Submission of educational transcripts',
+          rule: 'all',
+        },
+      ],
+      selectableVerifiableCredentials: [
+        {
+          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          vc: {
+            '@context': 'https://eu.com/claims/DriversLicense',
+            credentialSubject: {
+              accounts: [
+                {
+                  id: '1234567890',
+                  route: 'DE-9876543210',
+                },
+                {
+                  id: '2457913570',
+                  route: 'DE-0753197542',
+                },
+              ],
+              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
             },
-            'id': 'https://business-standards.org/schemas/employment-history.json',
-            'issuanceDate': '2010-01-01T19:73:24Z',
-            'issuer': 'did:foo:123',
-            'proof': {
-              'created': '2017-06-18T21:19:10Z',
-              'jws': '...',
-              'proofPurpose': 'assertionMethod',
-              'type': 'EcdsaSecp256k1VerificationKey2019',
-              'verificationMethod': 'https://example.edu/issuers/keys/1'
-            },
-            'type': [
-              'VerifiableCredential',
-              'GenericEmploymentCredential'
-            ]
+            id: 'https://eu.com/claims/DriversLicense',
+            issuanceDate: '2010-01-01T19:73:24Z',
+            issuer: 'did:example:123',
+            type: ['EUDriversLicense'],
           },
-          {
-            '@context': 'https://www.w3.org/2018/credentials/v1',
-            'credentialSubject': {
-              'id': 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-              'license': {
-                'dob': '07/13/80',
-                'number': '34DGE352'
-              }
+        },
+        {
+          '@context': 'https://business-standards.org/schemas/employment-history.json',
+          credentialSubject: {
+            active: true,
+            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+          },
+          id: 'https://business-standards.org/schemas/employment-history.json',
+          issuanceDate: '2010-01-01T19:73:24Z',
+          issuer: 'did:foo:123',
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
+          },
+          type: ['VerifiableCredential', 'GenericEmploymentCredential'],
+        },
+        {
+          '@context': 'https://www.w3.org/2018/credentials/v1',
+          credentialSubject: {
+            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+            license: {
+              dob: '07/13/80',
+              number: '34DGE352',
             },
-            'id': 'https://eu.com/claims/DriversLicense',
-            'issuanceDate': '2010-01-01T19:73:24Z',
-            'issuer': 'did:foo:123',
-            'proof': {
-              'created': '2017-06-18T21:19:10Z',
-              'jws': '...',
-              'proofPurpose': 'assertionMethod',
-              'type': 'RsaSignature2018',
-              'verificationMethod': 'https://example.edu/issuers/keys/1'
-            },
-            'type': [
-              'EUDriversLicense'
-            ]
-          }
-        ],
-        'warnings': []
-      }
-    );
+          },
+          id: 'https://eu.com/claims/DriversLicense',
+          issuanceDate: '2010-01-01T19:73:24Z',
+          issuer: 'did:foo:123',
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'RsaSignature2018',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
+          },
+          type: ['EUDriversLicense'],
+        },
+      ],
+      warnings: [],
+    });
   });
 
   it('Evaluate submission requirements min 2 from group B', () => {
@@ -190,9 +187,9 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      "errors": [
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
@@ -289,7 +286,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      'selectableVerifiableCredentials': [
+      selectableVerifiableCredentials: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -339,9 +336,9 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      "errors": [
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
@@ -428,11 +425,6 @@ describe('selectFrom tests', () => {
           status: 'error',
           message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
         },
-        {
-          tag: "MarkForSubmissionEvaluation",
-          status: "error",
-          message: "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
-        }
       ],
       matches: [
         {
@@ -457,7 +449,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      "selectableVerifiableCredentials": [
+      selectableVerifiableCredentials: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -530,9 +522,9 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      "errors": [
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
@@ -619,11 +611,6 @@ describe('selectFrom tests', () => {
           status: 'error',
           message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
         },
-        {
-          tag: "MarkForSubmissionEvaluation",
-          status: "error",
-          message: "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
-        }
       ],
       matches: [
         {
@@ -634,7 +621,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      "selectableVerifiableCredentials": [
+      selectableVerifiableCredentials: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -684,13 +671,20 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      "errors": [
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
-          "tag": "UriEvaluation",
-          "status": "error",
-          "message": "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]"
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+          status: 'error',
+          tag: 'UriEvaluation',
         },
         {
           tag: 'UriEvaluation',
@@ -766,11 +760,6 @@ describe('selectFrom tests', () => {
           status: 'error',
           message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
         },
-        {
-          tag: "MarkForSubmissionEvaluation",
-          status: "error",
-          message: "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
-        }
       ],
       matches: [
         {
@@ -794,7 +783,7 @@ describe('selectFrom tests', () => {
           rule: 'all',
         },
       ],
-      "selectableVerifiableCredentials": [
+      selectableVerifiableCredentials: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -867,9 +856,9 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      "areRequiredCredentialsPresent": Status.INFO,
-      'errors': [
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
@@ -956,11 +945,6 @@ describe('selectFrom tests', () => {
           status: 'error',
           message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
         },
-        {
-          tag: "MarkForSubmissionEvaluation",
-          status: "error",
-          message: "The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]"
-        }
       ],
       matches: [
         {
@@ -985,7 +969,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      'selectableVerifiableCredentials': [
+      selectableVerifiableCredentials: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -1058,8 +1042,9 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
+      errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
@@ -1243,7 +1228,7 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1342,7 +1327,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      "selectableVerifiableCredentials": [
+      selectableVerifiableCredentials: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -1392,7 +1377,7 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1541,7 +1526,7 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1690,7 +1675,7 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1838,89 +1823,95 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]'
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]'
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]'
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]'
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]'
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]'
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]'
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]'
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]'
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]'
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]'
-          },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $[2]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'UriEvaluation',
+          status: 'error',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $[1]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'FilterEvaluation',
+          status: 'error',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[0]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $[2]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[0]',
+        },
+        {
+          tag: 'MarkForSubmissionEvaluation',
+          status: 'error',
+          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $[1]',
+        },
       ],
       matches: [
         {
@@ -1945,7 +1936,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      'selectableVerifiableCredentials': [
+      selectableVerifiableCredentials: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {

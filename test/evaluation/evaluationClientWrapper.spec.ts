@@ -322,7 +322,7 @@ describe('evaluate', () => {
       selectResults,
       evaluationClientWrapperData.getVerifiableCredential()
     );
-    const verifiableCredential = selectResults.verifiableCredentials![0];
+    const verifiableCredential = selectResults.selectableVerifiableCredentials![0];
     const indexInResults = selectResults.vcIndexes![0];
     expect(verifiableCredential.id).toEqual(evaluationClientWrapperData.getVerifiableCredential()[indexInResults].id);
   });

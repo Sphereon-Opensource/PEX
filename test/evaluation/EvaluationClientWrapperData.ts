@@ -1,7 +1,5 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-import {PresentationSubmission} from "@sphereon/pe-models";
-
 import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
 
 export class EvaluationClientWrapperData {
