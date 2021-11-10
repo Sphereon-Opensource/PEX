@@ -1,6 +1,6 @@
 import {PresentationSubmission} from "@sphereon/pe-models";
 
-import {HandlerCheckResult, SelectResults, VerifiableCredential} from "../../lib";
+import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
 
 export class EvaluationClientWrapperData {
 
@@ -128,6 +128,7 @@ export class EvaluationClientWrapperData {
 
   public getSuccessError(): SelectResults {
     return {
+      areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
           message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
@@ -215,7 +216,8 @@ export class EvaluationClientWrapperData {
 
   public getSelectResults(): SelectResults {
     return {
-      verifiableCredentials: [
+      areRequiredCredentialsPresent: Status.INFO,
+      selectableVerifiableCredentials: [
         {
           id: "CredentialID2021110405",
           credentialStatus: {
@@ -312,6 +314,7 @@ export class EvaluationClientWrapperData {
 
   public getError2(): SelectResults {
     return {
+      areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
           message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',

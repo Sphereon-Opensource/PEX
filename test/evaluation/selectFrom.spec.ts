@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiableCredential } from '../../lib';
+import { Status, VerifiableCredential } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation/evaluationClientWrapper';
 
 function getFile(path: string) {
@@ -18,7 +18,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-        'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
           {
             "tag": "UriEvaluation",
             "status": "error",
@@ -108,7 +109,7 @@ describe('selectFrom tests', () => {
             'rule': 'all'
           }
         ],
-        'verifiableCredentials': [
+        'selectableVerifiableCredentials': [
           {
             'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
             'vc': {
@@ -190,7 +191,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -284,7 +286,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -340,7 +342,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -453,7 +456,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      "selectableVerifiableCredentials": [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {
@@ -534,7 +537,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -628,7 +632,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      "selectableVerifiableCredentials": [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -684,7 +688,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -795,7 +800,7 @@ describe('selectFrom tests', () => {
           'rule': 'all'
         }
       ],
-      'verifiableCredentials': [
+      "selectableVerifiableCredentials": [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {
@@ -876,6 +881,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      "areRequiredCredentialsPresent": Status.INFO,
       'errors': [
         {
           "tag": "UriEvaluation",
@@ -988,7 +994,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {
@@ -1069,7 +1075,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -1181,7 +1188,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      "selectableVerifiableCredentials": [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {
@@ -1262,7 +1269,8 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
-      'errors': [
+      "areRequiredCredentialsPresent": Status.INFO,
+      "errors": [
         {
           "tag": "UriEvaluation",
           "status": "error",
@@ -1356,7 +1364,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      "selectableVerifiableCredentials": [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -1412,6 +1420,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      "areRequiredCredentialsPresent": Status.WARN,
       'errors': [
         {
           "tag": "UriEvaluation",
@@ -1506,7 +1515,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -1562,6 +1571,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      "areRequiredCredentialsPresent": Status.WARN,
       'errors': [
         {
           "tag": "UriEvaluation",
@@ -1656,7 +1666,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -1712,6 +1722,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      "areRequiredCredentialsPresent": Status.INFO,
       'errors': [
         {
           "tag": "UriEvaluation",
@@ -1805,7 +1816,7 @@ describe('selectFrom tests', () => {
           'rule': 'all'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           'credentialSubject': {
@@ -1861,6 +1872,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did)).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
       'errors': [
           {
             "tag": "UriEvaluation",
@@ -1977,7 +1989,7 @@ describe('selectFrom tests', () => {
           'rule': 'pick'
         }
       ],
-      'verifiableCredentials': [
+      'selectableVerifiableCredentials': [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {
@@ -2059,6 +2071,7 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, did);
     expect(result).toEqual({
+      areRequiredCredentialsPresent: Status.WARN,
       'errors': [
         {
           'message': '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
@@ -2175,7 +2188,7 @@ describe('selectFrom tests', () => {
           'max': 1
         }
       ],
-      'verifiableCredentials': [
+      selectableVerifiableCredentials: [
         {
           'comment': 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           'vc': {

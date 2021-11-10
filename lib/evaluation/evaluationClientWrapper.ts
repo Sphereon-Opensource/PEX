@@ -49,21 +49,25 @@ export class EvaluationClientWrapper {
       const credentials: VerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: [...credentials],
+        areRequiredCredentialsPresent,
+        selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     } else {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
-
+      const submissionReqMatch = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(submissionReqMatch);
       selectResults = {
         errors: errors,
-        matches: [...this.matchWithoutSubmissionRequirements(marked, presentationDefinition)],
-        verifiableCredentials: [...this._client.verifiableCredential],
+        matches: [...submissionReqMatch],
+        areRequiredCredentialsPresent,
+        selectableVerifiableCredentials: [...this._client.verifiableCredential],
         warnings,
       };
     }
@@ -380,7 +384,7 @@ export class EvaluationClientWrapper {
     verifiableCredentials: VerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+      selectResults.selectableVerifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );
@@ -388,4 +392,48 @@ export class EvaluationClientWrapper {
       });
     }
   }
+
+  public determineAreRequiredCredentialsPresent(matchSubmissionRequirements: SubmissionRequirementMatch[]): Status {
+    let status = Status.INFO;
+    if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
+      status = Status.ERROR;
+    }
+    for (const m of matchSubmissionRequirements) {
+      if (m.matches.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+        return Status.ERROR;
+      }
+      if (m.count && m.matches.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+        return Status.ERROR;
+      }
+      if (m.count && (m.matches.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+        status = Status.WARN;
+      }
+      if (m.min && m.matches.length < m.min && m.from_nested && !m.from_nested?.length) {
+        return Status.ERROR;
+      }
+      if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+        status = Status.WARN;
+      } else if (m.from_nested) {
+        status = this.determineAreRequiredCredentialsPresent(m.from_nested);
+        if (status === Status.ERROR) {
+          return status;
+        }
+      }
+    }
+    return status;
+  }
+
+  /**
+   *
+   * All is fine because of existing non-empty vc list
+   * ________________________
+   * Pick:
+   * Min:1
+   * max:3
+   * count:2
+   * vc list:0
+   * ________________________
+   *
+   *
+   */
 }
