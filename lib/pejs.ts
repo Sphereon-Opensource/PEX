@@ -50,11 +50,11 @@ export class PEJS {
   public evaluateCredentials(
     presentationDefinition: PresentationDefinition,
     verifiableCredential: VerifiableCredential[],
-    holderDids: string[]
+    didsOfHolder: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredential));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredentialCopy, holderDids);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredentialCopy, didsOfHolder);
   }
 
   /**
