@@ -1,6 +1,6 @@
 import { PresentationSubmission } from '@sphereon/pe-models';
 
-import { HandlerCheckResult, SelectResults, VerifiableCredential } from '../../lib';
+import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {
@@ -110,6 +110,7 @@ export class EvaluationClientWrapperData {
 
   public getSuccessError(): SelectResults {
     return {
+      areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
           message:
@@ -200,7 +201,8 @@ export class EvaluationClientWrapperData {
 
   public getSelectResults(): SelectResults {
     return {
-      verifiableCredentials: [
+      areRequiredCredentialsPresent: Status.INFO,
+      selectableVerifiableCredentials: [
         {
           id: 'CredentialID2021110405',
           credentialStatus: {
@@ -297,6 +299,7 @@ export class EvaluationClientWrapperData {
 
   public getError2(): SelectResults {
     return {
+      areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
           message:

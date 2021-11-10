@@ -49,14 +49,14 @@ export class EvaluationClientWrapper {
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: [...credentials],
+        areRequiredCredentialsPresent: Status.INFO,
+        selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     } else {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
-
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: VerifiableCredential[] = matches.map(
@@ -65,13 +65,14 @@ export class EvaluationClientWrapper {
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: [...credentials],
+        areRequiredCredentialsPresent: Status.INFO,
+        selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     }
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
-
+    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     return selectResults;
   }
 
@@ -382,12 +383,40 @@ export class EvaluationClientWrapper {
     verifiableCredentials: VerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+      selectResults.selectableVerifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );
         selectResults.vcIndexes?.push(foundIndex);
       });
     }
+  }
+
+  public determineAreRequiredCredentialsPresent(
+    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined
+  ): Status {
+    let status = Status.INFO;
+    if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
+      return Status.ERROR;
+    }
+    for (const m of matchSubmissionRequirements) {
+      if (m.matches.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+        return Status.ERROR;
+      } else if (m.count && m.matches.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+        return Status.ERROR;
+      } else if (m.count && (m.matches.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+        status = Status.WARN;
+      } else if (m.min && m.matches.length < m.min && m.from_nested && !m.from_nested?.length) {
+        return Status.ERROR;
+      } else if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+        status = Status.WARN;
+      } else if (m.from_nested) {
+        status = this.determineAreRequiredCredentialsPresent(m.from_nested);
+        if (status === Status.ERROR) {
+          return status;
+        }
+      }
+    }
+    return status;
   }
 }
