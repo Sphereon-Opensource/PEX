@@ -21,6 +21,7 @@ export class EvaluationClient {
     this._results = [];
     this._verifiableCredential = [];
     this._presentationSubmission = {};
+    this._dids = [];
   }
 
   private failed_catched = {
@@ -33,9 +34,9 @@ export class EvaluationClient {
   private _results: HandlerCheckResult[];
   private _verifiableCredential: Partial<VerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
-  private _dids?: string[];
+  private _dids: string[];
 
-  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids?: string[]): void {
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): void {
     this._dids = holderDids;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, vcs);
@@ -59,7 +60,7 @@ export class EvaluationClient {
     return this._dids;
   }
 
-  public set dids(dids: string[] | undefined) {
+  public set dids(dids: string[]) {
     this._dids = dids;
   }
 

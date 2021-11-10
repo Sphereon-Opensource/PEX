@@ -173,7 +173,7 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids?: string[]): EvaluationResults {
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
     this._client.evaluate(pd, vcs, holderDids);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);

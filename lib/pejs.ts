@@ -29,7 +29,7 @@ export class PEJS {
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    const holderDids = presentation.holder ? [presentation.holder] : undefined;
+    const holderDids = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
       presentationCopy.verifiableCredential,
