@@ -14,14 +14,14 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
   }
 
-  /**
-   * The evaluate compares what is expected from a presentation with the presentation.
+  /***
+   * The evaluate compares what is expected from a presentation with the presentationDefinition.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param presentation the presentation which has to be evaluated in comparison of the definition.
    *
-   * @return the evaluation results specify what was expected and was fulfilled and also specifies what requirement described in the input descriptor
-   * was not fulfilled by the presentation.
+   * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
+   * were not fulfilled by the presentation.
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinition,
@@ -37,15 +37,15 @@ export class PEJS {
     );
   }
 
-  /**
-   * The evaluate compares what is expected from a presentation with the presentation.
+  /***
+   * The evaluate compares what is expected from a verifiableCredentials with the presentationDefinition.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
-   * @param verifiableCredential the verifiable credentials list which has to be evaluated in comparison of the definition.
-   * @param holderDids a list of holder dids.
+   * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
+   * @param didsOfHolder the list of the DIDs that the wallet holders controlls.
    *
-   * @return the evaluation results specify what was expected and was fulfilled and also specifies what requirement described in the input descriptor
-   * was not fulfilled by the presentation.
+   * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
+   * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinition,
