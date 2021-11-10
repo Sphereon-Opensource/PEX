@@ -18,6 +18,7 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -33,6 +34,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
@@ -47,14 +49,10 @@ describe('evaluate', () => {
   it('should return error if uri in verifiableCredential doesn\'t match', function() {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pdSimpleSchemaAgePredicateExample.ts').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
-  it("should return error if uri in verifiableCredential doesn't match", function () {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -75,6 +73,7 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -106,6 +105,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -121,6 +121,7 @@ describe('evaluate', () => {
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -136,6 +137,7 @@ describe('evaluate', () => {
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -151,6 +153,7 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -165,6 +168,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vpSimpleAgePredicateExample.ts') as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
@@ -181,6 +185,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -204,6 +209,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
       pdSchema,
@@ -239,6 +245,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
       pdSchema,
@@ -262,6 +269,7 @@ describe('evaluate', () => {
     delete pdSchema!.submission_requirements;
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationClientWrapperData = new EvaluationClientWrapperData();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
       pdSchema,
@@ -303,3 +311,4 @@ describe('evaluate', () => {
   });
 
 });
+
