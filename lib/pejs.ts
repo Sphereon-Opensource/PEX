@@ -23,11 +23,37 @@ export class PEJS {
    * @return the evaluation results specify what was expected and was fulfilled and also specifies what requirement described in the input descriptor
    * was not fulfilled by the presentation.
    */
-  public evaluate(presentationDefinition: PresentationDefinition, presentation: Presentation): EvaluationResults {
+  public evaluatePresentation(
+    presentationDefinition: PresentationDefinition,
+    presentation: Presentation
+  ): EvaluationResults {
+    const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation.verifiableCredential, [
-      presentation.holder,
-    ]);
+    return this._evaluationClientWrapper.evaluate(
+      presentationDefinition,
+      presentationCopy.verifiableCredential,
+      presentation.holder
+    );
+  }
+
+  /**
+   * The evaluate compares what is expected from a presentation with the presentation.
+   *
+   * @param presentationDefinition the definition of what is expected in the presentation.
+   * @param verifiableCredential the verifiable credentials list which has to be evaluated in comparison of the definition.
+   * @param holderDids a list of holder dids.
+   *
+   * @return the evaluation results specify what was expected and was fulfilled and also specifies what requirement described in the input descriptor
+   * was not fulfilled by the presentation.
+   */
+  public evaluateCredentials(
+    presentationDefinition: PresentationDefinition,
+    verifiableCredential: VerifiableCredential[],
+    holderDids: string[]
+  ): EvaluationResults {
+    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredential));
+    this._evaluationClientWrapper = new EvaluationClientWrapper();
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredentialCopy, holderDids);
   }
 
   /**

@@ -183,7 +183,7 @@ describe('evaluate', () => {
     ) as VerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    vpSimple!.holder = [evaluationClientWrapperData.getHolderDID()[0]];
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -226,7 +226,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    vpSimple!.holder = [evaluationClientWrapperData.getHolderDID()[0]];
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -263,7 +263,7 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    vpSimple!.holder = [evaluationClientWrapperData.getHolderDID()[0]];
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
@@ -288,7 +288,7 @@ describe('evaluate', () => {
     delete pdSchema!.submission_requirements;
     vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    vpSimple!.holder = [evaluationClientWrapperData.getHolderDID()[0]];
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
