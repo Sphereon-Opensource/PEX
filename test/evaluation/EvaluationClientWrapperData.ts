@@ -1,9 +1,8 @@
-import {PresentationSubmission} from "@sphereon/pe-models";
+import { PresentationSubmission } from '@sphereon/pe-models';
 
-import {HandlerCheckResult, SelectResults, VerifiableCredential} from "../../lib";
+import { HandlerCheckResult, SelectResults, VerifiableCredential } from '../../lib';
 
 export class EvaluationClientWrapperData {
-
   public getHolderDID(): string[] {
     return ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
   }
@@ -14,15 +13,12 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message:
+        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
       payload: {
-        inputDescriptorsUris: [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ],
-        presentationDefinitionUris: [
-          'https://www.w3.org/2018/credentials/v1'
-        ]
-      }
+        inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+        presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
+      },
     };
   }
 
@@ -35,14 +31,10 @@ export class EvaluationClientWrapperData {
       message: 'The input candidate is not eligible for submission',
       payload: {
         evaluator: 'UriEvaluation',
-        inputDescriptorsUris: [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ],
-        presentationDefinitionUris: [
-          'https://www.w3.org/2018/credentials/v1'
-        ]
-      }
-    }
+        inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+        presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
+      },
+    };
   }
 
   public getUriInVerifiableCredentialDoesNotMatchResult0(): HandlerCheckResult {
@@ -51,16 +43,13 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message:
+        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
       payload: {
-        inputDescriptorsUris: [
-          'https://www.w3.org/2018/credentials/v1'
-        ],
-        presentationDefinitionUris: [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ]
-      }
-    }
+        inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
+        presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+      },
+    };
   }
 
   public getUriInVerifiableCredentialDoesNotMatchResult3(): HandlerCheckResult {
@@ -72,57 +61,50 @@ export class EvaluationClientWrapperData {
       message: 'The input candidate is not eligible for submission',
       payload: {
         evaluator: 'UriEvaluation',
-        inputDescriptorsUris: [
-          'https://www.w3.org/2018/credentials/v1'
-        ],
-        presentationDefinitionUris: [
-          'https://www.w3.org/TR/vc-data-model/#types1'
-        ]
-      }
+        inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
+        presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+      },
     };
   }
 
   public getForSubmissionRequirementsAllRuleResult0(): PresentationSubmission {
     return {
-      id: "PresentationSubmission2021110401",
+      id: 'PresentationSubmission2021110401',
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
         {
           id: 'Educational transcripts',
           format: 'ldp_vc',
-          path: '$[0]'
-        }
-      ]
+          path: '$[0]',
+        },
+      ],
     };
   }
 
   public getgetForSubmissionRequirementsPickRuleResult0(): PresentationSubmission {
     return {
-      id: "PresentationSubmission2021110402",
+      id: 'PresentationSubmission2021110402',
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
         {
           format: 'ldp_vc',
           id: 'Educational transcripts 1',
-          path: '$[0]'
+          path: '$[0]',
         },
         {
           format: 'ldp_vc',
           id: 'Educational transcripts 2',
-          path: '$[1]'
+          path: '$[1]',
         },
-      ]
+      ],
     };
   }
 
-
   public getMax1FromBResult0(): PresentationSubmission {
     return {
-      id: "PresentationSubmission2021110403",
+      id: 'PresentationSubmission2021110403',
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-      descriptor_map: [
-        {'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[0]'}
-      ]
+      descriptor_map: [{ format: 'ldp_vc', id: 'Educational transcripts 1', path: '$[0]' }],
     };
   }
 
@@ -130,52 +112,53 @@ export class EvaluationClientWrapperData {
     return {
       errors: [
         {
-          message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
           status: 'error',
-          tag: 'UriEvaluation'
+          tag: 'UriEvaluation',
         },
         {
-          message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'UriEvaluation'
+          tag: 'UriEvaluation',
         },
         {
           message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
           status: 'error',
-          tag: 'FilterEvaluation'
+          tag: 'FilterEvaluation',
         },
         {
           message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'FilterEvaluation'
+          tag: 'FilterEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
+          tag: 'MarkForSubmissionEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
-        }
+          tag: 'MarkForSubmissionEvaluation',
+        },
       ],
-      warnings: []
+      warnings: [],
     };
   }
 
-
   public getValue(): PresentationSubmission {
     return {
-      id: "PresentationSubmission2021110400",
+      id: 'PresentationSubmission2021110400',
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
         {
           format: 'ldp_vc',
           id: 'bankaccount_input',
-          path: '$[0]'
-        }
-      ]
+          path: '$[0]',
+        },
+      ],
     };
   }
 
@@ -188,11 +171,11 @@ export class EvaluationClientWrapperData {
           {
             format: 'ldp_vc',
             id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-            path: '$[0]'
-          }
-        ]
+            path: '$[0]',
+          },
+        ],
       }),
-      warnings: []
+      warnings: [],
     };
   }
 
@@ -200,16 +183,18 @@ export class EvaluationClientWrapperData {
     return {
       errors: [
         {
-          message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
           status: 'error',
-          tag: 'UriEvaluation'
+          tag: 'UriEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
-        }
-      ], warnings: []
+          tag: 'MarkForSubmissionEvaluation',
+        },
+      ],
+      warnings: [],
     };
   }
 
@@ -217,26 +202,26 @@ export class EvaluationClientWrapperData {
     return {
       verifiableCredentials: [
         {
-          id: "CredentialID2021110405",
+          id: 'CredentialID2021110405',
           credentialStatus: {
-            id: "",
-            type: ""
+            id: '',
+            type: '',
           },
           credentialSubject: {},
-          expirationDate: "",
-          issuanceDate: "",
-          issuer: "",
+          expirationDate: '',
+          issuanceDate: '',
+          issuer: '',
           type: [],
 
-          "@context": [],
+          '@context': [],
           proof: {
-            type: "",
-            created: "",
-            proofPurpose: "",
-            verificationMethod: "",
-            jws: ""
-          }
-        }
+            type: '',
+            created: '',
+            proofPurpose: '',
+            verificationMethod: '',
+            jws: '',
+          },
+        },
       ],
       vcIndexes: [],
     };
@@ -245,112 +230,113 @@ export class EvaluationClientWrapperData {
   public getVerifiableCredential(): VerifiableCredential[] {
     return [
       {
-        id: "CredentialID2021110100",
+        id: 'CredentialID2021110100',
         credentialStatus: {
-          id: "",
-          type: ""
+          id: '',
+          type: '',
         },
         credentialSubject: {},
-        expirationDate: "",
-        issuanceDate: "",
-        issuer: "",
+        expirationDate: '',
+        issuanceDate: '',
+        issuer: '',
         type: [],
 
-        "@context": [],
+        '@context': [],
         proof: {
-          type: "",
-          created: "",
-          proofPurpose: "",
-          verificationMethod: "",
-          jws: ""
-        }
+          type: '',
+          created: '',
+          proofPurpose: '',
+          verificationMethod: '',
+          jws: '',
+        },
       },
       {
-        id: "CredentialID2021110405",
+        id: 'CredentialID2021110405',
         credentialStatus: {
-          id: "",
-          type: ""
+          id: '',
+          type: '',
         },
         credentialSubject: {},
-        expirationDate: "",
-        issuanceDate: "",
-        issuer: "",
+        expirationDate: '',
+        issuanceDate: '',
+        issuer: '',
         type: [],
 
-        "@context": [],
+        '@context': [],
         proof: {
-          type: "",
-          created: "",
-          proofPurpose: "",
-          verificationMethod: "",
-          jws: ""
-        }
+          type: '',
+          created: '',
+          proofPurpose: '',
+          verificationMethod: '',
+          jws: '',
+        },
       },
       {
-        id: "CredentialID2021110100",
+        id: 'CredentialID2021110100',
         credentialStatus: {
-          id: "",
-          type: ""
+          id: '',
+          type: '',
         },
         credentialSubject: {},
-        expirationDate: "",
-        issuanceDate: "",
-        issuer: "",
+        expirationDate: '',
+        issuanceDate: '',
+        issuer: '',
         type: [],
 
-        "@context": [],
+        '@context': [],
         proof: {
-          type: "",
-          created: "",
-          proofPurpose: "",
-          verificationMethod: "",
-          jws: ""
-        }
-      }
-    ]
+          type: '',
+          created: '',
+          proofPurpose: '',
+          verificationMethod: '',
+          jws: '',
+        },
+      },
+    ];
   }
 
   public getError2(): SelectResults {
     return {
       errors: [
         {
-          message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
           status: 'error',
-          tag: 'UriEvaluation'
+          tag: 'UriEvaluation',
         },
         {
-          message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'UriEvaluation'
+          tag: 'UriEvaluation',
         },
         {
           message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
           status: 'error',
-          tag: 'FilterEvaluation'
+          tag: 'FilterEvaluation',
         },
         {
           message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'FilterEvaluation'
+          tag: 'FilterEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
+          tag: 'MarkForSubmissionEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
+          tag: 'MarkForSubmissionEvaluation',
         },
         {
           message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
           status: 'error',
-          tag: 'MarkForSubmissionEvaluation'
-        }
+          tag: 'MarkForSubmissionEvaluation',
+        },
       ],
-      warnings: []
+      warnings: [],
     };
-
   }
 }

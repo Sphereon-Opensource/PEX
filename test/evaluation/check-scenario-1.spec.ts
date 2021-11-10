@@ -13,19 +13,19 @@ describe('1st scenario', () => {
    * In the first example the PresentationDefinition object is a simple one. Bob is sending her a presentationDefinition with two InputDescriptors
    * Alice has only one credential in her wallet that have the properties requested by Bob
    */
-  it('should return ok get the right presentationSubmission', function() {
+  it('should return ok get the right presentationSubmission', function () {
     const pd: PresentationDefinition = getPresentationDefinition();
     const pejs: PEJS = new PEJS();
     /**
      * optional, first we want to make sure that the presentationDefinition object that we got is correct
      */
     const result = pejs.validateDefinition(pd);
-    expect(result).toEqual([{ tag: 'root', status: 'info', message: 'ok' }])
+    expect(result).toEqual([{ tag: 'root', status: 'info', message: 'ok' }]);
     const wallet: Wallet = new Wallet();
     /**
      * we get the verifiableCredentials from our wallet
      */
-    const holderWallet: { holder: string, verifiableCredentials: VerifiableCredential[] } = wallet.getWallet();
+    const holderWallet: { holder: string; verifiableCredentials: VerifiableCredential[] } = wallet.getWallet();
     expect(holderWallet.holder).toEqual('did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd');
     /**
      * evaluation result will be:
@@ -92,16 +92,18 @@ describe('1st scenario', () => {
     }
      */
     const evaluationResult = pejs.evaluate(pd, {
-        '@context': [],
-        holder: holderWallet.holder,
-        type: [],
-        verifiableCredential: holderWallet.verifiableCredentials
-      }
-    );
+      '@context': [],
+      holder: holderWallet.holder,
+      type: [],
+      verifiableCredential: holderWallet.verifiableCredentials,
+    });
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
     expect(evaluationResult.value?.descriptor_map.length).toEqual(2);
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
-    expect(evaluationResult.value?.descriptor_map.map(dm => dm.id).sort()).toEqual(['867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'e73646de-43e2-4d72-ba4f-090d01c11eac']);
+    expect(evaluationResult.value?.descriptor_map.map((dm) => dm.id).sort()).toEqual([
+      '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+      'e73646de-43e2-4d72-ba4f-090d01c11eac',
+    ]);
     /**
      * selectFrom will result is this object. which is pointing Alice to the right VC to send. By processing it,
      * Alice will understand that she needs to send only one object, and that object is in fact index 2 of the verifiableCredential list
@@ -217,7 +219,10 @@ describe('1st scenario', () => {
      */
     const submissionFromResult = pejs.submissionFrom(pd, [holderWallet.verifiableCredentials[2]]);
     expect(submissionFromResult.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
-    expect(submissionFromResult.descriptor_map.map(dm => dm.id).sort()).toEqual(['867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'e73646de-43e2-4d72-ba4f-090d01c11eac']);
+    expect(submissionFromResult.descriptor_map.map((dm) => dm.id).sort()).toEqual([
+      '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+      'e73646de-43e2-4d72-ba4f-090d01c11eac',
+    ]);
     /**
      * But what happens if we pass another VerifiableCredential and not the right one?
      {
@@ -237,61 +242,53 @@ describe('1st scenario', () => {
       new PEJS().submissionFrom(pd, [holderWallet.verifiableCredentials[1]]);
     }).toThrowError('You need to call evaluate() before submissionFrom()');
   });
-
 });
 
 function getPresentationDefinition(): PresentationDefinition {
   return {
-    'id': '31e2f0f1-6b70-411d-b239-56aed5321884',
-    'purpose': 'To check if you have a valid college degree.',
-    'input_descriptors': [
+    id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+    purpose: 'To check if you have a valid college degree.',
+    input_descriptors: [
       {
-        'id': 'e73646de-43e2-4d72-ba4f-090d01c11eac',
-        'purpose': 'The issuer of your Bachelor degree should be a valid one.',
-        'schema': [
+        id: 'e73646de-43e2-4d72-ba4f-090d01c11eac',
+        purpose: 'The issuer of your Bachelor degree should be a valid one.',
+        schema: [
           {
-            'uri': 'https://www.w3.org/2018/credentials/v1'
-          }
+            uri: 'https://www.w3.org/2018/credentials/v1',
+          },
         ],
-        'constraints': {
-          'fields': [
+        constraints: {
+          fields: [
             {
-              'path': [
-                '$.issuer',
-                '$.vc.issuer',
-                '$.iss'
-              ],
-              'filter': {
-                'type': 'string',
-                'pattern': 'did:web:vc.transmute.world'
-              }
-            }
-          ]
-        }
+              path: ['$.issuer', '$.vc.issuer', '$.iss'],
+              filter: {
+                type: 'string',
+                pattern: 'did:web:vc.transmute.world',
+              },
+            },
+          ],
+        },
       },
       {
-        'id': '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-        'purpose': 'Your degree must be from type BachelorDegree.',
-        'schema': [
+        id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+        purpose: 'Your degree must be from type BachelorDegree.',
+        schema: [
           {
-            'uri': 'https://www.w3.org/2018/credentials/v1'
-          }
+            uri: 'https://www.w3.org/2018/credentials/v1',
+          },
         ],
-        'constraints': {
-          'fields': [
+        constraints: {
+          fields: [
             {
-              'path': [
-                '$.credentialSubject.degree.type',
-                '$.vc.credentialSubject.degree.type'
-              ],
-              'filter': {
-                'type': 'string',
-                'pattern': 'BachelorDegree'
-              }
-            }
-          ]
-        }
-      }
-    ]
+              path: ['$.credentialSubject.degree.type', '$.vc.credentialSubject.degree.type'],
+              filter: {
+                type: 'string',
+                pattern: 'BachelorDegree',
+              },
+            },
+          ],
+        },
+      },
+    ],
   };
 }
