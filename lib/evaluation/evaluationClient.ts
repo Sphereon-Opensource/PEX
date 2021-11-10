@@ -1,7 +1,7 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential } from '../verifiablePresentation';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -19,15 +19,9 @@ import {
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiablePresentation = {
-      '@context': [],
-      type: '',
-      holder: '',
-      verifiableCredential: [],
-      presentation_submission: { id: '', definition_id: '', descriptor_map: [] },
-      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
-    };
-    this._did = '';
+    this._verifiableCredential = [];
+    this._presentationSubmission = {};
+    this._dids = [];
   }
 
   private failed_catched = {
@@ -38,17 +32,18 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiablePresentation: VerifiablePresentation;
-  private _did: string;
+  private _verifiableCredential: Partial<VerifiableCredential>[];
+  private _presentationSubmission: Partial<PresentationSubmission>;
+  private _dids: string[];
 
-  public evaluate(pd: PresentationDefinition, vp: VerifiablePresentation): void {
-    this._did = vp.holder;
-    let currentHandler: EvaluationHandler = this.initEvaluationHandlers();
-    currentHandler.handle(pd, vp);
-    while (currentHandler.hasNext()) {
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): void {
+    this._dids = holderDids;
+    let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
+    currentHandler?.handle(pd, vcs);
+    while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler.handle(pd, vp);
+        currentHandler?.handle(pd, vcs);
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
@@ -61,20 +56,28 @@ export class EvaluationClient {
     return this._results;
   }
 
-  public get did() {
-    return this._did;
+  public get dids() {
+    return this._dids;
   }
 
-  public set did(did: string) {
-    this._did = did;
+  public set dids(dids: string[]) {
+    this._dids = dids;
   }
 
-  public get verifiablePresentation(): VerifiablePresentation {
-    return this._verifiablePresentation;
+  public get presentationSubmission(): PresentationSubmission {
+    return this._presentationSubmission as PresentationSubmission;
   }
 
-  public set verifiablePresentation(verifiablePresentation: VerifiablePresentation) {
-    this._verifiablePresentation = verifiablePresentation;
+  public set presentationSubmission(presentationSubmission: Partial<PresentationSubmission>) {
+    this._presentationSubmission = presentationSubmission;
+  }
+
+  public get verifiableCredential(): VerifiableCredential[] {
+    return this._verifiableCredential as VerifiableCredential[];
+  }
+
+  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
+    this._verifiableCredential = verifiableCredential;
   }
 
   private initEvaluationHandlers() {
@@ -83,11 +86,11 @@ export class EvaluationClient {
     uriEvaluation
       .setNext(new InputDescriptorFilterEvaluationHandler(this))
       .setNext(new PredicateRelatedFieldEvaluationHandler(this))
-      .setNext(new MarkForSubmissionEvaluationHandler(this))
       .setNext(new LimitDisclosureEvaluationHandler(this))
       .setNext(new SubjectIsIssuerEvaluationHandler(this))
       .setNext(new SubjectIsHolderEvaluationHandler(this))
-      .setNext(new SameSubjectEvaluationHandler(this));
+      .setNext(new SameSubjectEvaluationHandler(this))
+      .setNext(new MarkForSubmissionEvaluationHandler(this));
 
     return uriEvaluation;
   }

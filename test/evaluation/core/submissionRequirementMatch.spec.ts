@@ -6,15 +6,13 @@ import { SubmissionRequirementMatch } from '../../../lib';
 describe('submissionRequirementMatch', () => {
 
   it('should return ok constructor works correctly', function () {
-    const submissionRequirementMatch: SubmissionRequirementMatch = new SubmissionRequirementMatch(
-      "test srm",
-      Rules.All,
-      1,
-      ["$.verifiableCredential[1]"],
-      ["A"],
-      undefined
-    );
-    expect(submissionRequirementMatch.count).toBe(1);
+    const submissionRequirementMatch: SubmissionRequirementMatch = {
+      name: "test srm",
+      rule: Rules.All,
+      matches: ["$.verifiableCredential[1]"],
+      from: ["A"]
+    };
+    expect(submissionRequirementMatch.from).toContain("A");
     expect(submissionRequirementMatch.rule).toBe(Rules.All);
     expect(submissionRequirementMatch.matches[0]).toBe("$.verifiableCredential[1]");
   });

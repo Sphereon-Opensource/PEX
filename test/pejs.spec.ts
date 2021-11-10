@@ -20,9 +20,9 @@ describe('evaluate', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-PermanentResidentCard.json').presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
-    const result = pejs.selectFrom(pdSchema, [vc], 'FAsYneKJhWBP2n5E21ZzdY');
-    expect(result!.errors!.length).toEqual(3);
-    expect(result!.errors!.map(e => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation', 'IsHolderEvaluation']);
+    const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
+    expect(result!.errors!.length).toEqual(2);
+    expect(result!.errors!.map(e => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);
   });
 
   it('Evaluate case without any error', () => {
@@ -37,19 +37,19 @@ describe('evaluate', () => {
 
   it('Evaluate submission requirements all from group A', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
     pejs.evaluate(pdSchema, vpSimple);
-    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple);
+    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(expect.objectContaining({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts', 'path': '$.verifiableCredential[0]' },
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$.verifiableCredential[1]' },
-        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$.verifiableCredential[2]' }
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts', 'path': '$[0]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 1', 'path': '$[1]' },
+        { 'format': 'ldp_vc', 'id': 'Educational transcripts 2', 'path': '$[2]' }
       ]
     }));
   });

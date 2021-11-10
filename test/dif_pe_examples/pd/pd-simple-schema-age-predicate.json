@@ -17,7 +17,7 @@
           "fields": [
             {
               "path": [
-                "$.age"
+                "$.credentialSubject.age"
               ],
               "filter": {
                 "type": "integer",

@@ -1,7 +1,9 @@
-import { InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import jp from 'jsonpath';
+import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -16,13 +18,28 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, p: VerifiablePresentation): void {
+  public handle(d: PresentationDefinition, vcs: VerifiableCredential[]): void {
     d.input_descriptors.forEach((inDesc: InputDescriptor, i: number) => {
       const uris: string[] = inDesc.schema.map((so) => so.uri);
-      p.verifiableCredential.forEach((vc: VerifiableCredential, j: number) => {
+      vcs.forEach((vc: VerifiableCredential, j: number) => {
         this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
       });
     });
+    const descriptorMap: Descriptor[] = this.getResults()
+      .filter((e) => e.status === Status.INFO)
+      .map((e) => {
+        const inputDescriptor: InputDescriptor = jp.nodes(d, e.input_descriptor_path)[0].value;
+        return {
+          id: inputDescriptor.id,
+          format: 'ldp_vc',
+          path: e.verifiable_credential_path,
+        };
+      });
+    this.presentationSubmission = {
+      id: nanoid(),
+      definition_id: d.id,
+      descriptor_map: descriptorMap,
+    };
   }
 
   private static getPresentationURI(vc: VerifiableCredential): string[] {
@@ -89,7 +106,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private createResult(idIdx: number, vcIdx: number): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$.verifiableCredential[${vcIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
       message: undefined,

@@ -18,7 +18,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple);
+    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -29,10 +29,10 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0]['@context'][0] = "https://www.test.org/mock"
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple);
+    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     expect(evaluationHandler.getResults()[0]).toEqual(
       new HandlerCheckResult(
-        '$.input_descriptors[0]', "$.verifiableCredential[0]", "UriEvaluation",
+        '$.input_descriptors[0]', "$[0]", "UriEvaluation",
         Status.ERROR,
         "@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.",
         {
@@ -48,7 +48,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple);
+    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(6);
   });
@@ -59,7 +59,7 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = "https://business-standards.org/schemas/employment-history.json";
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple);
+    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
     const errorResults = evaluationClient.results.filter(result => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter(result => result.status === Status.INFO);
     expect(errorResults.length).toEqual(5);
