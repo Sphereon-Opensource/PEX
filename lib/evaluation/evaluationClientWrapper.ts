@@ -72,10 +72,7 @@ export class EvaluationClientWrapper {
     }
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
-    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(
-      selectResults?.matches,
-      Status.INFO
-    );
+    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     return selectResults;
   }
 
@@ -396,9 +393,9 @@ export class EvaluationClientWrapper {
   }
 
   public determineAreRequiredCredentialsPresent(
-    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined,
-    status: Status
+    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined
   ): Status {
+    let status = Status.INFO;
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
       return Status.ERROR;
     }
@@ -414,7 +411,7 @@ export class EvaluationClientWrapper {
       } else if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
         status = Status.WARN;
       } else if (m.from_nested) {
-        status = this.determineAreRequiredCredentialsPresent(m.from_nested, status);
+        status = this.determineAreRequiredCredentialsPresent(m.from_nested);
         if (status === Status.ERROR) {
           return status;
         }
