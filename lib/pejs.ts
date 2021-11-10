@@ -69,8 +69,9 @@ export class PEJS {
     verifiableCredentials: VerifiableCredential[],
     holderDids: string[]
   ): SelectResults {
+    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentials, holderDids);
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentialCopy, holderDids);
   }
 
   /**
