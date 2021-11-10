@@ -93,7 +93,7 @@ describe('1st scenario', () => {
      */
     const evaluationResult = pejs.evaluatePresentation(pd, {
       '@context': [],
-      holder: [holderWallet.holder],
+      holder: holderWallet.holder,
       type: [],
       verifiableCredential: holderWallet.verifiableCredentials,
     });
