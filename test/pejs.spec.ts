@@ -66,7 +66,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [vpSimple.holder]);
+    const evaluationResults = pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [
+      vpSimple.holder as string,
+    ]);
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
