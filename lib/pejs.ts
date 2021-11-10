@@ -25,7 +25,9 @@ export class PEJS {
    */
   public evaluate(presentationDefinition: PresentationDefinition, presentation: Presentation): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation);
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, presentation.verifiableCredential, [
+      presentation.holder,
+    ]);
   }
 
   /**
@@ -41,10 +43,10 @@ export class PEJS {
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    holderDid: string
+    holderDids: string[]
   ): SelectResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentials, holderDid);
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentials, holderDids);
   }
 
   /**

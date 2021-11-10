@@ -207,7 +207,7 @@ interface EvaluationResults {
 
 ### SelectFrom
 ```typescript
-selectFrom(presentationDefinition, credentials, holderDid)
+selectFrom(presentationDefinition, credentials, holderDids)
 ```
 ##### Description
 Gathers the matching credentials that fit a given presentation definition
@@ -217,7 +217,7 @@ Gathers the matching credentials that fit a given presentation definition
 |------|------|------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
 | `credentials` | `VerifiableCredential[]` | the array of verifiable credentials to select from |
-| `holderDid` | `string` | the holder's did. this can be found in VerifiablePresentation's holder property |
+| `holderDids` | `string[]` | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places|
 
 #### Return value
 - If the selection was successful or partially successful, the `matches` array will consist of `SubmissionRequirementMatch` object(s), representing the matching credentials for each `SubmissionRequirement` in the `presentationDefinition` input parameter.
@@ -321,6 +321,7 @@ Credential | A set of one or more claims made by an issuer. |
 Verifiable Credential |  Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
 Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires. |
 Holder | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a Presentation Definition.
+Holder's Did | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet|
 Verifier | Verifiers are entities that define what proofs they require from a Holder (via a Presentation Definition) in order to proceed with an interaction. |
 Issuer | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder. |
 Presentation | Data derived from one or more verifiable credentials, issued by one or more issuers |

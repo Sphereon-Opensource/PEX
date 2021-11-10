@@ -1,4 +1,20 @@
 # Release Notes
+## v0.3.0 - 2021-11-10
+Bugfix release (refactoring)
+
+- Fixed:
+  - Remove Presentation Definition from VP as these are separate types 
+  - Fix creation of VP from submissionFrom
+  - Fix sameSubject and issuerIsOwner handling 
+  - Fix JSON paths in matches 
+  - Fix several tests to be more strict
+
+- Updated:
+  - Remove usage of unknown/any types in favor of having interfaces and types   
+  - Enable strict mode 
+  - Refactoring of several classes
+  - Updated readme/flows
+
 ## v0.2.4 - 2021-10-06
 Bugfix release
 

@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pe-js",
-  "version": "0.2.5-UNSTABLE",
+  "version": "0.3.1-DEV",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
@@ -13,6 +13,7 @@
     "Presentation Exchange",
     "Verifiable Credentials",
     "Verifiable Presentations",
+    "Selective Disclosyre",
     "DIF"
   ],
   "scripts": {
@@ -24,12 +25,12 @@
     "clean": "rimraf node_modules dist coverage",
 
     "fix": "run-s fix:*",
-    "fix:prettier": "prettier \"{lib, test}/**/*.ts\" --write",
+    "fix:prettier": "prettier \"{lib,test}/**/*.ts\" --write",
     "fix:lint": "eslint . --ext .ts --fix",
 
     "test": "run-s build test:*",
     "test:lint": "eslint . --ext .ts",
-    "test:prettier": "prettier \"{lib, test}/**/*.ts\" --list-different",
+    "test:prettier": "prettier \"{lib,test}/**/*.ts\" --list-different",
     "test:unit": "jest",
     "test:cov": "jest --ci --coverage && codecov"
   },

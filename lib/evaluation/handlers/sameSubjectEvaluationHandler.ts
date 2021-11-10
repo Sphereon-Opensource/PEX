@@ -2,36 +2,27 @@ import { HolderSubject, Optionality, PresentationDefinition } from '@sphereon/pe
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { CredentialSubject, VerifiableCredential } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
-  private readonly fieldIdzInputDescriptorsSameSubjectRequired: Map<string, string[]>;
-  private readonly fieldIdzInputDescriptorsSameSubjectPreferred: Map<string, string[]>;
   private fieldIds: { path: PathComponent[]; value: string }[];
   private sameSubject: { path: PathComponent[]; value: HolderSubject }[];
-
-  private credentialsSubjects: Map<string, CredentialSubject>;
 
   private messages: Map<Status, string>;
 
   constructor(client: EvaluationClient) {
     super(client);
-
-    this.fieldIdzInputDescriptorsSameSubjectRequired = new Map<string, string[]>();
-    this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<string, string[]>();
     this.fieldIds = [];
     this.sameSubject = [];
-
-    this.credentialsSubjects = new Map<string, CredentialSubject>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the same subject to belong to same subject');
     this.messages.set(Status.WARN, 'The field ids preferring the same subject to belong to same subject');
-    this.messages.set(Status.ERROR, 'The field id is missing');
+    this.messages.set(Status.ERROR, 'The fields ids not belong to the same subject');
   }
 
   public getName(): string {
@@ -39,144 +30,99 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    this.findSameSubjectFieldIdsToInputDescriptorsSets(pd);
-    this.generateSameSubjectNotRequiredResults(pd, vcs);
-    this.findAllCredentialSubjects(vcs);
-    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO);
-    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN);
+    const sameSubjectInDesc = this.mapSameSubjectFieldIdsToInputDescriptors(pd);
+    const handlerCheckResults = this.mapCredentialsToResultObjecs(vcs, sameSubjectInDesc);
+    const fieldIdOccurrencesCount = this.countSameSubjectOccurrences(sameSubjectInDesc, handlerCheckResults);
+    this.generateErrorResults(fieldIdOccurrencesCount, handlerCheckResults);
     this.updatePresentationSubmission(pd);
   }
 
-  private generateSameSubjectNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
-    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(
-      (s) => !this.sameSubject.map((e) => e.path[2]).includes(s)
-    );
-    indexes.forEach((i) =>
-      vcs.forEach((_, index) =>
-        this.getResults().push(
-          this.createResult(
-            [],
-            `$.input_descriptors[${i}]`,
-            [`$[${index}]`, {}],
-            Status.INFO,
-            'same subject is not required'
-          )
-        )
-      )
-    );
-  }
-
-  /**
-   * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
-   */
-  private findSameSubjectFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
+  private mapSameSubjectFieldIdsToInputDescriptors(
+    pd: PresentationDefinition
+  ): [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][] {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.sameSubject.push(...jp.nodes(pd, '$..same_subject[*]'));
-    const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
 
-    const error: [string, string[]][] = [];
-
-    error.push(
-      ...this.evaluateFields(
-        this.fieldIdzInputDescriptorsSameSubjectPreferred,
-        this.sameSubject,
-        fields,
-        Optionality.Preferred
-      )
-    );
-    error.push(
-      ...this.evaluateFields(
-        this.fieldIdzInputDescriptorsSameSubjectRequired,
-        this.sameSubject,
-        fields,
-        Optionality.Required
-      )
-    );
-
-    error.forEach((q) => this.getResults().push(this.createResult(q[1], q[0], ['', {}], Status.ERROR)));
-  }
-
-  private evaluateFields(
-    fieldsMapping: Map<string, string[]>,
-    sameSubject: { path: PathComponent[]; value: HolderSubject }[],
-    fields: string[],
-    directive: Optionality
-  ) {
-    const error: [string, string[]][] = [];
-    sameSubject
-      .filter((d) => d.value.directive === directive)
-      .filter((e) => e.value.field_id.every((id) => fields.includes(id)))
-      .forEach((p) => fieldsMapping.set(jp.stringify(p.path.slice(0, 3)), p.value.field_id));
-
-    sameSubject
-      .filter((d) => d.value.directive === directive)
-      .filter((e) => !e.value.field_id.every((id) => fields.includes(id)))
-      .forEach((p) => error.push([jp.stringify(p.path.slice(0, 3)), p.value.field_id]));
-    return error;
-  }
-
-  private findAllCredentialSubjects(vcs: VerifiableCredential[]) {
-    //TODO handle nested path
-    const credentialSubject: { path: PathComponent[]; value: CredentialSubject }[] = jp.nodes(
-      vcs,
-      '$..credentialSubject'
-    );
-    credentialSubject.forEach((cs) => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));
-  }
-
-  private confirmAllFieldSetHasSameSubject(fieldIdzInputDescriptorsGroups: Map<string, string[]>, status: Status) {
-    const credentialMatchingFields = Array.from(fieldIdzInputDescriptorsGroups).flatMap((k) =>
-      Array.from(this.credentialsSubjects).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
-    );
-
-    const fields = Array.from(credentialMatchingFields).flatMap((s) => Object.keys(s[1]).filter((w) => w !== 'id'));
-
-    const allFieldsMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap((v) =>
-      v.every((e) => fields.includes(e))
-    )[0];
-
-    const isSameSubject: boolean =
-      new Set(Array.from(credentialMatchingFields).flatMap((s) => Object.keys(s[1]).filter((w) => w === 'id'))).size ===
-      1;
-
-    const credentialsToInputDescriptors = this.mapCredentialsToInputDescriptors();
-
-    credentialMatchingFields.forEach((subject) => {
-      const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
-      if (allFieldsMatched && isSameSubject) {
-        this.getResults().push(this.createResult(fields, inDescPath, subject, status));
-      } else {
-        this.getResults().push(this.createResult(fields, inDescPath, subject, Status.ERROR));
+    const results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][] = [];
+    this.fieldIds.forEach((f) => {
+      const sameSubject = this.sameSubject.find((ss) => ss.value.field_id.includes(f.value));
+      if (sameSubject) {
+        results.push([f, sameSubject]);
       }
     });
+    return results;
   }
 
-  private mapCredentialsToInputDescriptors(): Map<string, string> {
-    const credentialsToInputDescriptors: Map<string, string> = new Map<string, string>();
-    this.fieldIds?.forEach((id: { path: PathComponent[]; value: string }) => {
-      this.credentialsSubjects.forEach((cs: CredentialSubject, credentialPath: string) => {
-        if (Object.keys(cs).includes(id.value)) {
-          credentialsToInputDescriptors.set(credentialPath, jp.stringify(id.path.slice(0, 3)));
-        }
-      });
+  private generateErrorResults(
+    fieldIdOccurrencesCount: Map<string[], number>,
+    handlerCheckResults: HandlerCheckResult[]
+  ) {
+    fieldIdOccurrencesCount.forEach((v, k) => {
+      const results = handlerCheckResults
+        .filter((r) => k === r.payload.fieldIdSet)
+        .map((r) => r.payload.credentialSubject.id);
+      if (results.length !== v || new Set(results).size !== 1) {
+        handlerCheckResults.forEach((v, i, arr) => {
+          if (v.payload.fieldIdSet === k) {
+            v.status = Status.ERROR;
+            v.message = this.messages.get(Status.ERROR);
+            arr[i] = v;
+          }
+        });
+      }
     });
-    return credentialsToInputDescriptors;
+    this.client.results.push(...handlerCheckResults);
   }
 
-  private createResult(
-    fieldIdSet: string[],
-    inputDescriptorPath: string,
-    credentialSub: [string, CredentialSubject],
-    myStatus: Status,
-    message?: string
-  ): HandlerCheckResult {
-    return {
-      input_descriptor_path: inputDescriptorPath,
-      verifiable_credential_path: credentialSub[0],
-      evaluator: this.getName(),
-      status: myStatus,
-      payload: { fieldIdSet: Array.from(fieldIdSet), credentialSubject: credentialSub[1] },
-      message: message ?? this.messages.get(myStatus),
-    };
+  private countSameSubjectOccurrences(
+    sameSubjectInDesc: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][],
+    handlerCheckResults: HandlerCheckResult[]
+  ) {
+    const fieldIdOccurrencesCount: Map<string[], number> = new Map<string[], number>();
+    sameSubjectInDesc.forEach((s) => {
+      const result = handlerCheckResults.filter((c) => s[1].value.field_id === c.payload.fieldIdSet);
+      if (result) {
+        if (fieldIdOccurrencesCount.has(s[1].value.field_id) && fieldIdOccurrencesCount.get(s[1].value.field_id)) {
+          fieldIdOccurrencesCount.set(
+            s[1].value.field_id,
+            (fieldIdOccurrencesCount.get(s[1].value.field_id) as number) + 1
+          );
+        } else {
+          fieldIdOccurrencesCount.set(s[1].value.field_id, 1);
+        }
+      }
+    });
+    return fieldIdOccurrencesCount;
+  }
+
+  private mapCredentialsToResultObjecs(
+    vcs: VerifiableCredential[],
+    results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][]
+  ): HandlerCheckResult[] {
+    const subjects = [...jp.nodes(vcs, '$..credentialSubject')];
+    const handlerCheckResults: HandlerCheckResult[] = [];
+    subjects.forEach((s) => {
+      const result = results.find((id) => Object.keys(s.value).includes(id[0].value));
+      if (result && result[1].value.directive === Optionality.Required) {
+        handlerCheckResults.push({
+          input_descriptor_path: jp.stringify(result[0].path.slice(0, 3)),
+          status: Status.INFO,
+          evaluator: this.getName(),
+          payload: { fieldIdSet: result[1].value.field_id, credentialSubject: s.value },
+          message: this.messages.get(Status.INFO),
+          verifiable_credential_path: jp.stringify(s.path.slice(0, 2)),
+        });
+      } else if (result && result[1].value.directive === Optionality.Preferred) {
+        handlerCheckResults.push({
+          input_descriptor_path: jp.stringify(result[0].path.slice(0, 3)),
+          status: Status.WARN,
+          evaluator: this.getName(),
+          payload: { fieldIdSet: result[1].value.field_id, credentialSubject: s.value },
+          message: this.messages.get(Status.WARN),
+          verifiable_credential_path: jp.stringify(s.path.slice(0, 2)),
+        });
+      }
+    });
+    return handlerCheckResults;
   }
 }

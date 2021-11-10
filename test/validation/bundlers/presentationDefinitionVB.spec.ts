@@ -2,11 +2,10 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { PresentationDefinitionVB } from "../../../lib";
-import { ValidationBundler } from "../../../lib";
-import { ValidationEngine } from "../../../lib";
+import { PresentationDefinitionVB } from '../../../lib';
+import { ValidationBundler } from '../../../lib';
+import { ValidationEngine } from '../../../lib';
 import { Checked, Status } from '../../../lib/ConstraintUtils';
-
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -16,18 +15,14 @@ const base = './test/dif_pe_examples/pd/';
 const files = fs.readdirSync(base);
 
 describe('validate', () => {
+  test.each(files)('.validateKnownExample(%s)', (file) => {
+    const basicPD = getFile(base + file);
 
-  test.each(files)(
-    '.validateKnownExample(%s)',
-    (file) => {
-      const basicPD = getFile(base + file);
+    const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-      const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
-
-      const result = new ValidationEngine().validate([{bundler: vb, target: basicPD.presentation_definition}]);
-      expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
-    }
-  );
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD.presentation_definition }]);
+    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
+  });
 
   it('should return error for empty id', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
@@ -35,7 +30,7 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'id should not be empty')]);
   });
 
@@ -45,7 +40,7 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
@@ -55,8 +50,10 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string')]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
+    expect(result).toEqual([
+      new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string'),
+    ]);
   });
 
   it('should not return error for missing purpose', () => {
@@ -65,7 +62,7 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
@@ -75,8 +72,10 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string')]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
+    expect(result).toEqual([
+      new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string'),
+    ]);
   });
 
   it('should not return error for missing format', () => {
@@ -85,7 +84,7 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
@@ -95,18 +94,20 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
   it('should return error for empty algo', () => {
     const basicPD: PresentationDefinition = getFile('./test/resources/pd_basic.json');
-    basicPD!.format = {"jwt":{"alg": []}};
+    basicPD!.format = { jwt: { alg: [] } };
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty')]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
+    expect(result).toEqual([
+      new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty'),
+    ]);
   });
 
   it('should return error for empty algo value', () => {
@@ -115,12 +116,20 @@ describe('validate', () => {
 
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
 
-    const result = new ValidationEngine().validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'formats should only have known identifiers for alg or proof_type')]);
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
+    expect(result).toEqual([
+      new Checked(
+        'root.presentation_definition',
+        Status.ERROR,
+        'formats should only have known identifiers for alg or proof_type'
+      ),
+    ]);
   });
 
   it('should report error for duplicate id', () => {
-    const basicPD: PresentationDefinition = getFile('./test/resources/pd_require_is_holder.json').presentation_definition;
+    const basicPD: PresentationDefinition = getFile(
+      './test/resources/pd_require_is_holder.json'
+    ).presentation_definition;
     const vb: ValidationBundler<PresentationDefinition> = new PresentationDefinitionVB('root');
     const ve = new ValidationEngine();
     basicPD.input_descriptors[0].constraints!.fields![0]!.id = 'uuid2021-05-04 00';
@@ -131,8 +140,9 @@ describe('validate', () => {
     basicPD.input_descriptors[1].schema = [{ uri: 'https://www.w3.org/2018/credentials/v1' }];
     delete basicPD.input_descriptors[2];
     delete basicPD.input_descriptors[3];
-    const result = ve.validate([{bundler: vb, target: basicPD}]);
-    expect(result).toEqual([new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique')]);
+    const result = ve.validate([{ bundler: vb, target: basicPD }]);
+    expect(result).toEqual([
+      new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique'),
+    ]);
   });
-
 });

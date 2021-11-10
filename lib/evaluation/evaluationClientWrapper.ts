@@ -3,7 +3,7 @@ import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
-import { Presentation, VerifiableCredential } from '../verifiablePresentation';
+import { VerifiableCredential } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -24,14 +24,11 @@ export class EvaluationClientWrapper {
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    did: string
+    holderDids: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, {
-      verifiableCredential: verifiableCredentials,
-      holder: did,
-    });
+    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -62,6 +59,10 @@ export class EvaluationClientWrapper {
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
       const submissionReqMatch = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+      const matches = this.extractMatches(matchSubmissionRequirements);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      );
       const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(submissionReqMatch);
       selectResults = {
         errors: errors,
@@ -175,8 +176,8 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, p: Presentation): EvaluationResults {
-    this._client.evaluate(pd, p);
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
+    this._client.evaluate(pd, vcs, holderDids);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
@@ -422,18 +423,4 @@ export class EvaluationClientWrapper {
     }
     return status;
   }
-
-  /**
-   *
-   * All is fine because of existing non-empty vc list
-   * ________________________
-   * Pick:
-   * Min:1
-   * max:3
-   * count:2
-   * vc list:0
-   * ________________________
-   *
-   *
-   */
 }

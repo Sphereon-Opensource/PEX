@@ -1,7 +1,7 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiableCredential, VerifiablePresentation } from '../verifiablePresentation';
+import { VerifiableCredential } from '../verifiablePresentation';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -21,7 +21,7 @@ export class EvaluationClient {
     this._results = [];
     this._verifiableCredential = [];
     this._presentationSubmission = {};
-    this._did = '';
+    this._dids = [];
   }
 
   private failed_catched = {
@@ -34,16 +34,16 @@ export class EvaluationClient {
   private _results: HandlerCheckResult[];
   private _verifiableCredential: Partial<VerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
-  private _did: string;
+  private _dids: string[];
 
-  public evaluate(pd: PresentationDefinition, vp: Partial<VerifiablePresentation>): void {
-    this._did = (vp as VerifiablePresentation).holder;
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): void {
+    this._dids = holderDids;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
-    currentHandler?.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
+    currentHandler?.handle(pd, vcs);
     while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler?.handle(pd, vp?.verifiableCredential as VerifiableCredential[]);
+        currentHandler?.handle(pd, vcs);
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
@@ -56,12 +56,12 @@ export class EvaluationClient {
     return this._results;
   }
 
-  public get did() {
-    return this._did;
+  public get dids() {
+    return this._dids;
   }
 
-  public set did(did: string) {
-    this._did = did;
+  public set dids(dids: string[]) {
+    this._dids = dids;
   }
 
   public get presentationSubmission(): PresentationSubmission {
@@ -76,7 +76,7 @@ export class EvaluationClient {
     return this._verifiableCredential as VerifiableCredential[];
   }
 
-  public set verifiableCredential(verifiableCredential: Partial<VerifiableCredential>[]) {
+  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
     this._verifiableCredential = verifiableCredential;
   }
 

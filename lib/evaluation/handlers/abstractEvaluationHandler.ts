@@ -38,7 +38,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client.verifiableCredential;
   }
 
-  public set verifiableCredential(verifiableCredential: Partial<VerifiableCredential>[]) {
+  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
     this._client.verifiableCredential = verifiableCredential;
   }
 

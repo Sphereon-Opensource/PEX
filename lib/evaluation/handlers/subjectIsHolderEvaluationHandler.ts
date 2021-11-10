@@ -39,7 +39,6 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     this.findIsHolderFieldIdsToInputDescriptorsSets(pd);
-    this.generateIsHolderNotRequiredResults(pd, vcs);
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(
       this.fieldIdzInputDescriptorsSameSubjectRequired,
@@ -52,25 +51,6 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
       Optionality.Preferred
     );
     this.updatePresentationSubmission(pd);
-  }
-
-  private generateIsHolderNotRequiredResults(pd: PresentationDefinition, vcs: VerifiableCredential[]) {
-    const indexes = [...Array(pd.input_descriptors.length).keys()].filter(
-      (s) => !this.isHolder.map((e) => e.path[2]).includes(s)
-    );
-    indexes.forEach((i) =>
-      vcs.forEach((_, index) =>
-        this.getResults().push(
-          this.createResult(
-            [],
-            `$.input_descriptors[${i}]`,
-            [`$[${index}]`, {}],
-            Status.INFO,
-            'is holder is not required'
-          )
-        )
-      )
-    );
   }
 
   /**
@@ -149,7 +129,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
     subjectsMatchingFields.forEach((subject) => {
       const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
-      if (allFieldsMatched && subject[1].id === this.client.did) {
+      if (allFieldsMatched && subject[1].id && this.client.dids.includes(subject[1].id)) {
         this.getResults().push(
           this.createResult(
             Object.keys(subject[1]).filter((k) => k !== 'id'),

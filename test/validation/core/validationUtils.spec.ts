@@ -21,5 +21,4 @@ describe('validation utils tests', () => {
     const errors: Validated = [new Checked('random', Status.ERROR, 'Oops')];
     expect(hasErrors(errors)).toBeTruthy();
   });
-
 });
