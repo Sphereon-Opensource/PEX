@@ -337,7 +337,7 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids)).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
+      areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
           tag: 'UriEvaluation',

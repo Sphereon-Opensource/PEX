@@ -233,9 +233,9 @@ interface SelectResults {
    * This is the parameter that pejs library user should look into to determine what to do next
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `submissionFrom` after this method
-   *  2. WARN: you probably have sent us more than you should, this will be fine in our side,
-   *  but not good for your end user, therefore you should not send some credentials
-   *  3. Error: the credentials you've sent didn't satisfy the presentationDefinition object
+   *  2. WARN: method was called with more credentials than required. 
+   *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
+   *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object
    */
   areRequiredCredentialsPresent: Status;
   /**

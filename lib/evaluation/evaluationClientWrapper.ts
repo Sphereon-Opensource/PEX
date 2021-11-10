@@ -46,11 +46,10 @@ export class EvaluationClientWrapper {
       const credentials: VerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
-      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        areRequiredCredentialsPresent,
+        areRequiredCredentialsPresent: Status.INFO,
         selectableVerifiableCredentials: [...credentials],
         warnings,
       };
@@ -63,18 +62,20 @@ export class EvaluationClientWrapper {
       const credentials: VerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
-      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        areRequiredCredentialsPresent,
+        areRequiredCredentialsPresent: Status.INFO,
         selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     }
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
-
+    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(
+      selectResults?.matches,
+      Status.INFO
+    );
     return selectResults;
   }
 
@@ -394,28 +395,26 @@ export class EvaluationClientWrapper {
     }
   }
 
-  public determineAreRequiredCredentialsPresent(matchSubmissionRequirements: SubmissionRequirementMatch[]): Status {
-    let status = Status.INFO;
+  public determineAreRequiredCredentialsPresent(
+    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined,
+    status: Status
+  ): Status {
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
-      status = Status.ERROR;
+      return Status.ERROR;
     }
     for (const m of matchSubmissionRequirements) {
       if (m.matches.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
         return Status.ERROR;
-      }
-      if (m.count && m.matches.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+      } else if (m.count && m.matches.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
         return Status.ERROR;
-      }
-      if (m.count && (m.matches.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+      } else if (m.count && (m.matches.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
         status = Status.WARN;
-      }
-      if (m.min && m.matches.length < m.min && m.from_nested && !m.from_nested?.length) {
+      } else if (m.min && m.matches.length < m.min && m.from_nested && !m.from_nested?.length) {
         return Status.ERROR;
-      }
-      if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+      } else if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
         status = Status.WARN;
       } else if (m.from_nested) {
-        status = this.determineAreRequiredCredentialsPresent(m.from_nested);
+        status = this.determineAreRequiredCredentialsPresent(m.from_nested, status);
         if (status === Status.ERROR) {
           return status;
         }
