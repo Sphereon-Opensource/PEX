@@ -41,7 +41,7 @@ export interface Presentation {
   type: string[];
   verifiableCredential: VerifiableCredential[];
   presentation_submission?: PresentationSubmission;
-  holder: string;
+  holder?: string;
 }
 
 export interface VerifiablePresentation extends Presentation {

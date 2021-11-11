@@ -91,7 +91,7 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluate(pd, {
+    const evaluationResult = pejs.evaluatePresentation(pd, {
       '@context': [],
       holder: holderWallet.holder,
       type: [],

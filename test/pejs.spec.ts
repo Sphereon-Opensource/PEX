@@ -33,7 +33,7 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluate(pdSchema, vpSimple);
+    const evaluationResults = pejs.evaluatePresentation(pdSchema, vpSimple);
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -45,7 +45,41 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
-    pejs.evaluate(pdSchema, vpSimple);
+    pejs.evaluatePresentation(pdSchema, vpSimple);
+    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
+    expect(result).toEqual(
+      expect.objectContaining({
+        definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+        descriptor_map: [
+          { format: 'ldp_vc', id: 'Educational transcripts', path: '$[0]' },
+          { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$[1]' },
+          { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$[2]' },
+        ],
+      })
+    );
+  });
+
+  it('Evaluate case without any error', () => {
+    const pdSchema: PresentationDefinition = getFile(
+      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    ).presentation_definition;
+    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+    const pejs: PEJS = new PEJS();
+    const evaluationResults = pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [
+      vpSimple.holder as string,
+    ]);
+    expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
+    expect(evaluationResults!.errors!.length).toEqual(0);
+  });
+
+  it('Evaluate submission requirements all from group A', () => {
+    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const HOLDER_DID = ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
+    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
+    const pejs: PEJS = new PEJS();
+    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
     const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
     expect(result).toEqual(
       expect.objectContaining({
