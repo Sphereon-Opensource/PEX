@@ -192,7 +192,7 @@ describe('1st scenario', () => {
      */
     const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
     expect(selectFromResult.matches?.length).toEqual(1);
-    expect(selectFromResult.matches).toEqual([{ rule: 'all', matches: ['$[2]'] }]);
+    expect(selectFromResult.matches).toEqual([{ rule: 'all', matches: ['$[0]'] }]);
     expect(selectFromResult.verifiableCredentials?.length).toEqual(1);
 
     /**

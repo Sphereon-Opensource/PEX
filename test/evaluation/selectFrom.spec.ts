@@ -279,7 +279,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           min: 2,
           name: 'Eligibility to Work Proof',
           rule: 'pick',
@@ -612,7 +612,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           max: 2,
           name: 'Eligibility to Work Proof',
           rule: 'pick',
@@ -1314,7 +1314,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           min: 3,
           name: 'Eligibility to Work Proof',
           rule: 'pick',
@@ -1462,7 +1462,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           max: 1,
           name: 'Eligibility to Work Proof',
           rule: 'pick',
@@ -1611,7 +1611,7 @@ describe('selectFrom tests', () => {
         {
           count: 1,
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           name: 'Eligibility to Work Proof',
           rule: 'pick',
         },
@@ -1758,7 +1758,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[1]', '$[2]'],
+          matches: ['$[0]', '$[1]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
         },

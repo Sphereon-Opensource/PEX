@@ -66,11 +66,12 @@ export class EvaluationClientWrapper {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         verifiableCredentials: [...credentials],
+        vcIndexes: [],
         warnings,
       };
     }
 
-    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults);
 
     return selectResults;
   }
@@ -209,18 +210,19 @@ export class EvaluationClientWrapper {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
 
-    //let matched: [number, HandlerCheckResult[]];
-    const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) =>
-        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
-    );
-
     if (pd.submission_requirements) {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
       this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
       this.updatePresentationSubmission(upIdx);
       return this._client.presentationSubmission;
     }
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+    );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
     return this._client.presentationSubmission;
@@ -377,16 +379,12 @@ export class EvaluationClientWrapper {
     });
   }
 
-  public fillSelectableCredentialsToVerifiableCredentialsMapping(
-    selectResults: SelectResults,
-    verifiableCredentials: VerifiableCredential[]
-  ) {
-    if (selectResults) {
-      selectResults.verifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
-        const foundIndex: number = verifiableCredentials.findIndex(
-          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
-        );
-        selectResults.vcIndexes?.push(foundIndex);
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults) {
+    const srm: SubmissionRequirementMatch[] = selectResults.matches as SubmissionRequirementMatch[];
+    if (selectResults && srm?.length) {
+      srm[0].matches.forEach((_, index, matches) => {
+        matches[index] = `$[${index}]`;
+        selectResults.vcIndexes?.push(index);
       });
     }
   }
