@@ -25,7 +25,7 @@ describe('test scenario 2', () => {
     const presentationDefinition = getPresentationDefinition();
     const holderPE: PEJS = new PEJS();
     const vcs = [...wallet1.verifiableCredentials, ...wallet2.verifiableCredentials];
-    const evaluateResult: EvaluationResults = holderPE.evaluate(presentationDefinition, {
+    const evaluateResult: EvaluationResults = holderPE.evaluatePresentation(presentationDefinition, {
       '@context': [],
       type: [],
       verifiableCredential: vcs,
@@ -144,6 +144,7 @@ describe('test scenario 2', () => {
     const selectFromResult: SelectResults = holderPE.selectFrom(presentationDefinition, vcs, [wallet1.holder]);
 
     expect(selectFromResult).toEqual({
+      areRequiredCredentialsPresent: 'info',
       errors: [
         {
           tag: 'FilterEvaluation',
@@ -228,11 +229,12 @@ describe('test scenario 2', () => {
       ],
       matches: [
         {
+          name: undefined,
           rule: 'all',
           matches: ['$[0]', '$[1]'],
         },
       ],
-      verifiableCredentials: [
+      selectableVerifiableCredentials: [
         {
           '@context': ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'],
           issuer: 'did:web:vc.transmute.world',
@@ -279,10 +281,10 @@ describe('test scenario 2', () => {
       vcIndexes: [0, 1],
       warnings: [],
     });
-    if (selectFromResult.verifiableCredentials) {
+    if (selectFromResult.selectableVerifiableCredentials) {
       const presentationSubmission: PresentationSubmission = holderPE.submissionFrom(
         presentationDefinition,
-        selectFromResult.verifiableCredentials
+        selectFromResult.selectableVerifiableCredentials
       );
       expect(presentationSubmission).toEqual(
         expect.objectContaining({

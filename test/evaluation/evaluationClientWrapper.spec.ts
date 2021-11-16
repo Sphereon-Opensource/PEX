@@ -319,7 +319,7 @@ describe('evaluate', () => {
   it('should map successfully the links from selectable credentials to verifiable credentials.', () => {
     const selectResults = evaluationClientWrapperData.getSelectResults();
     new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults);
-    const verifiableCredential = selectResults.verifiableCredentials![0];
+    const verifiableCredential = selectResults.selectableVerifiableCredentials![0];
     expect(verifiableCredential.id).toEqual(evaluationClientWrapperData.getVerifiableCredential()[1].id);
   });
 });
