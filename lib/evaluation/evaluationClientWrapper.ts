@@ -217,8 +217,13 @@ export class EvaluationClientWrapper {
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
-      this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      this.updatePresentationSubmission(upIdx);
+      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
+        pd.submission_requirements,
+        updatedMarked,
+        0
+      );
+      const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
+      this.updatePresentationSubmission(finalIdx);
       return this._client.presentationSubmission;
     }
     const marked: HandlerCheckResult[] = this._client.results.filter(
