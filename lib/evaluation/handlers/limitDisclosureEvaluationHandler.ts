@@ -1,4 +1,4 @@
-import { Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Field, Format, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -18,19 +18,42 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
-      if (inDesc.constraints?.fields && inDesc.constraints?.limit_disclosure === Optionality.Required) {
-        this.enforceLimitDisclosure(vcs, inDesc.constraints.fields, index);
-      }
-    });
+    if (this.limitDisclosureSupported(pd)) {
+      pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+        //TODO need to check if limit disclosure is supported at input descriptor level
+        if (
+          inDesc.constraints?.fields &&
+          (inDesc.constraints?.limit_disclosure === Optionality.Required ||
+            inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+        ) {
+          this.enforceLimitDisclosure(vcs, inDesc.constraints, index);
+        }
+      });
+    }
   }
 
-  private enforceLimitDisclosure(verifiableCredential: VerifiableCredential[], fields: Field[], idIdx: number): void {
+  //TODO needs to be updated after the format is present in input descriptors (pe-models)
+  private limitDisclosureSupported(pd: PresentationDefinition): boolean {
+    const limitDisclosureSignatures = process.env.LIMIT_DISCLOSURE_SIGNATURES?.split(', ');
+    if (!pd.format || !Object.keys(pd.format as Format).find((f) => limitDisclosureSignatures?.includes(f))) {
+      //this.createLimitDisclosureNotSupportedResult();
+      return true;
+    }
+    return true;
+  }
+
+  private enforceLimitDisclosure(
+    verifiableCredential: VerifiableCredential[],
+    constraints: Constraints,
+    idIdx: number
+  ): void {
+    const fields = constraints?.fields as Field[];
+    const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
       const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
       if (verifiableCredentialToSend) {
         verifiableCredential[index] = verifiableCredentialToSend;
-        this.createSuccessResult(idIdx, `$[${index}]`);
+        this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
       }
     });
   }
@@ -72,18 +95,18 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private createSuccessResult(idIdx: number, path: string) {
+  private createSuccessResult(idIdx: number, path: string, limitDisclosure: Optionality) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
-      status: Status.INFO,
+      status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
       message: 'added variable in the limit_disclosure to the verifiableCredential',
       payload: undefined,
     });
   }
 
-  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
+  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: string[]) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$[${vcIdx}]`,
@@ -93,4 +116,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       payload: path,
     });
   }
+
+  // private createLimitDisclosureNotSupportedResult(idIdx?: number, vcIdx?: number) {
+  //   return this.getResults().push({
+  //     input_descriptor_path: idIdx ? `$.input_descriptors[${idIdx}]` : `$.input_descriptors[*]`,
+  //     verifiable_credential_path: vcIdx ? `$[${vcIdx}]` : `$[*]`,
+  //     evaluator: this.getName(),
+  //     status: Status.ERROR,
+  //     message: 'Limit disclosure not supported',
+  //   });
+  // }
 }

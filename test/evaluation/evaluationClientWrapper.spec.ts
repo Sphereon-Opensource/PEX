@@ -107,7 +107,7 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return ok if limit_disclosure deletes the etc field', function () {
+  it('should return info if limit_disclosure deletes the etc field', function () {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
@@ -123,7 +123,7 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
+  it('should return info if limit_disclosure does not delete the etc field', function () {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
@@ -140,7 +140,7 @@ describe('evaluate', () => {
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
   });
 
-  it('should return error if limit_disclosure deletes the etc field', function () {
+  it('should return warn if limit_disclosure deletes the etc field', function () {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
@@ -153,8 +153,8 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential,
       evaluationClientWrapperData.getHolderDID()
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
-    expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
+    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(evaluationResults).toEqual(evaluationClientWrapperData.getWarn());
   });
 
   it("should return ok if vc[0] doesn't have the birthPlace field", function () {

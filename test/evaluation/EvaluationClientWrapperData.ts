@@ -180,6 +180,29 @@ export class EvaluationClientWrapperData {
     };
   }
 
+  public getWarn() {
+    return {
+      errors: [],
+      value: expect.objectContaining({
+        definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+        descriptor_map: [
+          {
+            format: 'ldp_vc',
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            path: '$[0]',
+          },
+        ],
+      }),
+      warnings: [
+        {
+          message: 'added variable in the limit_disclosure to the verifiableCredential: $.input_descriptors[0]: $[0]',
+          status: 'warn',
+          tag: 'LimitDisclosureEvaluation',
+        },
+      ],
+    };
+  }
+
   public getError() {
     return {
       errors: [
