@@ -91,7 +91,7 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluate(pd, {
+    const evaluationResult = pejs.evaluatePresentation(pd, {
       '@context': [],
       holder: holderWallet.holder,
       type: [],
@@ -192,8 +192,8 @@ describe('1st scenario', () => {
      */
     const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
     expect(selectFromResult.matches?.length).toEqual(1);
-    expect(selectFromResult.matches).toEqual([{ rule: 'all', matches: ['$[0]'] }]);
-    expect(selectFromResult.verifiableCredentials?.length).toEqual(1);
+    expect(selectFromResult.matches).toEqual([{ rule: 'all', matches: ['$[2]'] }]);
+    expect(selectFromResult.selectableVerifiableCredentials?.length).toEqual(1);
 
     /**
      * Base on the selectFrom result, now Alice knows what to send, so she will call the submissionFrom with the right VerifiableCredential (index #2)

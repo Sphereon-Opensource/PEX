@@ -221,22 +221,43 @@ Gathers the matching credentials that fit a given presentation definition
 
 #### Return value
 - If the selection was successful or partially successful, the `matches` array will consist of `SubmissionRequirementMatch` object(s), representing the matching credentials for each `SubmissionRequirement` in the `presentationDefinition` input parameter.
-- If the selection was not successful, the `errors` array will consist of `Checked` object(s), representing what has failed in your selection process. 
+- If the selection was not successful, the `errors` array will consist of `Checked` object(s), representing what has failed in your selection process.
 
 ```typescript
+import { Status } from './ConstraintUtils';
+
 interface SelectResults {
-  errors?: Checked[]
+  errors?: Checked[];
   matches?: SubmissionRequirementMatch[];
+  /**
+   * This is the parameter that pejs library user should look into to determine what to do next
+   * Status can have three values:
+   *  1. INFO: everything is fine, you can call `submissionFrom` after this method
+   *  2. WARN: method was called with more credentials than required. 
+   *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
+   *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object
+   */
+  areRequiredCredentialsPresent: Status;
+  /**
+   * All matched/selectable credentials
+   */
+  selectableVerifiableCredentials?: VerifiableCredential[];
+  /**
+   * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
+   */
+  vcIndexes?: number[];
   warnings?: Checked[];
 }
 
 interface SubmissionRequirementMatch {
-  name: string;
-  rule: Rule;
-  count: number;
+  name?: string;
+  rule: Rules;
+  min?: number;
+  count?: number;
+  max?: number;
+  matches: string[];
   from?: string[];
-  from_nested?: SubmissionRequirementMatch[];
-  matches: string[]; // VerifiableCredential Address
+  from_nested?: SubmissionRequirementMatch[]; // VerifiableCredential Address
 }
 ```
 

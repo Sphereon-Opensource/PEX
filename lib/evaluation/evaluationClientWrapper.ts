@@ -49,14 +49,14 @@ export class EvaluationClientWrapper {
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: [...credentials],
+        areRequiredCredentialsPresent: Status.INFO,
+        selectableVerifiableCredentials: [...credentials],
         warnings,
       };
     } else {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
-
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: VerifiableCredential[] = matches.map(
@@ -65,7 +65,8 @@ export class EvaluationClientWrapper {
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
-        verifiableCredentials: [...credentials],
+        areRequiredCredentialsPresent: Status.INFO,
+        selectableVerifiableCredentials: [...credentials],
         vcIndexes: [],
         warnings,
       };
