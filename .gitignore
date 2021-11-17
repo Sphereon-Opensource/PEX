@@ -7,4 +7,3 @@ dist
 node_modules
 coverage
 *.log
-.env

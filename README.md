@@ -40,6 +40,11 @@ This project has been created using:
 * `yarn` version 1.22.5
 * `node` version 12.22.1
 
+### Environment variables:
+
+LIMIT_DISCLOSURE_SIGNATURES should be a string with comma separated values containing signatures that support 
+limit disclosure.
+
 ### Install
 ```shell
 yarn install

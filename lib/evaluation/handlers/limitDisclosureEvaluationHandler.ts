@@ -1,6 +1,7 @@
 import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
+import { LIMIT_DISCLOSURE_SIGNATURES } from '../../../keys';
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
 import { VerifiableCredential } from '../../verifiablePresentation';
@@ -29,10 +30,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     });
   }
 
-  private limitDisclosureSupported(vc: VerifiableCredential): boolean {
-    const limitDisclosureSignatures = process.env.LIMIT_DISCLOSURE_SIGNATURES?.split(', ');
+  private limitDisclosureSupported(vc: VerifiableCredential, vcIdx?: number, idIdx?: number): boolean {
+    const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES?.split(', ');
     if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
-      this.createLimitDisclosureNotSupportedResult();
+      this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       return false;
     }
     return true;
@@ -46,7 +47,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const fields = constraints?.fields as Field[];
     const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
-      if (this.limitDisclosureSupported(vc)) {
+      if (this.limitDisclosureSupported(vc, index, idIdx)) {
         const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
         if (verifiableCredentialToSend) {
           verifiableCredential[index] = verifiableCredentialToSend;
