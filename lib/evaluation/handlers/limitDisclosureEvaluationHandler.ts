@@ -1,4 +1,4 @@
-import { Constraints, Field, Format, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -18,26 +18,22 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    if (this.limitDisclosureSupported(pd)) {
-      pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
-        //TODO need to check if limit disclosure is supported at input descriptor level
-        if (
-          inDesc.constraints?.fields &&
-          (inDesc.constraints?.limit_disclosure === Optionality.Required ||
-            inDesc.constraints?.limit_disclosure === Optionality.Preferred)
-        ) {
-          this.enforceLimitDisclosure(vcs, inDesc.constraints, index);
-        }
-      });
-    }
+    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+      if (
+        inDesc.constraints?.fields &&
+        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
+          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+      ) {
+        this.enforceLimitDisclosure(vcs, inDesc.constraints, index);
+      }
+    });
   }
 
-  //TODO needs to be updated after the format is present in input descriptors (pe-models)
-  private limitDisclosureSupported(pd: PresentationDefinition): boolean {
+  private limitDisclosureSupported(vc: VerifiableCredential): boolean {
     const limitDisclosureSignatures = process.env.LIMIT_DISCLOSURE_SIGNATURES?.split(', ');
-    if (!pd.format || !Object.keys(pd.format as Format).find((f) => limitDisclosureSignatures?.includes(f))) {
-      //this.createLimitDisclosureNotSupportedResult();
-      return true;
+    if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+      this.createLimitDisclosureNotSupportedResult();
+      return false;
     }
     return true;
   }
@@ -50,10 +46,12 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const fields = constraints?.fields as Field[];
     const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
-      const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
-      if (verifiableCredentialToSend) {
-        verifiableCredential[index] = verifiableCredentialToSend;
-        this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+      if (this.limitDisclosureSupported(vc)) {
+        const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+        if (verifiableCredentialToSend) {
+          verifiableCredential[index] = verifiableCredentialToSend;
+          this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+        }
       }
     });
   }
@@ -117,13 +115,13 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     });
   }
 
-  // private createLimitDisclosureNotSupportedResult(idIdx?: number, vcIdx?: number) {
-  //   return this.getResults().push({
-  //     input_descriptor_path: idIdx ? `$.input_descriptors[${idIdx}]` : `$.input_descriptors[*]`,
-  //     verifiable_credential_path: vcIdx ? `$[${vcIdx}]` : `$[*]`,
-  //     evaluator: this.getName(),
-  //     status: Status.ERROR,
-  //     message: 'Limit disclosure not supported',
-  //   });
-  // }
+  private createLimitDisclosureNotSupportedResult(idIdx?: number, vcIdx?: number) {
+    return this.getResults().push({
+      input_descriptor_path: idIdx ? `$.input_descriptors[${idIdx}]` : `$.input_descriptors[*]`,
+      verifiable_credential_path: vcIdx ? `$[${vcIdx}]` : `$[*]`,
+      evaluator: this.getName(),
+      status: Status.ERROR,
+      message: 'Limit disclosure not supported',
+    });
+  }
 }

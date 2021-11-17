@@ -11,7 +11,7 @@ function getFile(path: string) {
 const HOLDER_DID = ['HOLDER_DID:example:ebfeb1f712ebc6f1c276e12ec21'];
 
 describe('evaluate', () => {
-  it("should return error if uri in inputDescriptors doesn't match", function () {
+  it("should return error if uri in inputDescriptors doesn't match", () => {
     const presentationDefinition: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;

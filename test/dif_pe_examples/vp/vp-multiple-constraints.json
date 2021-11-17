@@ -44,7 +44,14 @@
       },
       "id": "2dc74354-e965-4883-be5e-bfec48bf60c7",
       "issuer": "",
-      "type": ["VerifiableCredential"]
+      "type": ["VerifiableCredential"],
+      "proof": {
+        "type": "RsaSignature2018",
+        "created": "2017-06-18T21:19:10Z",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "https://example.edu/issuers/keys/1",
+        "jws": "..."
+      }
     }
   ]
 }

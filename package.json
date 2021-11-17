@@ -21,13 +21,10 @@
     "build:main": "tsc -p tsconfig.main.json",
     "build:browser": "tsc -p tsconfig.browser.json",
     "build:module": "tsc -p tsconfig.module.json",
-
     "clean": "rimraf node_modules dist coverage",
-
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"{lib,test}/**/*.ts\" --write",
     "fix:lint": "eslint . --ext .ts --fix",
-
     "test": "run-s build test:*",
     "test:lint": "eslint . --ext .ts",
     "test:prettier": "prettier \"{lib,test}/**/*.ts\" --list-different",
@@ -52,6 +49,7 @@
     "@typescript-eslint/parser": "^4.31.1",
     "codecov": "^3.8.3",
     "cspell": "^5.9.1",
+    "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -60,10 +58,10 @@
     "npm-run-all": "^4.1.5",
     "open-cli": "^7.0.1",
     "prettier": "^2.4.0",
+    "rimraf": "^2.6.2",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
-    "typescript": "^4.4.3",
-    "rimraf": "^2.6.2"
+    "typescript": "^4.4.3"
   },
   "files": [
     "index.ts",
