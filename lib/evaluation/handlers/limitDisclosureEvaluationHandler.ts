@@ -30,7 +30,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     });
   }
 
-  private limitDisclosureSupported(vc: VerifiableCredential, vcIdx?: number, idIdx?: number): boolean {
+  private limitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
     const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES;
     if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
       this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
@@ -64,16 +64,17 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     vcIdx: number
   ): VerifiableCredential | undefined {
     let vcToSend: VerifiableCredential = { ...vc, credentialSubject: {} };
-    fields.forEach((field) => {
+    for (const field of fields) {
       if (field.path) {
         const inputField = JsonPathUtils.extractInputField(vc, field.path);
         if (inputField.length > 0) {
           vcToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, vcToSend);
         } else {
           this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+          return undefined;
         }
       }
-    });
+    }
     return vcToSend;
   }
 
@@ -116,10 +117,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     });
   }
 
-  private createLimitDisclosureNotSupportedResult(idIdx?: number, vcIdx?: number) {
+  private createLimitDisclosureNotSupportedResult(idIdx: number, vcIdx: number) {
     return this.getResults().push({
-      input_descriptor_path: idIdx ? `$.input_descriptors[${idIdx}]` : `$.input_descriptors[*]`,
-      verifiable_credential_path: vcIdx ? `$[${vcIdx}]` : `$[*]`,
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
       message: 'Limit disclosure not supported',
