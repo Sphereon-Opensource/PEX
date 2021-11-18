@@ -2199,9 +2199,9 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.name).toEqual("EU Driver's License");
+    expect(result!.matches![0]!.name).toEqual('citizenship_input_1');
     expect(result!.matches![0]).toEqual({
-      name: "EU Driver's License",
+      name: 'citizenship_input_1',
       rule: 'all',
       matches: ['$[0]'],
     });

@@ -138,7 +138,7 @@ export class EvaluationClientWrapper {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
         const submissionRequirementMatch: SubmissionRequirementMatch = {
-          name: idRes[0].value.name,
+          name: idRes[0].value.id,
           rule: Rules.All,
           matches: sameIdVCs,
         };
