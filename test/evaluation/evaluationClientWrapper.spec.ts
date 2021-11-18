@@ -318,8 +318,12 @@ describe('evaluate', () => {
   });
   it('should map successfully the links from selectable credentials to verifiable credentials.', () => {
     const selectResults = evaluationClientWrapperData.getSelectResults();
-    new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults);
+    new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(
+      selectResults,
+      evaluationClientWrapperData.getVerifiableCredential()
+    );
     const verifiableCredential = selectResults.selectableVerifiableCredentials![0];
-    expect(verifiableCredential.id).toEqual(evaluationClientWrapperData.getVerifiableCredential()[1].id);
+    const indexInResults = selectResults.vcIndexes![0];
+    expect(verifiableCredential.id).toEqual(evaluationClientWrapperData.getVerifiableCredential()[indexInResults].id);
   });
 });

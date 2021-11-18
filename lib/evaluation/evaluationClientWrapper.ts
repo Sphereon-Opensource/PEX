@@ -72,9 +72,21 @@ export class EvaluationClientWrapper {
       };
     }
 
-    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults);
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
+    this.remapMatches(selectResults, verifiableCredentials);
     return selectResults;
+  }
+
+  private remapMatches(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+    selectResults.matches?.forEach((srm) => {
+      srm.matches.forEach((match, index, matches) => {
+        const vc = jp.query(verifiableCredentials, match)[0];
+        const newIndex = selectResults.selectableVerifiableCredentials?.findIndex((svc) => svc.id === vc.id);
+        matches[index] = `$[${newIndex}]`;
+      });
+      srm.name;
+    });
   }
 
   private extractMatches(matchSubmissionRequirements: SubmissionRequirementMatch[]): string[] {
@@ -385,12 +397,16 @@ export class EvaluationClientWrapper {
     });
   }
 
-  public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults) {
-    const srm: SubmissionRequirementMatch[] = selectResults.matches as SubmissionRequirementMatch[];
-    if (selectResults && srm?.length) {
-      srm[0].matches.forEach((_, index, matches) => {
-        matches[index] = `$[${index}]`;
-        selectResults.vcIndexes?.push(index);
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(
+    selectResults: SelectResults,
+    verifiableCredentials: VerifiableCredential[]
+  ) {
+    if (selectResults) {
+      selectResults.selectableVerifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+        const foundIndex: number = verifiableCredentials.findIndex(
+          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        );
+        selectResults.vcIndexes?.push(foundIndex);
       });
     }
   }
