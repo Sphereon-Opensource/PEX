@@ -1,1 +1,2 @@
-export const LIMIT_DISCLOSURE_SIGNATURES = ["RsaSignature2018", "Ed25519Signature2020"];
+export const LIMIT_DISCLOSURE_SIGNATURES_SUITES =
+  process.env.LIMIT_DISCLOSURE_SIGNATURES_SUITES ? ["bbs+"].concat(process.env.LIMIT_DISCLOSURE_SIGNATURES_SUITES.split(', ')): ['bbs+'];

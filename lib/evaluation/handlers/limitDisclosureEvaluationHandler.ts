@@ -1,7 +1,7 @@
 import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
-import { LIMIT_DISCLOSURE_SIGNATURES } from '../../../keys';
+import { LIMIT_DISCLOSURE_SIGNATURES_SUITES } from '../../../keys';
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
 import { VerifiableCredential } from '../../verifiablePresentation';
@@ -31,7 +31,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private limitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
-    const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES;
+    const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES_SUITES;
     if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
       this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       return false;
@@ -48,13 +48,24 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
       if (this.limitDisclosureSupported(vc, index, idIdx)) {
-        const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
-        if (verifiableCredentialToSend) {
-          verifiableCredential[index] = verifiableCredentialToSend;
-          this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
-        }
+        this.limitDisclosureEnforcement(vc, fields, idIdx, index, verifiableCredential, limitDisclosure);
       }
     });
+  }
+
+  private limitDisclosureEnforcement(
+    vc: VerifiableCredential,
+    fields: Field[],
+    idIdx: number,
+    index: number,
+    verifiableCredential: VerifiableCredential[],
+    limitDisclosure: 'required' | 'preferred'
+  ) {
+    const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+    if (verifiableCredentialToSend) {
+      verifiableCredential[index] = verifiableCredentialToSend;
+      this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+    }
   }
 
   private createVcWithRequiredFields(
