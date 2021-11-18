@@ -2,8 +2,11 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { VerifiablePresentation } from '../../lib';
+import { Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
+import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
+import { PdMultiCredentials } from '../test_data/limitDisclosureEvaluation/pdMultiCredentials';
+import { VcMultiCredentials } from '../test_data/limitDisclosureEvaluation/vcMultiCredentials';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -70,5 +73,16 @@ describe('evaluate', () => {
       status: 'error',
       verifiable_credential_path: '$[0]',
     });
+  });
+
+  it('should match 4 credentials', () => {
+    const pdSchema: PresentationDefinition = new PdMultiCredentials().getPresentationDefinition();
+    const verifiableCredentials: VerifiableCredential[] = new VcMultiCredentials().getVerifiableCredentials();
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    evaluationClient.evaluate(pdSchema, verifiableCredentials, HOLDER_DID);
+    expect(
+      evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)
+    ).toEqual(new LimitDisclosureEvaluationResults().getMultiCredentialResults());
   });
 });
