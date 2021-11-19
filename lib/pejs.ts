@@ -1,8 +1,9 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import {PresentationDefinition, PresentationSubmission} from '@sphereon/pe-models';
 
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { Presentation, VerifiableCredential } from './verifiablePresentation';
+import {EvaluationClientWrapper, EvaluationResults, SelectResults} from './evaluation';
+import {KeyPairOptions} from "./signing";
+import {PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine} from './validation';
+import {Presentation, VerifiableCredential} from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -143,4 +144,32 @@ export class PEJS {
       },
     ]);
   }
+
+  /**
+   * This is the method is provide a template that lists the inputs required to sign a presentation before sending.
+   *
+   * @param peJSPresentationDefinition is mainly required to apply limitDisclosure i.e. it informs the signingCallBack which fields have to be in the
+   *        signed object.
+   * @param peJSSelectedCredentials these are the credentials which are combined in the presentation.
+   * @param peJSSigningKeyOptions these are the signing keys require to sign.
+   * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
+   *        signing. One example of signing is available in the project named. pe-selective-disclosure.
+   *
+   * @return the signed presentations.
+   */
+  public createVerifiablePresentation(
+      peJSPresentationDefinition: PresentationDefinition,
+      peJSSelectedCredentials: VerifiableCredential[],
+      peJSSigningKeyOptions: KeyPairOptions,
+      signingCallBack: (
+          presentationDefinition: PresentationDefinition,
+          selectedCredentials: VerifiableCredential[],
+          signingKeyOptions: KeyPairOptions
+      ) => Presentation[]
+  ): Presentation[] {
+
+    return signingCallBack(peJSPresentationDefinition, peJSSelectedCredentials, peJSSigningKeyOptions);
+
+  }
+
 }

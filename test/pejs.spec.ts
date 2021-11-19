@@ -2,7 +2,10 @@ import fs from 'fs';
 
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { PEJS, Validated, VerifiablePresentation } from '../lib';
+import {PEJS, Presentation, Validated, VerifiablePresentation} from '../lib';
+
+import {KeyPairOptionsData} from "./test_data/KeyPairOptionsData";
+import {SigningUtilMock} from "./test_data/SigningUtilMock";
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -119,4 +122,32 @@ describe('evaluate', () => {
     const result: Validated = pejs.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
+
+  it('should return a sign the presentation', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const pejs: PEJS = new PEJS();
+    const presentations: Presentation[] = pejs.createVerifiablePresentation(
+      pdSchema.presentation_definition,
+      vpSimple.verifiableCredential,
+      new KeyPairOptionsData().getKeyPairOptionsData(),
+      new SigningUtilMock().getSinged
+    );
+    expect(presentations).toEqual(new SigningUtilMock().getSinged());
+  });
+
+  it('should throw exception if signing encounters a problem', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const pejs: PEJS = new PEJS();
+
+    expect(pejs.createVerifiablePresentation(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        new KeyPairOptionsData().getKeyPairOptionsData(),
+        new SigningUtilMock().getErrorThrown
+    )).toThrow(Error);
+
+  });
+
 });
