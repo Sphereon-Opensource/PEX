@@ -107,12 +107,11 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['A'],
           matches: ['$[0]', '$[1]', '$[2]'],
-          name: 'Submission of educational transcripts',
           rule: 'all',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -278,13 +277,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['B'],
           matches: ['$[1]', '$[2]'],
           min: 2,
-          name: 'Eligibility to Work Proof',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -427,27 +425,24 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           count: 1,
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -613,13 +608,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['B'],
           matches: ['$[1]', '$[2]'],
           max: 2,
-          name: 'Eligibility to Work Proof',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -762,26 +756,23 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'all',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -947,27 +938,24 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
           min: 1,
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1133,27 +1121,24 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
           max: 2,
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1319,13 +1304,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['B'],
           matches: ['$[1]', '$[2]'],
           min: 3,
-          name: 'Eligibility to Work Proof',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1468,13 +1452,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['B'],
           matches: ['$[1]', '$[2]'],
           max: 1,
-          name: 'Eligibility to Work Proof',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1617,13 +1600,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           count: 1,
           from: ['B'],
           matches: ['$[1]', '$[2]'],
-          name: 'Eligibility to Work Proof',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1766,12 +1748,11 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from: ['B'],
           matches: ['$[1]', '$[2]'],
-          name: 'Submission of educational transcripts',
           rule: 'all',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -1914,27 +1895,24 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
           min: 3,
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'pick',
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -2101,27 +2079,24 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        {
+        expect.objectContaining({
           from_nested: [
-            {
+            expect.objectContaining({
               from: ['A'],
               matches: ['$[0]', '$[1]', '$[2]'],
-              name: undefined,
               rule: 'all',
-            },
-            {
+            }),
+            expect.objectContaining({
               count: 2,
               from: ['B'],
               matches: ['$[1]', '$[2]'],
-              name: undefined,
               rule: 'pick',
-            },
+            }),
           ],
           matches: [],
-          name: 'Confirm banking relationship or employment and residence proofs',
           rule: 'pick',
           max: 1,
-        },
+        }),
       ],
       selectableVerifiableCredentials: [
         {
@@ -2199,12 +2174,13 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.name).toEqual("EU Driver's License");
-    expect(result!.matches![0]).toEqual({
-      name: "EU Driver's License",
-      rule: 'all',
-      matches: ['$[0]'],
-    });
+    expect(result!.matches![0]!.id).toBeDefined();
+    expect(result!.matches![0]).toEqual(
+      expect.objectContaining({
+        rule: 'all',
+        matches: ['$[0]'],
+      })
+    );
   });
 
   it('Evaluate driver license name result', () => {
@@ -2214,6 +2190,6 @@ describe('selectFrom tests', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY']);
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.name).toEqual(pdSchema!.submission_requirements![0]!.name);
+    expect(result!.matches![0]!.id).toBeDefined();
   });
 });

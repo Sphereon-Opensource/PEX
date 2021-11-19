@@ -25,12 +25,12 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         (inDesc.constraints?.limit_disclosure === Optionality.Required ||
           inDesc.constraints?.limit_disclosure === Optionality.Preferred)
       ) {
-        this.enforceLimitDisclosure(vcs, inDesc.constraints, index);
+        this.evaluateLimitDisclosure(vcs, inDesc.constraints, index);
       }
     });
   }
 
-  private limitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
+  private isLimitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
     const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES_SUITES;
     if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
       this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
@@ -39,7 +39,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return true;
   }
 
-  private enforceLimitDisclosure(
+  private evaluateLimitDisclosure(
     verifiableCredential: VerifiableCredential[],
     constraints: Constraints,
     idIdx: number
@@ -47,19 +47,19 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const fields = constraints?.fields as Field[];
     const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
-      if (this.limitDisclosureSupported(vc, index, idIdx)) {
-        this.limitDisclosureEnforcement(vc, fields, idIdx, index, verifiableCredential, limitDisclosure);
+      if (this.isLimitDisclosureSupported(vc, index, idIdx)) {
+        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, limitDisclosure);
       }
     });
   }
 
-  private limitDisclosureEnforcement(
+  private enforceLimitDisclosure(
     vc: VerifiableCredential,
     fields: Field[],
     idIdx: number,
     index: number,
     verifiableCredential: VerifiableCredential[],
-    limitDisclosure: 'required' | 'preferred'
+    limitDisclosure: Optionality
   ) {
     const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
     if (verifiableCredentialToSend) {

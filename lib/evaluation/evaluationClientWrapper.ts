@@ -1,5 +1,6 @@
 import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pe-models';
 import jp from 'jsonpath';
+import { nanoid } from 'nanoid';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { JsonPathUtils } from '../utils';
@@ -125,7 +126,7 @@ export class EvaluationClientWrapper {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
         const submissionRequirementMatch: SubmissionRequirementMatch = {
-          name: idRes[0].value.name,
+          id: nanoid(),
           rule: Rules.All,
           matches: sameIdVCs,
         };
@@ -161,14 +162,14 @@ export class EvaluationClientWrapper {
         rule: sr.rule,
         matches: [],
         from: [],
-        name: sr?.name,
+        id: nanoid(),
       };
     } else if (sr.from_nested) {
       return {
         rule: sr.rule,
         matches: [],
         from_nested: [],
-        name: sr?.name,
+        id: nanoid(),
       };
     }
     return null;
