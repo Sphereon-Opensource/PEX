@@ -77,7 +77,7 @@ describe('evaluate', () => {
     });
   });
 
-  it('should be 4 infos', () => {
+  it('should be 4 infos (limit disclosure supported by all)', () => {
     const pdSchema: PresentationDefinition = new PdMultiCredentials().getPresentationDefinition();
     const verifiableCredentials: VerifiableCredential[] = new VcMultiCredentials().getVerifiableCredentials();
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
@@ -89,7 +89,7 @@ describe('evaluate', () => {
   });
 
   //FIXME If atomic credential and not supports limit disclosure, but passes same subject the credential should not be valid for submission
-  it('should be 3 infos and 1 error', () => {
+  it('should be 3 infos and 1 error (limit disclosure unsupported by one)', () => {
     const pdSchema: PresentationDefinition = new PdMultiCredentials().getPresentationDefinition();
     const verifiableCredentials: VerifiableCredential[] = new VcMultiCredentials().getVerifiableCredentials();
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
