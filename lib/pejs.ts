@@ -19,21 +19,25 @@ export class PEJS {
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param presentation the presentation which has to be evaluated in comparison of the definition.
+   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
    * were not fulfilled by the presentation.
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinition,
-    presentation: Presentation
+    presentation: Presentation,
+    limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
+
     const holderDids = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
       presentationCopy.verifiableCredential,
-      holderDids
+      holderDids,
+      limitDisclosureSignatureSuites
     );
   }
 
@@ -43,6 +47,7 @@ export class PEJS {
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
    * @param didsOfHolder the list of the DIDs that the wallet holders controlls.
+   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
    * were not fulfilled by the verifiable credentials.
@@ -50,11 +55,17 @@ export class PEJS {
   public evaluateCredentials(
     presentationDefinition: PresentationDefinition,
     verifiableCredential: VerifiableCredential[],
-    didsOfHolder: string[]
+    didsOfHolder: string[],
+    limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredential));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredentialCopy, didsOfHolder);
+    return this._evaluationClientWrapper.evaluate(
+      presentationDefinition,
+      verifiableCredentialCopy,
+      didsOfHolder,
+      limitDisclosureSignatureSuites
+    );
   }
 
   /**
@@ -64,17 +75,24 @@ export class PEJS {
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
    * @param holderDids the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
    */
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    holderDids: string[]
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentialCopy, holderDids);
+    return this._evaluationClientWrapper.selectFrom(
+      presentationDefinition,
+      verifiableCredentialCopy,
+      holderDids,
+      limitDisclosureSignatureSuites
+    );
   }
 
   /**

@@ -1,7 +1,6 @@
 import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
-import { LIMIT_DISCLOSURE_SIGNATURES_SUITES } from '../../../keys';
 import { Status } from '../../ConstraintUtils';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
 import { VerifiableCredential } from '../../verifiablePresentation';
@@ -31,7 +30,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private isLimitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
-    const limitDisclosureSignatures = LIMIT_DISCLOSURE_SIGNATURES_SUITES;
+    const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
       this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       return false;
@@ -63,8 +62,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   ) {
     const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
     /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
-    * remain untouched and the verifiable credential won't be submitted.
-    */
+     * remain untouched and the verifiable credential won't be submitted.
+     */
     if (verifiableCredentialToSend) {
       verifiableCredential[index] = verifiableCredentialToSend;
       this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);

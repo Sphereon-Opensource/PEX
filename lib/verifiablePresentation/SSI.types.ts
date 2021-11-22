@@ -10,7 +10,6 @@ export interface Proof {
   created: string;
   proofPurpose: string;
   verificationMethod: string;
-  jws: string;
   [x: string]: string;
 }
 

@@ -25,11 +25,12 @@ export class EvaluationClientWrapper {
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    holderDids: string[]
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids);
+    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids, limitDisclosureSignatureSuites);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -175,8 +176,13 @@ export class EvaluationClientWrapper {
     return null;
   }
 
-  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
-    this._client.evaluate(pd, vcs, holderDids);
+  public evaluate(
+    pd: PresentationDefinition,
+    vcs: VerifiableCredential[],
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
+  ): EvaluationResults {
+    this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);

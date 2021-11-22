@@ -22,6 +22,7 @@ export class EvaluationClient {
     this._verifiableCredential = [];
     this._presentationSubmission = {};
     this._dids = [];
+    this._limitDisclosureSignatureSuites = [];
   }
 
   private failed_catched = {
@@ -35,9 +36,16 @@ export class EvaluationClient {
   private _verifiableCredential: Partial<VerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
   private _dids: string[];
+  private _limitDisclosureSignatureSuites: string[];
 
-  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): void {
+  public evaluate(
+    pd: PresentationDefinition,
+    vcs: VerifiableCredential[],
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
+  ): void {
     this._dids = holderDids;
+    this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, vcs);
     while (currentHandler?.hasNext()) {
@@ -78,6 +86,14 @@ export class EvaluationClient {
 
   public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
     this._verifiableCredential = verifiableCredential;
+  }
+
+  public get limitDisclosureSignatureSuites() {
+    return this._limitDisclosureSignatureSuites;
+  }
+
+  public set limitDisclosureSignatureSuites(limitDisclosureSignatureSuites: string[]) {
+    this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
   }
 
   private initEvaluationHandlers() {

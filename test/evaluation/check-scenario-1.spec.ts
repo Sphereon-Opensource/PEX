@@ -4,6 +4,8 @@ import { PEJS, VerifiableCredential } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
+
 describe('1st scenario', () => {
   /**
    * This scenario contains a flow in which Alice wants to prove to Bob that she has some kind of Credentials.
@@ -91,12 +93,16 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluatePresentation(pd, {
-      '@context': [],
-      holder: holderWallet.holder,
-      type: [],
-      verifiableCredential: holderWallet.verifiableCredentials,
-    });
+    const evaluationResult = pejs.evaluatePresentation(
+      pd,
+      {
+        '@context': [],
+        holder: holderWallet.holder,
+        type: [],
+        verifiableCredential: holderWallet.verifiableCredentials,
+      },
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
     expect(evaluationResult.value?.descriptor_map.length).toEqual(2);
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
@@ -190,7 +196,12 @@ describe('1st scenario', () => {
       "warnings": []
     }
      */
-    const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder]);
+    const selectFromResult = pejs.selectFrom(
+      pd,
+      holderWallet.verifiableCredentials,
+      [holderWallet.holder],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(selectFromResult.matches?.length).toEqual(2);
     expect(selectFromResult.matches).toEqual([
       expect.objectContaining({ rule: 'all', matches: ['$[2]'] }),

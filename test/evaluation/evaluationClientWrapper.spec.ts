@@ -10,6 +10,8 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
+
 const evaluationClientWrapperData: EvaluationClientWrapperData = new EvaluationClientWrapperData();
 
 describe('evaluate', () => {
@@ -24,7 +26,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult0());
     expect(evaluationClient.results[5]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
@@ -42,7 +45,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
@@ -60,7 +64,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.results[0]).toEqual(
       evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0()
@@ -82,7 +87,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
@@ -100,7 +106,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
@@ -117,7 +124,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
@@ -134,7 +142,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
@@ -151,7 +160,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getWarn());
@@ -168,7 +178,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
@@ -187,7 +198,8 @@ describe('evaluate', () => {
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults).toEqual(evaluationClientWrapperData.getSuccess());
@@ -204,7 +216,8 @@ describe('evaluate', () => {
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pdSchema,
@@ -230,7 +243,8 @@ describe('evaluate', () => {
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pdSchema,
@@ -267,7 +281,8 @@ describe('evaluate', () => {
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
       { ...vpSimple.verifiableCredential[1] },
@@ -292,7 +307,8 @@ describe('evaluate', () => {
     evaluationClientWrapper.evaluate(
       pdSchema,
       vpSimple.verifiableCredential,
-      evaluationClientWrapperData.getHolderDID()
+      evaluationClientWrapperData.getHolderDID(),
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
       { ...vpSimple.verifiableCredential[1] },
