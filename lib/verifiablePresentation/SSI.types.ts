@@ -10,7 +10,8 @@ export interface Proof {
   created: string;
   proofPurpose: string;
   verificationMethod: string;
-  [x: string]: string;
+  jws?: string;
+  [x: string]: string | undefined;
 }
 
 export interface CredentialStatus {
