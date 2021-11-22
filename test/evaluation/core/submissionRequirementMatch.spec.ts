@@ -5,7 +5,7 @@ import { SubmissionRequirementMatch } from '../../../lib';
 describe('submissionRequirementMatch', () => {
   it('should return ok constructor works correctly', function () {
     const submissionRequirementMatch: SubmissionRequirementMatch = {
-      id: 'test srm',
+      name: 'test srm',
       rule: Rules.All,
       matches: ['$.verifiableCredential[1]'],
       from: ['A'],

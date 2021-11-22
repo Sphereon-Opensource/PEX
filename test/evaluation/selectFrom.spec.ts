@@ -116,11 +116,12 @@ describe('selectFrom tests', () => {
         },
       ],
       matches: [
-        expect.objectContaining({
+        {
           from: ['A'],
           matches: ['$[0]', '$[1]', '$[2]'],
+          name: 'Submission of educational transcripts',
           rule: 'all',
-        }),
+        },
       ],
       selectableVerifiableCredentials: [
         {
@@ -295,9 +296,9 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
           min: 2,
+          name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
@@ -454,20 +455,20 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
           matches: [],
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
         },
       ],
@@ -644,9 +645,9 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
           max: 2,
+          name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
@@ -802,20 +803,20 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
           matches: [],
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'all',
         },
       ],
@@ -994,21 +995,21 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
           matches: [],
           min: 1,
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
         },
       ],
@@ -1187,21 +1188,21 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
           matches: [],
           max: 2,
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
         },
       ],
@@ -1378,9 +1379,9 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
           min: 3,
+          name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
@@ -1534,9 +1535,9 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
           max: 1,
+          name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
@@ -1691,8 +1692,8 @@ describe('selectFrom tests', () => {
         {
           count: 1,
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
+          name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
@@ -1846,8 +1847,8 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          id: 'Educational transcripts 2',
           matches: ['$[1]', '$[2]'],
+          name: 'Submission of educational transcripts',
           rule: 'all',
         },
       ],
@@ -2003,21 +2004,21 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
           matches: [],
           min: 3,
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
         },
       ],
@@ -2195,20 +2196,20 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              id: 'Educational transcripts 2',
               matches: ['$[0]', '$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              id: 'Educational transcripts 2',
               matches: ['$[1]', '$[2]'],
+              name: 'Submission of educational transcripts',
               rule: 'pick',
             },
           ],
-          id: '32f54163-7166-48f1-93d8-ff217bdb0653',
           matches: [],
+          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
           max: 1,
         },
@@ -2294,9 +2295,9 @@ describe('selectFrom tests', () => {
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.id).toEqual('citizenship_input_1');
+    expect(result!.matches![0]!.name).toEqual("EU Driver's License");
     expect(result!.matches![0]).toEqual({
-      id: 'citizenship_input_1',
+      name: "EU Driver's License",
       rule: 'all',
       matches: ['$[0]'],
     });
@@ -2314,6 +2315,6 @@ describe('selectFrom tests', () => {
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.id).toBeDefined();
+    expect(result!.matches![0]!.name).toEqual("EU Driver's License");
   });
 });

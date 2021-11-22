@@ -105,7 +105,7 @@ export class EvaluationClientWrapper {
           submissionRequirementMatches.push(matchingDescriptors);
         }
       } else if (sr.from_nested) {
-        const srm: SubmissionRequirementMatch = { id: pd.id, rule: sr.rule, from_nested: [], matches: [] };
+        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], matches: [] };
         if (srm && srm.from_nested) {
           sr.min ? (srm.min = sr.min) : undefined;
           sr.max ? (srm.max = sr.max) : undefined;
@@ -128,7 +128,7 @@ export class EvaluationClientWrapper {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
         const submissionRequirementMatch: SubmissionRequirementMatch = {
-          id: idRes[0].value.id,
+          name: idRes[0].value.name || idRes[0].value.id,
           rule: Rules.All,
           matches: sameIdVCs,
         };
@@ -147,7 +147,8 @@ export class EvaluationClientWrapper {
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
-        srm.id = jp.query(pd, m.input_descriptor_path)[0].id;
+        const inDesc = jp.query(pd, m.input_descriptor_path)[0];
+        srm.name = inDesc.name || inDesc.id;
         if (m.payload.group.includes(sr.from)) {
           if (srm.matches?.indexOf(m.verifiable_credential_path) === -1) {
             srm.matches.push(m.verifiable_credential_path);
