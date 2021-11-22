@@ -62,6 +62,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     limitDisclosure: Optionality
   ) {
     const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+    /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
+    * remain untouched and the verifiable credential won't be submitted.
+    */
     if (verifiableCredentialToSend) {
       verifiableCredential[index] = verifiableCredentialToSend;
       this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
