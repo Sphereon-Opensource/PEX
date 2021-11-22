@@ -147,7 +147,7 @@ export class EvaluationClientWrapper {
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
-        srm.id = jp.query(pd, m.input_descriptor_path)[0];
+        srm.id = jp.query(pd, m.input_descriptor_path)[0].id;
         if (m.payload.group.includes(sr.from)) {
           if (srm.matches?.indexOf(m.verifiable_credential_path) === -1) {
             srm.matches.push(m.verifiable_credential_path);
