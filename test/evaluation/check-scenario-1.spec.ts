@@ -196,7 +196,12 @@ describe('1st scenario', () => {
       "warnings": []
     }
      */
-    const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const selectFromResult = pejs.selectFrom(
+      pd,
+      holderWallet.verifiableCredentials,
+      [holderWallet.holder],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(selectFromResult.matches?.length).toEqual(2);
     expect(selectFromResult.matches).toEqual([
       { rule: 'all', matches: ['$[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
