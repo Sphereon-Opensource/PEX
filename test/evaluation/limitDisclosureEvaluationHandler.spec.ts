@@ -38,7 +38,7 @@ describe('evaluate', () => {
     expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
   });
 
-  it('limit disclosure should not be supported', () => {
+  it('should report an error if limit disclosure is not supported', () => {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
@@ -57,7 +57,7 @@ describe('evaluate', () => {
     });
   });
 
-  it('limit disclosure should not be supported', () => {
+  it('should report an error if mandatory fields are absent', () => {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
