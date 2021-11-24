@@ -39,6 +39,7 @@ export class EvaluationClientWrapper {
       );
       const marked = Array.from(new Set(info));
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
+        presentationDefinition,
         presentationDefinition.submission_requirements,
         marked
       );
@@ -73,7 +74,19 @@ export class EvaluationClientWrapper {
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
+    this.remapMatches(selectResults, verifiableCredentials);
     return selectResults;
+  }
+
+  private remapMatches(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+    selectResults.matches?.forEach((srm) => {
+      srm.matches.forEach((match, index, matches) => {
+        const vc = jp.query(verifiableCredentials, match)[0];
+        const newIndex = selectResults.selectableVerifiableCredentials?.findIndex((svc) => svc.id === vc.id);
+        matches[index] = `$[${newIndex}]`;
+      });
+      srm.name;
+    });
   }
 
   private extractMatches(matchSubmissionRequirements: SubmissionRequirementMatch[]): string[] {
@@ -88,13 +101,14 @@ export class EvaluationClientWrapper {
   }
 
   private matchSubmissionRequirements(
+    pd: PresentationDefinition,
     submissionRequirements: SubmissionRequirement[],
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     for (const sr of submissionRequirements) {
       if (sr.from) {
-        const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
+        const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
         if (matchingDescriptors) {
           sr.min ? (matchingDescriptors.min = sr.min) : undefined;
           sr.max ? (matchingDescriptors.max = sr.max) : undefined;
@@ -102,12 +116,12 @@ export class EvaluationClientWrapper {
           submissionRequirementMatches.push(matchingDescriptors);
         }
       } else if (sr.from_nested) {
-        const srm = this.createSubmissionRequirementMatch(sr);
+        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], matches: [] };
         if (srm && srm.from_nested) {
           sr.min ? (srm.min = sr.min) : undefined;
           sr.max ? (srm.max = sr.max) : undefined;
           sr.count ? (srm.count = sr.count) : undefined;
-          srm.from_nested.push(...this.matchSubmissionRequirements(sr.from_nested, marked));
+          srm.from_nested.push(...this.matchSubmissionRequirements(pd, sr.from_nested, marked));
           submissionRequirementMatches.push(srm);
         }
       }
@@ -125,7 +139,7 @@ export class EvaluationClientWrapper {
       const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
       if (idRes.length) {
         const submissionRequirementMatch: SubmissionRequirementMatch = {
-          name: idRes[0].value.name,
+          name: idRes[0].value.name || idRes[0].value.id,
           rule: Rules.All,
           matches: sameIdVCs,
         };
@@ -136,42 +150,24 @@ export class EvaluationClientWrapper {
   }
 
   private mapMatchingDescriptors(
+    pd: PresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
-  ): SubmissionRequirementMatch | null {
-    const srm = this.createSubmissionRequirementMatch(sr);
-    if (srm?.from && sr?.from) {
-      if (!srm.from.includes(sr.from)) {
-        srm.from.push(sr.from);
-      }
+  ): SubmissionRequirementMatch {
+    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], matches: [] };
+    if (sr?.from) {
+      srm.from?.push(sr.from);
       for (const m of marked) {
+        const idDesc = jp.query(pd, m.input_descriptor_path)[0];
+        srm.name = idDesc.name || idDesc.id;
         if (m.payload.group.includes(sr.from)) {
-          if (srm.matches.indexOf(m.verifiable_credential_path) === -1) {
+          if (srm.matches?.indexOf(m.verifiable_credential_path) === -1) {
             srm.matches.push(m.verifiable_credential_path);
           }
         }
       }
     }
-    return srm;
-  }
-
-  private createSubmissionRequirementMatch(sr: SubmissionRequirement): SubmissionRequirementMatch | null {
-    if (sr.from) {
-      return {
-        rule: sr.rule,
-        matches: [],
-        from: [],
-        name: sr?.name,
-      };
-    } else if (sr.from_nested) {
-      return {
-        rule: sr.rule,
-        matches: [],
-        from_nested: [],
-        name: sr?.name,
-      };
-    }
-    return null;
+    return srm as SubmissionRequirementMatch;
   }
 
   public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
@@ -210,18 +206,24 @@ export class EvaluationClientWrapper {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
 
-    //let matched: [number, HandlerCheckResult[]];
-    const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) =>
-        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
-    );
-
     if (pd.submission_requirements) {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
-      this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      this.updatePresentationSubmission(upIdx);
+      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
+        pd.submission_requirements,
+        updatedMarked,
+        0
+      );
+      const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
+      this.updatePresentationSubmission(finalIdx);
       return this._client.presentationSubmission;
     }
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+    );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
     return this._client.presentationSubmission;

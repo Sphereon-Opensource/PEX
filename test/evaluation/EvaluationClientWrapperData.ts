@@ -1,4 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission, Rules } from '@sphereon/pe-models';
 
 import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
 
@@ -226,6 +226,13 @@ export class EvaluationClientWrapperData {
         },
       ],
       vcIndexes: [],
+      matches: [
+        {
+          name: 'test',
+          rule: Rules.All,
+          matches: ['$[0]'],
+        },
+      ],
     };
   }
 
