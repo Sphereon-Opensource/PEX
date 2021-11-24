@@ -75,7 +75,19 @@ export class EvaluationClientWrapper {
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
+    this.remapMatches(selectResults, verifiableCredentials);
     return selectResults;
+  }
+
+  private remapMatches(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+    selectResults.matches?.forEach((srm) => {
+      srm.matches.forEach((match, index, matches) => {
+        const vc = jp.query(verifiableCredentials, match)[0];
+        const newIndex = selectResults.selectableVerifiableCredentials?.findIndex((svc) => svc.id === vc.id);
+        matches[index] = `$[${newIndex}]`;
+      });
+      srm.name;
+    });
   }
 
   private extractMatches(matchSubmissionRequirements: SubmissionRequirementMatch[]): string[] {
@@ -200,18 +212,24 @@ export class EvaluationClientWrapper {
       throw Error('You need to call evaluate() before submissionFrom()');
     }
 
-    //let matched: [number, HandlerCheckResult[]];
-    const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) =>
-        result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
-    );
-
     if (pd.submission_requirements) {
+      const marked: HandlerCheckResult[] = this._client.results.filter(
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+      );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
-      this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
-      this.updatePresentationSubmission(upIdx);
+      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
+        pd.submission_requirements,
+        updatedMarked,
+        0
+      );
+      const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
+      this.updatePresentationSubmission(finalIdx);
       return this._client.presentationSubmission;
     }
+    const marked: HandlerCheckResult[] = this._client.results.filter(
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+    );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
     return this._client.presentationSubmission;

@@ -196,16 +196,11 @@ describe('1st scenario', () => {
       "warnings": []
     }
      */
-    const selectFromResult = pejs.selectFrom(
-      pd,
-      holderWallet.verifiableCredentials,
-      [holderWallet.holder],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const selectFromResult = pejs.selectFrom(pd, holderWallet.verifiableCredentials, [holderWallet.holder], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(selectFromResult.matches?.length).toEqual(2);
     expect(selectFromResult.matches).toEqual([
-      expect.objectContaining({ rule: 'all', matches: ['$[2]'] }),
-      expect.objectContaining({ rule: 'all', matches: ['$[2]'] }),
+      { rule: 'all', matches: ['$[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
+      { rule: 'all', matches: ['$[0]'], name: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8' },
     ]);
     expect(selectFromResult.selectableVerifiableCredentials?.length).toEqual(1);
 
