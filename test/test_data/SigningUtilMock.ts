@@ -1,24 +1,23 @@
-import {Presentation} from "../../lib";
-
+import { Presentation } from '../../lib';
 
 export class SigningUtilMock {
   public getSinged(): Presentation[] {
     return [
       {
         verifiableCredential: [],
-        holder: "",
-        "@context": [""],
+        holder: 'did:didMethod:2021112402',
+        '@context': [''],
         presentation_submission: {
           descriptor_map: [],
-          definition_id: "",
-          id: ""
+          definition_id: '',
+          id: '',
         },
-        type: [""]
-      }
+        type: [''],
+      },
     ];
   }
 
   public getErrorThrown(): Presentation[] {
-    throw new Error("Could not sign because of missing fields");
+    throw new Error('Could not sign because of missing fields');
   }
 }

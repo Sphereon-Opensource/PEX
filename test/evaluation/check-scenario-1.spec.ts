@@ -1,6 +1,6 @@
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { PEJS, VerifiableCredential } from '../../lib';
+import { PEJS, Presentation, VerifiableCredential } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 
@@ -231,9 +231,13 @@ describe('1st scenario', () => {
 
      which is wrong in the case of our example, because the index of our verifiableCredential is no longer #2, but it's "1"
      */
-    const submissionFromResult = pejs.submissionFrom(pd, [holderWallet.verifiableCredentials[2]]);
-    expect(submissionFromResult.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
-    expect(submissionFromResult.descriptor_map.map((dm) => dm.id).sort()).toEqual([
+    const presentation: Presentation = pejs.presentationFrom(
+      pd,
+      [holderWallet.verifiableCredentials[2]],
+      'did:didMethod:2021112400'
+    );
+    expect(presentation!.presentation_submission!.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
+    expect(presentation!.presentation_submission!.descriptor_map.map((dm) => dm.id).sort()).toEqual([
       '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
       'e73646de-43e2-4d72-ba4f-090d01c11eac',
     ]);
@@ -253,7 +257,7 @@ describe('1st scenario', () => {
      As you can see, no matter what we pass, we will get the same result
      */
     expect(() => {
-      new PEJS().submissionFrom(pd, [holderWallet.verifiableCredentials[1]]);
+      new PEJS().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
     }).toThrowError('You need to call evaluate() before submissionFrom()');
   });
 });
