@@ -210,7 +210,7 @@ describe('1st scenario', () => {
     expect(selectFromResult.selectableVerifiableCredentials?.length).toEqual(1);
 
     /**
-     * Base on the selectFrom result, now Alice knows what to send, so she will call the submissionFrom with the right VerifiableCredential (index #2)
+     * Base on the selectFrom result, now Alice knows what to send, so she will call the presentationFrom with the right VerifiableCredential (index #2)
      * and she will get a presentationSubmission object:
      submissionFromResult:  {
       "id": "FEkF4tcII0CXVnv1mWyr-",
@@ -258,7 +258,7 @@ describe('1st scenario', () => {
      */
     expect(() => {
       new PEJS().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
-    }).toThrowError('You need to call evaluate() before submissionFrom()');
+    }).toThrowError('You need to call evaluate() before pejs.presentationFrom()');
   });
 });
 

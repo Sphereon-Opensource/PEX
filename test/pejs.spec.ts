@@ -87,7 +87,7 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
-    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID]);
+    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const presentation: Presentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
@@ -101,9 +101,11 @@ describe('evaluate', () => {
     );
     expect(presentation.holder).toEqual(HOLDER_DID);
     expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential);
-    expect(presentation.type).toEqual(["VerifiablePresentation"]);
-    expect(presentation["@context"]).toEqual(["https://www.w3.org/2018/credentials/v1"]);
-
+    expect(presentation.type).toEqual(['VerifiablePresentation', 'PresentationSubmission']);
+    expect(presentation['@context']).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://identity.foundation/presentation-exchange/submission/v1',
+    ]);
   });
 
   it('Evaluate pd schema of our sr_rules.json pd', () => {
@@ -155,5 +157,4 @@ describe('evaluate', () => {
       );
     }).toThrow(Error);
   });
-
 });

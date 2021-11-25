@@ -144,7 +144,7 @@ const selectedCredentials = srMatches.map(
 ).flat();
 
 // Construct presentation submission from selected credentials
-const presentationSubmission = pejs.submissionFrom(presentationDefinition, selectedCredentials);
+const presentationSubmission = pejs.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
 
 const presentation = {
   "@context": [
@@ -232,7 +232,7 @@ interface SelectResults {
   /**
    * This is the parameter that pejs library user should look into to determine what to do next
    * Status can have three values:
-   *  1. INFO: everything is fine, you can call `submissionFrom` after this method
+   *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required. 
    *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
    *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object
@@ -261,9 +261,9 @@ interface SubmissionRequirementMatch {
 }
 ```
 
-### SubmissionFrom
+### PresentationFrom
 ```typescript
-submissionFrom(presentationDefinition, selectedCredentials)
+presentationFrom(presentationDefinition, selectedCredentials, holderDID)
 ```
 ##### Description
 Creates the corresponding Presentation Submission object to be included in the Verifiable Presentation response, which maps the submitted credentials to the requested inputs in the `presentationDefinition` input parameter.
@@ -273,6 +273,7 @@ Creates the corresponding Presentation Submission object to be included in the V
 |------|------|------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
 | `selectedCredentials` | `VerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition |
+| `holderDid` | `string` | the holder's DID. This can be found in VerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places|
 
 #### Return value
 If the selected credentials successfully match the submission requirements in the presentation definition, the return value will be a non-null `PresentationSubmission`

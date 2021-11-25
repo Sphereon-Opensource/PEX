@@ -1,9 +1,9 @@
-import {PresentationDefinition, PresentationSubmission} from '@sphereon/pe-models';
+import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import {EvaluationClientWrapper, EvaluationResults, SelectResults} from './evaluation';
-import {KeyPairOptions} from './signing';
-import {PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine} from './validation';
-import {Presentation, VerifiableCredential} from './verifiablePresentation';
+import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { KeyPairOptions } from './signing';
+import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import { Presentation, VerifiableCredential } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -37,7 +37,7 @@ export class PEJS {
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
       presentationCopy.verifiableCredential,
-        holderDIDs,
+      holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
@@ -121,14 +121,18 @@ export class PEJS {
   }
 
   private static getPresentation(
-      holderDID: string,
-      presentationSubmission: PresentationSubmission,
-      selectedCredential: VerifiableCredential[]
+    holderDID: string,
+    presentationSubmission: PresentationSubmission,
+    selectedCredential: VerifiableCredential[]
   ) {
     return {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      '@context': [
+        'https://www.w3.org/2018/credentials/v1',
+        'https://identity.foundation/presentation-exchange/submission/v1',
+      ],
       type: [
-        'VerifiablePresentation', // This will be truely verifiable after the proof field is populated.
+        'VerifiablePresentation',
+        'PresentationSubmission', // This will be truely verifiable after the proof field is populated.
       ],
       holder: holderDID,
       presentation_submission: presentationSubmission,
