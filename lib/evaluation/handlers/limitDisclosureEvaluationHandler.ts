@@ -1,4 +1,4 @@
-import { Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -19,20 +19,55 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
     pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
-      if (inDesc.constraints?.fields && inDesc.constraints?.limit_disclosure === Optionality.Required) {
-        this.enforceLimitDisclosure(vcs, inDesc.constraints.fields, index);
+      if (
+        inDesc.constraints?.fields &&
+        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
+          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+      ) {
+        this.evaluateLimitDisclosure(vcs, inDesc.constraints, index);
       }
     });
   }
 
-  private enforceLimitDisclosure(verifiableCredential: VerifiableCredential[], fields: Field[], idIdx: number): void {
+  private isLimitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
+    const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
+    if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+      this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
+      return false;
+    }
+    return true;
+  }
+
+  private evaluateLimitDisclosure(
+    verifiableCredential: VerifiableCredential[],
+    constraints: Constraints,
+    idIdx: number
+  ): void {
+    const fields = constraints?.fields as Field[];
+    const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
-      const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
-      if (verifiableCredentialToSend) {
-        verifiableCredential[index] = verifiableCredentialToSend;
-        this.createSuccessResult(idIdx, `$[${index}]`);
+      if (this.isLimitDisclosureSupported(vc, index, idIdx)) {
+        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, limitDisclosure);
       }
     });
+  }
+
+  private enforceLimitDisclosure(
+    vc: VerifiableCredential,
+    fields: Field[],
+    idIdx: number,
+    index: number,
+    verifiableCredential: VerifiableCredential[],
+    limitDisclosure: Optionality
+  ) {
+    const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+    /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
+     * remain untouched and the verifiable credential won't be submitted.
+     */
+    if (verifiableCredentialToSend) {
+      verifiableCredential[index] = verifiableCredentialToSend;
+      this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+    }
   }
 
   private createVcWithRequiredFields(
@@ -42,16 +77,17 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     vcIdx: number
   ): VerifiableCredential | undefined {
     let vcToSend: VerifiableCredential = { ...vc, credentialSubject: {} };
-    fields.forEach((field) => {
+    for (const field of fields) {
       if (field.path) {
         const inputField = JsonPathUtils.extractInputField(vc, field.path);
         if (inputField.length > 0) {
           vcToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, vcToSend);
         } else {
           this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+          return undefined;
         }
       }
-    });
+    }
     return vcToSend;
   }
 
@@ -72,18 +108,18 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     };
   }
 
-  private createSuccessResult(idIdx: number, path: string) {
+  private createSuccessResult(idIdx: number, path: string, limitDisclosure: Optionality) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
-      status: Status.INFO,
+      status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
       message: 'added variable in the limit_disclosure to the verifiableCredential',
       payload: undefined,
     });
   }
 
-  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: Array<string>) {
+  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: string[]) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `$[${vcIdx}]`,
@@ -91,6 +127,16 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       status: Status.ERROR,
       message: 'mandatory field not present in the verifiableCredential',
       payload: path,
+    });
+  }
+
+  private createLimitDisclosureNotSupportedResult(idIdx: number, vcIdx: number) {
+    return this.getResults().push({
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
+      evaluator: this.getName(),
+      status: Status.ERROR,
+      message: 'Limit disclosure not supported',
     });
   }
 }

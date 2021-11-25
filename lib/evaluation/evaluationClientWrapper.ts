@@ -24,11 +24,12 @@ export class EvaluationClientWrapper {
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    holderDids: string[]
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids);
+    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids, limitDisclosureSignatureSuites);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -158,8 +159,8 @@ export class EvaluationClientWrapper {
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
-        const idDesc = jp.query(pd, m.input_descriptor_path)[0];
-        srm.name = idDesc.name || idDesc.id;
+        const inDesc = jp.query(pd, m.input_descriptor_path)[0];
+        srm.name = inDesc.name || inDesc.id;
         if (m.payload.group.includes(sr.from)) {
           if (srm.matches?.indexOf(m.verifiable_credential_path) === -1) {
             srm.matches.push(m.verifiable_credential_path);
@@ -170,8 +171,13 @@ export class EvaluationClientWrapper {
     return srm as SubmissionRequirementMatch;
   }
 
-  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[]): EvaluationResults {
-    this._client.evaluate(pd, vcs, holderDids);
+  public evaluate(
+    pd: PresentationDefinition,
+    vcs: VerifiableCredential[],
+    holderDids: string[],
+    limitDisclosureSignatureSuites: string[]
+  ): EvaluationResults {
+    this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {};
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);

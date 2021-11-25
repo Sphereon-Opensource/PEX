@@ -102,7 +102,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     const subjects = [...jp.nodes(vcs, '$..credentialSubject')];
     const handlerCheckResults: HandlerCheckResult[] = [];
     subjects.forEach((s) => {
-      const result = results.find((id) => Object.keys(s.value).includes(id[0].value));
+      const result = results.find((id) => jp.query(s.value, `$..${id[0].value}`).length !== 0);
       if (result && result[1].value.directive === Optionality.Required) {
         handlerCheckResults.push({
           input_descriptor_path: jp.stringify(result[0].path.slice(0, 3)),
