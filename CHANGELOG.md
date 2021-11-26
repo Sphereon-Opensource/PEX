@@ -1,4 +1,18 @@
 # Release Notes
+## v0.4.0 - 2021-11-26
+Improve selective disclosure, add sign callback, several fixes
+
+
+- Added:
+  - Add status object to SelectResults informing the user whether to continue submission to the verifier or not
+  - Allow user to pass in ZKP based signature suite types, so that PE can determine whether limited/selective disclosure can be applied. Note you still need to create the proofs yourself
+  - Create a Verifiable Presentation with PresentationSubmission object that accepts a signature callback 
+  
+- Fixed:
+  - Ensure supplied params are final and not mutated
+  - Limited/selective disclosure fixes
+
+
 ## v0.3.0 - 2021-11-10
 Bugfix release (refactoring)
 
