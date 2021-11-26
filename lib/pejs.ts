@@ -1,9 +1,9 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { KeyPairOptions } from './signing';
+import { SigningCallBackParams, SigningParams } from './signing';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { Presentation, VerifiableCredential } from './verifiablePresentation';
+import { Presentation, VerifiableCredential, VerifiablePresentation } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -28,7 +28,7 @@ export class PEJS {
   public evaluatePresentation(
     presentationDefinition: PresentationDefinition,
     presentation: Presentation,
-    limitDisclosureSignatureSuites: string[]
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -173,27 +173,50 @@ export class PEJS {
   }
 
   /**
-   * This is the method is provide a template that lists the inputs required to sign a presentation before sending.
+   * This method can be used to combine a definition, selected Verifiable Credentials, together with
+   * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
-   * @param peJSPresentationDefinition is mainly required to apply limitDisclosure i.e. it informs the signingCallBack which fields have to be in the
-   *        signed object.
-   * @param peJSSelectedCredentials these are the credentials which are combined in the presentation.
-   * @param peJSSigningKeyOptions these are the signing keys require to sign.
+   * Please note that PE-JS has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
+   * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
+   * It is up to you to decide whether you simply add the proof to the supplied presentation in the callback,
+   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
+   *
+   * @param opts: Signing Params these are the signing params required to sign.
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
    *
-   * @return the signed presentations.
+   * @return the signed and thus Verifiable Presentation.
    */
   public createVerifiablePresentation(
-    peJSPresentationDefinition: PresentationDefinition,
-    peJSSelectedCredentials: VerifiableCredential[],
-    peJSSigningKeyOptions: KeyPairOptions,
-    signingCallBack: (
-      presentationDefinition: PresentationDefinition,
-      selectedCredentials: VerifiableCredential[],
-      signingKeyOptions: KeyPairOptions
-    ) => Presentation[]
-  ): Presentation[] {
-    return signingCallBack(peJSPresentationDefinition, peJSSelectedCredentials, peJSSigningKeyOptions);
+    signingCallBack: (opts: SigningCallBackParams) => VerifiablePresentation,
+    opts: SigningParams
+  ): VerifiablePresentation {
+    //fixme: holderDids and suites
+    this.evaluateCredentials(
+      opts.presentationDefinition,
+      opts.selectedCredentials,
+      [opts.signingOptions.verificationMethodOpts.controller],
+      [opts.signingOptions.type]
+    );
+
+    const presentation = this.presentationFrom(
+      opts.presentationDefinition,
+      opts.selectedCredentials,
+      opts.signingOptions.verificationMethodOpts.controller
+    );
+    const evaluationResults = this.evaluatePresentation(opts.presentationDefinition, presentation, [
+      opts.signingOptions.type,
+    ]);
+    if (!evaluationResults.value) {
+      throw new Error('Could not get evaluation results from presentation');
+    }
+    return signingCallBack({
+      presentation,
+      presentationDefinition: opts.presentationDefinition,
+      selectedCredentials: opts.selectedCredentials,
+      signingOptions: opts.signingOptions,
+      presentationSubmission: evaluationResults.value,
+      evaluationResults,
+    });
   }
 }

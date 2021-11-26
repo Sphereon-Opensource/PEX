@@ -175,7 +175,7 @@ export class EvaluationClientWrapper {
     pd: PresentationDefinition,
     vcs: VerifiableCredential[],
     holderDids: string[],
-    limitDisclosureSignatureSuites: string[]
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {};

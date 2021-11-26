@@ -130,17 +130,18 @@ describe('evaluate', () => {
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should return a sign the presentation', () => {
+  it('should return a signed presentation', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const pejs: PEJS = new PEJS();
-    const presentations: Presentation[] = pejs.createVerifiablePresentation(
-      pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
-      new KeyPairOptionsData().getKeyPairOptionsData(),
-      new SigningUtilMock().getSinged
-    );
-    expect(presentations).toEqual(new SigningUtilMock().getSinged());
+    const vp: VerifiablePresentation = pejs.createVerifiablePresentation(new SigningUtilMock().getSinged, {
+      presentationDefinition: pdSchema.presentation_definition,
+      selectedCredentials: vpSimple.verifiableCredential,
+      signingOptions: new KeyPairOptionsData().getKeyPairOptionsData(),
+    });
+    expect(vp.proof.created).toEqual('2021-12-01T20:10:45.000Z');
+    expect(vp.proof.proofValue).toEqual('fake');
+    expect(vp.proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
   it('should throw exception if signing encounters a problem', () => {
@@ -149,12 +150,11 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
 
     expect(() => {
-      pejs.createVerifiablePresentation(
-        pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
-        new KeyPairOptionsData().getKeyPairOptionsData(),
-        new SigningUtilMock().getErrorThrown
-      );
+      pejs.createVerifiablePresentation(new SigningUtilMock().getErrorThrown, {
+        presentationDefinition: pdSchema.presentation_definition,
+        selectedCredentials: vpSimple.verifiableCredential,
+        signingOptions: new KeyPairOptionsData().getKeyPairOptionsData(),
+      });
     }).toThrow(Error);
   });
 });

@@ -36,13 +36,13 @@ export class EvaluationClient {
   private _verifiableCredential: Partial<VerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
   private _dids: string[];
-  private _limitDisclosureSignatureSuites: string[];
+  private _limitDisclosureSignatureSuites: string[] | undefined;
 
   public evaluate(
     pd: PresentationDefinition,
     vcs: VerifiableCredential[],
     holderDids: string[],
-    limitDisclosureSignatureSuites: string[]
+    limitDisclosureSignatureSuites?: string[]
   ): void {
     this._dids = holderDids;
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
@@ -89,7 +89,7 @@ export class EvaluationClient {
   }
 
   public get limitDisclosureSignatureSuites() {
-    return this._limitDisclosureSignatureSuites;
+    return this._limitDisclosureSignatureSuites || [];
   }
 
   public set limitDisclosureSignatureSuites(limitDisclosureSignatureSuites: string[]) {

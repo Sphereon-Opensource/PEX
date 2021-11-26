@@ -1,1 +1,1 @@
-export * from './KeyPairOptions';
+export * from './types';

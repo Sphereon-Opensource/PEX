@@ -31,7 +31,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private isLimitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
-    if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+    if (!vc.proof || !vc.proof.type || !limitDisclosureSignatures?.includes(vc.proof.type)) {
       this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       return false;
     }
