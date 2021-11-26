@@ -61,12 +61,7 @@ export class PEJS {
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(
-      presentationDefinition,
-      verifiableCredentialCopy,
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    return this._evaluationClientWrapper.evaluate(presentationDefinition, verifiableCredentialCopy, holderDIDs, limitDisclosureSignatureSuites);
   }
 
   /**
@@ -88,12 +83,7 @@ export class PEJS {
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(
-      presentationDefinition,
-      verifiableCredentialCopy,
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    return this._evaluationClientWrapper.selectFrom(presentationDefinition, verifiableCredentialCopy, holderDIDs, limitDisclosureSignatureSuites);
   }
 
   /**
@@ -112,24 +102,14 @@ export class PEJS {
     selectedCredential: VerifiableCredential[],
     holderDID: string
   ): Presentation {
-    const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
-      presentationDefinition,
-      selectedCredential
-    );
+    const presentationSubmission = this._evaluationClientWrapper.submissionFrom(presentationDefinition, selectedCredential);
 
     return PEJS.getPresentation(holderDID, presentationSubmission, selectedCredential);
   }
 
-  private static getPresentation(
-    holderDID: string,
-    presentationSubmission: PresentationSubmission,
-    selectedCredential: VerifiableCredential[]
-  ) {
+  private static getPresentation(holderDID: string, presentationSubmission: PresentationSubmission, selectedCredential: VerifiableCredential[]) {
     return {
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1',
-        'https://identity.foundation/presentation-exchange/submission/v1',
-      ],
+      '@context': ['https://www.w3.org/2018/credentials/v1', 'https://identity.foundation/presentation-exchange/submission/v1'],
       type: [
         'VerifiablePresentation',
         'PresentationSubmission', // This will be truely verifiable after the proof field is populated.
@@ -204,9 +184,7 @@ export class PEJS {
       opts.selectedCredentials,
       opts.signingOptions.verificationMethodOpts.controller
     );
-    const evaluationResults = this.evaluatePresentation(opts.presentationDefinition, presentation, [
-      opts.signingOptions.type,
-    ]);
+    const evaluationResults = this.evaluatePresentation(opts.presentationDefinition, presentation, [opts.signingOptions.type]);
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
     }

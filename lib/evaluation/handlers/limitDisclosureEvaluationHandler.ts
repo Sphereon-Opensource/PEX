@@ -21,8 +21,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
       if (
         inDesc.constraints?.fields &&
-        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
-          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+        (inDesc.constraints?.limit_disclosure === Optionality.Required || inDesc.constraints?.limit_disclosure === Optionality.Preferred)
       ) {
         this.evaluateLimitDisclosure(vcs, inDesc.constraints, index);
       }
@@ -38,11 +37,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return true;
   }
 
-  private evaluateLimitDisclosure(
-    verifiableCredential: VerifiableCredential[],
-    constraints: Constraints,
-    idIdx: number
-  ): void {
+  private evaluateLimitDisclosure(verifiableCredential: VerifiableCredential[], constraints: Constraints, idIdx: number): void {
     const fields = constraints?.fields as Field[];
     const limitDisclosure = constraints.limit_disclosure as Optionality;
     verifiableCredential.forEach((vc, index) => {
@@ -70,12 +65,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private createVcWithRequiredFields(
-    vc: VerifiableCredential,
-    fields: Field[],
-    idIdx: number,
-    vcIdx: number
-  ): VerifiableCredential | undefined {
+  private createVcWithRequiredFields(vc: VerifiableCredential, fields: Field[], idIdx: number, vcIdx: number): VerifiableCredential | undefined {
     let vcToSend: VerifiableCredential = { ...vc, credentialSubject: {} };
     for (const field of fields) {
       if (field.path) {

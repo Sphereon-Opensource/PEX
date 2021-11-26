@@ -14,24 +14,20 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
   private readonly fieldIdMustBeArrayOfStringsMsg = 'field_id property must be an array of strings';
   private readonly fieldIdMustCorrespondToFieldIdMsg = 'field_id must correspond to a present field object id property';
   private readonly directivePropertyIsMandatoryMsg = 'directive property is mandatory';
-  private readonly oneOfTheKnownDirectivePropertiesMandatoryMsg =
-    'directive property must be one of [required, preferred]';
+  private readonly oneOfTheKnownDirectivePropertiesMandatoryMsg = 'directive property must be one of [required, preferred]';
 
   constructor(parentTag: string) {
     super(parentTag, 'constraints');
   }
 
-  public getValidations(
-    constraints: Constraints
-  ): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
+  public getValidations(constraints: Constraints): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
     let validations: (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] = [];
     if (constraints) {
       validations = [
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
-            ConstraintsVB.disclosureLimitShouldHaveKnownValue(constraints.limit_disclosure),
+          predicate: (constraints: Constraints) => ConstraintsVB.disclosureLimitShouldHaveKnownValue(constraints.limit_disclosure),
           message: this.disclosureLimitShouldHaveKnownValueMsg,
         },
         {
@@ -55,15 +51,13 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
-            this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.is_holder),
+          predicate: (constraints: Constraints) => this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.is_holder),
           message: this.fieldIdMustCorrespondToFieldIdMsg,
         },
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
-            this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.same_subject),
+          predicate: (constraints: Constraints) => this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.same_subject),
           message: this.fieldIdMustCorrespondToFieldIdMsg,
         },
         ...this.getSubjectsValidations(constraints?.is_holder),
@@ -108,10 +102,8 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
   private static shouldBeKnownOption(subjects?: HolderSubject[]): boolean {
     if (subjects) {
       return (
-        subjects.filter(
-          (subject: HolderSubject) =>
-            subject.directive !== Optionality.Preferred && subject.directive !== Optionality.Required
-        ).length === 0
+        subjects.filter((subject: HolderSubject) => subject.directive !== Optionality.Preferred && subject.directive !== Optionality.Required)
+          .length === 0
       );
     }
     return true;
@@ -137,8 +129,7 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
           {
             tag: this.getMyTag(subjectInd),
             target: holderSubjects[subjectInd],
-            predicate: (subject: HolderSubject) =>
-              subject.field_id.length === subject.field_id.filter((id) => typeof id === 'string').length,
+            predicate: (subject: HolderSubject) => subject.field_id.length === subject.field_id.filter((id) => typeof id === 'string').length,
             message: this.fieldIdMustBeArrayOfStringsMsg,
           },
           {
@@ -150,8 +141,7 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
           {
             tag: this.getMyTag(subjectInd),
             target: holderSubjects[subjectInd],
-            predicate: (subject: HolderSubject) =>
-              subject.directive === Optionality.Preferred || subject.directive === Optionality.Required,
+            predicate: (subject: HolderSubject) => subject.directive === Optionality.Preferred || subject.directive === Optionality.Required,
             message: this.oneOfTheKnownDirectivePropertiesMandatoryMsg,
           },
         ];

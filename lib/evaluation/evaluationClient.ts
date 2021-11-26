@@ -38,12 +38,7 @@ export class EvaluationClient {
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
 
-  public evaluate(
-    pd: PresentationDefinition,
-    vcs: VerifiableCredential[],
-    holderDids: string[],
-    limitDisclosureSignatureSuites?: string[]
-  ): void {
+  public evaluate(pd: PresentationDefinition, vcs: VerifiableCredential[], holderDids: string[], limitDisclosureSignatureSuites?: string[]): void {
     this._dids = holderDids;
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();

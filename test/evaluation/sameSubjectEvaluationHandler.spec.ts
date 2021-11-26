@@ -1,4 +1,5 @@
-import { EvaluationClient, SameSubjectEvaluationHandler } from '../../lib';
+import { EvaluationClient } from '../../lib';
+import { SameSubjectEvaluationHandler } from '../../lib/evaluation/handlers';
 import { PdRequireSameSubject } from '../test_data/sameSubjectEvaluationHandler/pdRequireSameSubject';
 import { SameSubjectHandlerCheckResults } from '../test_data/sameSubjectEvaluationHandler/sameSubjectEvaluationResults';
 import { SameSubjectPresentationSubmission } from '../test_data/sameSubjectEvaluationHandler/sameSubjectPresentationSubmission';
@@ -11,13 +12,8 @@ describe('sameSubjectEvaluationHandler', () => {
     evaluationClient.verifiableCredential = new SameSubjectVerifiableCredential().getVerifiableCredential();
     const evaluationHandler: SameSubjectEvaluationHandler = new SameSubjectEvaluationHandler(evaluationClient);
 
-    evaluationHandler.handle(
-      new PdRequireSameSubject().getPresentationDefinition(),
-      evaluationClient.verifiableCredential
-    );
+    evaluationHandler.handle(new PdRequireSameSubject().getPresentationDefinition(), evaluationClient.verifiableCredential);
 
-    expect(evaluationHandler.client.results).toEqual(
-      new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult()
-    );
+    expect(evaluationHandler.client.results).toEqual(new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult());
   });
 });

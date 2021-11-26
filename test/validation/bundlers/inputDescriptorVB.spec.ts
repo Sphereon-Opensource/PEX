@@ -1,7 +1,7 @@
 import { InputDescriptor } from '@sphereon/pe-models';
 
-import { InputDescriptorsVB, ValidationEngine } from '../../../lib';
-import { Checked, Status } from '../../../lib/ConstraintUtils';
+import { Checked, Status, ValidationEngine } from '../../../lib';
+import { InputDescriptorsVB } from '../../../lib/validation';
 
 function getTestableInputDescriptors(): InputDescriptor[] {
   return [

@@ -52,12 +52,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return schemaUris;
   }
 
-  private evaluateUris(
-    verifiableCredentialUris: string[],
-    inputDescriptorsUris: string[],
-    idIdx: number,
-    vcIdx: number
-  ): void {
+  private evaluateUris(verifiableCredentialUris: string[], inputDescriptorsUris: string[], idIdx: number, vcIdx: number): void {
     let hasAnyMatch = false;
     for (let i = 0; i < verifiableCredentialUris.length; i++) {
       if (inputDescriptorsUris.find((el) => el === verifiableCredentialUris[i]) != undefined) {
@@ -65,40 +60,24 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       }
     }
     if (hasAnyMatch) {
-      this.getResults().push(
-        this.createSuccessResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx)
-      );
+      this.getResults().push(this.createSuccessResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx));
     } else {
-      this.getResults().push(
-        this.createErrorResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx)
-      );
+      this.getResults().push(this.createErrorResultObject(verifiableCredentialUris, inputDescriptorsUris, idIdx, vcIdx));
     }
   }
 
-  private createSuccessResultObject(
-    verifiableCredentialUris: string[],
-    inputDescriptorsUris: string[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private createSuccessResultObject(verifiableCredentialUris: string[], inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
-    result.message =
-      '@context URI(s) for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
+    result.message = '@context URI(s) for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
     result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
 
-  private createErrorResultObject(
-    verifiableCredentialUris: string[],
-    inputDescriptorsUris: string[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private createErrorResultObject(verifiableCredentialUris: string[], inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
-    result.message =
-      '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
+    result.message = '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
     result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }

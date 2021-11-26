@@ -3,10 +3,7 @@ import { VerifiablePresentation } from '../../../lib';
 export class SrRules {
   public getVerifiablePresentation(): Partial<VerifiablePresentation> {
     return {
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1',
-        'https://identity.foundation/presentation-exchange/submission/v1',
-      ],
+      '@context': ['https://www.w3.org/2018/credentials/v1', 'https://identity.foundation/presentation-exchange/submission/v1'],
       presentation_submission: {
         id: 'accd5adf-1dbf-4ed9-9ba2-d687476126cb',
         definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',

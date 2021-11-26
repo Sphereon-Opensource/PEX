@@ -2,9 +2,8 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { PredicateRelatedFieldEvaluationHandler, Status } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
+import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
+import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -21,8 +20,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -92,8 +90,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -152,8 +149,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -197,8 +193,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],

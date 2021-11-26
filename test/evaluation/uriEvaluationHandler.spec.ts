@@ -13,9 +13,7 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
   it('should return ok if uris match in vpSimple.verifiableCredential[0].credentialSchema[0].id', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
@@ -25,9 +23,7 @@ describe('evaluate', () => {
   });
 
   it('should return error for not matching (exactly) any URI for the schema of the candidate input with one of the Input Descriptor schema object uri values.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     vpSimple.verifiableCredential[0]['@context'][0] = 'https://www.test.org/mock';
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -49,9 +45,7 @@ describe('evaluate', () => {
   });
 
   it('should generate 6 error result fo this test case.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_examples.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
@@ -61,9 +55,7 @@ describe('evaluate', () => {
   });
 
   it('should generate 5 error result and 1 info.', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/input_descriptor_filter_examples.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const evaluationClient: EvaluationClient = new EvaluationClient();

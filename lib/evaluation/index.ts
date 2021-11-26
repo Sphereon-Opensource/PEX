@@ -1,6 +1,11 @@
-export * from './core';
-export * from './handlers';
-export * from './evaluationClient';
+import { SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationClient } from './evaluationClient';
+import { EvaluationResults } from './evaluationResults';
+import { HandlerCheckResult } from './handlerCheckResult';
+import { EvaluationHandler } from './handlers';
+export { EvaluationClient };
+export { SubmissionRequirementMatch, SelectResults };
+export { EvaluationHandler };
 export * from './evaluationClientWrapper';
-export * from './evaluationResults';
-export * from './handlerCheckResult';
+export { EvaluationResults };
+export { HandlerCheckResult };

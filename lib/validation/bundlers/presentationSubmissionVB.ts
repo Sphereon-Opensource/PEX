@@ -35,15 +35,13 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
       {
         tag: this.getTag(),
         target: ps,
-        predicate: (ps: PresentationSubmission) =>
-          PresentationSubmissionVB.descriptorMapMustBePresent(ps?.descriptor_map),
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.descriptorMapMustBePresent(ps?.descriptor_map),
         message: 'descriptor_map should be a non-empty list',
       },
       {
         tag: this.getTag(),
         target: ps,
-        predicate: (ps: PresentationSubmission) =>
-          PresentationSubmissionVB.idMustBeSameForEachLevelOfNesting(ps?.descriptor_map),
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.idMustBeSameForEachLevelOfNesting(ps?.descriptor_map),
         message: 'each descriptor should have a one id in it, on all levels',
       },
       {
@@ -55,8 +53,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
       {
         tag: this.getTag(),
         target: ps,
-        predicate: (ps: PresentationSubmission) =>
-          PresentationSubmissionVB.pathsShouldBeValidJsonPaths(ps?.descriptor_map),
+        predicate: (ps: PresentationSubmission) => PresentationSubmissionVB.pathsShouldBeValidJsonPaths(ps?.descriptor_map),
         message: 'each path should be a valid jsonPath',
       },
     ];
@@ -120,8 +117,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
 
     if (descriptor.path_nested != null) {
       // WARNING : Specification does not allow any bounds. So, no checks against stackoverflow due to unbounded recursion.
-      isProofFormatKnown =
-        isProofFormatKnown && PresentationSubmissionVB.formatShouldBeKnown(descriptor.path_nested, formats);
+      isProofFormatKnown = isProofFormatKnown && PresentationSubmissionVB.formatShouldBeKnown(descriptor.path_nested, formats);
     }
 
     return isProofFormatKnown;

@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pe-js",
-  "version": "0.4.2-DEV",
+  "version": "0.4.2-unstable.3",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
@@ -75,6 +75,6 @@
   ],
   "prettier": {
     "singleQuote": true,
-    "printWidth": 120
+    "printWidth": 150
   }
 }
