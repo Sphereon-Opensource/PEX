@@ -1,8 +1,11 @@
 import fs from 'fs';
 
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { PEJS, Validated, VerifiablePresentation } from '../lib';
+import { PEJS, Presentation, Validated, VerifiablePresentation } from '../lib';
+
+import { KeyPairOptionsData } from './test_data/KeyPairOptionsData';
+import { SigningUtilMock } from './test_data/SigningUtilMock';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -48,8 +51,8 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
     vpSimple.holder = HOLDER_DID;
     pejs.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
-    expect(result).toEqual(
+    const presentation: Presentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, vpSimple.holder);
+    expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
@@ -81,12 +84,12 @@ describe('evaluate', () => {
   it('Evaluate submission requirements all from group A', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const HOLDER_DID = ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
+    const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEJS = new PEJS();
-    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const result: PresentationSubmission = pejs.submissionFrom(pdSchema, vpSimple.verifiableCredential);
-    expect(result).toEqual(
+    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const presentation: Presentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
@@ -96,6 +99,13 @@ describe('evaluate', () => {
         ],
       })
     );
+    expect(presentation.holder).toEqual(HOLDER_DID);
+    expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential);
+    expect(presentation.type).toEqual(['VerifiablePresentation', 'PresentationSubmission']);
+    expect(presentation['@context']).toEqual([
+      'https://www.w3.org/2018/credentials/v1',
+      'https://identity.foundation/presentation-exchange/submission/v1',
+    ]);
   });
 
   it('Evaluate pd schema of our sr_rules.json pd', () => {
@@ -118,5 +128,33 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
+  });
+
+  it('should return a sign the presentation', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const pejs: PEJS = new PEJS();
+    const presentations: Presentation[] = pejs.createVerifiablePresentation(
+      pdSchema.presentation_definition,
+      vpSimple.verifiableCredential,
+      new KeyPairOptionsData().getKeyPairOptionsData(),
+      new SigningUtilMock().getSinged
+    );
+    expect(presentations).toEqual(new SigningUtilMock().getSinged());
+  });
+
+  it('should throw exception if signing encounters a problem', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const pejs: PEJS = new PEJS();
+
+    expect(() => {
+      pejs.createVerifiablePresentation(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        new KeyPairOptionsData().getKeyPairOptionsData(),
+        new SigningUtilMock().getErrorThrown
+      );
+    }).toThrow(Error);
   });
 });

@@ -209,7 +209,7 @@ export class EvaluationClientWrapper {
 
   public submissionFrom(pd: PresentationDefinition, vcs: VerifiableCredential[]): PresentationSubmission {
     if (!this._client.results.length) {
-      throw Error('You need to call evaluate() before submissionFrom()');
+      throw Error('You need to call evaluate() before pejs.presentationFrom()');
     }
 
     if (pd.submission_requirements) {

@@ -1,6 +1,7 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { KeyPairOptions } from './signing';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 import { Presentation, VerifiableCredential } from './verifiablePresentation';
 
@@ -32,11 +33,11 @@ export class PEJS {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDids = presentation.holder ? [presentation.holder] : [];
+    const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
       presentationCopy.verifiableCredential,
-      holderDids,
+      holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
@@ -46,7 +47,7 @@ export class PEJS {
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
-   * @param didsOfHolder the list of the DIDs that the wallet holders controlls.
+   * @param holderDIDs the list of the DIDs that the wallet holders controlls.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
@@ -54,16 +55,16 @@ export class PEJS {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinition,
-    verifiableCredential: VerifiableCredential[],
-    didsOfHolder: string[],
+    verifiableCredentials: VerifiableCredential[],
+    holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
-    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredential));
+    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
       verifiableCredentialCopy,
-      didsOfHolder,
+      holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
@@ -74,7 +75,7 @@ export class PEJS {
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param holderDids the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param holderDIDs the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
@@ -82,7 +83,7 @@ export class PEJS {
   public selectFrom(
     presentationDefinition: PresentationDefinition,
     verifiableCredentials: VerifiableCredential[],
-    holderDids: string[],
+    holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
@@ -90,7 +91,7 @@ export class PEJS {
     return this._evaluationClientWrapper.selectFrom(
       presentationDefinition,
       verifiableCredentialCopy,
-      holderDids,
+      holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
@@ -102,14 +103,41 @@ export class PEJS {
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
+   * @param holderDID the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
    *
    * @return the presentation submission.
    */
-  public submissionFrom(
+  public presentationFrom(
     presentationDefinition: PresentationDefinition,
+    selectedCredential: VerifiableCredential[],
+    holderDID: string
+  ): Presentation {
+    const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
+      presentationDefinition,
+      selectedCredential
+    );
+
+    return PEJS.getPresentation(holderDID, presentationSubmission, selectedCredential);
+  }
+
+  private static getPresentation(
+    holderDID: string,
+    presentationSubmission: PresentationSubmission,
     selectedCredential: VerifiableCredential[]
-  ): PresentationSubmission {
-    return this._evaluationClientWrapper.submissionFrom(presentationDefinition, selectedCredential);
+  ) {
+    return {
+      '@context': [
+        'https://www.w3.org/2018/credentials/v1',
+        'https://identity.foundation/presentation-exchange/submission/v1',
+      ],
+      type: [
+        'VerifiablePresentation',
+        'PresentationSubmission', // This will be truely verifiable after the proof field is populated.
+      ],
+      holder: holderDID,
+      presentation_submission: presentationSubmission,
+      verifiableCredential: selectedCredential,
+    };
   }
 
   /**
@@ -142,5 +170,30 @@ export class PEJS {
         target: presentationSubmission,
       },
     ]);
+  }
+
+  /**
+   * This is the method is provide a template that lists the inputs required to sign a presentation before sending.
+   *
+   * @param peJSPresentationDefinition is mainly required to apply limitDisclosure i.e. it informs the signingCallBack which fields have to be in the
+   *        signed object.
+   * @param peJSSelectedCredentials these are the credentials which are combined in the presentation.
+   * @param peJSSigningKeyOptions these are the signing keys require to sign.
+   * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
+   *        signing. One example of signing is available in the project named. pe-selective-disclosure.
+   *
+   * @return the signed presentations.
+   */
+  public createVerifiablePresentation(
+    peJSPresentationDefinition: PresentationDefinition,
+    peJSSelectedCredentials: VerifiableCredential[],
+    peJSSigningKeyOptions: KeyPairOptions,
+    signingCallBack: (
+      presentationDefinition: PresentationDefinition,
+      selectedCredentials: VerifiableCredential[],
+      signingKeyOptions: KeyPairOptions
+    ) => Presentation[]
+  ): Presentation[] {
+    return signingCallBack(peJSPresentationDefinition, peJSSelectedCredentials, peJSSigningKeyOptions);
   }
 }
