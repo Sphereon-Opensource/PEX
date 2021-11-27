@@ -15,7 +15,7 @@ export enum ProofType {
   RsaSignature2018 = 'RsaSignature2018',
   GpgSignature2020 = 'GpgSignature2020',
   JcsEd25519Signature2020 = 'JcsEd25519Signature2020',
-  BbsBlsSignature2020 = 'BbsBlsSignature2020',
+  BbsBlsSignatureProof2020 = 'BbsBlsSignatureProof2020',
   BbsBlsBoundSignatureProof2020 = 'BbsBlsBoundSignatureProof2020',
 }
 
