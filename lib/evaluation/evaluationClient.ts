@@ -2,6 +2,7 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 
 import { Status } from '../ConstraintUtils';
 import { VerifiableCredential } from '../verifiablePresentation';
+import { ProofType } from '../verifiablePresentation/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -16,7 +17,7 @@ import {
   UriEvaluationHandler,
 } from './handlers';
 
-const DEFAULT_LIMIT_DISCLOSURE_TYPES = ['BbsBlsSignatureProof2020'];
+const DEFAULT_LIMIT_DISCLOSURE_TYPES = [ProofType.BbsBlsSignatureProof2020];
 
 export class EvaluationClient {
   constructor() {

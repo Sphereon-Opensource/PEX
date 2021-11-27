@@ -1,3 +1,3 @@
-import { KeyEncoding, ProofOptions, SigningCallBackParams, SigningParams, VerificationMethodOpts } from './types';
+import { KeyEncoding, PresentationSignCallBackParams, PresentationSignParams, ProofOptions, SignatureOptions } from './types';
 
-export { SigningCallBackParams, SigningParams, VerificationMethodOpts, ProofOptions, KeyEncoding };
+export { PresentationSignCallBackParams, PresentationSignParams, SignatureOptions, ProofOptions, KeyEncoding };

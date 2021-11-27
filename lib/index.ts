@@ -1,7 +1,7 @@
 import { Checked, NonEmptyArray, Status } from './ConstraintUtils';
 import { EvaluationClient, EvaluationHandler, EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './evaluation';
 import { PEJS } from './pejs';
-import { KeyEncoding, ProofOptions, SigningCallBackParams, SigningParams, VerificationMethodOpts } from './signing';
+import { KeyEncoding, PresentationSignCallBackParams, PresentationSignParams, ProofOptions, SignatureOptions } from './signing';
 import { Validated, Validation, ValidationBundler, ValidationEngine, ValidationPredicate, Validator } from './validation';
 import {
   Credential,
@@ -15,7 +15,7 @@ import {
 } from './verifiablePresentation';
 
 export { SubmissionRequirementMatch, HandlerCheckResult, EvaluationHandler, EvaluationResults, SelectResults, EvaluationClient };
-export { SigningCallBackParams, SigningParams, ProofOptions, VerificationMethodOpts, KeyEncoding };
+export { PresentationSignCallBackParams, PresentationSignParams, ProofOptions, SignatureOptions, KeyEncoding };
 export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine, ValidationBundler };
 export { VerifiableCredential, Credential, CredentialSubject, CredentialStatus, VerifiablePresentation, Presentation, Proof, InputFieldType };
 export { Checked, Status, NonEmptyArray };

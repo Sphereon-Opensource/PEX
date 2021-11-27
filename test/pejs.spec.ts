@@ -3,15 +3,15 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { PEJS, Presentation, Validated, VerifiablePresentation } from '../lib';
+import { ProofType } from '../lib/verifiablePresentation/SSI.types';
 
-import { KeyPairOptionsData } from './test_data/KeyPairOptionsData';
-import { SigningUtilMock } from './test_data/SigningUtilMock';
+import { assertedMockCallback, getErrorThrown, getProofOptionsMock, getSingatureOptionsMock } from './test_data/PresentationSignUtilMock';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate', () => {
   it('testing constructor', function () {
@@ -128,10 +128,12 @@ describe('evaluate', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const pejs: PEJS = new PEJS();
-    const vp: VerifiablePresentation = pejs.createVerifiablePresentation(new SigningUtilMock().getSinged, {
+    const vp: VerifiablePresentation = pejs.verifiablePresentationFrom(assertedMockCallback, {
       presentationDefinition: pdSchema.presentation_definition,
       selectedCredentials: vpSimple.verifiableCredential,
-      signingOptions: new KeyPairOptionsData().getKeyPairOptionsData(),
+      proofOptions: getProofOptionsMock(),
+      signatureOptions: getSingatureOptionsMock(),
+      holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
     });
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
@@ -145,10 +147,11 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
 
     expect(() => {
-      pejs.createVerifiablePresentation(new SigningUtilMock().getErrorThrown, {
+      pejs.verifiablePresentationFrom(getErrorThrown, {
         presentationDefinition: pdSchema.presentation_definition,
         selectedCredentials: vpSimple.verifiableCredential,
-        signingOptions: new KeyPairOptionsData().getKeyPairOptionsData(),
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
       });
     }).toThrow(Error);
   });
