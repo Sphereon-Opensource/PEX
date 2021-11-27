@@ -1,11 +1,11 @@
 {
   "name": "@sphereon/pe-js",
-  "version": "0.4.2-unstable.4",
+  "version": "0.4.2-unstable.19",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "dist/main/index.js",
-  "typings": "dist/main/index.d.ts",
-  "browser": "dist/browser/index.js",
   "module": "dist/module/index.js",
+  "browser": "dist/browser/index.js",
+  "typings": "dist/main/index.d.ts",
   "repository": "https://github.com/Sphereon-Opensource/pe-js.git",
   "license": "Apache-2.0",
   "keywords": [
@@ -64,11 +64,7 @@
   },
   "files": [
     "index.ts",
-    "dist/main",
-    "dist/browser",
-    "dist/module",
-    "!**/*.spec.*",
-    "!**/*.json",
+    "/dist",
     "CHANGELOG.md",
     "LICENSE",
     "README.md"

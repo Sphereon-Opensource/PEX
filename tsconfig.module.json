@@ -5,8 +5,15 @@
     "outDir": "dist/module",
     "module": "esnext"
   },
+  "include": [
+    "index.ts",
+    "lib/**/*.ts",
+  ],
   "exclude": [
-    "test/**",
-    "node_modules/**"
-  ]
+    "node_modules/**",
+    "coverage/**",
+    "resources/**",
+    "dist/**",
+    "test/**"
+  ],
 }
