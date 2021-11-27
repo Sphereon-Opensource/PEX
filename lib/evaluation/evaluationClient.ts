@@ -16,13 +16,15 @@ import {
   UriEvaluationHandler,
 } from './handlers';
 
+const DEFAULT_LIMIT_DISCLOSURE_TYPES = ['BbsBlsSignatureProof2020'];
+
 export class EvaluationClient {
   constructor() {
     this._results = [];
     this._verifiableCredential = [];
     this._presentationSubmission = {};
     this._dids = [];
-    this._limitDisclosureSignatureSuites = [];
+    this._limitDisclosureSignatureSuites = DEFAULT_LIMIT_DISCLOSURE_TYPES;
   }
 
   private failed_catched = {
@@ -84,7 +86,7 @@ export class EvaluationClient {
   }
 
   public get limitDisclosureSignatureSuites() {
-    return this._limitDisclosureSignatureSuites || [];
+    return this._limitDisclosureSignatureSuites || DEFAULT_LIMIT_DISCLOSURE_TYPES;
   }
 
   public set limitDisclosureSignatureSuites(limitDisclosureSignatureSuites: string[]) {
