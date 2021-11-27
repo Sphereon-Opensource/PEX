@@ -20,12 +20,17 @@ export interface CredentialStatus {
   type: string;
 }
 
+export interface Issuer {
+  id: string;
+  [x: string]: unknown;
+}
+
 export interface Credential {
   '@context': string[];
   id: string;
   type: string[];
   credentialSubject: CredentialSubject;
-  issuer: unknown;
+  issuer: string | Issuer;
   issuanceDate: string;
   expirationDate?: string;
   credentialStatus?: CredentialStatus;
