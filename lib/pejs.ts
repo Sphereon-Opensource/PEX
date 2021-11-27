@@ -107,7 +107,11 @@ export class PEJS {
     return PEJS.getPresentation(holderDID, presentationSubmission, selectedCredential);
   }
 
-  private static getPresentation(holderDID: string, presentationSubmission: PresentationSubmission, selectedCredential: VerifiableCredential[]) {
+  private static getPresentation(
+    holderDID: string,
+    presentationSubmission: PresentationSubmission,
+    selectedCredential: VerifiableCredential[]
+  ): Presentation {
     return {
       '@context': ['https://www.w3.org/2018/credentials/v1', 'https://identity.foundation/presentation-exchange/submission/v1'],
       type: [
