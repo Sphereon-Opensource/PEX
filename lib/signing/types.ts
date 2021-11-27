@@ -13,12 +13,24 @@ export interface ProofOptions {
    */
   readonly privateKey: string;
 
+  /**
+   * The signature type. For instance RsaSignature2018
+   */
   type: string;
 
+  /**
+   * A challenge protecting against replay attacks
+   */
   challenge?: string;
 
+  /**
+   * A domain protecting against replay attacks
+   */
   domain?: string;
 
+  /**
+   * The purpose of this proof, for instance assertionMethod or authentication, see https://www.w3.org/TR/vc-data-model/#proofs-signatures-0
+   */
   proofPurpose: string;
 }
 

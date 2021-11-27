@@ -133,9 +133,10 @@ describe('evaluate', () => {
       selectedCredentials: vpSimple.verifiableCredential,
       signingOptions: new KeyPairOptionsData().getKeyPairOptionsData(),
     });
-    expect(vp.proof.created).toEqual('2021-12-01T20:10:45.000Z');
-    expect(vp.proof.proofValue).toEqual('fake');
-    expect(vp.proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
+    const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
+    expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
+    expect(proof.proofValue).toEqual('fake');
+    expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
   it('should throw exception if signing encounters a problem', () => {
