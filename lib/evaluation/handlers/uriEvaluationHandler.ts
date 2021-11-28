@@ -3,7 +3,7 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 

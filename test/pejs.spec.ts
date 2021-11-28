@@ -3,7 +3,7 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { PEJS, Presentation, Validated, VerifiablePresentation } from '../lib';
-import { ProofType } from '../lib/verifiablePresentation/SSI.types';
+import { ProofType } from '../lib/types/SSI.types';
 
 import {
   assertedMockCallback,

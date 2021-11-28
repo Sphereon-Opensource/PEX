@@ -2,8 +2,8 @@ import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinitio
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
+import { VerifiableCredential } from '../../types';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
-import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';

@@ -1,8 +1,8 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiableCredential } from '../verifiablePresentation';
-import { ProofType } from '../verifiablePresentation/SSI.types';
+import { VerifiableCredential } from '../types';
+import { ProofType } from '../types/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {

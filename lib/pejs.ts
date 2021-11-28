@@ -2,8 +2,8 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
+import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -97,7 +97,7 @@ export class PEJS {
   }
 
   /**
-   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes verifiablePresentation. And can be sent to
+   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes types. And can be sent to
    * the verifier.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.

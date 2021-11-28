@@ -1,8 +1,8 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationResults } from '../evaluation';
-import { Presentation, Proof, VerifiableCredential } from '../verifiablePresentation';
-import { ProofPurpose, ProofType } from '../verifiablePresentation/SSI.types';
+import { Presentation, Proof, VerifiableCredential } from '../types';
+import { ProofPurpose, ProofType } from '../types/SSI.types';
 
 export interface ProofOptions {
   /**

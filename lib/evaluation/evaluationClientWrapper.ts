@@ -2,8 +2,8 @@ import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequir
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { VerifiableCredential } from '../types';
 import { JsonPathUtils } from '../utils';
-import { VerifiableCredential } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';

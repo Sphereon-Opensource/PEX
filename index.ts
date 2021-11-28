@@ -6,6 +6,7 @@ import {
   EvaluationHandler,
   EvaluationResults,
   InputFieldType,
+  Issuer,
   KeyEncoding,
   NonEmptyArray,
   PEJS,
@@ -14,6 +15,8 @@ import {
   PresentationSignOptions,
   Proof,
   ProofOptions,
+  ProofPurpose,
+  ProofType,
   SelectResults,
   SignatureOptions,
   Status,
@@ -51,5 +54,8 @@ export {
   SignatureOptions,
   InputFieldType,
   PresentationSignOptions,
-  PresentationSignCallBackParams
+  PresentationSignCallBackParams,
+  Issuer,
+  ProofType,
+  ProofPurpose
 };

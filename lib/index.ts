@@ -16,6 +16,19 @@ import {
   SignatureOptions,
 } from './signing';
 import {
+  Credential,
+  CredentialStatus,
+  CredentialSubject,
+  InputFieldType,
+  Issuer,
+  Presentation,
+  Proof,
+  ProofPurpose,
+  ProofType,
+  VerifiableCredential,
+  VerifiablePresentation,
+} from './types';
+import {
   Validated,
   Validation,
   ValidationBundler,
@@ -23,16 +36,6 @@ import {
   ValidationPredicate,
   Validator,
 } from './validation';
-import {
-  Credential,
-  CredentialStatus,
-  CredentialSubject,
-  InputFieldType,
-  Presentation,
-  Proof,
-  VerifiableCredential,
-  VerifiablePresentation,
-} from './verifiablePresentation';
 
 export {
   SubmissionRequirementMatch,
@@ -53,6 +56,9 @@ export {
   Presentation,
   Proof,
   InputFieldType,
+  Issuer,
+  ProofType,
+  ProofPurpose,
 };
 export { Checked, Status, NonEmptyArray };
 export { PEJS };

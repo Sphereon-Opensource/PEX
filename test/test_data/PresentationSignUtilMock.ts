@@ -6,7 +6,7 @@ import {
   SignatureOptions,
   VerifiablePresentation,
 } from '../../lib';
-import { ProofPurpose, ProofType } from '../../lib/verifiablePresentation/SSI.types';
+import { ProofPurpose, ProofType } from '../../lib/types/SSI.types';
 
 export function mockCallback(opts: PresentationSignCallBackParams): VerifiablePresentation {
   return {
