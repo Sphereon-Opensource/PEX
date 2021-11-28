@@ -201,11 +201,10 @@ export class PEJS {
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
       if (proofOptions?.typeSupportsSelectiveDisclosure) {
-        if (proofOptions?.type) {
-          limitDisclosureSignatureSuites = [proofOptions.type];
-        } else {
-          limitDisclosureSignatureSuites = [];
+        if (!proofOptions?.type) {
+          throw Error('Please provide a proof type if you enable selective disclosure');
         }
+        limitDisclosureSignatureSuites = [proofOptions.type];
       }
       return limitDisclosureSignatureSuites;
     }
