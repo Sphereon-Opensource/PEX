@@ -11,7 +11,7 @@ import {
   PEJS,
   Presentation,
   PresentationSignCallBackParams,
-  PresentationSignParams,
+  PresentationSignOptions,
   Proof,
   ProofOptions,
   SelectResults,
@@ -34,7 +34,7 @@ export {
   ProofOptions,
   Validation,
   VerifiableCredential,
-  PEJS,
+  PEJS as pejs,
   Credential,
   KeyEncoding,
   Status,
@@ -50,6 +50,6 @@ export {
   NonEmptyArray,
   SignatureOptions,
   InputFieldType,
-  PresentationSignParams,
+  PresentationSignOptions,
   PresentationSignCallBackParams
 };

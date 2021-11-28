@@ -1,7 +1,7 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, PresentationSignParams } from './signing';
+import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './verifiablePresentation';
 
@@ -166,17 +166,21 @@ export class PEJS {
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
    * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
    *
-   * @param opts: Signing Params these are the signing params required to sign.
+   * @param presentationDefinition the Presentation Definition
+   * @param selectedCredentials the PE-JS and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
+   * @param options: Signing Params these are the signing params required to sign.
    *
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFrom(
-    signingCallBack: (opts: PresentationSignCallBackParams) => VerifiablePresentation,
-    opts: PresentationSignParams
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
+    options: PresentationSignOptions
   ): VerifiablePresentation {
-    const { presentationDefinition, holder, signatureOptions, proofOptions, selectedCredentials } = opts;
+    const { holder, signatureOptions, proofOptions } = options;
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -213,12 +217,10 @@ export class PEJS {
     };
 
     const callBackParams: PresentationSignCallBackParams = {
+      options,
       presentation,
       presentationDefinition,
       selectedCredentials,
-      proofOptions,
-      signatureOptions,
-      holder,
       proof,
       presentationSubmission: evaluationResults.value,
       evaluationResults,

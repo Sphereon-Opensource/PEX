@@ -128,13 +128,16 @@ describe('evaluate', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const pejs: PEJS = new PEJS();
-    const vp: VerifiablePresentation = pejs.verifiablePresentationFrom(assertedMockCallback, {
-      presentationDefinition: pdSchema.presentation_definition,
-      selectedCredentials: vpSimple.verifiableCredential,
-      proofOptions: getProofOptionsMock(),
-      signatureOptions: getSingatureOptionsMock(),
-      holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-    });
+    const vp: VerifiablePresentation = pejs.verifiablePresentationFrom(
+      pdSchema.presentation_definition,
+      vpSimple.verifiableCredential,
+      assertedMockCallback,
+      {
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
+        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+      }
+    );
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -147,9 +150,7 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
 
     expect(() => {
-      pejs.verifiablePresentationFrom(getErrorThrown, {
-        presentationDefinition: pdSchema.presentation_definition,
-        selectedCredentials: vpSimple.verifiableCredential,
+      pejs.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
       });

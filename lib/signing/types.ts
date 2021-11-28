@@ -68,21 +68,11 @@ export interface SignatureOptions {
   jws?: string; // JWS based proof
 }
 
-export interface PresentationSignParams {
+export interface PresentationSignOptions {
   /**
    * The optional holder of the presentation
    */
   holder?: string;
-
-  /**
-   * The presentation definition
-   */
-  presentationDefinition: PresentationDefinition;
-
-  /**
-   * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
-   */
-  selectedCredentials: VerifiableCredential[];
 
   /**
    * Proof options
@@ -95,7 +85,22 @@ export interface PresentationSignParams {
   signatureOptions?: SignatureOptions;
 }
 
-export interface PresentationSignCallBackParams extends PresentationSignParams {
+export interface PresentationSignCallBackParams {
+  /**
+   * The originally supplied presentation sign options
+   */
+  options: PresentationSignOptions;
+
+  /**
+   * The presentation definition
+   */
+  presentationDefinition: PresentationDefinition;
+
+  /**
+   * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
+   */
+  selectedCredentials: VerifiableCredential[];
+
   /**
    * The presentation object created from the definition and verifiable credentials.
    * Can be used directly or in more complex situations can be discarded by using the definition, credentials, proof options, submission and evaluation results

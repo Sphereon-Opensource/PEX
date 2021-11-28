@@ -12,16 +12,17 @@ export function mockCallback(opts: PresentationSignCallBackParams): VerifiablePr
   };
 }
 
-export function assertedMockCallback(opts: PresentationSignCallBackParams): VerifiablePresentation {
-  expect(opts.proof).toBeDefined();
-  expect(opts.proof.proofValue).toBeUndefined();
-  expect(opts.proof.created).toBeDefined();
-  expect(opts.proof.verificationMethod).toBeDefined();
-  expect(opts.proof.type).toBeDefined();
-  expect(opts.presentation).toBeDefined();
-  expect(opts.proofOptions?.created).toBeUndefined();
+export function assertedMockCallback(callBackParams: PresentationSignCallBackParams): VerifiablePresentation {
+  expect(callBackParams.proof).toBeDefined();
+  expect(callBackParams.proof.proofValue).toBeUndefined();
+  expect(callBackParams.proof.created).toBeDefined();
+  expect(callBackParams.proof.verificationMethod).toBeDefined();
+  expect(callBackParams.proof.type).toBeDefined();
+  expect(callBackParams.presentation).toBeDefined();
+  expect(callBackParams.options).toBeDefined();
+  expect(callBackParams.options.proofOptions?.created).toBeUndefined();
 
-  const vp = mockCallback(opts);
+  const vp = mockCallback(callBackParams);
   expect(vp).toBeDefined();
 
   const { proof } = vp;
