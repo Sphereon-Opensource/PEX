@@ -10,6 +10,7 @@ Refactor verifiable presentation support using callbacks
   - Credential and Presentation interfaces were not fully conforming
   - Explicit imports and exports added
   - Selective disclosure errors fixed
+  - Releases contained too many files 
 
 ## v0.4.1 - 2021-11-26
 Improve selective disclosure, add sign callback, several fixes
