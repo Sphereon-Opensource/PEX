@@ -17,7 +17,13 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
 
   public getValidations(
     inputDescriptors: InputDescriptor[]
-  ): (Validation<InputDescriptor> | Validation<InputDescriptor[]> | Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
+  ): (
+    | Validation<InputDescriptor>
+    | Validation<InputDescriptor[]>
+    | Validation<Constraints>
+    | Validation<Field>
+    | Validation<HolderSubject>
+  )[] {
     let validations: (
       | Validation<InputDescriptor>
       | Validation<InputDescriptor[]>
@@ -127,8 +133,10 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     // TODO extract to generic util or use built-in method
     return (inDesc: InputDescriptor): boolean => {
       return (
-        inDesc.schema.filter((schema: Schema) => this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean'))
-          .length > 0
+        inDesc.schema.filter(
+          (schema: Schema) =>
+            this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
+        ).length > 0
       );
     };
   }

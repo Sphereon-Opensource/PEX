@@ -21,7 +21,8 @@ function getTestableConstraint(): Constraints {
       {
         id: 'fieldID-2021-05-04 00',
         path: ['$.issuer', '$.vc.issuer', '$.iss'],
-        purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor or regulatory authority.',
+        purpose:
+          'We can only verify bank accounts if they are attested by a trusted bank, auditor or regulatory authority.',
         filter: {
           type: 'string',
           pattern: 'did:example:123|did:example:456',
@@ -198,7 +199,9 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = [''];
     const result = ve.validate([{ bundler: vb, target: constraints }]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')]);
+    expect(result).toEqual([
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property'),
+    ]);
   });
 
   it('There should be error reported for same_subject[0].field_id missing', () => {
@@ -207,6 +210,8 @@ describe('constraints tests', () => {
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = ['missing_fieldID'];
     const result = ve.validate([{ bundler: vb, target: constraints }]);
-    expect(result).toEqual([new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property')]);
+    expect(result).toEqual([
+      new Checked('root.constraints', Status.ERROR, 'field_id must correspond to a present field object id property'),
+    ]);
   });
 });

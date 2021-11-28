@@ -13,7 +13,8 @@ const results: HandlerCheckResult[] = [
     verifiable_credential_path: '$[0]',
     evaluator: 'UriEvaluation',
     status: 'info',
-    message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+    message:
+      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
   },
   {
     input_descriptor_path: '$.input_descriptors[0]',
@@ -39,7 +40,8 @@ const results_with_error: HandlerCheckResult[] = [
     verifiable_credential_path: '$[0]',
     evaluator: 'UriEvaluation',
     status: 'info',
-    message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+    message:
+      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
   },
   {
     input_descriptor_path: '$.input_descriptors[0]',
@@ -72,8 +74,12 @@ function getFile(path: string): PresentationDefinition | VerifiablePresentation 
 
 describe('markForSubmissionEvaluationHandler tests', () => {
   it(`Mark input candidates for presentation submission`, () => {
-    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
+    const presentation: VerifiablePresentation = getFile(
+      './test/dif_pe_examples/vp/vp_general.json'
+    ) as VerifiablePresentation;
+    const presentationDefinition: PresentationDefinition = getFile(
+      './test/resources/pd_input_descriptor_filter.json'
+    ) as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
@@ -91,8 +97,12 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
-    const presentation: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile('./test/resources/pd_input_descriptor_filter.json') as PresentationDefinition;
+    const presentation: VerifiablePresentation = getFile(
+      './test/dif_pe_examples/vp/vp_general.json'
+    ) as VerifiablePresentation;
+    const presentationDefinition: PresentationDefinition = getFile(
+      './test/resources/pd_input_descriptor_filter.json'
+    ) as PresentationDefinition;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);

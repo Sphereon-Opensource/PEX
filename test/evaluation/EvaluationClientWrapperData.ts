@@ -13,7 +13,8 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message:
+        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
@@ -42,7 +43,8 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message:
+        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],

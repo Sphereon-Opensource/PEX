@@ -9,4 +9,13 @@ import {
   VerifiablePresentation,
 } from './SSI.types';
 
-export { Presentation, VerifiablePresentation, VerifiableCredential, CredentialStatus, CredentialSubject, Credential, Proof, InputFieldType };
+export {
+  Presentation,
+  VerifiablePresentation,
+  VerifiableCredential,
+  CredentialStatus,
+  CredentialSubject,
+  Credential,
+  Proof,
+  InputFieldType,
+};

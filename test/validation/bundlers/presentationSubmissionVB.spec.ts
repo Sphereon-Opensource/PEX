@@ -36,7 +36,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'presentation_definition_id should not be empty')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'presentation_definition_id should not be empty'),
+    ]);
   });
 
   it('should return error for empty descriptor_map', () => {
@@ -46,7 +48,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'descriptor_map should be a non-empty list')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'descriptor_map should be a non-empty list'),
+    ]);
   });
 
   it('should return error for empty descriptor id', () => {
@@ -56,7 +60,13 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each descriptor should have a one id in it, on all levels')]);
+    expect(result).toEqual([
+      new Checked(
+        'root.presentation_submission',
+        Status.ERROR,
+        'each descriptor should have a one id in it, on all levels'
+      ),
+    ]);
   });
 
   it('should return error for empty descriptor path', () => {
@@ -66,7 +76,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath'),
+    ]);
   });
 
   it('should return error for invalid descriptor path', () => {
@@ -76,7 +88,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath'),
+    ]);
   });
 
   it('should return error for empty descriptor path', () => {
@@ -86,7 +100,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each format should be one of the known format')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'each format should be one of the known format'),
+    ]);
   });
 
   it('should return error for invalid descriptor path', () => {
@@ -96,7 +112,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each format should be one of the known format')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'each format should be one of the known format'),
+    ]);
   });
 
   it('should return error for invalid nested id', () => {
@@ -106,7 +124,13 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each descriptor should have a one id in it, on all levels')]);
+    expect(result).toEqual([
+      new Checked(
+        'root.presentation_submission',
+        Status.ERROR,
+        'each descriptor should have a one id in it, on all levels'
+      ),
+    ]);
   });
 
   it('should return error for invalid nested path', () => {
@@ -116,7 +140,9 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath')]);
+    expect(result).toEqual([
+      new Checked('root.presentation_submission', Status.ERROR, 'each path should be a valid jsonPath'),
+    ]);
   });
 
   it('should return error for id in the descriptor to be different in nested objects', () => {
@@ -126,6 +152,12 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationSubmission> = new PresentationSubmissionVB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPS }]);
-    expect(result).toEqual([new Checked('root.presentation_submission', Status.ERROR, 'each descriptor should have a one id in it, on all levels')]);
+    expect(result).toEqual([
+      new Checked(
+        'root.presentation_submission',
+        Status.ERROR,
+        'each descriptor should have a one id in it, on all levels'
+      ),
+    ]);
   });
 });

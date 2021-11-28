@@ -1,4 +1,11 @@
-import { KeyEncoding, PresentationSignCallBackParams, Proof, ProofOptions, SignatureOptions, VerifiablePresentation } from '../../lib';
+import {
+  KeyEncoding,
+  PresentationSignCallBackParams,
+  Proof,
+  ProofOptions,
+  SignatureOptions,
+  VerifiablePresentation,
+} from '../../lib';
 import { ProofPurpose, ProofType } from '../../lib/verifiablePresentation/SSI.types';
 
 export function mockCallback(opts: PresentationSignCallBackParams): VerifiablePresentation {

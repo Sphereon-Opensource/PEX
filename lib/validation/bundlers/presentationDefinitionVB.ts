@@ -94,7 +94,8 @@ export class PresentationDefinitionVB extends ValidationBundler<
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues(pd?.format),
+        predicate: (pd: PresentationDefinition) =>
+          PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues(pd?.format),
         message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
@@ -202,7 +203,9 @@ export class PresentationDefinitionVB extends ValidationBundler<
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 
-      const difference = new Set([...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x)));
+      const difference = new Set(
+        [...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x))
+      );
 
       return difference.size === 0;
     }
@@ -214,7 +217,9 @@ export class PresentationDefinitionVB extends ValidationBundler<
     return srs?.reduce(
       (accumulator: SubmissionRequirement[], submissionRequirement: SubmissionRequirement) =>
         accumulator.concat(
-          Array.isArray(submissionRequirement.from_nested) ? this.flatten(submissionRequirement.from_nested) : submissionRequirement
+          Array.isArray(submissionRequirement.from_nested)
+            ? this.flatten(submissionRequirement.from_nested)
+            : submissionRequirement
         ),
       []
     );

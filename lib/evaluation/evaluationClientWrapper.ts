@@ -35,7 +35,8 @@ export class EvaluationClientWrapper {
 
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
-        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const marked = Array.from(new Set(info));
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
@@ -44,7 +45,9 @@ export class EvaluationClientWrapper {
         marked
       );
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: VerifiableCredential[] = matches.map((e) => jp.nodes(this._client.verifiableCredential, e)[0].value);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
@@ -58,7 +61,9 @@ export class EvaluationClientWrapper {
       );
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: VerifiableCredential[] = matches.map((e) => jp.nodes(this._client.verifiableCredential, e)[0].value);
+      const credentials: VerifiableCredential[] = matches.map(
+        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
@@ -125,7 +130,10 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private matchWithoutSubmissionRequirements(marked: HandlerCheckResult[], pd: PresentationDefinition): SubmissionRequirementMatch[] {
+  private matchWithoutSubmissionRequirements(
+    marked: HandlerCheckResult[],
+    pd: PresentationDefinition
+  ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
     for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
@@ -142,7 +150,11 @@ export class EvaluationClientWrapper {
     return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
   }
 
-  private mapMatchingDescriptors(pd: PresentationDefinition, sr: SubmissionRequirement, marked: HandlerCheckResult[]): SubmissionRequirementMatch {
+  private mapMatchingDescriptors(
+    pd: PresentationDefinition,
+    sr: SubmissionRequirement,
+    marked: HandlerCheckResult[]
+  ): SubmissionRequirementMatch {
     const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], matches: [] };
     if (sr?.from) {
       srm.from?.push(sr.from);
@@ -173,7 +185,9 @@ export class EvaluationClientWrapper {
       const len = this._client.presentationSubmission?.descriptor_map.length;
       for (let i = 0; i < len; i++) {
         this._client.presentationSubmission.descriptor_map[i] &&
-          this._client.presentationSubmission.descriptor_map.push(this._client.presentationSubmission.descriptor_map[i]);
+          this._client.presentationSubmission.descriptor_map.push(
+            this._client.presentationSubmission.descriptor_map[i]
+          );
       }
       this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
       result.value = this._client.presentationSubmission;
@@ -200,10 +214,15 @@ export class EvaluationClientWrapper {
 
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
-        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) =>
+          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
-      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(pd.submission_requirements, updatedMarked, 0);
+      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
+        pd.submission_requirements,
+        updatedMarked,
+        0
+      );
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
       this.updatePresentationSubmission(finalIdx);
       return this._client.presentationSubmission;
@@ -228,9 +247,15 @@ export class EvaluationClientWrapper {
       });
   }
 
-  private matchUserSelectedVcs(marked: HandlerCheckResult[], vcs: VerifiableCredential[]): [HandlerCheckResult[], [string, string][]] {
+  private matchUserSelectedVcs(
+    marked: HandlerCheckResult[],
+    vcs: VerifiableCredential[]
+  ): [HandlerCheckResult[], [string, string][]] {
     const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
-    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [index, JSON.stringify(vc)]);
+    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
+      index,
+      JSON.stringify(vc),
+    ]);
     const updatedIndexes: [string, string][] = [];
     userSelected.forEach((us, i) => {
       allCredentials.forEach((ac, j) => {
@@ -288,7 +313,10 @@ export class EvaluationClientWrapper {
     return [total, result];
   }
 
-  private countMatchingInputDescriptors(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]): [number, HandlerCheckResult[]] {
+  private countMatchingInputDescriptors(
+    submissionRequirement: SubmissionRequirement,
+    marked: HandlerCheckResult[]
+  ): [number, HandlerCheckResult[]] {
     let count = 0;
     const matched: HandlerCheckResult[] = [];
     for (const m of marked) {
@@ -358,16 +386,23 @@ export class EvaluationClientWrapper {
     });
   }
 
-  public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(
+    selectResults: SelectResults,
+    verifiableCredentials: VerifiableCredential[]
+  ) {
     if (selectResults) {
       selectResults.selectableVerifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
-        const foundIndex: number = verifiableCredentials.findIndex((verifiableCredential) => selectableCredential.id === verifiableCredential.id);
+        const foundIndex: number = verifiableCredentials.findIndex(
+          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        );
         selectResults.vcIndexes?.push(foundIndex);
       });
     }
   }
 
-  public determineAreRequiredCredentialsPresent(matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined): Status {
+  public determineAreRequiredCredentialsPresent(
+    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined
+  ): Status {
     let status = Status.INFO;
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
       return Status.ERROR;

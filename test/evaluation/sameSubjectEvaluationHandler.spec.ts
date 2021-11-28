@@ -12,8 +12,13 @@ describe('sameSubjectEvaluationHandler', () => {
     evaluationClient.verifiableCredential = new SameSubjectVerifiableCredential().getVerifiableCredential();
     const evaluationHandler: SameSubjectEvaluationHandler = new SameSubjectEvaluationHandler(evaluationClient);
 
-    evaluationHandler.handle(new PdRequireSameSubject().getPresentationDefinition(), evaluationClient.verifiableCredential);
+    evaluationHandler.handle(
+      new PdRequireSameSubject().getPresentationDefinition(),
+      evaluationClient.verifiableCredential
+    );
 
-    expect(evaluationHandler.client.results).toEqual(new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult());
+    expect(evaluationHandler.client.results).toEqual(
+      new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult()
+    );
   });
 });

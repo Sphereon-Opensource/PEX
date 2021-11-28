@@ -5,7 +5,12 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 import { PEJS, Presentation, Validated, VerifiablePresentation } from '../lib';
 import { ProofType } from '../lib/verifiablePresentation/SSI.types';
 
-import { assertedMockCallback, getErrorThrown, getProofOptionsMock, getSingatureOptionsMock } from './test_data/PresentationSignUtilMock';
+import {
+  assertedMockCallback,
+  getErrorThrown,
+  getProofOptionsMock,
+  getSingatureOptionsMock,
+} from './test_data/PresentationSignUtilMock';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -21,7 +26,9 @@ describe('evaluate', () => {
 
   it('Evaluate case with error result', () => {
     const pejs: PEJS = new PEJS();
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-PermanentResidentCard.json').presentation_definition;
+    const pdSchema: PresentationDefinition = getFile(
+      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
+    ).presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
     const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
@@ -30,7 +37,9 @@ describe('evaluate', () => {
   });
 
   it('Evaluate case without any error', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
+    const pdSchema: PresentationDefinition = getFile(
+      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();
@@ -61,7 +70,9 @@ describe('evaluate', () => {
   });
 
   it('Evaluate case without any error', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json').presentation_definition;
+    const pdSchema: PresentationDefinition = getFile(
+      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pejs: PEJS = new PEJS();

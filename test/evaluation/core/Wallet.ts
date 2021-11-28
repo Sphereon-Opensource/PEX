@@ -6,7 +6,10 @@ export class Wallet {
       holder: 'did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd',
       verifiableCredentials: [
         {
-          '@context': ['https://www.w3.org/2018/credentials/v1', 'https://w3c-ccg.github.io/vc-examples/covid-19/v2/v2.jsonld'],
+          '@context': [
+            'https://www.w3.org/2018/credentials/v1',
+            'https://w3c-ccg.github.io/vc-examples/covid-19/v2/v2.jsonld',
+          ],
           id: 'http://example.com/credential/123',
           type: ['VerifiableCredential', 'qSARS-CoV-2-Rapid-Test-Credential'],
           description:
@@ -36,7 +39,8 @@ export class Wallet {
           proof: {
             type: 'Ed25519Signature2018',
             created: '2020-04-18T18:35:13Z',
-            verificationMethod: 'did:elem:ropsten:EiBJJPdo-ONF0jxqt8mZYEj9Z7FbdC87m2xvN0_HAbcoEg#xqc3gS1gz1vch7R3RvNebWMjLvBOY-n_14feCYRPsUo',
+            verificationMethod:
+              'did:elem:ropsten:EiBJJPdo-ONF0jxqt8mZYEj9Z7FbdC87m2xvN0_HAbcoEg#xqc3gS1gz1vch7R3RvNebWMjLvBOY-n_14feCYRPsUo',
             proofPurpose: 'assertionMethod',
             jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..xnB7m8M6TcAFmz2efqb74IyJECUTAMpCkJAudfmVkLC3CPmCrMznvlD2E7WCCkzF9nnrZlJw0VpHdXJpjEU-AQ',
           },

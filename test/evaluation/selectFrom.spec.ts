@@ -19,7 +19,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -190,7 +197,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -339,7 +353,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -525,7 +546,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -674,7 +702,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -859,7 +894,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1045,7 +1087,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1231,7 +1280,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1380,7 +1436,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1529,7 +1592,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1678,7 +1748,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1826,7 +1903,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(
+        pdSchema,
+        vpSimple.verifiableCredential,
+        dids,
+        LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      )
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -2012,7 +2096,12 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pdSchema, vpSimple.verifiableCredential, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(
+      pdSchema,
+      vpSimple.verifiableCredential,
+      dids,
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(result).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
@@ -2195,10 +2284,17 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate case without presentation submission', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd-PermanentResidentCard.json').presentation_definition;
+    const pdSchema: PresentationDefinition = getFile(
+      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
+    ).presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(
+      pdSchema,
+      [vc],
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual("EU Driver's License");
     expect(result!.matches![0]).toEqual({
@@ -2213,7 +2309,12 @@ describe('selectFrom tests', () => {
       .presentation_definition as PresentationDefinition;
     const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as VerifiableCredential;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(
+      pdSchema,
+      [vc],
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
     expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual("EU Driver's License");
   });
