@@ -3,15 +3,20 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { PEJS, Presentation, Validated, VerifiablePresentation } from '../lib';
+import { ProofType } from '../lib/types/SSI.types';
 
-import { KeyPairOptionsData } from './test_data/KeyPairOptionsData';
-import { SigningUtilMock } from './test_data/SigningUtilMock';
+import {
+  assertedMockCallback,
+  getErrorThrown,
+  getProofOptionsMock,
+  getSingatureOptionsMock,
+} from './test_data/PresentationSignUtilMock';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate', () => {
   it('testing constructor', function () {
@@ -130,17 +135,24 @@ describe('evaluate', () => {
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should return a sign the presentation', () => {
+  it('should return a signed presentation', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const pejs: PEJS = new PEJS();
-    const presentations: Presentation[] = pejs.createVerifiablePresentation(
+    const vp: VerifiablePresentation = pejs.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
-      new KeyPairOptionsData().getKeyPairOptionsData(),
-      new SigningUtilMock().getSinged
+      assertedMockCallback,
+      {
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
+        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+      }
     );
-    expect(presentations).toEqual(new SigningUtilMock().getSinged());
+    const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
+    expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
+    expect(proof.proofValue).toEqual('fake');
+    expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
   it('should throw exception if signing encounters a problem', () => {
@@ -149,12 +161,10 @@ describe('evaluate', () => {
     const pejs: PEJS = new PEJS();
 
     expect(() => {
-      pejs.createVerifiablePresentation(
-        pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
-        new KeyPairOptionsData().getKeyPairOptionsData(),
-        new SigningUtilMock().getErrorThrown
-      );
+      pejs.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
+      });
     }).toThrow(Error);
   });
 });

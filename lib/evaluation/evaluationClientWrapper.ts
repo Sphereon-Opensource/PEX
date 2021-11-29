@@ -2,8 +2,8 @@ import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequir
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { VerifiableCredential } from '../types';
 import { JsonPathUtils } from '../utils';
-import { VerifiableCredential } from '../verifiablePresentation';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -175,7 +175,7 @@ export class EvaluationClientWrapper {
     pd: PresentationDefinition,
     vcs: VerifiableCredential[],
     holderDids: string[],
-    limitDisclosureSignatureSuites: string[]
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {};

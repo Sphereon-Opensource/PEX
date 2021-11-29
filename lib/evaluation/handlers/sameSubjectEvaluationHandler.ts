@@ -2,7 +2,7 @@ import { HolderSubject, Optionality, PresentationDefinition } from '@sphereon/pe
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 

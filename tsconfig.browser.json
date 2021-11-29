@@ -5,11 +5,18 @@
     "outDir": "dist/browser",
     "module": "commonjs"
   },
-  "exclude": [
-    "test/**",
-    "node_modules/**"
-  ],
   "lib": [
     "es2015", "dom", "es6"
+  ],
+  "include": [
+    "index.ts",
+    "lib/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules/**",
+    "coverage/**",
+    "resources/**",
+    "dist/**",
+    "test/**"
   ]
 }

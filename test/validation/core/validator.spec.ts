@@ -1,5 +1,5 @@
-import { validate } from '../../../lib';
-import { Checked, Status } from '../../../lib/ConstraintUtils';
+import { Checked, Status } from '../../../lib';
+import { validate } from '../../../lib/validation';
 
 function toChecked(message: string) {
   return new Checked('person.name', Status.ERROR, message);

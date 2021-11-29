@@ -2,8 +2,8 @@ import fs from 'fs';
 
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { SubjectIsHolderEvaluationHandler, VerifiableCredential, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
+import { EvaluationClient, VerifiableCredential, VerifiablePresentation } from '../../lib';
+import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/handlers';
 
 function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));

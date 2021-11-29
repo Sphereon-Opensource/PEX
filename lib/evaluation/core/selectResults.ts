@@ -1,5 +1,5 @@
 import { Checked, Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../verifiablePresentation';
+import { VerifiableCredential } from '../../types';
 
 import { SubmissionRequirementMatch } from './submissionRequirementMatch';
 

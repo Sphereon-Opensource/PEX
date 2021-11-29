@@ -6,11 +6,11 @@ import {
   EvaluationClient,
   EvaluationHandler,
   HandlerCheckResult,
-  InputDescriptorFilterEvaluationHandler,
   Status,
   VerifiableCredential,
   VerifiablePresentation,
 } from '../../lib';
+import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/handlers';
 
 const message: HandlerCheckResult = {
   input_descriptor_path: `$.input_descriptors[0]`,

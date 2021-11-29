@@ -2,7 +2,8 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { EvaluationClient, EvaluationClientWrapper, Status, VerifiablePresentation } from '../../lib';
+import { Status, VerifiablePresentation } from '../../lib';
+import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
 

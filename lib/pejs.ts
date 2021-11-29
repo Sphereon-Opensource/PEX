@@ -1,9 +1,9 @@
 import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { KeyPairOptions } from './signing';
+import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
+import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { Presentation, VerifiableCredential } from './verifiablePresentation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -28,7 +28,7 @@ export class PEJS {
   public evaluatePresentation(
     presentationDefinition: PresentationDefinition,
     presentation: Presentation,
-    limitDisclosureSignatureSuites: string[]
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -97,34 +97,35 @@ export class PEJS {
   }
 
   /**
-   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes verifiablePresentation. And can be sent to
-   * the verifier.
+   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
+   * the verifier after signing it.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param holderDID the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
    *
-   * @return the presentation submission.
+   * @return the presentation.
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinition,
     selectedCredential: VerifiableCredential[],
-    holderDID: string
+    holderDID?: string
   ): Presentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       presentationDefinition,
       selectedCredential
     );
 
-    return PEJS.getPresentation(holderDID, presentationSubmission, selectedCredential);
+    return PEJS.getPresentation(presentationSubmission, selectedCredential, holderDID);
   }
 
   private static getPresentation(
-    holderDID: string,
     presentationSubmission: PresentationSubmission,
-    selectedCredential: VerifiableCredential[]
-  ) {
+    selectedCredential: VerifiableCredential[],
+    holderDID?: string
+  ): Presentation {
+    const holder = holderDID;
     return {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',
@@ -132,9 +133,9 @@ export class PEJS {
       ],
       type: [
         'VerifiablePresentation',
-        'PresentationSubmission', // This will be truely verifiable after the proof field is populated.
+        'PresentationSubmission', // This will be truly verifiable after the proof field is populated.
       ],
-      holder: holderDID,
+      holder,
       presentation_submission: presentationSubmission,
       verifiableCredential: selectedCredential,
     };
@@ -173,27 +174,77 @@ export class PEJS {
   }
 
   /**
-   * This is the method is provide a template that lists the inputs required to sign a presentation before sending.
+   * This method can be used to combine a definition, selected Verifiable Credentials, together with
+   * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
-   * @param peJSPresentationDefinition is mainly required to apply limitDisclosure i.e. it informs the signingCallBack which fields have to be in the
-   *        signed object.
-   * @param peJSSelectedCredentials these are the credentials which are combined in the presentation.
-   * @param peJSSigningKeyOptions these are the signing keys require to sign.
+   * Please note that PE-JS has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
+   * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
+   * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
+   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
+   *
+   * @param presentationDefinition the Presentation Definition
+   * @param selectedCredentials the PE-JS and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
+   * @param options: Signing Params these are the signing params required to sign.
    *
-   * @return the signed presentations.
+   * @return the signed and thus Verifiable Presentation.
    */
-  public createVerifiablePresentation(
-    peJSPresentationDefinition: PresentationDefinition,
-    peJSSelectedCredentials: VerifiableCredential[],
-    peJSSigningKeyOptions: KeyPairOptions,
-    signingCallBack: (
-      presentationDefinition: PresentationDefinition,
-      selectedCredentials: VerifiableCredential[],
-      signingKeyOptions: KeyPairOptions
-    ) => Presentation[]
-  ): Presentation[] {
-    return signingCallBack(peJSPresentationDefinition, peJSSelectedCredentials, peJSSigningKeyOptions);
+  public verifiablePresentationFrom(
+    presentationDefinition: PresentationDefinition,
+    selectedCredentials: VerifiableCredential[],
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
+    options: PresentationSignOptions
+  ): VerifiablePresentation {
+    const { holder, signatureOptions, proofOptions } = options;
+
+    function limitedDisclosureSuites() {
+      let limitDisclosureSignatureSuites: string[] = [];
+      if (proofOptions?.typeSupportsSelectiveDisclosure) {
+        if (!proofOptions?.type) {
+          throw Error('Please provide a proof type if you enable selective disclosure');
+        }
+        limitDisclosureSignatureSuites = [proofOptions.type];
+      }
+      return limitDisclosureSignatureSuites;
+    }
+
+    const holderDIDs: string[] = holder ? [holder] : [];
+    const limitDisclosureSignatureSuites = limitedDisclosureSuites();
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+
+    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
+    const evaluationResults = this.evaluatePresentation(
+      presentationDefinition,
+      presentation,
+      limitDisclosureSignatureSuites
+    );
+    if (!evaluationResults.value) {
+      throw new Error('Could not get evaluation results from presentation');
+    }
+
+    const proof: Partial<Proof> = {
+      type: proofOptions?.type,
+      verificationMethod: signatureOptions?.verificationMethod,
+      created: proofOptions?.created ? proofOptions.created : new Date().toISOString(),
+      proofPurpose: proofOptions?.proofPurpose,
+      proofValue: signatureOptions?.proofValue,
+      jws: signatureOptions?.jws,
+      challenge: proofOptions?.challenge,
+      nonce: proofOptions?.nonce,
+      domain: proofOptions?.domain,
+    };
+
+    const callBackParams: PresentationSignCallBackParams = {
+      options,
+      presentation,
+      presentationDefinition,
+      selectedCredentials,
+      proof,
+      presentationSubmission: evaluationResults.value,
+      evaluationResults,
+    };
+
+    return signingCallBack(callBackParams);
   }
 }

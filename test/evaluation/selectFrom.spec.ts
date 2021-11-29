@@ -2,7 +2,8 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { EvaluationClientWrapper, Status, VerifiableCredential } from '../../lib';
+import { Status, VerifiableCredential } from '../../lib';
+import { EvaluationClientWrapper } from '../../lib/evaluation';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

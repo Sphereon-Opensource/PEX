@@ -45,6 +45,7 @@
   "exclude": [
     "node_modules/**",
     "coverage/**",
+    "resources/**",
     "dist/**"
   ],
   "compileOnSave": false

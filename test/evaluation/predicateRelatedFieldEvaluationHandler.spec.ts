@@ -2,9 +2,8 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { PredicateRelatedFieldEvaluationHandler, Status } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
+import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
+import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

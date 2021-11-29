@@ -1,4 +1,17 @@
 # Release Notes
+## v0.5.0 - NOT RELEASE YET
+Refactor verifiable presentation support using callbacks
+
+- Added:
+  - verifiablePresentationFrom method that accepts a callback function and signature proof options
+  - Documentation on the above as well as general improvements
+
+- Fixed:
+  - Credential and Presentation interfaces were not fully conforming
+  - Explicit imports and exports added
+  - Selective disclosure errors fixed
+  - Releases contained too many files 
+
 ## v0.4.1 - 2021-11-26
 Improve selective disclosure, add sign callback, several fixes
 

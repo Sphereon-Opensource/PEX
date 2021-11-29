@@ -2,8 +2,8 @@ import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinitio
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
+import { VerifiableCredential } from '../../types';
 import { JsonPathUtils } from '../../utils/jsonPathUtils';
-import { VerifiableCredential } from '../../verifiablePresentation';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
@@ -29,10 +29,20 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     });
   }
 
-  private isLimitDisclosureSupported(vc: VerifiableCredential, vcIdx: number, idIdx: number): boolean {
+  private isLimitDisclosureSupported(
+    vc: VerifiableCredential,
+    vcIdx: number,
+    idIdx: number,
+    optionality: Optionality
+  ): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
-    if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
-      this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
+    if (!vc.proof || Array.isArray(vc.proof) || !vc.proof.type) {
+      // todo: Support/inspect array based proofs
+      return false;
+    } else if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+      if (optionality == Optionality.Required) {
+        this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
+      }
       return false;
     }
     return true;
@@ -44,10 +54,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     idIdx: number
   ): void {
     const fields = constraints?.fields as Field[];
-    const limitDisclosure = constraints.limit_disclosure as Optionality;
+    const optionality = constraints.limit_disclosure;
     verifiableCredential.forEach((vc, index) => {
-      if (this.isLimitDisclosureSupported(vc, index, idIdx)) {
-        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, limitDisclosure);
+      if (optionality && this.isLimitDisclosureSupported(vc, index, idIdx, optionality)) {
+        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, optionality);
       }
     });
   }

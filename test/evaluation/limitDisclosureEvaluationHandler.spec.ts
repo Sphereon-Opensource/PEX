@@ -44,7 +44,9 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    vpSimple.verifiableCredential[0].proof.type = 'limit disclosure unsupported';
+    if ('type' in vpSimple.verifiableCredential[0].proof) {
+      vpSimple.verifiableCredential[0].proof.type = 'limit disclosure unsupported';
+    }
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toEqual('Maarssen');

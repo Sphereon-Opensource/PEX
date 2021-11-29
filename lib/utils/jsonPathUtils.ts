@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jp from 'jsonpath';
 
-import { InputFieldType } from '../verifiablePresentation/SSI.types';
+import { InputFieldType } from '../types/SSI.types';
 
 export class JsonPathUtils {
   /**

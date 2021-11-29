@@ -1,7 +1,7 @@
 import { Constraints, Directives, Optionality } from '@sphereon/pe-models';
 
-import { ConstraintsVB, ValidationBundler, ValidationEngine } from '../../../lib';
-import { Checked, Status } from '../../../lib/ConstraintUtils';
+import { Checked, Status, ValidationBundler } from '../../../lib';
+import { ConstraintsVB, ValidationEngine } from '../../../lib/validation';
 
 function getTestableConstraint(): Constraints {
   return {
