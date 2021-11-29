@@ -1,5 +1,5 @@
 # Release Notes
-## v0.5.0 - NOT RELEASE YET
+## v0.5.0 - 2021-11-29
 Refactor verifiable presentation support using callbacks
 
 - Added:
