@@ -97,8 +97,8 @@ export class PEJS {
   }
 
   /**
-   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes types. And can be sent to
-   * the verifier.
+   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
+   * the verifier after signing it.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
