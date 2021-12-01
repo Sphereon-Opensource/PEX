@@ -258,12 +258,12 @@ describe('evaluate', () => {
           {
             format: 'ldp_vc',
             id: 'Educational transcripts 1',
-            path: '$[1]',
+            path: '$.verifiableCredential[1]',
           },
           {
             format: 'ldp_vc',
             id: 'Educational transcripts 2',
-            path: '$[2]',
+            path: '$.verifiableCredential[2]',
           },
         ],
       })
@@ -291,7 +291,7 @@ describe('evaluate', () => {
     expect(result).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-        descriptor_map: [{ format: 'ldp_vc', id: 'Educational transcripts 1', path: '$[0]' }],
+        descriptor_map: [{ format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[0]' }],
       })
     );
   });
@@ -322,12 +322,12 @@ describe('evaluate', () => {
           {
             format: 'ldp_vc',
             id: 'Educational transcripts 1',
-            path: '$[0]',
+            path: '$.verifiableCredential[0]',
           },
           {
             format: 'ldp_vc',
             id: 'Educational transcripts 2',
-            path: '$[1]',
+            path: '$.verifiableCredential[1]',
           },
         ],
       })

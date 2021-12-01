@@ -1,4 +1,10 @@
-import { PresentationDefinition, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pe-models';
+import {
+  Descriptor,
+  PresentationDefinition,
+  PresentationSubmission,
+  Rules,
+  SubmissionRequirement,
+} from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
@@ -76,6 +82,9 @@ export class EvaluationClientWrapper {
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     this.remapMatches(selectResults, verifiableCredentials);
+    selectResults.matches?.forEach((m) => {
+      this.updateSubmissionRequirementMatchPathToAlias(m, 'selectableVerifiableCredentials');
+    });
     return selectResults;
   }
 
@@ -225,6 +234,7 @@ export class EvaluationClientWrapper {
       );
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
       this.updatePresentationSubmission(finalIdx);
+      this.updatePresentationSubmissionPathToAlias('verifiableCredential');
       return this._client.presentationSubmission;
     }
     const marked: HandlerCheckResult[] = this._client.results.filter(
@@ -232,6 +242,7 @@ export class EvaluationClientWrapper {
     );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
+    this.updatePresentationSubmissionPathToAlias('verifiableCredential');
     return this._client.presentationSubmission;
   }
 
@@ -426,5 +437,34 @@ export class EvaluationClientWrapper {
       }
     }
     return status;
+  }
+
+  private updateSubmissionRequirementMatchPathToAlias(
+    submissionRequirementMatch: SubmissionRequirementMatch,
+    alias: string
+  ) {
+    const matches: string[] = [];
+    submissionRequirementMatch.matches.forEach((m) => {
+      matches.push(m.replace('$', '$.' + alias));
+    });
+    submissionRequirementMatch.matches = matches;
+    if (submissionRequirementMatch.from_nested) {
+      submissionRequirementMatch.from_nested.forEach((f) => {
+        this.updateSubmissionRequirementMatchPathToAlias(f, alias);
+      });
+    }
+  }
+
+  private updatePresentationSubmissionPathToAlias(alias: string) {
+    this._client.presentationSubmission.descriptor_map.forEach((d) => {
+      this.replacePathWithAlias(d, alias);
+    });
+  }
+
+  private replacePathWithAlias(descriptor: Descriptor, alias: string) {
+    descriptor.path = descriptor.path.replace('$', '$.' + alias);
+    if (descriptor.path_nested) {
+      this.replacePathWithAlias(descriptor.path_nested, alias);
+    }
   }
 }

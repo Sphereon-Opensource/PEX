@@ -75,7 +75,7 @@ export class EvaluationClientWrapperData {
         {
           id: 'Educational transcripts',
           format: 'ldp_vc',
-          path: '$[0]',
+          path: '$.verifiableCredential[0]',
         },
       ],
     };

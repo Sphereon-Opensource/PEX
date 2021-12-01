@@ -119,7 +119,11 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['A'],
-          matches: ['$[0]', '$[1]', '$[2]'],
+          matches: [
+            '$.selectableVerifiableCredentials[0]',
+            '$.selectableVerifiableCredentials[1]',
+            '$.selectableVerifiableCredentials[2]',
+          ],
           name: 'Submission of educational transcripts',
           rule: 'all',
         },
@@ -297,7 +301,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           min: 2,
           name: 'Submission of educational transcripts',
           rule: 'pick',
@@ -456,14 +460,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -646,7 +654,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           max: 2,
           name: 'Submission of educational transcripts',
           rule: 'pick',
@@ -804,14 +812,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -996,14 +1008,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -1189,14 +1205,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -1380,7 +1400,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           min: 3,
           name: 'Submission of educational transcripts',
           rule: 'pick',
@@ -1536,7 +1556,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           max: 1,
           name: 'Submission of educational transcripts',
           rule: 'pick',
@@ -1693,7 +1713,7 @@ describe('selectFrom tests', () => {
         {
           count: 1,
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
@@ -1848,7 +1868,7 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$[0]', '$[1]'],
+          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
         },
@@ -2005,14 +2025,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -2197,14 +2221,18 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: ['$[0]', '$[1]', '$[2]'],
+              matches: [
+                '$.selectableVerifiableCredentials[0]',
+                '$.selectableVerifiableCredentials[1]',
+                '$.selectableVerifiableCredentials[2]',
+              ],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$[1]', '$[2]'],
+              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -2300,7 +2328,7 @@ describe('selectFrom tests', () => {
     expect(result!.matches![0]).toEqual({
       name: "EU Driver's License",
       rule: 'all',
-      matches: ['$[0]'],
+      matches: ['$.selectableVerifiableCredentials[0]'],
     });
   });
 
