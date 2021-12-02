@@ -58,7 +58,7 @@ export class EvaluationClientWrapper {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        selectableVerifiableCredentials: [...credentials],
+        verifiableCredential: [...credentials],
         warnings,
       };
     } else {
@@ -74,7 +74,7 @@ export class EvaluationClientWrapper {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        selectableVerifiableCredentials: [...credentials],
+        verifiableCredential: [...credentials],
         warnings,
       };
     }
@@ -83,7 +83,7 @@ export class EvaluationClientWrapper {
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     this.remapMatches(selectResults, verifiableCredentials);
     selectResults.matches?.forEach((m) => {
-      this.updateSubmissionRequirementMatchPathToAlias(m, 'selectableVerifiableCredentials');
+      this.updateSubmissionRequirementMatchPathToAlias(m, 'verifiableCredential');
     });
     return selectResults;
   }
@@ -92,7 +92,7 @@ export class EvaluationClientWrapper {
     selectResults.matches?.forEach((srm) => {
       srm.matches.forEach((match, index, matches) => {
         const vc = jp.query(verifiableCredentials, match)[0];
-        const newIndex = selectResults.selectableVerifiableCredentials?.findIndex((svc) => svc.id === vc.id);
+        const newIndex = selectResults.verifiableCredential?.findIndex((svc) => svc.id === vc.id);
         matches[index] = `$[${newIndex}]`;
       });
       srm.name;
@@ -402,7 +402,7 @@ export class EvaluationClientWrapper {
     verifiableCredentials: VerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.selectableVerifiableCredentials?.forEach((selectableCredential: VerifiableCredential) => {
+      selectResults.verifiableCredential?.forEach((selectableCredential: VerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );

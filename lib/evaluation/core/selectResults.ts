@@ -18,7 +18,7 @@ export interface SelectResults {
   /**
    * All matched/selectable credentials
    */
-  selectableVerifiableCredentials?: VerifiableCredential[];
+  verifiableCredential?: VerifiableCredential[];
   /**
    * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
    */

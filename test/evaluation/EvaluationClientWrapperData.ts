@@ -225,7 +225,7 @@ export class EvaluationClientWrapperData {
   public getSelectResults(): SelectResults {
     return {
       areRequiredCredentialsPresent: Status.INFO,
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           id: 'CredentialID2021110405',
           credentialStatus: {

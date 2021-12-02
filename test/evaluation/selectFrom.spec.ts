@@ -119,16 +119,12 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['A'],
-          matches: [
-            '$.selectableVerifiableCredentials[0]',
-            '$.selectableVerifiableCredentials[1]',
-            '$.selectableVerifiableCredentials[2]',
-          ],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -301,13 +297,13 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           min: 2,
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -460,18 +456,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -481,7 +473,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -654,13 +646,13 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           max: 2,
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -812,18 +804,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -833,7 +821,7 @@ describe('selectFrom tests', () => {
           rule: 'all',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -1008,18 +996,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -1030,7 +1014,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -1205,18 +1189,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -1227,7 +1207,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -1400,13 +1380,13 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           min: 3,
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -1556,13 +1536,13 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           max: 1,
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -1713,12 +1693,12 @@ describe('selectFrom tests', () => {
         {
           count: 1,
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           name: 'Submission of educational transcripts',
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -1868,12 +1848,12 @@ describe('selectFrom tests', () => {
       matches: [
         {
           from: ['B'],
-          matches: ['$.selectableVerifiableCredentials[0]', '$.selectableVerifiableCredentials[1]'],
+          matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           '@context': 'https://business-standards.org/schemas/employment-history.json',
           credentialSubject: {
@@ -2025,18 +2005,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -2047,7 +2023,7 @@ describe('selectFrom tests', () => {
           rule: 'pick',
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -2221,18 +2197,14 @@ describe('selectFrom tests', () => {
           from_nested: [
             {
               from: ['A'],
-              matches: [
-                '$.selectableVerifiableCredentials[0]',
-                '$.selectableVerifiableCredentials[1]',
-                '$.selectableVerifiableCredentials[2]',
-              ],
+              matches: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
               from: ['B'],
-              matches: ['$.selectableVerifiableCredentials[1]', '$.selectableVerifiableCredentials[2]'],
+              matches: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
             },
@@ -2243,7 +2215,7 @@ describe('selectFrom tests', () => {
           max: 1,
         },
       ],
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
           vc: {
@@ -2328,7 +2300,7 @@ describe('selectFrom tests', () => {
     expect(result!.matches![0]).toEqual({
       name: "EU Driver's License",
       rule: 'all',
-      matches: ['$.selectableVerifiableCredentials[0]'],
+      matches: ['$.verifiableCredential[0]'],
     });
   });
 

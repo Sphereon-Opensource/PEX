@@ -1,4 +1,11 @@
 # Release Notes
+## v5.0.1 - 2021-12-03
+Fixed json path issue in library responses.
+
+- Updated:
+  - selectFrom response changed to have "verifiableCredential" instead of "selectableVerifiableCredential"
+  - json path of the verifiableCredentials, now start at presentation object root
+
 ## v0.5.0 - 2021-11-29
 Refactor verifiable presentation support using callbacks
 

@@ -204,10 +204,10 @@ describe('1st scenario', () => {
     );
     expect(selectFromResult.matches?.length).toEqual(2);
     expect(selectFromResult.matches).toEqual([
-      { rule: 'all', matches: ['$.selectableVerifiableCredentials[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
-      { rule: 'all', matches: ['$.selectableVerifiableCredentials[0]'], name: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8' },
+      { rule: 'all', matches: ['$.verifiableCredential[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
+      { rule: 'all', matches: ['$.verifiableCredential[0]'], name: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8' },
     ]);
-    expect(selectFromResult.selectableVerifiableCredentials?.length).toEqual(1);
+    expect(selectFromResult.verifiableCredential?.length).toEqual(1);
 
     /**
      * Base on the selectFrom result, now Alice knows what to send, so she will call the presentationFrom with the right VerifiableCredential (index #2)
