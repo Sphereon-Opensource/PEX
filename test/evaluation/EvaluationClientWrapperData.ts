@@ -172,7 +172,7 @@ export class EvaluationClientWrapperData {
           {
             format: 'ldp_vc',
             id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-            path: '$[0]',
+            path: '$.verifiableCredential[0]',
           },
         ],
       }),
@@ -189,7 +189,7 @@ export class EvaluationClientWrapperData {
           {
             format: 'ldp_vc',
             id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-            path: '$[0]',
+            path: '$.verifiableCredential[0]',
           },
         ],
       }),
@@ -253,7 +253,7 @@ export class EvaluationClientWrapperData {
         {
           name: 'test',
           rule: Rules.All,
-          vc_path: ['$[0]'],
+          vc_path: ['$.verifiableCredential[0]'],
         },
       ],
     };

@@ -187,7 +187,7 @@ export class EvaluationClientWrapper {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
-    const result: EvaluationResults = {};
+    const result: EvaluationResults = { verifiableCredential: [...vcs] };
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
     if (this._client.presentationSubmission?.descriptor_map.length) {
@@ -199,8 +199,9 @@ export class EvaluationClientWrapper {
           );
       }
       this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
-      result.value = this._client.presentationSubmission;
+      result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
+    this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
     return result;
   }
 
@@ -455,10 +456,16 @@ export class EvaluationClientWrapper {
     }
   }
 
-  private updatePresentationSubmissionPathToAlias(alias: string) {
-    this._client.presentationSubmission.descriptor_map.forEach((d) => {
-      this.replacePathWithAlias(d, alias);
-    });
+  private updatePresentationSubmissionPathToAlias(alias: string, presentationSubmission?: PresentationSubmission) {
+    if (presentationSubmission) {
+      presentationSubmission.descriptor_map.forEach((d) => {
+        this.replacePathWithAlias(d, alias);
+      });
+    } else {
+      this._client.presentationSubmission.descriptor_map.forEach((d) => {
+        this.replacePathWithAlias(d, alias);
+      });
+    }
   }
 
   private replacePathWithAlias(descriptor: Descriptor, alias: string) {
