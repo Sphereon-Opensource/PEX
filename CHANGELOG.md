@@ -3,8 +3,11 @@
 Fixed json path issue in library responses.
 
 - Updated:
+  - added verifiableCredential (list) to return params of evaluatePresentation 
+  - added verifiableCredential (list) to return params of evaluateCredentials
   - selectFrom response changed to have "verifiableCredential" instead of "selectableVerifiableCredential"
   - json path of the verifiableCredentials, now start at presentation object root
+  - renamed matches in submissionRequirementMatches to vc_path
 
 ## v0.5.0 - 2021-11-29
 Refactor verifiable presentation support using callbacks
