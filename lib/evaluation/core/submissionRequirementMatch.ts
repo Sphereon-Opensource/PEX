@@ -6,7 +6,7 @@ export interface SubmissionRequirementMatch {
   min?: number;
   count?: number;
   max?: number;
-  matches: string[];
+  vc_path: string[];
   from?: string[];
   from_nested?: SubmissionRequirementMatch[];
 }

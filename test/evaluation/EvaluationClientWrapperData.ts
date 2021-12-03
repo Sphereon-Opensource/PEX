@@ -75,7 +75,7 @@ export class EvaluationClientWrapperData {
         {
           id: 'Educational transcripts',
           format: 'ldp_vc',
-          path: '$[0]',
+          path: '$.verifiableCredential[0]',
         },
       ],
     };
@@ -172,7 +172,7 @@ export class EvaluationClientWrapperData {
           {
             format: 'ldp_vc',
             id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-            path: '$[0]',
+            path: '$.verifiableCredential[0]',
           },
         ],
       }),
@@ -189,7 +189,7 @@ export class EvaluationClientWrapperData {
           {
             format: 'ldp_vc',
             id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-            path: '$[0]',
+            path: '$.verifiableCredential[0]',
           },
         ],
       }),
@@ -225,7 +225,7 @@ export class EvaluationClientWrapperData {
   public getSelectResults(): SelectResults {
     return {
       areRequiredCredentialsPresent: Status.INFO,
-      selectableVerifiableCredentials: [
+      verifiableCredential: [
         {
           id: 'CredentialID2021110405',
           credentialStatus: {
@@ -253,7 +253,7 @@ export class EvaluationClientWrapperData {
         {
           name: 'test',
           rule: Rules.All,
-          matches: ['$[0]'],
+          vc_path: ['$.verifiableCredential[0]'],
         },
       ],
     };

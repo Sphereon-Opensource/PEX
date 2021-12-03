@@ -453,6 +453,7 @@ interface EvaluationResults {
   value?: PresentationSubmission;
   warnings?: string[];
   errors?: Error[];
+  verifiableCredential: VerifiableCredential[];
 }
 ```
 
@@ -500,7 +501,7 @@ interface SelectResults {
   /**
    * All matched/selectable credentials
    */
-  selectableVerifiableCredentials?: VerifiableCredential[];
+  verifiableCredential?: VerifiableCredential[];
   /**
    * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
    */
@@ -514,7 +515,7 @@ interface SubmissionRequirementMatch {
   min?: number;
   count?: number;
   max?: number;
-  matches: string[];
+  vc_path: string[];
   from?: string[];
   from_nested?: SubmissionRequirementMatch[]; // VerifiableCredential Address
 }
