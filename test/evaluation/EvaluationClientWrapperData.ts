@@ -253,7 +253,7 @@ export class EvaluationClientWrapperData {
         {
           name: 'test',
           rule: Rules.All,
-          matches: ['$[0]'],
+          vc_path: ['$[0]'],
         },
       ],
     };

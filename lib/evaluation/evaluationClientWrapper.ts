@@ -90,7 +90,7 @@ export class EvaluationClientWrapper {
 
   private remapMatches(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
     selectResults.matches?.forEach((srm) => {
-      srm.matches.forEach((match, index, matches) => {
+      srm.vc_path.forEach((match, index, matches) => {
         const vc = jp.query(verifiableCredentials, match)[0];
         const newIndex = selectResults.verifiableCredential?.findIndex((svc) => svc.id === vc.id);
         matches[index] = `$[${newIndex}]`;
@@ -102,7 +102,7 @@ export class EvaluationClientWrapper {
   private extractMatches(matchSubmissionRequirements: SubmissionRequirementMatch[]): string[] {
     const matches: string[] = [];
     matchSubmissionRequirements.forEach((e) => {
-      matches.push(...e.matches);
+      matches.push(...e.vc_path);
       if (e.from_nested) {
         matches.push(...this.extractMatches(e.from_nested));
       }
@@ -126,7 +126,7 @@ export class EvaluationClientWrapper {
           submissionRequirementMatches.push(matchingDescriptors);
         }
       } else if (sr.from_nested) {
-        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], matches: [] };
+        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], vc_path: [] };
         if (srm && srm.from_nested) {
           sr.min ? (srm.min = sr.min) : undefined;
           sr.max ? (srm.max = sr.max) : undefined;
@@ -151,7 +151,7 @@ export class EvaluationClientWrapper {
         const submissionRequirementMatch: SubmissionRequirementMatch = {
           name: idRes[0].value.name || idRes[0].value.id,
           rule: Rules.All,
-          matches: sameIdVCs,
+          vc_path: sameIdVCs,
         };
         submissionRequirementMatches.push(submissionRequirementMatch);
       }
@@ -164,15 +164,15 @@ export class EvaluationClientWrapper {
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
-    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], matches: [] };
+    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], vc_path: [] };
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
         const inDesc = jp.query(pd, m.input_descriptor_path)[0];
         srm.name = inDesc.name || inDesc.id;
         if (m.payload.group.includes(sr.from)) {
-          if (srm.matches?.indexOf(m.verifiable_credential_path) === -1) {
-            srm.matches.push(m.verifiable_credential_path);
+          if (srm.vc_path?.indexOf(m.verifiable_credential_path) === -1) {
+            srm.vc_path.push(m.verifiable_credential_path);
           }
         }
       }
@@ -419,15 +419,15 @@ export class EvaluationClientWrapper {
       return Status.ERROR;
     }
     for (const m of matchSubmissionRequirements) {
-      if (m.matches.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+      if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
         return Status.ERROR;
-      } else if (m.count && m.matches.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+      } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
         return Status.ERROR;
-      } else if (m.count && (m.matches.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+      } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
         status = Status.WARN;
-      } else if (m.min && m.matches.length < m.min && m.from_nested && !m.from_nested?.length) {
+      } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
         return Status.ERROR;
-      } else if (m.max && (m.matches.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+      } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
         status = Status.WARN;
       } else if (m.from_nested) {
         status = this.determineAreRequiredCredentialsPresent(m.from_nested);
@@ -443,11 +443,11 @@ export class EvaluationClientWrapper {
     submissionRequirementMatch: SubmissionRequirementMatch,
     alias: string
   ) {
-    const matches: string[] = [];
-    submissionRequirementMatch.matches.forEach((m) => {
-      matches.push(m.replace('$', '$.' + alias));
+    const vc_path: string[] = [];
+    submissionRequirementMatch.vc_path.forEach((m) => {
+      vc_path.push(m.replace('$', '$.' + alias));
     });
-    submissionRequirementMatch.matches = matches;
+    submissionRequirementMatch.vc_path = vc_path;
     if (submissionRequirementMatch.from_nested) {
       submissionRequirementMatch.from_nested.forEach((f) => {
         this.updateSubmissionRequirementMatchPathToAlias(f, alias);
