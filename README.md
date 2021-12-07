@@ -75,7 +75,7 @@ Input evaluation is the primary mechanism by which a verifier determines whether
 matches the requested presentation definition from the request.
 
 ```typescript
-  import pejs from '@sphereon/pe-js';
+import { pejs } from '@sphereon/pe-js';
 
 const presentationDefinition = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
@@ -113,7 +113,7 @@ const { value, warnings, errors } = pejs.evaluate(presentationDefinition, verifi
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
 
 ```typescript
-  import pejs from '@sphereon/pe-js';
+import { pejs } from '@sphereon/pe-js';
 
 // Definition from verifier request
 const presentationDefinition = {
@@ -149,7 +149,7 @@ are different libraries that allow you to do this. You can also use the callback
 chapter for this.
 
 ```typescript
-  import { pejs, Presentation } from '@sphereon/pe-js';
+import { pejs, Presentation } from '@sphereon/pe-js';
 
 // Construct presentation from selected credentials
 const presentation: Presentation = pejs.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
@@ -407,7 +407,7 @@ In addition to the core functionality above, the underlying validation methods a
 functions.
 
 ```typescript
-import pejs from '@sphereon/pe-js';
+import { pejs } from '@sphereon/pe-js';
 
 const presentationDefinition = {
   ...
