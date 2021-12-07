@@ -77,6 +77,8 @@ matches the requested presentation definition from the request.
 ```typescript
 import { pejs } from '@sphereon/pe-js';
 
+const pe = new pejs();
+
 const presentationDefinition = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -105,7 +107,7 @@ const verifiablePresentation = {
   proof: { ... }
 }
 
-const { value, warnings, errors } = pejs.evaluate(presentationDefinition, verifiablePresentation);
+const { value, warnings, errors } = pe.evaluate(presentationDefinition, verifiablePresentation);
 ```
 
 ### Credential Query
@@ -114,6 +116,8 @@ A credential query allows holders to filter their set of credentials for matches
 
 ```typescript
 import { pejs } from '@sphereon/pe-js';
+
+const pe = new pejs();
 
 // Definition from verifier request
 const presentationDefinition = {
@@ -124,7 +128,7 @@ const presentationDefinition = {
 const credentials = await secureStore.getCredentials();
 
 // Find matching credentials
-const srMatches = pejs.selectFrom(presentationDefinition, credentials, holderDid);
+const srMatches = pe.selectFrom(presentationDefinition, credentials, holderDid);
 
 // An example that selects the first 'count' credentials from
 // the matches. in a real scenario, the user has to select which 
@@ -151,8 +155,10 @@ chapter for this.
 ```typescript
 import { pejs, Presentation } from '@sphereon/pe-js';
 
+const pe = new pejs();
+
 // Construct presentation from selected credentials
-const presentation: Presentation = pejs.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
+const presentation: Presentation = pe.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
 /** presentation object:
  *
  *   {
@@ -359,6 +365,8 @@ import {
   KeyEncoding
 } from '@sphereon/pe-js';
 
+const pe = new pejs();
+
 const params: PresentationSignOptions = {
   holder: 'did:example:1234....',
   proofOptions: {
@@ -372,7 +380,7 @@ const params: PresentationSignOptions = {
   }
 }
 
-const vp = pejs.verifiablePresentationFrom(presentationDefinition, selectedCredentials, simpleSignedProofCallback, params);
+const vp = pe.verifiablePresentationFrom(presentationDefinition, selectedCredentials, simpleSignedProofCallback, params);
 
 function simpleSignedProofCallback(callBackParams: PresentationSignCallBackParams): VerifiablePresentation {
   // Prereq is properly filled out `proofOptions` and `signatureOptions`, together with a `proofValue` or `jws` value.
@@ -409,17 +417,19 @@ functions.
 ```typescript
 import { pejs } from '@sphereon/pe-js';
 
+const pe = new pejs();
+
 const presentationDefinition = {
   ...
 };
 
-const { warnings: pdWarnings, errors: pdErrors } = pejs.validateDefinition(presentationDefinition);
+const { warnings: pdWarnings, errors: pdErrors } = pe.validateDefinition(presentationDefinition);
 
 const presentationSubmission = {
   ...
 };
 
-const { warnings: psWarnings, errors: psErrors } = pejs.validateSubmission(presentationSubmission);
+const { warnings: psWarnings, errors: psErrors } = pe.validateSubmission(presentationSubmission);
 ```
 
 ## API
