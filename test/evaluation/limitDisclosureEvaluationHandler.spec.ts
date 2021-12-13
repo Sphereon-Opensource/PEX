@@ -7,6 +7,7 @@ import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
 import { PdMultiCredentials } from '../test_data/limitDisclosureEvaluation/pdMultiCredentials';
 import { VcMultiCredentials } from '../test_data/limitDisclosureEvaluation/vcMultiCredentials';
+import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -24,7 +25,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
   });
 
   it("should return ok if verifiable Credential doesn't have the birthPlace field", () => {
@@ -35,7 +38,9 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
+    ).toBeUndefined();
   });
 
   it('should report an error if limit disclosure is not supported', () => {
@@ -49,7 +54,9 @@ describe('evaluate', () => {
     }
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toEqual('Maarssen');
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
+    ).toEqual('Maarssen');
     expect(evaluationClient.results[7]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
@@ -65,10 +72,12 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    delete vpSimple.verifiableCredential[0].credentialSubject['details'];
+    delete (vpSimple.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['details'];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['details']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['details']
+    ).toBeUndefined();
     expect(evaluationClient.results[6]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',

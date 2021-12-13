@@ -22,7 +22,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     d.input_descriptors.forEach((inDesc: InputDescriptor, i: number) => {
       const uris: string[] = inDesc.schema.map((so) => so.uri);
       vcs.forEach((vc: VerifiableCredential, j: number) => {
-        this.evaluateUris(UriEvaluationHandler.getPresentationURI(vc), uris, i, j);
+        this.evaluateUris(vc.getContext(), uris, i, j);
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
@@ -40,16 +40,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       definition_id: d.id,
       descriptor_map: descriptorMap,
     };
-  }
-
-  private static getPresentationURI(vc: VerifiableCredential): string[] {
-    const schemaUris: string[] = [];
-    if (vc && vc['@context']) {
-      schemaUris.push(...this.fetchContextUris(vc));
-    } else if (vc && vc.vc && vc.vc['@context']) {
-      schemaUris.push(...this.fetchContextUris(vc.vc));
-    }
-    return schemaUris;
   }
 
   private evaluateUris(
@@ -111,15 +101,5 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       status: Status.INFO,
       message: undefined,
     };
-  }
-
-  private static fetchContextUris(vc: VerifiableCredential): string[] {
-    const schemaUris: string[] = [];
-    if (Array.isArray(vc['@context'])) {
-      schemaUris.push(...vc['@context']);
-    } else if (typeof vc['@context'] === 'string') {
-      schemaUris.push(vc['@context']);
-    }
-    return schemaUris;
   }
 }

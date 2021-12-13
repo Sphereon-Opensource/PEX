@@ -55,22 +55,61 @@ export interface Issuer {
 }
 
 export interface Credential {
-  '@context': string[];
-  id: string;
-  type: string[];
-  credentialSubject: CredentialSubject;
-  issuer: string | Issuer;
-  issuanceDate: string;
-  expirationDate?: string;
-  credentialStatus?: CredentialStatus;
-  vc?: VerifiableCredential; // fixme: This probably doesn't make sense, at this is used in JWT based credentials, but these to do not have the outermost properties typically
-
+  getBaseCredential(): CredentialBase;
+  getContext(): string[];
   [x: string]: unknown;
 }
 
-export interface VerifiableCredential extends Credential {
+export class CredentialBase {
+  '@context': string[];
+  credentialStatus?: CredentialStatus;
+  // @ts-ignore
+  credentialSubject: CredentialSubject;
+  description?: string;
+  expirationDate?: string;
+  id: string;
+  issuanceDate: string;
+  issuer: unknown;
+  name?: string;
+  type: string[];
+  [x: string]: unknown;
+}
+
+export class CredentialJWT implements Credential {
+  iss: string;
+  exp?: string;
+  nbf?: string; // (not before) claim identifies the time before which the JWT MUST NOT be accepted for processing
+  vc: CredentialBase;
+  [x: string]: unknown;
+
+  getBaseCredential(): CredentialBase {
+    return this.vc;
+  }
+
+  getContext(): string[] {
+    return this.vc['@context'];
+  }
+}
+
+export class CredentialJsonLD extends CredentialBase implements Credential {
+  getBaseCredential(): CredentialBase {
+    return this;
+  }
+
+  getContext(): string[] {
+    return this['@context'];
+  }
+}
+
+export interface VerifiableCredentialJsonLD extends CredentialJsonLD {
   proof: Proof | Proof[];
 }
+
+export interface VerifiableCredentialJwt extends CredentialJWT {
+  proof: Proof | Proof[];
+}
+
+export type VerifiableCredential = VerifiableCredentialJsonLD | VerifiableCredentialJwt;
 
 export interface Presentation {
   '@context': string[];

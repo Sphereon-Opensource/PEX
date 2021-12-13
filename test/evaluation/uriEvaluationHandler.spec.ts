@@ -29,7 +29,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0]['@context'][0] = 'https://www.test.org/mock';
+    vpSimple.verifiableCredential[0].getContext()[0] = 'https://www.test.org/mock';
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);

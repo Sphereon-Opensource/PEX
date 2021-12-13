@@ -3,6 +3,7 @@ import fs from 'fs';
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
 import { EvaluationClient, Status, VerifiablePresentation } from '../../lib';
+import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -62,7 +63,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.verifiableCredential[0]['@context'][0] = 'https://www.w3.org/TR/vc-data-model/#types1';
+    vpSimple.verifiableCredential[0].getContext()[0] = 'https://www.w3.org/TR/vc-data-model/#types1';
     evaluationClient.evaluate(
       presentationDefinition,
       vpSimple.verifiableCredential,
@@ -128,7 +129,9 @@ describe('evaluate', () => {
       HOLDER_DID,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
   });
 
   it('should return info if limit_disclosure does not delete the etc field', function () {
@@ -144,7 +147,9 @@ describe('evaluate', () => {
       HOLDER_DID,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
+    expect((evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']).toEqual(
+      'etc'
+    );
   });
 
   it('should return warn if limit_disclosure deletes the etc field', function () {
@@ -160,7 +165,9 @@ describe('evaluate', () => {
       HOLDER_DID,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the birthPlace field", function () {
@@ -176,7 +183,9 @@ describe('evaluate', () => {
       HOLDER_DID,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
+    ).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the etc field", function () {
@@ -192,6 +201,8 @@ describe('evaluate', () => {
       HOLDER_DID,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
   });
 });

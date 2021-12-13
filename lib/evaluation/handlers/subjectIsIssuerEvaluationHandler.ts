@@ -38,7 +38,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
         const vc: { path: PathComponent[]; value: VerifiableCredential }[] = JsonPathUtils.extractInputField(vcs, [
           currentDescriptor.path,
         ]);
-        if (vc[0]?.value.issuer === vc[0]?.value.credentialSubject.id) {
+        if (vc[0]?.value.issuer === vc[0]?.value.getBaseCredential().credentialSubject.id) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {
           this.getResults().push(this.generateErrorResult(idIdx, currentDescriptor.path));
