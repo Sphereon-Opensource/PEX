@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
 
-import { EvaluationClient, Status, VerifiablePresentation } from '../../lib';
+import { EvaluationClient, Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
@@ -21,12 +21,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationClient.results[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
       verifiable_credential_path: '$[0]',
@@ -47,12 +44,9 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -63,13 +57,10 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.verifiableCredential[0].getContext()[0] = 'https://www.w3.org/TR/vc-data-model/#types1';
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationClient.results[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
       verifiable_credential_path: '$[0]',
@@ -91,12 +82,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
   });
@@ -106,13 +94,10 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -122,13 +107,10 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
     ).toBeUndefined();
@@ -141,12 +123,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     delete presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure;
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect((evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']).toEqual(
       'etc'
     );
@@ -159,12 +138,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
     ).toBeUndefined();
@@ -177,12 +153,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/2018/credentials/v1';
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
     ).toBeUndefined();
@@ -194,13 +167,9 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    presentationDefinition.input_descriptors;
-    evaluationClient.evaluate(
-      presentationDefinition,
-      vpSimple.verifiableCredential,
-      HOLDER_DID,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(presentationDefinition, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
     ).toBeUndefined();

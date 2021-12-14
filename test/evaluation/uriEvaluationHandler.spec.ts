@@ -2,10 +2,11 @@ import fs from 'fs';
 
 import { PresentationDefinition } from '@sphereon/pe-models';
 
-import { Status, VerifiablePresentation } from '../../lib';
+import { Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
 import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
 import { UriEvaluationHandler } from '../../lib/evaluation/handlers/uriEvaluationHandler';
+import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -19,7 +20,9 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationHandler.handle(pdSchema, [vc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -29,10 +32,12 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0].getContext()[0] = 'https://www.test.org/mock';
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc['@context'] = ['https://www.test.org/mock'];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
+    evaluationHandler.handle(pdSchema, [vc]);
     expect(evaluationHandler.getResults()[0]).toEqual(
       new HandlerCheckResult(
         '$.input_descriptors[0]',
@@ -53,11 +58,13 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJwt();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
+    evaluationHandler.handle(pdSchema, [vc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
-    expect(errorResults.length).toEqual(6);
+    expect(errorResults.length).toEqual(2);
   });
 
   it('should generate 5 error result and 1 info.', () => {
@@ -65,10 +72,16 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pdSchema, vpSimple.verifiableCredential);
+    evaluationHandler.handle(pdSchema, [vc0, vc1, vc2]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter((result) => result.status === Status.INFO);
     expect(errorResults.length).toEqual(5);

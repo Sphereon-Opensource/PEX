@@ -31,6 +31,7 @@
   "verifiableCredential": [
     {
       "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
+      "iss": "",
       "vc": {
         "@context": "https://eu.com/claims/DriversLicense",
         "id": "https://eu.com/claims/DriversLicense",
@@ -52,6 +53,13 @@
             }
           ]
         }
+      },
+      "proof": {
+        "type": "EcdsaSecp256k1VerificationKey2019",
+        "created": "2017-06-18T21:19:10Z",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "https://example.edu/issuers/keys/1",
+        "jws": "..."
       }
     },
     {

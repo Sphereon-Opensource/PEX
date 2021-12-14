@@ -43,14 +43,21 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private evaluateUris(
-    verifiableCredentialUris: string[],
+    verifiableCredentialUris: string[] | string,
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
   ): void {
     let hasAnyMatch = false;
+    let vcUris: string[] = [];
+    if (Array.isArray(verifiableCredentialUris)) {
+      vcUris = [...verifiableCredentialUris];
+    } else {
+      vcUris = [verifiableCredentialUris];
+    }
+
     for (let i = 0; i < verifiableCredentialUris.length; i++) {
-      if (inputDescriptorsUris.find((el) => el === verifiableCredentialUris[i]) != undefined) {
+      if (inputDescriptorsUris.find((el) => el === vcUris[i]) != undefined) {
         hasAnyMatch = true;
       }
     }
@@ -66,7 +73,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private createSuccessResultObject(
-    verifiableCredentialUris: string[],
+    verifiableCredentialUris: string[] | string,
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -80,7 +87,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private createErrorResultObject(
-    verifiableCredentialUris: string[],
+    verifiableCredentialUris: string[] | string,
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -100,6 +107,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       evaluator: this.getName(),
       status: Status.INFO,
       message: undefined,
-    };
+    } as HandlerCheckResult;
   }
 }

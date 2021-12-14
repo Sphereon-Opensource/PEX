@@ -3,8 +3,9 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { VerifiableCredential } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers/subjectIsIssuerEvaluationHandler';
+import { EvaluationClient } from '../../lib';
+import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
+import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -30,27 +31,26 @@ describe('evaluate', () => {
         },
       ],
     };
-    const verifiableCredential: Array<VerifiableCredential> = [
-      {
-        credentialSubject: {
-          id: 'did:example:123',
-          age: 19,
-        },
-        id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-        type: ['VerifiableCredential'],
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        issuer: 'did:example:123',
-        credentialSchema: [
-          {
-            id: 'https://www.w3.org/TR/vc-data-model/#types',
-          },
-        ],
-        issuanceDate: '2021-04-12T23:20:50.52Z',
-        proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, {
+      credentialSubject: {
+        id: 'did:example:123',
+        age: 19,
       },
-    ];
+      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
+      type: ['VerifiableCredential'],
+      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      issuer: 'did:example:123',
+      credentialSchema: [
+        {
+          id: 'https://www.w3.org/TR/vc-data-model/#types',
+        },
+      ],
+      issuanceDate: '2021-04-12T23:20:50.52Z',
+      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    });
 
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, verifiableCredential);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, [vc]);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
       verifiable_credential_path: '$[0]',
@@ -79,27 +79,26 @@ describe('evaluate', () => {
         },
       ],
     };
-    const verifiableCredentials: Array<VerifiableCredential> = [
-      {
-        credentialSubject: {
-          id: 'did:example:123',
-          age: 19,
-        },
-        id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-        type: ['VerifiableCredential'],
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        issuer: 'did:example:124',
-        credentialSchema: [
-          {
-            id: 'https://www.w3.org/TR/vc-data-model/#types',
-          },
-        ],
-        issuanceDate: '2021-04-12T23:20:50.52Z',
-        proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, {
+      credentialSubject: {
+        id: 'did:example:123',
+        age: 19,
       },
-    ];
+      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
+      type: ['VerifiableCredential'],
+      '@context': ['https://www.w3.org/2018/credentials/v1'],
+      issuer: 'did:example:124',
+      credentialSchema: [
+        {
+          id: 'https://www.w3.org/TR/vc-data-model/#types',
+        },
+      ],
+      issuanceDate: '2021-04-12T23:20:50.52Z',
+      proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
+    });
 
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, verifiableCredentials);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, [vc]);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       evaluator: 'SubjectIsIssuerEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',

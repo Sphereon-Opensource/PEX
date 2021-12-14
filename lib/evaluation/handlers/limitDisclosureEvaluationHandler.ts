@@ -1,9 +1,10 @@
-import { Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
-import jp, { PathComponent } from 'jsonpath';
+import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
+import { VerifiableCredential } from '../../types';
+import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
-import { VerifiableCredential, VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
@@ -18,65 +19,97 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    const updatedVCs: VerifiableCredential[] = [];
-    vcs.forEach((vc, index) => {
-      const result: VerifiableCredential[] = this.createRevealDocuments(vc, pd, index);
-      if (result.length) {
-        updatedVCs.push(result[0]);
-      } else {
-        updatedVCs.push(vc);
+    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+      if (
+        inDesc.constraints?.fields &&
+        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
+          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+      ) {
+        this.evaluateLimitDisclosure(vcs, inDesc.constraints, index);
       }
     });
-    this.verifiableCredential = updatedVCs;
-    if (this.getResults().filter((r) => r.evaluator === 'LimitDisclosureEvaluation').length) {
-      this.presentationSubmission.descriptor_map = this.getResults()
-        .filter((r) => r.status !== Status.ERROR && r.evaluator === 'LimitDisclosureEvaluation')
-        .flatMap((r) => {
-          /**
-           * TODO Map nested credentials
-           */
-          const inputDescriptor: InputDescriptor = jp.query(pd, r.input_descriptor_path)[0];
-          return this.presentationSubmission.descriptor_map.filter(
-            (ps) => ps.path === r.verifiable_credential_path && ps.id === inputDescriptor.id
-          );
-        });
+  }
+
+  private isLimitDisclosureSupported(
+    vc: VerifiableCredential,
+    vcIdx: number,
+    idIdx: number,
+    optionality: Optionality
+  ): boolean {
+    const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
+    if (!vc.proof || Array.isArray(vc.proof) || !vc.proof.type) {
+      // todo: Support/inspect array based proofs
+      return false;
+    } else if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+      if (optionality == Optionality.Required) {
+        this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
+      }
+      return false;
+    }
+    return true;
+  }
+
+  private evaluateLimitDisclosure(
+    verifiableCredential: VerifiableCredential[],
+    constraints: Constraints,
+    idIdx: number
+  ): void {
+    const fields = constraints?.fields as Field[];
+    const optionality = constraints.limit_disclosure;
+    verifiableCredential.forEach((vc, index) => {
+      if (optionality && this.isLimitDisclosureSupported(vc, index, idIdx, optionality)) {
+        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, optionality);
+      }
+    });
+  }
+
+  private enforceLimitDisclosure(
+    vc: VerifiableCredential,
+    fields: Field[],
+    idIdx: number,
+    index: number,
+    verifiableCredential: VerifiableCredential[],
+    limitDisclosure: Optionality
+  ) {
+    const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+    /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
+     * remain untouched and the verifiable credential won't be submitted.
+     */
+    if (verifiableCredentialToSend) {
+      verifiableCredential[index] = verifiableCredentialToSend;
+      this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
     }
   }
 
-  private createRevealDocuments(
-    verifiableCredential: VerifiableCredential,
-    presentationDefinition: PresentationDefinition,
-    vcIdx: number
-  ): VerifiableCredential[] {
-    const result: VerifiableCredential[] = [];
-    //TODO: find a better solution for handling jwt VCs
-    const revealDocument: VerifiableCredential = this.createWithMandatoryFields(verifiableCredential);
-    presentationDefinition.input_descriptors.forEach((inDesc: InputDescriptor, idIdx) => {
-      if (inDesc?.constraints?.fields && inDesc?.constraints?.limit_disclosure === Optionality.Required) {
-        this.determineNecessaryPaths(verifiableCredential, revealDocument, inDesc.constraints.fields);
-        result.push(revealDocument);
-      }
-      this.createSuccessResult(idIdx, `$.input_descriptors[${vcIdx}]`);
-    });
-    return result;
-  }
-
-  private determineNecessaryPaths(
+  private createVcWithRequiredFields(
     vc: VerifiableCredential,
-    revealDocument: VerifiableCredential,
-    fields: Field[]
-  ): void {
-    for (let i = 0; i < fields.length; i++) {
-      const field: Field = fields[i];
-      if (field && field.path) {
+    fields: Field[],
+    idIdx: number,
+    vcIdx: number
+  ): VerifiableCredential | undefined {
+    let vcToSend: VerifiableCredential;
+    if (vc.getType() === 'jwt') {
+      vcToSend = new VerifiableCredentialJwt();
+      vcToSend = { ...vc } as unknown as VerifiableCredentialJwt;
+      vcToSend = Object.assign(vcToSend, vc);
+      vcToSend.getBaseCredential().credentialSubject = {};
+    } else {
+      vcToSend = new VerifiableCredentialJsonLD();
+      vcToSend = Object.assign(vcToSend, vc);
+      vcToSend.getBaseCredential().credentialSubject = {};
+    }
+    for (const field of fields) {
+      if (field.path) {
         const inputField = JsonPathUtils.extractInputField(vc, field.path);
         if (inputField.length > 0) {
-          this.copyResultPathToDestinationCredential(inputField[0].path, vc, revealDocument);
+          vcToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, vcToSend);
         } else {
-          console.log(`Warning: mandatory field ${field.path} not found.`);
+          this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+          return undefined;
         }
       }
     }
+    return vcToSend;
   }
 
   private copyResultPathToDestinationCredential(
@@ -84,67 +117,48 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     verifiableCredential: VerifiableCredential,
     verifiableCredentialToSend: VerifiableCredential
   ): VerifiableCredential {
-    let credentialSubject = { ...verifiableCredential.getBaseCredential().credentialSubject };
+    let credentialSubject = { ...verifiableCredential?.getBaseCredential().credentialSubject };
     requiredField.path.forEach((e) => {
       if (credentialSubject[e]) {
         credentialSubject = { [e]: credentialSubject[e] } as { [x: string]: unknown };
       }
     });
-    let result: VerifiableCredential;
-    if (verifiableCredentialToSend as VerifiableCredentialJsonLD) {
-      result = {
-        ...verifiableCredentialToSend,
-      } as VerifiableCredentialJsonLD;
-    } else {
-      result = {
-        ...verifiableCredentialToSend,
-      } as VerifiableCredentialJwt;
-    }
-    result.getBaseCredential().credentialSubject = { ...credentialSubject };
-    return result;
+    verifiableCredentialToSend.getBaseCredential().credentialSubject = {
+      ...verifiableCredentialToSend.getBaseCredential().credentialSubject,
+      ...credentialSubject,
+    };
+    return verifiableCredentialToSend;
   }
 
-  private createSuccessResult(idIdx: number, path: string) {
+  private createSuccessResult(idIdx: number, path: string, limitDisclosure: Optionality) {
     return this.getResults().push({
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
-      status: Status.INFO,
+      status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
       message: 'added variable in the limit_disclosure to the verifiableCredential',
       payload: undefined,
     });
   }
 
-  private createWithMandatoryFields(verifiableCredential: VerifiableCredential): VerifiableCredential {
-    let revealDocument: VerifiableCredential;
-    if (verifiableCredential as VerifiableCredentialJwt) {
-      const vcJWT: VerifiableCredentialJwt = verifiableCredential as VerifiableCredentialJwt;
-      revealDocument = {
-        exp: vcJWT.exp,
-        iss: vcJWT.iss,
-        nbf: vcJWT.nbf,
-        vc: {
-          '@context': vcJWT.vc['@context'],
-          issuer: vcJWT.vc.issuer,
-          issuanceDate: vcJWT.vc.issuanceDate,
-          id: vcJWT.vc.id,
-          credentialSubject: vcJWT.vc.credentialSubject,
-          type: vcJWT.vc.type,
-        },
-        proof: vcJWT.proof,
-      } as VerifiableCredentialJwt;
-    } else {
-      const vcJsonLD: VerifiableCredentialJsonLD = verifiableCredential as VerifiableCredentialJsonLD;
-      revealDocument = {
-        '@context': vcJsonLD['@context'],
-        issuer: vcJsonLD.issuer,
-        issuanceDate: vcJsonLD.issuanceDate,
-        id: vcJsonLD.id,
-        credentialSubject: vcJsonLD.credentialSubject,
-        type: vcJsonLD.type,
-        proof: vcJsonLD.proof,
-      } as VerifiableCredentialJsonLD;
-    }
-    return revealDocument;
+  private createMandatoryFieldNotFoundResult(idIdx: number, vcIdx: number, path: string[]) {
+    return this.getResults().push({
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
+      evaluator: this.getName(),
+      status: Status.ERROR,
+      message: 'mandatory field not present in the verifiableCredential',
+      payload: path,
+    });
+  }
+
+  private createLimitDisclosureNotSupportedResult(idIdx: number, vcIdx: number) {
+    return this.getResults().push({
+      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+      verifiable_credential_path: `$[${vcIdx}]`,
+      evaluator: this.getName(),
+      status: Status.ERROR,
+      message: 'Limit disclosure not supported',
+    });
   }
 }

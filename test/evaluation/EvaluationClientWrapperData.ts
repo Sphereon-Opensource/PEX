@@ -1,6 +1,7 @@
 import { PresentationSubmission, Rules } from '@sphereon/pe-models';
 
 import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
+import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {
@@ -237,7 +238,6 @@ export class EvaluationClientWrapperData {
           issuanceDate: '',
           issuer: '',
           type: [],
-
           '@context': [],
           proof: {
             type: '',
@@ -246,7 +246,7 @@ export class EvaluationClientWrapperData {
             verificationMethod: '',
             jws: '',
           },
-        },
+        } as unknown as VerifiableCredentialJsonLD,
       ],
       vcIndexes: [],
       matches: [
@@ -281,7 +281,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      },
+      } as unknown as VerifiableCredentialJsonLD,
       {
         id: 'CredentialID2021110405',
         credentialStatus: {
@@ -302,7 +302,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      },
+      } as unknown as VerifiableCredentialJsonLD,
       {
         id: 'CredentialID2021110100',
         credentialStatus: {
@@ -323,7 +323,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      },
+      } as unknown as VerifiableCredentialJsonLD,
     ];
   }
 

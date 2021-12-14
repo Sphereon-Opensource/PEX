@@ -2,8 +2,9 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
 
-import { Status, VerifiablePresentation } from '../../lib';
+import { Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
+import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../lib/types/SSI.types';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
 
@@ -24,9 +25,11 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -44,9 +47,11 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -65,9 +70,11 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -89,9 +96,11 @@ describe('evaluate', () => {
     vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -109,9 +118,11 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -129,13 +140,17 @@ describe('evaluate', () => {
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -149,13 +164,17 @@ describe('evaluate', () => {
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toEqual('etc');
+    expect((evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']).toEqual(
+      'etc'
+    );
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -169,13 +188,17 @@ describe('evaluate', () => {
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getWarn().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings).toEqual(evaluationClientWrapperData.getWarn().warnings);
@@ -189,13 +212,17 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['birthPlace']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
+    ).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -211,13 +238,17 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.verifiableCredential[0].credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
+    ).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -231,9 +262,15 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -255,19 +292,22 @@ describe('evaluate', () => {
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0.getBaseCredential().issuer = 'did:foo:123';
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
-      pdSchema,
-      vpSimple.verifiableCredential
-    );
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [vc0, vc1, vc2]);
     expect(result).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -293,17 +333,23 @@ describe('evaluate', () => {
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0.getBaseCredential().issuer = 'did:foo:123';
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
-      { ...vpSimple.verifiableCredential[1] },
+      { ...vc1 } as VerifiableCredentialJsonLD,
     ]);
     expect(result).toEqual(
       expect.objectContaining({
@@ -319,18 +365,25 @@ describe('evaluate', () => {
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     delete pdSchema!.submission_requirements;
-    vpSimple!.verifiableCredential![0]!.vc!.issuer = 'did:foo:123';
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    const vcAttr: VerifiableCredentialJwt = <VerifiableCredentialJwt>vpSimple.verifiableCredential[0];
+    vc0 = Object.assign(vc0, vcAttr);
+    vc0.getBaseCredential().issuer = 'did:foo:123';
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
-      { ...vpSimple.verifiableCredential[1] },
-      { ...vpSimple.verifiableCredential[2] },
+      { ...vpSimple.verifiableCredential[1] } as VerifiableCredentialJsonLD,
+      { ...vpSimple.verifiableCredential[2] } as VerifiableCredentialJsonLD,
     ]);
     expect(result).toEqual(
       expect.objectContaining({

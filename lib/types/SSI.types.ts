@@ -55,15 +55,15 @@ export interface Issuer {
 }
 
 export interface Credential {
+  getType(): string;
   getBaseCredential(): CredentialBase;
-  getContext(): string[];
+  getContext(): string[] | string;
   [x: string]: unknown;
 }
 
 export class CredentialBase {
-  '@context': string[];
+  '@context': string[] | string;
   credentialStatus?: CredentialStatus;
-  // @ts-ignore
   credentialSubject: CredentialSubject;
   description?: string;
   expirationDate?: string;
@@ -86,8 +86,12 @@ export class CredentialJWT implements Credential {
     return this.vc;
   }
 
-  getContext(): string[] {
+  getContext(): string[] | string {
     return this.vc['@context'];
+  }
+
+  getType(): string {
+    return 'jwt';
   }
 }
 
@@ -96,17 +100,29 @@ export class CredentialJsonLD extends CredentialBase implements Credential {
     return this;
   }
 
-  getContext(): string[] {
+  getContext(): string[] | string {
     return this['@context'];
+  }
+
+  getType(): string {
+    return 'json-ld';
   }
 }
 
-export interface VerifiableCredentialJsonLD extends CredentialJsonLD {
+export class VerifiableCredentialJsonLD extends CredentialJsonLD {
   proof: Proof | Proof[];
+
+  constructor() {
+    super();
+  }
 }
 
-export interface VerifiableCredentialJwt extends CredentialJWT {
+export class VerifiableCredentialJwt extends CredentialJWT {
   proof: Proof | Proof[];
+
+  constructor() {
+    super();
+  }
 }
 
 export type VerifiableCredential = VerifiableCredentialJsonLD | VerifiableCredentialJwt;

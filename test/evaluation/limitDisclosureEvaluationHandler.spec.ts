@@ -3,11 +3,11 @@ import fs from 'fs';
 import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
+import { EvaluationClient } from '../../lib';
+import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
 import { PdMultiCredentials } from '../test_data/limitDisclosureEvaluation/pdMultiCredentials';
 import { VcMultiCredentials } from '../test_data/limitDisclosureEvaluation/vcMultiCredentials';
-import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -24,7 +24,9 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    evaluationClient.evaluate(pdSchema, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['etc']
     ).toBeUndefined();
@@ -35,9 +37,11 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClient.evaluate(pdSchema, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
     ).toBeUndefined();
@@ -48,12 +52,14 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    if ('type' in vpSimple.verifiableCredential[0].proof) {
-      vpSimple.verifiableCredential[0].proof.type = 'limit disclosure unsupported';
+    if ('type' in vc.proof) {
+      vc.proof.type = 'limit disclosure unsupported';
     }
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClient.evaluate(pdSchema, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['birthPlace']
     ).toEqual('Maarssen');
@@ -71,10 +77,12 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    delete (vpSimple.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['details'];
+    delete vc.getBaseCredential().credentialSubject['details'];
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.evaluate(pdSchema, vpSimple.verifiableCredential, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClient.evaluate(pdSchema, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as VerifiableCredentialJsonLD).credentialSubject['details']
     ).toBeUndefined();

@@ -3,6 +3,7 @@ import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-mod
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
+import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from './types/SSI.types';
 import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -31,6 +32,7 @@ export class PEJS {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
+    presentationCopy.verifiableCredential = this.recognizeAndEditVCs(presentationCopy.verifiableCredential);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
@@ -63,7 +65,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       presentationDefinition,
-      verifiableCredentialCopy,
+      this.recognizeAndEditVCs(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -90,7 +92,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       presentationDefinition,
-      verifiableCredentialCopy,
+      this.recognizeAndEditVCs(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -246,5 +248,21 @@ export class PEJS {
     };
 
     return signingCallBack(callBackParams);
+  }
+
+  private recognizeAndEditVCs(verifiableCredential: VerifiableCredential[]): VerifiableCredential[] {
+    const vcs: VerifiableCredential[] = [];
+    for (let i = 0; i < verifiableCredential.length; i++) {
+      if (verifiableCredential[i]['vc']) {
+        let vc: VerifiableCredential = new VerifiableCredentialJwt();
+        vc = Object.assign(vc, verifiableCredential[i]);
+        vcs.push(vc);
+      } else {
+        let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+        vc = Object.assign(vc, verifiableCredential[i]);
+        vcs.push(vc);
+      }
+    }
+    return vcs;
   }
 }

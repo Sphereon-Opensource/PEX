@@ -4,6 +4,7 @@ import { PresentationDefinition } from '@sphereon/pe-models';
 
 import { Status, VerifiableCredential } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
+import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -17,15 +18,16 @@ describe('selectFrom tests', () => {
   it('Evaluate submission requirements all from group A', () => {
     const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -127,6 +129,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -146,6 +149,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -197,13 +207,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -353,13 +364,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
@@ -476,6 +488,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -495,6 +508,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -546,13 +566,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -702,13 +723,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -824,6 +846,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -843,6 +866,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -894,13 +924,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -1017,6 +1048,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -1036,6 +1068,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -1087,13 +1126,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -1210,6 +1250,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -1229,6 +1270,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -1280,13 +1328,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -1436,13 +1485,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
@@ -1592,13 +1642,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
@@ -1748,13 +1799,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -1903,13 +1955,14 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(
-      evaluationClientWrapper.selectFrom(
-        pdSchema,
-        vpSimple.verifiableCredential,
-        dids,
-        LIMIT_DISCLOSURE_SIGNATURE_SUITES
-      )
+      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
     ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
@@ -2026,6 +2079,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -2045,6 +2099,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -2096,9 +2157,15 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     const result = evaluationClientWrapper.selectFrom(
       pdSchema,
-      vpSimple.verifiableCredential,
+      [vc0, vc1, vc2],
       dids,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -2218,6 +2285,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
+          iss: '',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -2237,6 +2305,13 @@ describe('selectFrom tests', () => {
             issuanceDate: '2010-01-01T19:73:24Z',
             issuer: 'did:example:123',
             type: ['EUDriversLicense'],
+          },
+          proof: {
+            created: '2017-06-18T21:19:10Z',
+            jws: '...',
+            proofPurpose: 'assertionMethod',
+            type: 'EcdsaSecp256k1VerificationKey2019',
+            verificationMethod: 'https://example.edu/issuers/keys/1',
           },
         },
         {
@@ -2287,7 +2362,9 @@ describe('selectFrom tests', () => {
     const pdSchema: PresentationDefinition = getFile(
       './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
     ).presentation_definition;
-    const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    const verifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(
       pdSchema,
@@ -2307,7 +2384,11 @@ describe('selectFrom tests', () => {
   it('Evaluate driver license name result', () => {
     const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
       .presentation_definition as PresentationDefinition;
-    const vc: VerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as VerifiableCredential;
+    const verifiableCredential: VerifiableCredential = getFile(
+      './test/dif_pe_examples/vc/vc-driverLicense.json'
+    ) as VerifiableCredential;
+    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(
       pdSchema,
