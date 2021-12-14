@@ -1,5 +1,5 @@
 import { VerifiablePresentation } from '../../../lib';
-import {VerifiableCredentialJsonLD} from "../../../dist/browser/lib/types/SSI.types";
+import { VerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<VerifiablePresentation> {
