@@ -1,4 +1,5 @@
 import { VerifiablePresentation } from '../../../lib';
+import {VerifiableCredentialJsonLD} from "../../../dist/browser/lib/types/SSI.types";
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<VerifiablePresentation> {
@@ -58,7 +59,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        },
+        } as unknown as VerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -82,7 +83,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        },
+        } as unknown as VerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -106,7 +107,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        },
+        } as unknown as VerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -130,7 +131,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110804',
           },
-        },
+        } as unknown as VerifiableCredentialJsonLD,
       ],
     };
   }
