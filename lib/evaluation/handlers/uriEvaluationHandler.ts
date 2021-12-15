@@ -1,9 +1,10 @@
-import { Descriptor, InputDescriptor, PresentationDefinition } from '@sphereon/pe-models';
+import { Descriptor, InputDescriptorV1 } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
+import { PresentationDefinition, PresentationDefinitionV1 } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -19,7 +20,11 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   public handle(d: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    d.input_descriptors.forEach((inDesc: InputDescriptor, i: number) => {
+    // This filter is removed in V2
+    if (d.getVersion() == 'v2') {
+      return;
+    }
+    (<PresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = inDesc.schema.map((so) => so.uri);
       vcs.forEach((vc: VerifiableCredential, j: number) => {
         this.evaluateUris(vc.getContext(), uris, i, j);
@@ -28,7 +33,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     const descriptorMap: Descriptor[] = this.getResults()
       .filter((e) => e.status === Status.INFO)
       .map((e) => {
-        const inputDescriptor: InputDescriptor = jp.nodes(d, e.input_descriptor_path)[0].value;
+        const inputDescriptor: InputDescriptorV1 = jp.nodes(d, e.input_descriptor_path)[0].value;
         return {
           id: inputDescriptor.id,
           format: 'ldp_vc',

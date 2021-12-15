@@ -1,9 +1,10 @@
 import fs from 'fs';
 
-import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Optionality } from '@sphereon/pe-models';
 
 import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
 import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
+import { PresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -11,7 +12,7 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
   it('should return ok if payload value of PredicateRelatedField is integer', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -70,7 +71,7 @@ describe('evaluate', () => {
   });
 
   it('should return ok if payload value of PredicateRelatedField is boolean', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
@@ -130,7 +131,7 @@ describe('evaluate', () => {
   });
 
   it('should return error if we process the predicate filter for this PD', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
@@ -175,7 +176,7 @@ describe('evaluate', () => {
   });
 
   it("should return ok if verifiableCredential's age value is matching the specification in the input descriptor", function () {
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;

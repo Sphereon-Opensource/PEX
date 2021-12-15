@@ -1,8 +1,9 @@
-import { HolderSubject, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { HolderSubject, Optionality } from '@sphereon/pe-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
+import { PresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 

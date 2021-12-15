@@ -1,32 +1,32 @@
-import { Constraints, Field, HolderSubject, InputDescriptor, Schema } from '@sphereon/pe-models';
+import { Constraints, Field, HolderSubject, InputDescriptorV2 } from '@sphereon/pe-models';
 
-import { Validation, ValidationPredicate } from '../core';
+import { ObjectValidationUtils } from '../../utils/ObjectValidationUtils';
+import { Validation } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';
 import { ValidationBundler } from './validationBundler';
 
-export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
+export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]> {
   private readonly idMustBeNonEmptyStringMsg = 'input descriptor id must be non-empty string';
   private readonly nameShouldBeNonEmptyStringMsg = 'input descriptor name should be non-empty string';
   private readonly purposeShouldBeNonEmptyStringMsg = 'input descriptor purpose should be non-empty string';
-  private readonly shouldHaveValidSchemaURIMsg = 'schema should have valid URI';
 
   constructor(parentTag: string) {
     super(parentTag, 'input_descriptor');
   }
 
   public getValidations(
-    inputDescriptors: InputDescriptor[]
+    inputDescriptors: InputDescriptorV2[]
   ): (
-    | Validation<InputDescriptor>
-    | Validation<InputDescriptor[]>
+    | Validation<InputDescriptorV2>
+    | Validation<InputDescriptorV2[]>
     | Validation<Constraints>
     | Validation<Field>
     | Validation<HolderSubject>
   )[] {
     let validations: (
-      | Validation<InputDescriptor>
-      | Validation<InputDescriptor[]>
+      | Validation<InputDescriptorV2>
+      | Validation<InputDescriptorV2[]>
       | Validation<Constraints>
       | Validation<Field>
       | Validation<HolderSubject>
@@ -36,13 +36,13 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
       {
         tag: this.getTag(),
         target: inputDescriptors,
-        predicate: (inDescs: InputDescriptor[]) => this.shouldHaveUniqueIds(inDescs),
+        predicate: (inDescs: InputDescriptorV2[]) => this.shouldHaveUniqueIds(inDescs),
         message: 'input descriptor ids must be unique',
       },
       {
         tag: this.getTag(),
         target: inputDescriptors,
-        predicate: (inDescs: InputDescriptor[]) => this.shouldHaveUniqueFieldsIds(inDescs),
+        predicate: (inDescs: InputDescriptorV2[]) => this.shouldHaveUniqueFieldsIds(inDescs),
         message: 'fields id must be unique',
       }
     );
@@ -57,36 +57,30 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return validations;
   }
 
-  private getValidationFor(inputDescriptor: InputDescriptor, inDescInd: number): Validation<InputDescriptor>[] {
+  private getValidationFor(inputDescriptor: InputDescriptorV2, inDescInd: number): Validation<InputDescriptorV2>[] {
     return [
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor,
-        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.nonEmptyString(inDesc?.id),
+        predicate: (inDesc: InputDescriptorV2) => ObjectValidationUtils.nonEmptyString(inDesc?.id),
         message: this.idMustBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor,
-        predicate: this.isValidSchema(),
-        message: this.shouldHaveValidSchemaURIMsg,
-      },
-      {
-        tag: this.getMyTag(inDescInd),
-        target: inputDescriptor,
-        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.optionalNonEmptyString(inDesc?.name),
+        predicate: (inDesc: InputDescriptorV2) => ObjectValidationUtils.optionalNonEmptyString(inDesc?.name),
         message: this.nameShouldBeNonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(inDescInd),
         target: inputDescriptor,
-        predicate: (inDesc: InputDescriptor) => InputDescriptorsVB.optionalNonEmptyString(inDesc?.purpose),
+        predicate: (inDesc: InputDescriptorV2) => ObjectValidationUtils.optionalNonEmptyString(inDesc?.purpose),
         message: this.purposeShouldBeNonEmptyStringMsg,
       },
     ];
   }
 
-  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptor[]): boolean {
+  private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptorV2[]): boolean {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
     const tmp: Field[] = [];
@@ -106,7 +100,7 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return nonUniqueInputDescriptorFieldsIds.length === uniqueInputDescriptorFieldsIds.size;
   }
 
-  private shouldHaveUniqueIds(inputDescriptors: InputDescriptor[]): boolean {
+  private shouldHaveUniqueIds(inputDescriptors: InputDescriptorV2[]): boolean {
     const nonUniqueInputDescriptorIds: string[] = [];
     const uniqueInputDescriptorIds: Set<string> = new Set<string>();
     inputDescriptors.forEach((e) => nonUniqueInputDescriptorIds.push(e.id));
@@ -119,62 +113,8 @@ export class InputDescriptorsVB extends ValidationBundler<InputDescriptor[]> {
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private static nonEmptyString(id: string): boolean {
-    // TODO extract to generic utils or use something like lodash
-    return id != null && id.length > 0;
-  }
-
-  private static optionalNonEmptyString(name: string | undefined): boolean {
-    // TODO extract to generic utils or use something like lodash
-    return name == null || name.length > 0;
-  }
-
-  isValidSchema(): ValidationPredicate<InputDescriptor> {
-    // TODO extract to generic util or use built-in method
-    return (inDesc: InputDescriptor): boolean => {
-      return (
-        inDesc.schema.filter(
-          (schema: Schema) =>
-            this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
-        ).length > 0
-      );
-    };
-  }
-
-  isAValidURI(uri: string) {
-    try {
-      new URL(uri);
-    } catch (err) {
-      // console.log(err)
-      return InputDescriptorsVB.isValidDIDURI(uri);
-    }
-    return true;
-  }
-
-  private static isValidDIDURI(uri: string) {
-    const pchar = "[a-zA-Z-\\._~]|%[0-9a-fA-F]{2}|[!$&'()*+,;=:@]";
-    const format =
-      '^' +
-      'did:' +
-      '([a-z0-9]+)' + // method_name
-      '(:' + // method-specific-id
-      '([a-zA-Z0-9\\.\\-_]|%[0-9a-fA-F]{2})+' +
-      ')+' +
-      '(/(' +
-      pchar +
-      ')*)?'; // + // path-abempty
-    '(\\?(' +
-      pchar +
-      '|/|\\?)+)?' + // [ "?" query ]
-      '(#(' +
-      pchar +
-      '|/|\\?)+)?'; // [ "#" fragment ]
-    ('$');
-    return new RegExp(format).test(uri);
-  }
-
   constraintsValidations(
-    inputDescriptor: InputDescriptor,
+    inputDescriptor: InputDescriptorV2,
     inDescInd: number
   ): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
     if (inputDescriptor.constraints) {

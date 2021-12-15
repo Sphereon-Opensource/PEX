@@ -1,10 +1,13 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
-
 import { Status, VerifiableCredential } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
-import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../lib/types/SSI.types';
+import {
+  PresentationDefinitionV1,
+  VerifiableCredentialJsonLD,
+  VerifiableCredentialJwt,
+} from '../../lib/types/SSI.types';
+import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -16,7 +19,7 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 
 describe('selectFrom tests', () => {
   it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -25,10 +28,9 @@ describe('selectFrom tests', () => {
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -203,9 +205,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -213,9 +216,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -360,9 +361,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements either all from group A or 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -370,9 +372,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -562,9 +562,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -572,9 +573,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -719,9 +718,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group A and 2 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -729,9 +729,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -920,9 +918,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 1: (all from group A or 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -930,9 +929,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1122,9 +1119,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1132,9 +1130,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1324,9 +1320,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1334,9 +1331,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1481,9 +1476,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1491,9 +1487,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1638,9 +1632,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements exactly 1 from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1648,9 +1643,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1795,9 +1788,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group B', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1805,9 +1799,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -1951,9 +1943,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -1961,9 +1954,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    expect(
-      evaluationClientWrapper.selectFrom(pdSchema, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)
-    ).toEqual({
+    expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
@@ -2153,9 +2144,10 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -2163,12 +2155,7 @@ describe('selectFrom tests', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    const result = evaluationClientWrapper.selectFrom(
-      pdSchema,
-      [vc0, vc1, vc2],
-      dids,
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const result = evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
@@ -2359,15 +2346,16 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate case without presentation submission', () => {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
     ).presentation_definition;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const verifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(
-      pdSchema,
+      pd,
       [vc],
       ['FAsYneKJhWBP2n5E21ZzdY'],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -2382,8 +2370,9 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate driver license name result', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
-      .presentation_definition as PresentationDefinition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
+      .presentation_definition as PresentationDefinitionV1;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const verifiableCredential: VerifiableCredential = getFile(
       './test/dif_pe_examples/vc/vc-driverLicense.json'
     ) as VerifiableCredential;
@@ -2391,7 +2380,7 @@ describe('selectFrom tests', () => {
     vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(
-      pdSchema,
+      pd,
       [vc],
       ['FAsYneKJhWBP2n5E21ZzdY'],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES

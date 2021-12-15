@@ -1,11 +1,9 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
-
 import { VerifiableCredential, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation/evaluationClient';
-import { HandlerCheckResult } from '../../lib/evaluation/handlerCheckResult';
-import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers/markForSubmissionEvaluationHandler';
+import { EvaluationClient, HandlerCheckResult } from '../../lib';
+import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers';
+import { PresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 const results: HandlerCheckResult[] = [
   {
@@ -61,10 +59,10 @@ const results_with_error: HandlerCheckResult[] = [
   },
 ];
 
-function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+function getFile(path: string): PresentationDefinitionV1 | VerifiablePresentation | VerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
   if (Object.keys(file).includes('presentation_definition')) {
-    return file.presentation_definition as PresentationDefinition;
+    return file.presentation_definition as PresentationDefinitionV1;
   } else if (Object.keys(file).includes('presentation_submission')) {
     return file as VerifiablePresentation;
   } else {
@@ -77,9 +75,9 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
@@ -100,9 +98,9 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);

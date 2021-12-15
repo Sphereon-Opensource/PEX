@@ -1,6 +1,7 @@
-import { Constraints, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
+import { PresentationDefinition, PresentationDefinitionV2 } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -16,7 +17,8 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
   }
 
   public handle(pd: PresentationDefinition): void {
-    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+    // PresentationDefinitionV2 is the common denominator
+    (pd as PresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (inDesc.constraints) {
         this.examinePredicateRelatedField(index, inDesc.constraints);
       }

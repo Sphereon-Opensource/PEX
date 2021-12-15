@@ -1,8 +1,8 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
+import { PresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 

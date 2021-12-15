@@ -1,8 +1,9 @@
-import { InputDescriptor, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
+import { PresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -60,7 +61,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
          * TODO map the nested credential
          let vcPath = jp.stringify(e.payload.result.path)
          */
-      let inputDescriptor: InputDescriptor;
+      let inputDescriptor: InputDescriptorV1 | InputDescriptorV2;
       const result = this.getResults()
         .filter((r) => r.status === Status.ERROR && r.evaluator === this.getName())
         .find((result) => {

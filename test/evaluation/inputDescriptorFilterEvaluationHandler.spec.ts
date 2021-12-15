@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pe-models';
 
 import {
   EvaluationClient,
@@ -11,6 +11,7 @@ import {
   VerifiablePresentation,
 } from '../../lib';
 import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/handlers';
+import { PresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 const message: HandlerCheckResult = {
   input_descriptor_path: `$.input_descriptors[0]`,
@@ -21,10 +22,10 @@ const message: HandlerCheckResult = {
   message: 'Input candidate valid for presentation submission',
 };
 
-function getFile(path: string): PresentationDefinition | VerifiablePresentation | VerifiableCredential {
+function getFile(path: string): PresentationDefinitionV1 | VerifiablePresentation | VerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
   if (Object.keys(file).includes('presentation_definition')) {
-    return file.presentation_definition as PresentationDefinition;
+    return file.presentation_definition as PresentationDefinitionV1;
   } else if (Object.keys(file).includes('presentation_submission')) {
     return file as VerifiablePresentation;
   } else {
@@ -37,9 +38,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
@@ -63,9 +64,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[1]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
@@ -89,9 +90,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[2]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
@@ -115,9 +116,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[3]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
@@ -144,9 +145,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[4]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
@@ -169,9 +170,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinition = getFile(
+    const presentationDefinition: PresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinition;
+    ) as PresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[5]];
     presentation.presentation_submission?.descriptor_map.forEach(
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))

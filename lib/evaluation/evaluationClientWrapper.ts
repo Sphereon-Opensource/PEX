@@ -1,14 +1,9 @@
-import {
-  Descriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { VerifiableCredential } from '../types';
+import { PresentationDefinition } from '../types/SSI.types';
 import { JsonPathUtils } from '../utils';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';

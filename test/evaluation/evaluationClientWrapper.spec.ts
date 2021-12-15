@@ -1,10 +1,15 @@
 import fs from 'fs';
 
-import { Optionality, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { Optionality, PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status, VerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
-import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../lib/types/SSI.types';
+import {
+  PresentationDefinitionV1,
+  VerifiableCredentialJsonLD,
+  VerifiableCredentialJwt,
+} from '../../lib/types/SSI.types';
+import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
 
@@ -18,17 +23,18 @@ const evaluationClientWrapperData: EvaluationClientWrapperData = new EvaluationC
 
 describe('evaluate', () => {
   it("should return error if uri in inputDescriptors doesn't match", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -40,17 +46,18 @@ describe('evaluate', () => {
   });
 
   it("should return ok if uri in vp matches at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -63,9 +70,10 @@ describe('evaluate', () => {
   });
 
   it("should return error if uri in verifiableCredential doesn't match", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -73,7 +81,7 @@ describe('evaluate', () => {
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -89,9 +97,10 @@ describe('evaluate', () => {
   });
 
   it("should return error if all the uris in vp don't match at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
@@ -99,7 +108,7 @@ describe('evaluate', () => {
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -111,17 +120,18 @@ describe('evaluate', () => {
   });
 
   it("should return ok if all the uris in vp match at least one of input_descriptor's uris", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -134,16 +144,17 @@ describe('evaluate', () => {
   });
 
   it('should return info if limit_disclosure deletes the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -157,17 +168,18 @@ describe('evaluate', () => {
   });
 
   it('should return info if limit_disclosure does not delete the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -181,17 +193,18 @@ describe('evaluate', () => {
   });
 
   it('should return warn if limit_disclosure deletes the etc field', function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -205,17 +218,18 @@ describe('evaluate', () => {
   });
 
   it("should return ok if vc[0] doesn't have the birthPlace field", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -229,9 +243,10 @@ describe('evaluate', () => {
   });
 
   it("should return ok if vc[0] doesn't have the etc field", function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp-simple-age-predicate.json'
     ) as VerifiablePresentation;
@@ -241,7 +256,7 @@ describe('evaluate', () => {
     let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
@@ -255,12 +270,13 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements all rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
@@ -269,15 +285,12 @@ describe('evaluate', () => {
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
-      pdSchema,
-      vpSimple.verifiableCredential
-    );
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, vpSimple.verifiableCredential);
     expect(result.descriptor_map).toEqual(
       expect.objectContaining(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().descriptor_map)
     );
@@ -287,11 +300,12 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements pick rule', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
@@ -302,12 +316,12 @@ describe('evaluate', () => {
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [vc0, vc1, vc2]);
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [vc0, vc1, vc2]);
     expect(result).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -328,11 +342,12 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission from user selected credentials (max 1 from B)', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
@@ -343,12 +358,12 @@ describe('evaluate', () => {
     let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [
       { ...vc1 } as VerifiableCredentialJsonLD,
     ]);
     expect(result).toEqual(
@@ -360,11 +375,12 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission without submission requirements', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
     delete pdSchema!.submission_requirements;
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     let vc0: VerifiableCredential = new VerifiableCredentialJwt();
     const vcAttr: VerifiableCredentialJwt = <VerifiableCredentialJwt>vpSimple.verifiableCredential[0];
     vc0 = Object.assign(vc0, vcAttr);
@@ -376,12 +392,12 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
-      pdSchema,
+      pd,
       [vc0, vc1, vc2],
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pdSchema, [
+    const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [
       { ...vpSimple.verifiableCredential[1] } as VerifiableCredentialJsonLD,
       { ...vpSimple.verifiableCredential[2] } as VerifiableCredentialJsonLD,
     ]);

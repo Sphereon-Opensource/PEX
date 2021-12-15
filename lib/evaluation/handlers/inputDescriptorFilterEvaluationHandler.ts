@@ -1,10 +1,11 @@
-import { Field, PresentationDefinition } from '@sphereon/pe-models';
+import { Field } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { PresentationDefinition, PresentationDefinitionV2 } from '../../types/SSI.types';
+import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -46,7 +47,8 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private createNoFieldResults(pd: PresentationDefinition, vcIndex: number) {
-    const noFields = pd.input_descriptors
+    // PresentationDefinitionV2 is the common denominator
+    const noFields = (pd as PresentationDefinitionV2).input_descriptors
       .map((inDesc, index) => {
         return { index, inDesc };
       })

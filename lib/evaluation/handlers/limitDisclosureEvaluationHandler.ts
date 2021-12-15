@@ -1,9 +1,14 @@
-import { Constraints, Field, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Field, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
-import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from '../../types/SSI.types';
+import {
+  PresentationDefinition,
+  PresentationDefinitionV2,
+  VerifiableCredentialJsonLD,
+  VerifiableCredentialJwt,
+} from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -19,7 +24,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+    // PresentationDefinitionV2 is the common denominator
+    (pd as PresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (
         inDesc.constraints?.fields &&
         (inDesc.constraints?.limit_disclosure === Optionality.Required ||

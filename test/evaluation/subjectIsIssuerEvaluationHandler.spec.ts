@@ -1,11 +1,9 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
-
 import { VerifiableCredential } from '../../lib';
 import { EvaluationClient } from '../../lib';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
-import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
+import { PresentationDefinitionV1, VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -13,7 +11,7 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
   it('should return ok if subject_is_issuer is verified', function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -61,7 +59,7 @@ describe('evaluate', () => {
   });
 
   it('should return error if subject_is_issuer is not verified', function () {
-    const pdSchema: PresentationDefinition = getFile(
+    const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();

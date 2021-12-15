@@ -1034,10 +1034,14 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sphereon/pe-models@0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@sphereon/pe-models/-/pe-models-0.0.5.tgz#a096bc2ecde7190253d0e4d27538f017f75e7190"
-  integrity sha512-r7JFgAK9fhc1MN+qnON3NLqj0n5Lekz+K0CCvsSh/87YLe6iARiun1hvM3ZMd6Mbe1ukGDMTnwRauUgl8xUOFg==
+"@sphereon/pe-models@./sphereon-pe-models-0.0.6.tgz":
+  version "0.0.6"
+  uid "76748b16ad2328a7c777400d7cb8d2090aa8cebf"
+  resolved "./sphereon-pe-models-0.0.6.tgz#76748b16ad2328a7c777400d7cb8d2090aa8cebf"
+
+"@sphereon/pe-models@file:../../programming/WebstormProjects/pe-openapi/target/sdks/models/typescript/sphereon-pe-models-0.0.6.tgz":
+  version "0.0.6"
+  resolved "file:../../programming/WebstormProjects/pe-openapi/target/sdks/models/typescript/sphereon-pe-models-0.0.6.tgz#76748b16ad2328a7c777400d7cb8d2090aa8cebf"
 
 "@tokenizer/token@^0.3.0":
   version "0.3.0"

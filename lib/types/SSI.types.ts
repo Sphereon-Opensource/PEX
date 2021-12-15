@@ -1,4 +1,12 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import {
+  Format,
+  InputDescriptorV1,
+  InputDescriptorV2,
+  PresentationDefinitionV1 as PdV1,
+  PresentationDefinitionV2 as PdV2,
+  PresentationSubmission,
+  SubmissionRequirement,
+} from '@sphereon/pe-models';
 
 export interface CredentialSubject {
   id?: string;
@@ -126,6 +134,77 @@ export class VerifiableCredentialJwt extends CredentialJWT {
 }
 
 export type VerifiableCredential = VerifiableCredentialJsonLD | VerifiableCredentialJwt;
+
+export interface PresentationDefinition {
+  format?: Format;
+  id: string;
+  name?: string;
+  purpose?: string;
+  submission_requirements?: Array<SubmissionRequirement>;
+
+  getVersion(): string;
+}
+
+export class PresentationDefinitionV1 implements PdV1, PresentationDefinition {
+  input_descriptors: Array<InputDescriptorV1>;
+
+  constructor(
+    id: string,
+    input_descriptors: Array<InputDescriptorV1>,
+    format?: Format,
+    name?: string,
+    purpose?: string,
+    submission_requirements?: Array<SubmissionRequirement>
+  ) {
+    this.id = id;
+    this.input_descriptors = input_descriptors;
+    this.format = format;
+    this.name = name;
+    this.purpose = purpose;
+    this.submission_requirements = submission_requirements;
+  }
+
+  format?: Format | undefined;
+  id: string;
+  name?: string | undefined;
+  purpose?: string | undefined;
+  submission_requirements?: SubmissionRequirement[] | undefined;
+  getVersion(): string {
+    return 'v1';
+  }
+}
+
+export class PresentationDefinitionV2 implements PdV2, PresentationDefinition {
+  format?: Format;
+  frame?: any;
+  id: string;
+  input_descriptors: Array<InputDescriptorV2>;
+  name?: string;
+  purpose?: string;
+  submission_requirements?: Array<SubmissionRequirement>;
+
+  constructor(
+    id: string,
+    input_descriptors: Array<InputDescriptorV2>,
+    format?: Format,
+    frame?: any,
+    name?: string,
+    purpose?: string,
+    submission_requirements?: Array<SubmissionRequirement>
+  ) {
+    this.format = format;
+    this.frame = frame;
+    this.id = id;
+    this.input_descriptors = input_descriptors;
+    this.name = name;
+    this.purpose = purpose;
+    this.submission_requirements = submission_requirements;
+  }
+
+  getVersion(): string {
+    return 'v2';
+  }
+}
 
 export interface Presentation {
   '@context': string[];

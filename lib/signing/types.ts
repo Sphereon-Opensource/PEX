@@ -1,8 +1,7 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationResults } from '../evaluation';
-import { Presentation, Proof, VerifiableCredential } from '../types';
-import { ProofPurpose, ProofType } from '../types/SSI.types';
+import { Presentation, Proof, ProofPurpose, ProofType, VerifiableCredential } from '../types';
 
 export interface ProofOptions {
   /**
@@ -92,11 +91,6 @@ export interface PresentationSignCallBackParams {
   options: PresentationSignOptions;
 
   /**
-   * The presentation definition
-   */
-  presentationDefinition: PresentationDefinition;
-
-  /**
    * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
    */
   selectedCredentials: VerifiableCredential[];
@@ -121,6 +115,20 @@ export interface PresentationSignCallBackParams {
    * The evaluation results, which the callback function could use to create a VP using the proof(s) using the supplied credentials
    */
   evaluationResults: EvaluationResults;
+}
+
+export interface PresentationSignCallBackParamsV1 extends PresentationSignCallBackParams {
+  /**
+   * The presentation definition
+   */
+  presentationDefinition: PresentationDefinitionV1;
+}
+
+export interface PresentationSignCallBackParamsV2 extends PresentationSignCallBackParams {
+  /**
+   * The presentation definition
+   */
+  presentationDefinition: PresentationDefinitionV2;
 }
 
 export enum KeyEncoding {

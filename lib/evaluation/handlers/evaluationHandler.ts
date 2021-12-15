@@ -1,6 +1,5 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
-
 import { VerifiableCredential } from '../../types';
+import { PresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 
 export interface EvaluationHandler {

@@ -1,9 +1,10 @@
-import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Constraints, Optionality } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { VerifiableCredential } from '../../types';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { PresentationDefinition, PresentationDefinitionV2 } from '../../types/SSI.types';
+import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -19,7 +20,8 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    pd.input_descriptors.forEach((inputDescriptor, index) => {
+    // PresentationDefinitionV2 is the common denominator
+    (pd as PresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
       const constraints: Constraints | undefined = inputDescriptor.constraints;
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
