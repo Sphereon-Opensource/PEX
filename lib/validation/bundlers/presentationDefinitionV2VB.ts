@@ -16,6 +16,7 @@ import { JwtAlgos } from '../core/jwtAlgos';
 import { LdpTypes } from '../core/ldpTypes';
 import { PresentationDefinitionSchema } from '../core/presentationDefinitionSchema';
 
+import { FrameVB } from './frameVB';
 import { InputDescriptorsV2VB } from './inputDescriptorsV2VB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { ValidationBundler } from './validationBundler';
@@ -40,16 +41,34 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
     | Validation<InputDescriptorV2[]>
     | Validation<PresentationDefinitionV2>
     | Validation<SubmissionRequirement>
+    | Validation<unknown>
   )[] {
+    let validations: (
+      | Validation<Field>
+      | Validation<HolderSubject>
+      | Validation<Constraints>
+      | Validation<InputDescriptorV2>
+      | Validation<InputDescriptorV2[]>
+      | Validation<PresentationDefinitionV2>
+      | Validation<SubmissionRequirement>
+      | Validation<unknown>
+    )[] = [];
     if (pd.submission_requirements) {
-      return [
+      validations = [
         ...this.myValidations(pd),
         ...new InputDescriptorsV2VB(this.myTag).getValidations(pd.input_descriptors),
         ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
       ];
     } else {
-      return [...this.myValidations(pd), ...new InputDescriptorsV2VB(this.myTag).getValidations(pd.input_descriptors)];
+      validations = [
+        ...this.myValidations(pd),
+        ...new InputDescriptorsV2VB(this.myTag).getValidations(pd.input_descriptors),
+      ];
     }
+    if (pd.frame) {
+      validations.push(...new FrameVB(this.myTag).getValidations(pd.frame));
+    }
+    return validations;
   }
 
   private myValidations(pd: PresentationDefinitionV2): Validation<PresentationDefinitionV2>[] {
