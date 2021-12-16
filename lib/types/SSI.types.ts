@@ -64,8 +64,11 @@ export interface Issuer {
 
 export interface Credential {
   getType(): string;
+
   getBaseCredential(): CredentialBase;
+
   getContext(): string[] | string;
+
   [x: string]: unknown;
 }
 
@@ -80,6 +83,7 @@ export class CredentialBase {
   issuer: unknown;
   name?: string;
   type: string[];
+
   [x: string]: unknown;
 }
 
@@ -88,6 +92,7 @@ export class CredentialJWT implements Credential {
   exp?: string;
   nbf?: string; // (not before) claim identifies the time before which the JWT MUST NOT be accepted for processing
   vc: CredentialBase;
+
   [x: string]: unknown;
 
   getBaseCredential(): CredentialBase {
@@ -142,7 +147,7 @@ export interface PresentationDefinition {
   purpose?: string;
   submission_requirements?: Array<SubmissionRequirement>;
 
-  getVersion(): string;
+  getVersion(): PEVersion;
 }
 
 export class PresentationDefinitionV1 implements PdV1, PresentationDefinition {
@@ -169,8 +174,9 @@ export class PresentationDefinitionV1 implements PdV1, PresentationDefinition {
   name?: string | undefined;
   purpose?: string | undefined;
   submission_requirements?: SubmissionRequirement[] | undefined;
-  getVersion(): string {
-    return 'v1';
+
+  getVersion(): PEVersion {
+    return PEVersion.v1;
   }
 }
 
@@ -201,8 +207,8 @@ export class PresentationDefinitionV2 implements PdV2, PresentationDefinition {
     this.submission_requirements = submission_requirements;
   }
 
-  getVersion(): string {
-    return 'v2';
+  getVersion(): PEVersion {
+    return PEVersion.v2;
   }
 }
 
@@ -223,3 +229,8 @@ export type InputFieldType =
   | VerifiableCredential
   | VerifiableCredential[]
   | PresentationDefinition;
+
+export enum PEVersion {
+  v1 = 'v1',
+  v2 = 'v2',
+}

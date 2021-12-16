@@ -200,11 +200,12 @@ describe('evaluate', () => {
 
   it('Evaluate presentationDefinition v2 should fail for frame', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
-    // @ts-ignore
     pd.frame = { '@id': 'this is not valid' };
     const pejs: PEJS = new PEJS();
     const result: Validated = pejs.validateDefinitionV2(pd);
-    expect(result).toEqual([{ message: 'frame value is not valid', status: 'error', tag: 'presentation_definition.frame' }]);
+    expect(result).toEqual([
+      { message: 'frame value is not valid', status: 'error', tag: 'presentation_definition.frame' },
+    ]);
   });
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
@@ -278,5 +279,35 @@ describe('evaluate', () => {
         }
       );
     }).toThrow(Error);
+  });
+
+  it('should return v1 when calling version discovery', function () {
+    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const pejs: PEJS = new PEJS();
+    const result = pejs.definitionVersionDiscovery(pdSchema.presentation_definition);
+    expect(result.version).toEqual('v1');
+  });
+
+  it('should return v2 when calling version discovery', function () {
+    const pdSchema = getPresentationDefinitionV2();
+    const pejs: PEJS = new PEJS();
+    const result = pejs.definitionVersionDiscovery(pdSchema);
+    expect(result.version).toEqual('v2');
+  });
+
+  it('should return error when called with a mixed version', function () {
+    const pdSchema = getPresentationDefinitionV2();
+    (pdSchema as PresentationDefinitionV1).input_descriptors[0]['schema'] = [{ uri: 'schema' }];
+    const pejs: PEJS = new PEJS();
+    const result = pejs.definitionVersionDiscovery(pdSchema);
+    expect(result.error).toEqual('This is not a valid PresentationDefinition');
+  });
+
+  it('should return v2 when calling without schema', function () {
+    const pdSchema = getPresentationDefinitionV2();
+    delete pdSchema.frame;
+    const pejs: PEJS = new PEJS();
+    const result = pejs.definitionVersionDiscovery(pdSchema);
+    expect(result.version).toEqual('v2');
   });
 });

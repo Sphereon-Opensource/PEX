@@ -8,7 +8,7 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { PresentationSignCallBackParamsV1, PresentationSignCallBackParamsV2 } from './signing/types';
 import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
-import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from './types/SSI.types';
+import { PEVersion, VerifiableCredentialJsonLD, VerifiableCredentialJwt } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import {
   PresentationDefinitionV1VB,
@@ -454,6 +454,33 @@ export class PEJS {
     };
 
     return signingCallBack(callBackParams);
+  }
+
+  public definitionVersionDiscovery(presentationDefinition: PdV2 | PdV1): { version?: PEVersion; error?: string } {
+    let version = undefined;
+    for (const key of Object.keys(presentationDefinition)) {
+      if (key === 'frame') {
+        if (version === PEVersion.v1) {
+          return { error: 'This is not a valid PresentationDefinition' };
+        }
+        version = PEVersion.v2;
+      } else if (key === 'input_descriptors') {
+        for (const id of presentationDefinition['input_descriptors']) {
+          for (const idKey of Object.keys(id)) {
+            if (idKey === 'schema') {
+              if (version === PEVersion.v2) {
+                return { error: 'This is not a valid PresentationDefinition' };
+              }
+              version = PEVersion.v1;
+            }
+          }
+        }
+      }
+    }
+    if (!version) {
+      version = PEVersion.v2;
+    }
+    return { version: version };
   }
 
   private recognizeAndEditVCs(verifiableCredential: VerifiableCredential[]): VerifiableCredential[] {
