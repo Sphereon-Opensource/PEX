@@ -20,7 +20,7 @@ describe('1st scenario', () => {
     /**
      * optional, first we want to make sure that the presentationDefinition object that we got is correct
      */
-    const result = pejs.validateDefinition(pd);
+    const result = pejs.validateDefinitionV1(pd);
     expect(result).toEqual([{ tag: 'root', status: 'info', message: 'ok' }]);
     const wallet: Wallet = new Wallet();
     /**

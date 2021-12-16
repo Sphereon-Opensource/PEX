@@ -1,14 +1,14 @@
-import { Descriptor, InputDescriptorV1 } from '@sphereon/pe-models';
+import {Descriptor, InputDescriptorV1} from '@sphereon/pe-models';
 import jp from 'jsonpath';
-import { nanoid } from 'nanoid';
+import {nanoid} from 'nanoid';
 
-import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { PresentationDefinition, PresentationDefinitionV1 } from '../../types/SSI.types';
-import { EvaluationClient } from '../evaluationClient';
-import { HandlerCheckResult } from '../handlerCheckResult';
+import {Status} from '../../ConstraintUtils';
+import {VerifiableCredential} from '../../types';
+import {PresentationDefinition, PresentationDefinitionV1} from '../../types/SSI.types';
+import {EvaluationClient} from '../evaluationClient';
+import {HandlerCheckResult} from '../handlerCheckResult';
 
-import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+import {AbstractEvaluationHandler} from './abstractEvaluationHandler';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
@@ -21,13 +21,10 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
   public handle(d: PresentationDefinition, vcs: VerifiableCredential[]): void {
     // This filter is removed in V2
-    if (d.getVersion() == 'v2') {
-      return;
-    }
     (<PresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
-      const uris: string[] = inDesc.schema.map((so) => so.uri);
+      const uris: string[] = d.getVersion() != 'v2' ? inDesc.schema.map((so) => so.uri) : [];
       vcs.forEach((vc: VerifiableCredential, j: number) => {
-        this.evaluateUris(vc.getContext(), uris, i, j);
+        this.evaluateUris(vc.getContext(), uris, i, j, d.getVersion());
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
@@ -51,20 +48,25 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     verifiableCredentialUris: string[] | string,
     inputDescriptorsUris: string[],
     idIdx: number,
-    vcIdx: number
+    vcIdx: number,
+    pdVersion: string
   ): void {
     let hasAnyMatch = false;
-    let vcUris: string[] = [];
-    if (Array.isArray(verifiableCredentialUris)) {
-      vcUris = [...verifiableCredentialUris];
-    } else {
-      vcUris = [verifiableCredentialUris];
-    }
-
-    for (let i = 0; i < verifiableCredentialUris.length; i++) {
-      if (inputDescriptorsUris.find((el) => el === vcUris[i]) != undefined) {
-        hasAnyMatch = true;
+    if (pdVersion === 'v1') {
+      let vcUris: string[] = [];
+      if (Array.isArray(verifiableCredentialUris)) {
+        vcUris = [...verifiableCredentialUris];
+      } else {
+        vcUris = [verifiableCredentialUris];
       }
+
+      for (let i = 0; i < verifiableCredentialUris.length; i++) {
+        if (inputDescriptorsUris.find((el) => el === vcUris[i]) != undefined) {
+          hasAnyMatch = true;
+        }
+      }
+    } else {
+      hasAnyMatch = true;
     }
     if (hasAnyMatch) {
       this.getResults().push(
@@ -87,7 +89,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.INFO;
     result.message =
       '@context URI(s) for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
-    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
+    result.payload = {presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris};
     return result;
   }
 
@@ -101,7 +103,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.ERROR;
     result.message =
       '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
-    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
+    result.payload = {presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris};
     return result;
   }
 

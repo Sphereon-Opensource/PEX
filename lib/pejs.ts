@@ -10,7 +10,13 @@ import { PresentationSignCallBackParamsV1, PresentationSignCallBackParamsV2 } fr
 import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
 import { VerifiableCredentialJsonLD, VerifiableCredentialJwt } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
-import { PresentationDefinitionV1VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import {
+  PresentationDefinitionV1VB,
+  PresentationDefinitionV2VB,
+  PresentationSubmissionVB,
+  Validated,
+  ValidationEngine,
+} from './validation';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -255,15 +261,31 @@ export class PEJS {
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *
-   * @param presentationDefinition the object to be validated.
+   * @param presentationDefinitionV1 the object to be validated.
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: PdV1 | PdV2): Validated {
+  public validateDefinitionV1(presentationDefinitionV1: PdV1): Validated {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV1VB('root'),
-        target: presentationDefinition,
+        target: presentationDefinitionV1,
+      },
+    ]);
+  }
+
+  /**
+   * This method validates whether an object is usable as a presentation definition or not.
+   *
+   * @param presentationDefinitionV2 the object to be validated.
+   *
+   * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
+   */
+  public validateDefinitionV2(presentationDefinitionV2: PdV2): Validated {
+    return new ValidationEngine().validate([
+      {
+        bundler: new PresentationDefinitionV2VB('root'),
+        target: presentationDefinitionV2,
       },
     ]);
   }
