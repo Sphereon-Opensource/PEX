@@ -63,11 +63,21 @@ export interface Issuer {
 }
 
 export interface Credential {
-  getType(): string;
+  getAudience(): string | undefined;
 
   getBaseCredential(): CredentialBase;
 
   getContext(): string[] | string;
+
+  getExpirationDate(): string | undefined;
+
+  getId(): string;
+
+  getIssuer(): unknown;
+
+  getIssuanceDate(): string | undefined;
+
+  getType(): string;
 
   [x: string]: unknown;
 }
@@ -88,9 +98,37 @@ export class CredentialBase {
 }
 
 export class CredentialJWT implements Credential {
-  iss: string;
+  /**
+   * aud MUST represent (i.e., identify) the intended audience of the verifiable presentation
+   * (i.e., the verifier intended by the presenting holder to receive and verify the verifiable presentation).
+   */
+  aud?: string;
+
+  /**
+   * MUST represent the expirationDate property, encoded as a UNIX timestamp (NumericDate).
+   */
   exp?: string;
-  nbf?: string; // (not before) claim identifies the time before which the JWT MUST NOT be accepted for processing
+
+  /**
+   * MUST represent the issuer property of a verifiable credential or the holder property of a verifiable presentation.
+   */
+  iss: string;
+
+  /**
+   * MUST represent the id property of the verifiable credential or verifiable presentation.
+   */
+  jti?: string;
+
+  /**
+   * MUST represent issuanceDate, encoded as a UNIX timestamp (NumericDate).
+   */
+  nbf?: string;
+
+  /**
+   * MUST represent the id property contained in the verifiable credential subject.
+   */
+  sub?: string;
+
   vc: CredentialBase;
 
   [x: string]: unknown;
@@ -106,6 +144,26 @@ export class CredentialJWT implements Credential {
   getType(): string {
     return 'jwt';
   }
+
+  getAudience(): string | undefined {
+    return this.aud;
+  }
+
+  getExpirationDate(): string | undefined {
+    return this.exp ? this.exp : this.vc.expirationDate;
+  }
+
+  getId(): string {
+    return this.sub ? this.sub : this.vc.id;
+  }
+
+  getIssuer(): unknown {
+    return this.iss;
+  }
+
+  getIssuanceDate(): string | undefined {
+    return this.nbf ? this.nbf : this.vc.issuanceDate;
+  }
 }
 
 export class CredentialJsonLD extends CredentialBase implements Credential {
@@ -119,6 +177,27 @@ export class CredentialJsonLD extends CredentialBase implements Credential {
 
   getType(): string {
     return 'json-ld';
+  }
+
+  // TODO: see if there's any equivalent for jwt's aud in JSON-LD standard, I couldn't find anything
+  getAudience(): string | undefined {
+    return undefined;
+  }
+
+  getExpirationDate(): string | undefined {
+    return this.expirationDate;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getIssuanceDate(): string | undefined {
+    return this.issuanceDate;
+  }
+
+  getIssuer(): unknown {
+    return this.issuer;
   }
 }
 
