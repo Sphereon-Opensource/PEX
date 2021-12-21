@@ -45,6 +45,7 @@ the generation of the objects in many languages and frameworks consistently by c
 * Input evaluations: Verification of presentation submissions conforming to the presentation definition
 * Utilities: to build and use different models compliant with
   the [DIF Presentation Exchange v2.0.0 specification](https://identity.foundation/presentation-exchange/).
+* Support for [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
 
 Stateful storage, signature support or credential management should be implemented in separate libraries/ modules that
 make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay
@@ -77,8 +78,9 @@ matches the requested presentation definition from the request.
 ```typescript
 import { pejs } from '@sphereon/pe-js';
 
-const pe = new pejs();
+const pejs: PEJS = new PEJS();
 
+// Example of Presentation Definition V1
 const presentationDefinitionV1 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -93,6 +95,7 @@ const presentationDefinitionV1 = {
   ]
 };
 
+// Example of Presentation Definition V2
 const presentationDefinitionV2 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -126,27 +129,30 @@ const { value, warnings, errors } = pe.evaluate(presentationDefinition, verifiab
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
 
 ```typescript
-import { pejs } from '@sphereon/pe-js';
+import {PEJS} from '@sphereon/pe-js';
+import {VerifiableCredential} from "./SSI.types";
 
-const pe = new pejs();
+const pejs: PEJS = new PEJS();
 
 // Definition from verifier request
 const presentationDefinition = {
   ...
 };
-
+// Finding out which version presentationDefinition is this:
+// The result is either v1, v2 or an erro
+const result = pejs.definitionVersionDiscovery(pdSchema);
 // Example for loading credentials
-const credentials = await secureStore.getCredentials();
+const credentials: VerifiableCredential[] = await secureStore.getCredentials();
 
 // Find matching credentials
-const srMatches = pe.selectFrom(presentationDefinition, credentials, holderDid);
+const srMatches = pe.selectFromV1(presentationDefinition, credentials, holderDid);
 
 // An example that selects the first 'count' credentials from
 // the matches. in a real scenario, the user has to select which 
 // credentials to use. PE-JS did the first filtering, 
 // but there still could be multiple credentials satisfying a presentation definition
 const selectedCredentials = srMatches.map(
-  ({ matches, count }) => matches.slice(0, count)
+  ({matches, count}) => matches.slice(0, count)
 ).flat();
 
 
@@ -164,12 +170,12 @@ are different libraries that allow you to do this. You can also use the callback
 chapter for this.
 
 ```typescript
-import { pejs, Presentation } from '@sphereon/pe-js';
+import { PEJS, Presentation } from '@sphereon/pe-js';
 
-const pe = new pejs();
+const pejs: PEJS = new PEJS();
 
 // Construct presentation from selected credentials
-const presentation: Presentation = pe.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
+const presentation: Presentation = pejs.presentationFromV1(presentationDefinition, selectedCredentials, holderDID);
 /** presentation object:
  *
  *   {
@@ -376,7 +382,7 @@ import {
   KeyEncoding
 } from '@sphereon/pe-js';
 
-const pe = new pejs();
+const pejs: PEJS = new PEJS();
 
 const params: PresentationSignOptions = {
   holder: 'did:example:1234....',
@@ -391,7 +397,7 @@ const params: PresentationSignOptions = {
   }
 }
 
-const vp = pe.verifiablePresentationFrom(presentationDefinition, selectedCredentials, simpleSignedProofCallback, params);
+const vp = pejs.verifiablePresentationFromV1(presentationDefinition, selectedCredentials, simpleSignedProofCallback, params);
 
 function simpleSignedProofCallback(callBackParams: PresentationSignCallBackParams): VerifiablePresentation {
   // Prereq is properly filled out `proofOptions` and `signatureOptions`, together with a `proofValue` or `jws` value.
@@ -428,19 +434,20 @@ functions.
 ```typescript
 import { pejs } from '@sphereon/pe-js';
 
-const pe = new pejs();
+const pejs: PEJS = new PEJS();
 
 const presentationDefinition = {
   ...
 };
 
-const { warnings: pdWarnings, errors: pdErrors } = pe.validateDefinition(presentationDefinition);
+const result = pejs.definitionVersionDiscovery(presentationDefinition);
+const { warnings: pdWarnings, errors: pdErrors } = pejs.validateDefinitionV1(presentationDefinition);
 
 const presentationSubmission = {
   ...
 };
 
-const { warnings: psWarnings, errors: psErrors } = pe.validateSubmission(presentationSubmission);
+const { warnings: psWarnings, errors: psErrors } = pejs.validateSubmission(presentationSubmission);
 ```
 
 ## API
@@ -448,21 +455,32 @@ const { warnings: psWarnings, errors: psErrors } = pe.validateSubmission(present
 ### Evaluate
 
 ```typescript
-evaluate(presentationDefinition, verifiablePresentation)
+evaluatePresentationV1(presentationDefinition, verifiablePresentation)
+evaluatePresentationV2(presentationDefinition, verifiablePresentation)
 ```
 
 ##### Description
+These two methods are quite similar. One receives a v1 presentation definition and the other one receives v2.
+
+**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
 Evaluates whether a presentation submission meets the requested presentation definition Since this method will be used
 both **before** and **after** creating a VerifiablePresentation, we accept both _signed_ and _unsigned_ version of a
 presentation here.
 
-#### Parameters
+#### evaluatePresentationV1 Parameters
 
-| name | type | description|
-|------|------|------------|
-| `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
-| `presentation` | `Presentation` | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
+| name | type | description                                                                                                                                       |
+|------|------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v1 presentation definition that initiated the request from the verifier, you can check the version discovery to make sure which method to use |
+| `presentation` | `Presentation` | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition    |
+
+#### evaluatePresentationV2 Parameters
+
+| name | type | description                                                                                                                                       |
+|------|------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v2 presentation definition that initiated the request from the verifier, you can check the version discovery to make sure which method to use |
+| `presentation` | `Presentation` | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition    |
 
 #### Return value
 
@@ -481,20 +499,32 @@ interface EvaluationResults {
 ### SelectFrom
 
 ```typescript
-selectFrom(presentationDefinition, credentials, holderDids)
+selectFromV1(presentationDefinition, credentials, holderDids)
+selectFromV2(presentationDefinition, credentials, holderDids)
 ```
 
 ##### Description
+These two methods are quite similar. One receives a v1 presentation definition and the other one receives v2.
+
+**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
 Gathers the matching credentials that fit a given presentation definition
 
-#### Parameters
+#### selectFromV1 Parameters
 
-| name | type | description|
-|------|------|------------|
-| `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
-| `credentials` | `VerifiableCredential[]` | the array of verifiable credentials to select from |
-| `holderDids` | `string[]` | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places|
+| name | type | description                                                                                                                                                  |
+|------|------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v1 presentation definition that initiated the request from the verifier                                                                                  |
+| `credentials` | `VerifiableCredential[]` | the array of verifiable credentials to select from                                                                                                           |
+| `holderDids` | `string[]` | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
+
+#### selectFromV2 Parameters
+
+| name | type | description                                                                                                                                                  |
+|------|------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v2 presentation definition that initiated the request from the verifier                                                                                  |
+| `credentials` | `VerifiableCredential[]` | the array of verifiable credentials to select from                                                                                                           |
+| `holderDids` | `string[]` | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
 
 #### Return value
 
@@ -545,21 +575,33 @@ interface SubmissionRequirementMatch {
 ### PresentationFrom
 
 ```typescript
-presentationFrom(presentationDefinition, selectedCredentials, holderDID)
+presentationFromV1(presentationDefinition, selectedCredentials, holderDID)
+presentationFromV2(presentationDefinition, selectedCredentials, holderDID)
 ```
 
 ##### Description
+These two methods are quite similar. One receives a v1 presentation definition and the other one receives v2.
+
+**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
 Creates the corresponding Presentation Submission object to be included in the Verifiable Presentation response, which
 maps the submitted credentials to the requested inputs in the `presentationDefinition` input parameter.
 
-#### Parameters
+#### presentationFromV1 Parameters
 
-| name | type | description|
-|------|------|------------|
-| `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier |
-| `selectedCredentials` | `VerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition |
-| `holderDid` | `string` | the holder's DID. This can be found in VerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places|
+| name | type | description                                                                                                                                                 |
+|------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v1 presentation definition that initiated the request from the verifier                                                                                 |
+| `selectedCredentials` | `VerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
+| `holderDid` | `string` | the holder's DID. This can be found in VerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+
+#### presentationFromV2 Parameters
+
+| name | type | description                                                                                                                                                 |
+|------|------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `presentationDefinition` | `PresentationDefinition` | the v2 presentation definition that initiated the request from the verifier                                                                                 |
+| `selectedCredentials` | `VerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
+| `holderDid` | `string` | the holder's DID. This can be found in VerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### Return value
 
@@ -577,7 +619,8 @@ interface PresentationSubmission {
 ### Validation
 
 ```typescript
-validateDefinition(objToValidate)
+validateDefinitionV1(objToValidate)
+validateDefinitionV2(objToValidate)
 ```
 
 ```typescript
@@ -590,9 +633,9 @@ A validation utility function for `PresentationDefinition` and `PresentationSubm
 
 #### Parameters
 
-| name | type | description|
-|------|------|------------|
-| `objToValidate` | <code>PresentationDefinition &#124; PresentationSubmission</code> | the presentation definition or presentation definition to be validated |
+| name | type | description                                                            |
+|------|------|------------------------------------------------------------------------|
+| `objToValidate` | <code>PresentationDefinition &#124; PresentationSubmission</code> | the presentation definition or presentation submission to be validated |
 
 #### Return value
 
@@ -607,6 +650,43 @@ interface Checked {
 ```
 
 status can have following values `'info' | 'warn' | 'error'`
+
+### Definition Version Discovery
+
+```typescript
+definitionVersionDiscovery(presentationDefinition)
+```
+#### Description
+
+A utility function for `PresentationDefinition` objects. This method will determine the version of your presentationDefinition object.
+
+
+#### Parameters
+
+| name                     | type | description                                                         |
+|--------------------------|------|---------------------------------------------------------------------|
+| `presentationDefinition` | <code>PresentationDefinition</code> | the presentation definition that you need to decide the version for |
+
+#### Return value
+
+The `definitionVersionDiscovery` method returns a version of an error, with following structure:
+
+```typescript
+{
+  version?: PEVersion;
+  error?: string;
+}
+
+enum PEVersion {
+  v1 = 'v1',
+  v2 = 'v2',
+}
+````
+
+## From V1 to V2
+The following changes has been made in the v2:
+1. `schema` removed from `InputDescriptor` properties.
+2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing Document object 
 
 ## Workflow Diagram
 
