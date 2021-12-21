@@ -1,9 +1,9 @@
-import { VerifiableCredential } from '../../../lib';
-import { VerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { InternalVerifiableCredential } from '../../../lib';
+import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
 
 export class SameSubjectVerifiableCredential {
-  public getVerifiableCredential(): VerifiableCredential[] {
-    let vc0: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+  public getVerifiableCredential(): InternalVerifiableCredential[] {
+    let vc0: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc0 = Object.assign(vc0, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -27,7 +27,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc1: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -51,7 +51,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc2: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -75,7 +75,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc3: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc3: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc3 = Object.assign(vc3, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -99,7 +99,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc4: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc4: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc4 = Object.assign(vc4, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -123,7 +123,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc5: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc5: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc5 = Object.assign(vc5, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -147,7 +147,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc6: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc6: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc6 = Object.assign(vc6, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -171,7 +171,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc7: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc7: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc7 = Object.assign(vc7, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -195,7 +195,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc8: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc8: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc8 = Object.assign(vc8, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -219,7 +219,7 @@ export class SameSubjectVerifiableCredential {
         created: '',
       },
     });
-    let vc9: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc9: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc9 = Object.assign(vc9, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [

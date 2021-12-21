@@ -1,5 +1,5 @@
 import { VerifiablePresentation } from '../../../lib';
-import { VerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<VerifiablePresentation> {
@@ -59,7 +59,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as VerifiableCredentialJsonLD,
+        } as unknown as InternalVerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -83,7 +83,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as VerifiableCredentialJsonLD,
+        } as unknown as InternalVerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -107,7 +107,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as VerifiableCredentialJsonLD,
+        } as unknown as InternalVerifiableCredentialJsonLD,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -131,7 +131,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110804',
           },
-        } as unknown as VerifiableCredentialJsonLD,
+        } as unknown as InternalVerifiableCredentialJsonLD,
       ],
     };
   }

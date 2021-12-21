@@ -2,12 +2,12 @@ import { Constraints, Field, InputDescriptorV2, Optionality } from '@sphereon/pe
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
+import { InternalVerifiableCredential } from '../../types';
 import {
-  PresentationDefinition,
-  PresentationDefinitionV2,
-  VerifiableCredentialJsonLD,
-  VerifiableCredentialJwt,
+  InternalPresentationDefinition,
+  InternalPresentationDefinitionV2,
+  InternalVerifiableCredentialJsonLD,
+  InternalVerifiableCredentialJwt,
 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
@@ -23,9 +23,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
-    (pd as PresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
+    (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (
         inDesc.constraints?.fields &&
         (inDesc.constraints?.limit_disclosure === Optionality.Required ||
@@ -37,7 +37,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private isLimitDisclosureSupported(
-    vc: VerifiableCredential,
+    vc: InternalVerifiableCredential,
     vcIdx: number,
     idIdx: number,
     optionality: Optionality
@@ -56,7 +56,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private evaluateLimitDisclosure(
-    verifiableCredential: VerifiableCredential[],
+    verifiableCredential: InternalVerifiableCredential[],
     constraints: Constraints,
     idIdx: number
   ): void {
@@ -70,11 +70,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private enforceLimitDisclosure(
-    vc: VerifiableCredential,
+    vc: InternalVerifiableCredential,
     fields: Field[],
     idIdx: number,
     index: number,
-    verifiableCredential: VerifiableCredential[],
+    verifiableCredential: InternalVerifiableCredential[],
     limitDisclosure: Optionality
   ) {
     const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
@@ -88,19 +88,19 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createVcWithRequiredFields(
-    vc: VerifiableCredential,
+    vc: InternalVerifiableCredential,
     fields: Field[],
     idIdx: number,
     vcIdx: number
-  ): VerifiableCredential | undefined {
-    let vcToSend: VerifiableCredential;
+  ): InternalVerifiableCredential | undefined {
+    let vcToSend: InternalVerifiableCredential;
     if (vc.getType() === 'jwt') {
-      vcToSend = new VerifiableCredentialJwt();
-      vcToSend = { ...vc } as unknown as VerifiableCredentialJwt;
+      vcToSend = new InternalVerifiableCredentialJwt();
+      vcToSend = { ...vc } as unknown as InternalVerifiableCredentialJwt;
       vcToSend = Object.assign(vcToSend, vc);
       vcToSend.getBaseCredential().credentialSubject = {};
     } else {
-      vcToSend = new VerifiableCredentialJsonLD();
+      vcToSend = new InternalVerifiableCredentialJsonLD();
       vcToSend = Object.assign(vcToSend, vc);
       vcToSend.getBaseCredential().credentialSubject = {};
     }
@@ -120,9 +120,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
-    verifiableCredential: VerifiableCredential,
-    verifiableCredentialToSend: VerifiableCredential
-  ): VerifiableCredential {
+    verifiableCredential: InternalVerifiableCredential,
+    verifiableCredentialToSend: InternalVerifiableCredential
+  ): InternalVerifiableCredential {
     let credentialSubject = { ...verifiableCredential?.getBaseCredential().credentialSubject };
     requiredField.path.forEach((e) => {
       if (credentialSubject[e]) {

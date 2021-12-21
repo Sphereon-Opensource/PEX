@@ -2,8 +2,8 @@ import { HolderSubject, Optionality } from '@sphereon/pe-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { PresentationDefinition } from '../../types/SSI.types';
+import { InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -30,7 +30,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return 'SameSubjectEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     const sameSubjectInDesc = this.mapSameSubjectFieldIdsToInputDescriptors(pd);
     const handlerCheckResults = this.mapCredentialsToResultObjecs(vcs, sameSubjectInDesc);
     const fieldIdOccurrencesCount = this.countSameSubjectOccurrences(sameSubjectInDesc, handlerCheckResults);
@@ -39,7 +39,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapSameSubjectFieldIdsToInputDescriptors(
-    pd: PresentationDefinition
+    pd: InternalPresentationDefinition
   ): [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][] {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.sameSubject.push(...jp.nodes(pd, '$..same_subject[*]'));
@@ -97,7 +97,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapCredentialsToResultObjecs(
-    vcs: VerifiableCredential[],
+    vcs: InternalVerifiableCredential[],
     results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][]
   ): HandlerCheckResult[] {
     const subjects = [...jp.nodes(vcs, '$..credentialSubject')];

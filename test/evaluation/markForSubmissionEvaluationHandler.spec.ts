@@ -1,9 +1,10 @@
 import fs from 'fs';
 
-import { VerifiableCredential, VerifiablePresentation } from '../../lib';
+import { InternalVerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, HandlerCheckResult } from '../../lib';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers';
-import { PresentationDefinitionV1 } from '../../lib/types/SSI.types';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
+import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 const results: HandlerCheckResult[] = [
   {
@@ -59,14 +60,16 @@ const results_with_error: HandlerCheckResult[] = [
   },
 ];
 
-function getFile(path: string): PresentationDefinitionV1 | VerifiablePresentation | VerifiableCredential {
+function getFile(
+  path: string
+): InternalPresentationDefinitionV1 | VerifiablePresentation | InternalVerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
   if (Object.keys(file).includes('presentation_definition')) {
-    return file.presentation_definition as PresentationDefinitionV1;
+    return file.presentation_definition as InternalPresentationDefinitionV1;
   } else if (Object.keys(file).includes('presentation_submission')) {
     return file as VerifiablePresentation;
   } else {
-    return file as VerifiableCredential;
+    return file as InternalVerifiableCredential;
   }
 }
 
@@ -75,14 +78,17 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinitionV1 = getFile(
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinitionV1;
+    ) as InternalPresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results);
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, presentation.verifiableCredential);
+    evaluationHandler.handle(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(presentation.verifiableCredential)
+    );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',
@@ -98,14 +104,17 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const presentation: VerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_general.json'
     ) as VerifiablePresentation;
-    const presentationDefinition: PresentationDefinitionV1 = getFile(
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
-    ) as PresentationDefinitionV1;
+    ) as InternalPresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push(...results_with_error);
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(presentationDefinition, presentation.verifiableCredential);
+    evaluationHandler.handle(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(presentation.verifiableCredential)
+    );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',

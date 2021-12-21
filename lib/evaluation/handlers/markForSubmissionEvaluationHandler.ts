@@ -1,8 +1,8 @@
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { PresentationDefinition } from '../../types/SSI.types';
+import { InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -17,7 +17,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     return 'MarkForSubmissionEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     const results: HandlerCheckResult[] = [...this.getResults()];
     const errors: HandlerCheckResult[] = results.filter((result: HandlerCheckResult) => result.status === Status.ERROR);
     const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors);
@@ -38,7 +38,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     );
   }
 
-  private produceSuccessResults(infos: HandlerCheckResult[], pd: PresentationDefinition) {
+  private produceSuccessResults(infos: HandlerCheckResult[], pd: InternalPresentationDefinition) {
     this.removeDuplicate(infos).forEach((info) => {
       const parsedPath = jp.nodes(pd, info.input_descriptor_path);
       const group = parsedPath[0].value.group;

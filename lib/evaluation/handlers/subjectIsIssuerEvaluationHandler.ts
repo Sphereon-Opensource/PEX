@@ -2,8 +2,8 @@ import { Constraints, Optionality } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { PresentationDefinition, PresentationDefinitionV2 } from '../../types/SSI.types';
+import { InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -19,9 +19,9 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     return 'SubjectIsIssuerEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
-    (pd as PresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
+    (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
       const constraints: Constraints | undefined = inputDescriptor.constraints;
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
@@ -34,12 +34,13 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     this.updatePresentationSubmission(pd);
   }
 
-  private checkSubjectIsIssuer(inputDescriptorId: string, vcs: VerifiableCredential[], idIdx: number): void {
+  private checkSubjectIsIssuer(inputDescriptorId: string, vcs: InternalVerifiableCredential[], idIdx: number): void {
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc: { path: PathComponent[]; value: VerifiableCredential }[] = JsonPathUtils.extractInputField(vcs, [
-          currentDescriptor.path,
-        ]);
+        const vc: { path: PathComponent[]; value: InternalVerifiableCredential }[] = JsonPathUtils.extractInputField(
+          vcs,
+          [currentDescriptor.path]
+        );
         if (vc[0]?.value.issuer === vc[0]?.value.getBaseCredential().credentialSubject.id) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {

@@ -1,11 +1,11 @@
 import fs from 'fs';
 
-import { Status, VerifiableCredential } from '../../lib';
+import { InternalVerifiableCredential, Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
 import {
-  PresentationDefinitionV1,
-  VerifiableCredentialJsonLD,
-  VerifiableCredentialJwt,
+  InternalPresentationDefinitionV1,
+  InternalVerifiableCredentialJsonLD,
+  InternalVerifiableCredentialJwt,
 } from '../../lib/types/SSI.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
@@ -19,13 +19,15 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 
 describe('selectFrom tests', () => {
   it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
@@ -130,8 +132,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -205,16 +206,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 2 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -361,16 +364,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements either all from group A or 2 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![2]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
@@ -487,8 +492,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -562,16 +566,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![3]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -718,16 +724,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group A and 2 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![8]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -843,8 +851,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -918,16 +925,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 1: (all from group A or 2 from group B)', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![9]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -1044,8 +1053,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -1119,16 +1127,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 2: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![10]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -1245,8 +1255,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -1320,16 +1329,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![4]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -1476,16 +1487,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
@@ -1632,16 +1645,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements exactly 1 from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![6]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
@@ -1788,16 +1803,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements all from group B', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![7]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -1943,16 +1960,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     expect(evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
@@ -2069,8 +2088,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -2144,16 +2162,18 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate submission requirements max 1: (all from group A and 2 from group B)', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![12]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    let vc0: VerifiableCredential = new VerifiableCredentialJwt();
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     const result = evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result).toEqual({
@@ -2271,8 +2291,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
-          comment: 'IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS',
-          iss: '',
+          iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -2346,12 +2365,12 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate case without presentation submission', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile(
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const verifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
-    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(
@@ -2370,13 +2389,13 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate driver license name result', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
-      .presentation_definition as PresentationDefinitionV1;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
+      .presentation_definition as InternalPresentationDefinitionV1;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const verifiableCredential: VerifiableCredential = getFile(
+    const verifiableCredential: InternalVerifiableCredential = getFile(
       './test/dif_pe_examples/vc/vc-driverLicense.json'
-    ) as VerifiableCredential;
-    let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
+    ) as InternalVerifiableCredential;
+    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, verifiableCredential);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(

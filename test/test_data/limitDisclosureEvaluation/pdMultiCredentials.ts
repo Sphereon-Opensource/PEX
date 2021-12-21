@@ -1,7 +1,7 @@
-import { PresentationDefinitionV1 } from '../../../lib/types/SSI.types';
+import { InternalPresentationDefinitionV1 } from '../../../lib/types/SSI.types';
 
 export class PdMultiCredentials {
-  getPresentationDefinition(): PresentationDefinitionV1 {
+  getPresentationDefinition(): InternalPresentationDefinitionV1 {
     return {
       id: '31e2f0f1-6b70-411d-b239-56aed5321884',
       purpose: 'To sell you a drink we need to know that you are an adult.',
@@ -117,6 +117,6 @@ export class PdMultiCredentials {
           },
         },
       ],
-    } as PresentationDefinitionV1;
+    } as InternalPresentationDefinitionV1;
   }
 }

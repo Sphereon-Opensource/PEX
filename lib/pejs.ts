@@ -1,14 +1,10 @@
-import {
-  PresentationDefinitionV1 as PdV1,
-  PresentationDefinitionV2 as PdV2,
-  PresentationSubmission,
-} from '@sphereon/pe-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pe-models';
 
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { PresentationSignCallBackParamsV1, PresentationSignCallBackParamsV2 } from './signing/types';
-import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
-import { PEVersion, VerifiableCredentialJsonLD, VerifiableCredentialJwt } from './types/SSI.types';
+import { InternalVerifiableCredential, Presentation, Proof, VerifiablePresentation } from './types';
+import { PEVersion, VerifiableCredential } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import {
   PresentationDefinitionV1VB,
@@ -39,18 +35,20 @@ export class PEJS {
    * were not fulfilled by the presentation.
    */
   public evaluatePresentationV1(
-    presentationDefinition: PdV1,
+    presentationDefinition: PresentationDefinitionV1,
     presentation: Presentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
-    presentationCopy.verifiableCredential = this.recognizeAndEditVCs(presentationCopy.verifiableCredential);
+    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+      presentationCopy.verifiableCredential
+    );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      presentationCopy.verifiableCredential,
+      internalVCs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -67,17 +65,19 @@ export class PEJS {
    * were not fulfilled by the presentation.
    */
   public evaluatePresentationV2(
-    presentationDefinition: PdV2,
+    presentationDefinition: PresentationDefinitionV2,
     presentation: Presentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
-    presentationCopy.verifiableCredential = this.recognizeAndEditVCs(presentationCopy.verifiableCredential);
+    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+      presentationCopy.verifiableCredential
+    );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      presentationCopy.verifiableCredential,
+      internalVCs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -95,7 +95,7 @@ export class PEJS {
    * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentialsV1(
-    presentationDefinition: PdV1,
+    presentationDefinition: PresentationDefinitionV1,
     verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
@@ -104,7 +104,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      this.recognizeAndEditVCs(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -122,8 +122,8 @@ export class PEJS {
    * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentialsV2(
-    presentationDefinition: PdV2,
-    verifiableCredentials: VerifiableCredential[],
+    presentationDefinition: PresentationDefinitionV2,
+    verifiableCredentials: InternalVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
@@ -131,7 +131,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      this.recognizeAndEditVCs(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -149,8 +149,8 @@ export class PEJS {
    * @return the selectable credentials.
    */
   public selectFromV1(
-    presentationDefinition: PdV1,
-    verifiableCredentials: VerifiableCredential[],
+    presentationDefinition: PresentationDefinitionV1,
+    verifiableCredentials: InternalVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -158,7 +158,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      this.recognizeAndEditVCs(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -176,8 +176,8 @@ export class PEJS {
    * @return the selectable credentials.
    */
   public selectFromV2(
-    presentationDefinition: PdV2,
-    verifiableCredentials: VerifiableCredential[],
+    presentationDefinition: PresentationDefinitionV2,
+    verifiableCredentials: InternalVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -185,7 +185,7 @@ export class PEJS {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      this.recognizeAndEditVCs(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -203,15 +203,19 @@ export class PEJS {
    * @return the presentation.
    */
   public presentationFromV1(
-    presentationDefinition: PdV1,
+    presentationDefinition: PresentationDefinitionV1,
     selectedCredential: VerifiableCredential[],
     holderDID?: string
   ): Presentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      selectedCredential
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential)
     );
-    return PEJS.getPresentation(presentationSubmission, selectedCredential, holderDID);
+    return PEJS.getPresentation(
+      presentationSubmission,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential),
+      holderDID
+    );
   }
 
   /**
@@ -226,8 +230,8 @@ export class PEJS {
    * @return the presentation.
    */
   public presentationFromV2(
-    presentationDefinition: PdV2,
-    selectedCredential: VerifiableCredential[],
+    presentationDefinition: PresentationDefinitionV2,
+    selectedCredential: InternalVerifiableCredential[],
     holderDID?: string
   ): Presentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
@@ -239,7 +243,7 @@ export class PEJS {
 
   private static getPresentation(
     presentationSubmission: PresentationSubmission,
-    selectedCredential: VerifiableCredential[],
+    selectedCredential: InternalVerifiableCredential[],
     holderDID?: string
   ): Presentation {
     const holder = holderDID;
@@ -254,7 +258,7 @@ export class PEJS {
       ],
       holder,
       presentation_submission: presentationSubmission,
-      verifiableCredential: selectedCredential,
+      verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(selectedCredential),
     };
   }
 
@@ -265,7 +269,7 @@ export class PEJS {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinitionV1(presentationDefinitionV1: PdV1): Validated {
+  public validateDefinitionV1(presentationDefinitionV1: PresentationDefinitionV1): Validated {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV1VB('root'),
@@ -281,7 +285,7 @@ export class PEJS {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinitionV2(presentationDefinitionV2: PdV2): Validated {
+  public validateDefinitionV2(presentationDefinitionV2: PresentationDefinitionV2): Validated {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
@@ -324,7 +328,7 @@ export class PEJS {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFromV1(
-    presentationDefinition: PdV1,
+    presentationDefinition: PresentationDefinitionV1,
     selectedCredentials: VerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
     options: PresentationSignOptions
@@ -344,9 +348,18 @@ export class PEJS {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentialsV1(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    this.evaluateCredentialsV1(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holderDIDs,
+      limitDisclosureSignatureSuites
+    );
 
-    const presentation = this.presentationFromV1(presentationDefinition, selectedCredentials, holder);
+    const presentation = this.presentationFromV1(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holder
+    );
     const evaluationResults = this.evaluatePresentationV1(
       presentationDefinition,
       presentation,
@@ -399,7 +412,7 @@ export class PEJS {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFromV2(
-    presentationDefinition: PdV2,
+    presentationDefinition: PresentationDefinitionV2,
     selectedCredentials: VerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
     options: PresentationSignOptions
@@ -419,9 +432,18 @@ export class PEJS {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentialsV2(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    this.evaluateCredentialsV2(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holderDIDs,
+      limitDisclosureSignatureSuites
+    );
 
-    const presentation = this.presentationFromV2(presentationDefinition, selectedCredentials, holder);
+    const presentation = this.presentationFromV2(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holder
+    );
     const evaluationResults = this.evaluatePresentationV2(
       presentationDefinition,
       presentation,
@@ -456,7 +478,10 @@ export class PEJS {
     return signingCallBack(callBackParams);
   }
 
-  public definitionVersionDiscovery(presentationDefinition: PdV2 | PdV1): { version?: PEVersion; error?: string } {
+  public definitionVersionDiscovery(presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2): {
+    version?: PEVersion;
+    error?: string;
+  } {
     let version = undefined;
     for (const key of Object.keys(presentationDefinition)) {
       if (key === 'frame') {
@@ -481,21 +506,5 @@ export class PEJS {
       version = PEVersion.v2;
     }
     return { version: version };
-  }
-
-  private recognizeAndEditVCs(verifiableCredential: VerifiableCredential[]): VerifiableCredential[] {
-    const vcs: VerifiableCredential[] = [];
-    for (let i = 0; i < verifiableCredential.length; i++) {
-      if (verifiableCredential[i]['vc']) {
-        let vc: VerifiableCredential = new VerifiableCredentialJwt();
-        vc = Object.assign(vc, verifiableCredential[i]);
-        vcs.push(vc);
-      } else {
-        let vc: VerifiableCredential = new VerifiableCredentialJsonLD();
-        vc = Object.assign(vc, verifiableCredential[i]);
-        vcs.push(vc);
-      }
-    }
-    return vcs;
   }
 }

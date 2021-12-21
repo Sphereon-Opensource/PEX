@@ -44,7 +44,7 @@ the generation of the objects in many languages and frameworks consistently by c
 * Validating a presentation (submission) when received
 * Input evaluations: Verification of presentation submissions conforming to the presentation definition
 * Utilities: to build and use different models compliant with
-  the [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/).
+  the [DIF Presentation Exchange v2.0.0 specification](https://identity.foundation/presentation-exchange/).
 
 Stateful storage, signature support or credential management should be implemented in separate libraries/ modules that
 make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay
@@ -79,7 +79,7 @@ import { pejs } from '@sphereon/pe-js';
 
 const pe = new pejs();
 
-const presentationDefinition = {
+const presentationDefinitionV1 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
     {
@@ -89,6 +89,17 @@ const presentationDefinition = {
       "schema": [{
         "uri": "https://licenses.example.com/business-license.json"
       }]
+    }
+  ]
+};
+
+const presentationDefinitionV2 = {
+  "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
+  "input_descriptors": [
+    {
+      "id": "wa_driver_license",
+      "name": "Washington State Business License",
+      "purpose": "We can only allow licensed Washington State business representatives into the WA Business Conference"
     }
   ]
 };

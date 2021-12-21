@@ -3,8 +3,8 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { PEVersion, PresentationDefinition, PresentationDefinitionV1 } from '../../types/SSI.types';
+import { InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition, InternalPresentationDefinitionV1, PEVersion } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -19,11 +19,11 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return 'UriEvaluation';
   }
 
-  public handle(d: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(d: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // This filter is removed in V2
-    (<PresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
+    (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
-      vcs.forEach((vc: VerifiableCredential, j: number) => {
+      vcs.forEach((vc: InternalVerifiableCredential, j: number) => {
         this.evaluateUris(vc.getContext(), uris, i, j, d.getVersion());
       });
     });

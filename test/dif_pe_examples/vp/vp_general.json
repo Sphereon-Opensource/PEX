@@ -30,8 +30,7 @@
   },
   "verifiableCredential": [
     {
-      "comment": "IN REALWORLD VPs, THIS WILL BE A BIG UGLY OBJECT INSTEAD OF THE DECODED JWT PAYLOAD THAT FOLLOWS",
-      "iss": "",
+      "iss": "did:example:123",
       "vc": {
         "@context": "https://eu.com/claims/DriversLicense",
         "id": "https://eu.com/claims/DriversLicense",

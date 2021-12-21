@@ -1,7 +1,7 @@
 import { PresentationSubmission, Rules } from '@sphereon/pe-models';
 
-import { HandlerCheckResult, SelectResults, Status, VerifiableCredential } from '../../lib';
-import { VerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
+import { HandlerCheckResult, InternalVerifiableCredential, SelectResults, Status } from '../../lib';
+import { InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {
@@ -246,7 +246,7 @@ export class EvaluationClientWrapperData {
             verificationMethod: '',
             jws: '',
           },
-        } as unknown as VerifiableCredentialJsonLD,
+        } as unknown as InternalVerifiableCredentialJsonLD,
       ],
       vcIndexes: [],
       matches: [
@@ -259,7 +259,7 @@ export class EvaluationClientWrapperData {
     };
   }
 
-  public getVerifiableCredential(): VerifiableCredential[] {
+  public getVerifiableCredential(): InternalVerifiableCredential[] {
     return [
       {
         id: 'CredentialID2021110100',
@@ -281,7 +281,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as VerifiableCredentialJsonLD,
+      } as unknown as InternalVerifiableCredentialJsonLD,
       {
         id: 'CredentialID2021110405',
         credentialStatus: {
@@ -302,7 +302,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as VerifiableCredentialJsonLD,
+      } as unknown as InternalVerifiableCredentialJsonLD,
       {
         id: 'CredentialID2021110100',
         credentialStatus: {
@@ -323,7 +323,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as VerifiableCredentialJsonLD,
+      } as unknown as InternalVerifiableCredentialJsonLD,
     ];
   }
 

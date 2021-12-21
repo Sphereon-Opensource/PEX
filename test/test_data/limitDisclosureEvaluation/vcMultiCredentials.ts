@@ -1,9 +1,9 @@
-import { VerifiableCredential } from '../../../lib';
-import { VerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { InternalVerifiableCredential } from '../../../lib';
+import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
 
 export class VcMultiCredentials {
-  getVerifiableCredentials(): VerifiableCredential[] {
-    let vc0: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+  getVerifiableCredentials(): InternalVerifiableCredential[] {
+    let vc0: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc0 = Object.assign(vc0, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -29,7 +29,7 @@ export class VcMultiCredentials {
         nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
       },
     });
-    let vc1: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc1: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc1 = Object.assign(vc1, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -57,7 +57,7 @@ export class VcMultiCredentials {
         nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
       },
     });
-    let vc2: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc2: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
@@ -87,7 +87,7 @@ export class VcMultiCredentials {
         nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
       },
     });
-    let vc3: VerifiableCredentialJsonLD = new VerifiableCredentialJsonLD();
+    let vc3: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
     vc3 = Object.assign(vc3, {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [

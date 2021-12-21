@@ -16,16 +16,16 @@ import {
   SignatureOptions,
 } from './signing';
 import {
-  Credential,
   CredentialStatus,
   CredentialSubject,
   InputFieldType,
+  InternalCredential,
+  InternalVerifiableCredential,
   Issuer,
   Presentation,
   Proof,
   ProofPurpose,
   ProofType,
-  VerifiableCredential,
   VerifiablePresentation,
 } from './types';
 import {
@@ -48,8 +48,8 @@ export {
 export { PresentationSignCallBackParams, PresentationSignOptions, ProofOptions, SignatureOptions, KeyEncoding };
 export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine, ValidationBundler };
 export {
-  VerifiableCredential,
-  Credential,
+  InternalVerifiableCredential,
+  InternalCredential,
   CredentialSubject,
   CredentialStatus,
   VerifiablePresentation,

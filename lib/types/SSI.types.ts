@@ -2,8 +2,8 @@ import {
   Format,
   InputDescriptorV1,
   InputDescriptorV2,
-  PresentationDefinitionV1 as PdV1,
-  PresentationDefinitionV2 as PdV2,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
   PresentationSubmission,
   SubmissionRequirement,
 } from '@sphereon/pe-models';
@@ -62,27 +62,29 @@ export interface Issuer {
   [x: string]: unknown;
 }
 
-export interface Credential {
+export interface InternalCredential {
   getAudience(): string | undefined;
 
-  getBaseCredential(): CredentialBase;
+  getBaseCredential(): InternalCredentialBase;
 
   getContext(): string[] | string;
 
   getExpirationDate(): string | undefined;
 
-  getId(): string;
+  getId(): string | undefined;
 
   getIssuer(): unknown;
 
   getIssuanceDate(): string | undefined;
+
+  getJti(): string | undefined;
 
   getType(): string;
 
   [x: string]: unknown;
 }
 
-export class CredentialBase {
+export class InternalCredentialBase {
   '@context': string[] | string;
   credentialStatus?: CredentialStatus;
   credentialSubject: CredentialSubject;
@@ -97,7 +99,7 @@ export class CredentialBase {
   [x: string]: unknown;
 }
 
-export class CredentialJWT implements Credential {
+export class InternalCredentialJWT implements InternalCredential {
   /**
    * aud MUST represent (i.e., identify) the intended audience of the verifiable presentation
    * (i.e., the verifier intended by the presenting holder to receive and verify the verifiable presentation).
@@ -129,11 +131,11 @@ export class CredentialJWT implements Credential {
    */
   sub?: string;
 
-  vc: CredentialBase;
+  vc: InternalCredentialBase;
 
   [x: string]: unknown;
 
-  getBaseCredential(): CredentialBase {
+  getBaseCredential(): InternalCredentialBase {
     return this.vc;
   }
 
@@ -150,11 +152,11 @@ export class CredentialJWT implements Credential {
   }
 
   getExpirationDate(): string | undefined {
-    return this.exp ? this.exp : this.vc.expirationDate;
+    return this.exp;
   }
 
-  getId(): string {
-    return this.sub ? this.sub : this.vc.id;
+  getId(): string | undefined {
+    return this.sub;
   }
 
   getIssuer(): unknown {
@@ -162,12 +164,16 @@ export class CredentialJWT implements Credential {
   }
 
   getIssuanceDate(): string | undefined {
-    return this.nbf ? this.nbf : this.vc.issuanceDate;
+    return this.nbf;
+  }
+
+  getJti(): string | undefined {
+    return this.jti;
   }
 }
 
-export class CredentialJsonLD extends CredentialBase implements Credential {
-  getBaseCredential(): CredentialBase {
+export class InternalCredentialJsonLD extends InternalCredentialBase implements InternalCredential {
+  getBaseCredential(): InternalCredentialBase {
     return this;
   }
 
@@ -199,9 +205,13 @@ export class CredentialJsonLD extends CredentialBase implements Credential {
   getIssuer(): unknown {
     return this.issuer;
   }
+
+  getJti(): string | undefined {
+    return undefined;
+  }
 }
 
-export class VerifiableCredentialJsonLD extends CredentialJsonLD {
+export class InternalVerifiableCredentialJsonLD extends InternalCredentialJsonLD {
   proof: Proof | Proof[];
 
   constructor() {
@@ -209,7 +219,7 @@ export class VerifiableCredentialJsonLD extends CredentialJsonLD {
   }
 }
 
-export class VerifiableCredentialJwt extends CredentialJWT {
+export class InternalVerifiableCredentialJwt extends InternalCredentialJWT {
   proof: Proof | Proof[];
 
   constructor() {
@@ -217,9 +227,44 @@ export class VerifiableCredentialJwt extends CredentialJWT {
   }
 }
 
-export type VerifiableCredential = VerifiableCredentialJsonLD | VerifiableCredentialJwt;
+export type InternalVerifiableCredential = InternalVerifiableCredentialJsonLD | InternalVerifiableCredentialJwt;
 
-export interface PresentationDefinition {
+export interface Credential {
+  /**
+   * Below are the jwt related credentials
+   */
+  aud?: string;
+  exp?: string;
+  iss?: string;
+  jti?: string;
+  nbf?: string;
+  sub?: string;
+  vc?: InternalCredentialBase;
+  // JWT related fields end
+
+  /**
+   * Below are the json-ld related credentials
+   */
+  '@context'?: string[] | string;
+  credentialStatus?: CredentialStatus;
+  credentialSubject?: CredentialSubject;
+  description?: string;
+  expirationDate?: string;
+  id?: string;
+  issuanceDate?: string;
+  issuer?: unknown;
+  name?: string;
+  type?: string[];
+  // JSON-LD related fields end
+
+  [x: string]: unknown;
+}
+
+export interface VerifiableCredential extends Credential {
+  proof: Proof | Proof[];
+}
+
+export interface InternalPresentationDefinition {
   format?: Format;
   id: string;
   name?: string;
@@ -229,7 +274,7 @@ export interface PresentationDefinition {
   getVersion(): PEVersion;
 }
 
-export class PresentationDefinitionV1 implements PdV1, PresentationDefinition {
+export class InternalPresentationDefinitionV1 implements PresentationDefinitionV1, InternalPresentationDefinition {
   input_descriptors: Array<InputDescriptorV1>;
 
   constructor(
@@ -259,7 +304,7 @@ export class PresentationDefinitionV1 implements PdV1, PresentationDefinition {
   }
 }
 
-export class PresentationDefinitionV2 implements PdV2, PresentationDefinition {
+export class InternalPresentationDefinitionV2 implements PresentationDefinitionV2, InternalPresentationDefinition {
   format?: Format;
   frame?: any;
   id: string;
@@ -305,9 +350,9 @@ export interface VerifiablePresentation extends Presentation {
 
 export type InputFieldType =
   | VerifiablePresentation
-  | VerifiableCredential
-  | VerifiableCredential[]
-  | PresentationDefinition;
+  | InternalVerifiableCredential
+  | InternalVerifiableCredential[]
+  | InternalPresentationDefinition;
 
 export enum PEVersion {
   v1 = 'v1',

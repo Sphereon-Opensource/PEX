@@ -1,24 +1,24 @@
 import {
-  Credential,
   CredentialStatus,
   CredentialSubject,
   InputFieldType,
+  InternalCredential,
+  InternalVerifiableCredential,
   Issuer,
   Presentation,
   Proof,
   ProofPurpose,
   ProofType,
-  VerifiableCredential,
   VerifiablePresentation,
 } from './SSI.types';
 
 export {
   Presentation,
   VerifiablePresentation,
-  VerifiableCredential,
+  InternalVerifiableCredential,
   CredentialStatus,
   CredentialSubject,
-  Credential,
+  InternalCredential,
   Proof,
   InputFieldType,
   Issuer,

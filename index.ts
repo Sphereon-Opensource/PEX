@@ -1,11 +1,12 @@
 import {
   Checked,
-  Credential,
   CredentialStatus,
   CredentialSubject,
   EvaluationHandler,
   EvaluationResults,
   InputFieldType,
+  InternalCredential,
+  InternalVerifiableCredential,
   Issuer,
   KeyEncoding,
   NonEmptyArray,
@@ -25,7 +26,6 @@ import {
   Validation,
   ValidationPredicate,
   Validator,
-  VerifiableCredential,
   VerifiablePresentation
 } from './lib';
 
@@ -36,9 +36,9 @@ export {
   Proof,
   ProofOptions,
   Validation,
-  VerifiableCredential,
+  InternalVerifiableCredential,
   PEJS as pejs,
-  Credential,
+  InternalCredential,
   KeyEncoding,
   Status,
   CredentialStatus,
