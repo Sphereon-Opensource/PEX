@@ -3,6 +3,7 @@ import fs from 'fs';
 import { InternalVerifiableCredential } from '../../lib';
 import { EvaluationClient } from '../../lib';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
+import PEMessages from '../../lib/types/Messages';
 import { InternalPresentationDefinitionV1, InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
@@ -54,7 +55,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'SubjectIsIssuerEvaluation',
       status: 'info',
-      message: 'subject is issuer',
+      message: PEMessages.SUBJECT_IS_ISSUER,
     });
   });
 
@@ -100,7 +101,7 @@ describe('evaluate', () => {
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       evaluator: 'SubjectIsIssuerEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: 'subject is not issuer',
+      message: PEMessages.SUBJECT_IS_NOT_ISSUER,
       status: 'error',
       verifiable_credential_path: '$[0]',
     });

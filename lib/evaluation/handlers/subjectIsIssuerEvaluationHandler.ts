@@ -3,6 +3,7 @@ import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
 import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
@@ -55,7 +56,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: 'subject is not issuer',
+      message: PEMessages.SUBJECT_IS_NOT_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }
@@ -65,7 +66,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: message ?? 'subject is issuer',
+      message: message ?? PEMessages.SUBJECT_IS_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }

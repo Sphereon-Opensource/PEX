@@ -2,6 +2,7 @@ import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
 import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -48,7 +49,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         evaluator: this.getName(),
         status: Status.INFO,
         payload: { group },
-        message: 'The input candidate is eligible for submission',
+        message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       });
     });
   }
@@ -60,7 +61,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       this.getResults().push({
         ...error,
         evaluator: this.getName(),
-        message: 'The input candidate is not eligible for submission',
+        message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         payload: payload,
       });
     });

@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
 import { InternalPresentationDefinition, InternalPresentationDefinitionV1, PEVersion } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -87,8 +88,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   ) {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
-    result.message =
-      '@context URI(s) for the schema of the candidate input is equal to one of the input_descriptors object uri values.';
+    result.message = PEMessages.URI_EVALUATION_PASSED;
     result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
@@ -101,8 +101,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   ) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
-    result.message =
-      '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.';
+    result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }

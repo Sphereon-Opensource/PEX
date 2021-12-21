@@ -1,6 +1,7 @@
 import { Constraints, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
+import PEMessages from '../../types/Messages';
 import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -101,7 +102,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: results[resultIdx].verifiable_credential_path,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: evaluationResult,
     };
   }

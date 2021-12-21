@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib';
+import PEMessages from '../../lib/types/Messages';
 import { InternalPresentationDefinitionV1, InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
@@ -68,7 +69,7 @@ describe('evaluate', () => {
     expect(evaluationClient.results[7]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: 'Limit disclosure not supported',
+      message: PEMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
       status: 'error',
       verifiable_credential_path: '$[0]',
     });
@@ -92,7 +93,7 @@ describe('evaluate', () => {
     expect(evaluationClient.results[6]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: 'mandatory field not present in the verifiableCredential',
+      message: PEMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
       payload: ['$.credentialSubject.citizenship[*]', '$.credentialSubject.details.citizenship[*]'],
       status: 'error',
       verifiable_credential_path: '$[0]',

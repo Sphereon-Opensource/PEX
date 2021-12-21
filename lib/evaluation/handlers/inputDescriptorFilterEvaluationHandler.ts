@@ -4,6 +4,7 @@ import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
 import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
@@ -31,10 +32,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
         if (!inputField.length) {
           const payload = { valid: false };
-          this.createResponse(field, vcIndex, payload, 'Input candidate does not contain property');
+          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
         } else if (!this.evaluateFilter(inputField[0], field.value)) {
           const payload = { result: { ...inputField[0] }, valid: false };
-          this.createResponse(field, vcIndex, payload, 'Input candidate failed filter evaluation');
+          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
         } else {
           const payload = { result: { ...inputField[0] }, valid: true };
           this.getResults().push({
@@ -80,7 +81,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: `$[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload,
     };
   }

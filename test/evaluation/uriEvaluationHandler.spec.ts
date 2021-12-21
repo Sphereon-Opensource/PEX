@@ -3,6 +3,7 @@ import fs from 'fs';
 import { InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, HandlerCheckResult } from '../../lib';
 import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
+import PEMessages from '../../lib/types/Messages';
 import {
   InternalPresentationDefinitionV1,
   InternalVerifiableCredentialJsonLD,
@@ -48,7 +49,7 @@ describe('evaluate', () => {
         '$[0]',
         'UriEvaluation',
         Status.ERROR,
-        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+        PEMessages.URI_EVALUATION_DIDNT_PASS,
         {
           inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
           presentationDefinitionUris: ['https://www.test.org/mock'],

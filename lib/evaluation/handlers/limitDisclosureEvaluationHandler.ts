@@ -3,6 +3,7 @@ import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
 import {
   InternalPresentationDefinition,
   InternalPresentationDefinitionV2,
@@ -142,7 +143,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
       status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
-      message: 'added variable in the limit_disclosure to the verifiableCredential',
+      message: PEMessages.LIMIT_DISCLOSURE_APPLIED,
       payload: undefined,
     });
   }
@@ -153,7 +154,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: 'mandatory field not present in the verifiableCredential',
+      message: PEMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
       payload: path,
     });
   }
@@ -164,7 +165,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: 'Limit disclosure not supported',
+      message: PEMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
     });
   }
 }

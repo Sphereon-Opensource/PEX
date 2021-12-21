@@ -4,6 +4,7 @@ import { Optionality } from '@sphereon/pe-models';
 
 import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
 import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
+import PEMessages from '../../lib/types/Messages';
 import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
@@ -21,8 +22,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -33,7 +33,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -61,7 +61,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           path: ['$', 'credentialSubject', 'age'],
           value: 19,
@@ -92,8 +92,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -104,7 +103,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -121,7 +120,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           path: ['$', 'credentialSubject', 'age'],
           value: true,
@@ -152,8 +151,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -164,7 +162,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'error',
-      message: 'Input candidate does not contain property',
+      message: PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY,
       payload: {
         result: [],
         valid: false,
@@ -197,8 +195,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -209,7 +206,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -223,7 +220,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           path: ['$', 'credentialSubject', 'details', 'citizenship', 0],
@@ -237,7 +234,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 'NLD',
@@ -254,7 +251,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         { value: true, path: ['$', 'credentialSubject', 'age'] }
       )
     );
@@ -264,7 +261,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         { value: 'eu', path: ['$', 'credentialSubject', 'details', 'citizenship', 0] }
       )
     );
@@ -274,7 +271,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           value: 'NLD',
           path: ['$', 'credentialSubject', 'country', 0, 'abbr'],

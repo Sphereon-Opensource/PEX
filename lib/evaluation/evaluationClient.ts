@@ -2,6 +2,7 @@ import { PresentationSubmission } from '@sphereon/pe-models';
 
 import { Status } from '../ConstraintUtils';
 import { InternalVerifiableCredential } from '../types';
+import PEMessages from '../types/Messages';
 import { InternalPresentationDefinition, ProofType } from '../types/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
@@ -31,7 +32,7 @@ export class EvaluationClient {
   private failed_catched = {
     tag: 'root',
     status: Status.ERROR,
-    message: 'unknown exception occurred: ',
+    message: PEMessages.UNKNOWN_EXCEPTION as string,
     stacktrace: '',
   };
 

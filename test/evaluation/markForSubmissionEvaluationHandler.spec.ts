@@ -3,6 +3,7 @@ import fs from 'fs';
 import { InternalVerifiableCredential, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, HandlerCheckResult } from '../../lib';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers';
+import PEMessages from '../../lib/types/Messages';
 import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
@@ -93,7 +94,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: 'The input candidate is eligible for submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: { group: ['A'] },
       status: 'info',
       verifiable_credential_path: '$[0]',
@@ -119,7 +120,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
       evaluator: 'MarkForSubmissionEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: 'The input candidate is not eligible for submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: { evaluator: 'PredicateRelatedField', path: ['$', 'age'], value: false },
       status: 'error',
       verifiable_credential_path: '$[0]',

@@ -3,6 +3,7 @@ import fs from 'fs';
 import { Optionality } from '@sphereon/pe-models';
 
 import { EvaluationClient, InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
+import PEMessages from '../../lib/types/Messages';
 import { InternalPresentationDefinitionV1, InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
@@ -31,8 +32,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message:
-        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
@@ -70,8 +70,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message:
-        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],

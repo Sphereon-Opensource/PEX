@@ -1,6 +1,7 @@
 import { PresentationSubmission, Rules } from '@sphereon/pe-models';
 
 import { HandlerCheckResult, InternalVerifiableCredential, SelectResults, Status } from '../../lib';
+import PEMessages from '../../lib/types/Messages';
 import { InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 export class EvaluationClientWrapperData {
@@ -14,8 +15,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message:
-        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
@@ -29,7 +29,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'MarkForSubmissionEvaluation',
       status: 'error',
-      message: 'The input candidate is not eligible for submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
@@ -44,8 +44,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message:
-        '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.',
+      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
@@ -59,7 +58,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'MarkForSubmissionEvaluation',
       status: 'error',
-      message: 'The input candidate is not eligible for submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
@@ -114,34 +113,34 @@ export class EvaluationClientWrapperData {
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[1]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
+          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[1]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
+          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[2]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[1]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[2]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
@@ -196,7 +195,7 @@ export class EvaluationClientWrapperData {
       }),
       warnings: [
         {
-          message: 'added variable in the limit_disclosure to the verifiableCredential: $.input_descriptors[0]: $[0]',
+          message: PEMessages.LIMIT_DISCLOSURE_APPLIED + ': $.input_descriptors[0]: $[0]',
           status: 'warn',
           tag: 'LimitDisclosureEvaluation',
         },
@@ -208,13 +207,13 @@ export class EvaluationClientWrapperData {
     return {
       errors: [
         {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $[0]',
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
@@ -332,39 +331,40 @@ export class EvaluationClientWrapperData {
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[0]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $[2]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[1]',
+          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[1]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $[2]',
+          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[2]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[0]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[2]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[2]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $[1]',
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[1]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
