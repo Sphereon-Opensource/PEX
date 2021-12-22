@@ -1,6 +1,6 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pe-models';
 
-import { InternalVerifiableCredential, PEJS, Presentation } from '../../lib';
+import { InternalVerifiableCredential, PEX, Presentation } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
@@ -16,11 +16,11 @@ describe('1st scenario', () => {
    */
   it('should return ok get the right presentationSubmission', function () {
     const pd: PdV1 = getPresentationDefinition();
-    const pejs: PEJS = new PEJS();
+    const pejs: PEX = new PEX();
     /**
      * optional, first we want to make sure that the presentationDefinition object that we got is correct
      */
-    const result = pejs.validateDefinitionV1(pd);
+    const result = pejs.validateDefinition(pd);
     expect(result).toEqual([{ tag: 'root', status: 'info', message: 'ok' }]);
     const wallet: Wallet = new Wallet();
     /**
@@ -92,7 +92,7 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluatePresentationV1(
+    const evaluationResult = pejs.evaluatePresentation(
       pd,
       {
         '@context': [],
@@ -195,7 +195,7 @@ describe('1st scenario', () => {
       "warnings": []
     }
      */
-    const selectFromResult = pejs.selectFromV1(
+    const selectFromResult = pejs.selectFrom(
       pd,
       holderWallet.verifiableCredentials,
       [holderWallet.holder],
@@ -230,7 +230,7 @@ describe('1st scenario', () => {
 
      which is wrong in the case of our example, because the index of our verifiableCredential is no longer #2, but it's "1"
      */
-    const presentation: Presentation = pejs.presentationFromV1(
+    const presentation: Presentation = pejs.presentationFrom(
       pd,
       [holderWallet.verifiableCredentials[2]],
       'did:didMethod:2021112400'
@@ -256,7 +256,7 @@ describe('1st scenario', () => {
      As you can see, no matter what we pass, we will get the same result
      */
     expect(() => {
-      new PEJS().presentationFromV1(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
+      new PEX().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
     }).toThrowError('You need to call evaluate() before pejs.presentationFrom()');
   });
 });

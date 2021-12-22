@@ -108,6 +108,11 @@ export interface PresentationSignCallBackParams {
   proof: Partial<Proof>;
 
   /**
+   * The presentation definition
+   */
+  presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2;
+
+  /**
    * The presentation submission data, which can also be found in the presentation itself
    */
   presentationSubmission: PresentationSubmission;
@@ -116,20 +121,6 @@ export interface PresentationSignCallBackParams {
    * The evaluation results, which the callback function could use to create a VP using the proof(s) using the supplied credentials
    */
   evaluationResults: EvaluationResults;
-}
-
-export interface PresentationSignCallBackParamsV1 extends PresentationSignCallBackParams {
-  /**
-   * The presentation definition
-   */
-  presentationDefinition: PresentationDefinitionV1;
-}
-
-export interface PresentationSignCallBackParamsV2 extends PresentationSignCallBackParams {
-  /**
-   * The presentation definition
-   */
-  presentationDefinition: PresentationDefinitionV2;
 }
 
 export enum KeyEncoding {

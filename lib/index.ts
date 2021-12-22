@@ -1,4 +1,7 @@
 import { Checked, NonEmptyArray, Status } from './ConstraintUtils';
+import { PEX } from './PEX';
+import { PEXv1 } from './PEXv1';
+import { PEXv2 } from './PEXv2';
 import {
   EvaluationClient,
   EvaluationHandler,
@@ -7,7 +10,6 @@ import {
   SelectResults,
   SubmissionRequirementMatch,
 } from './evaluation';
-import { PEJS } from './pejs';
 import {
   KeyEncoding,
   PresentationSignCallBackParams,
@@ -61,4 +63,4 @@ export {
   ProofPurpose,
 };
 export { Checked, Status, NonEmptyArray };
-export { PEJS };
+export { PEX, PEXv1, PEXv2 };
