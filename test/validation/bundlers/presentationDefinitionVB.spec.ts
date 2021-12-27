@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pe-models';
+import { InputDescriptorV2, PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pe-models';
 
 import { Checked, Status } from '../../../lib';
 import {
@@ -171,6 +171,7 @@ describe('validate', () => {
 
   it('should return error for empty purpose v2', () => {
     const basicPD: PresentationDefinitionV2 = getFile('./test/resources/pd_basic.json');
+    delete basicPD.input_descriptors[0]['schema' as keyof InputDescriptorV2];
     basicPD.purpose = '';
 
     const vb: ValidationBundler<PresentationDefinitionV2> = new PresentationDefinitionV2VB('root');

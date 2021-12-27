@@ -36,6 +36,12 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
       {
         tag: this.getTag(),
         target: inputDescriptors,
+        predicate: (inDescs: InputDescriptorV2[]) => this.shouldNotHaveSchema(inDescs),
+        message: 'input descriptor should not have schema property',
+      },
+      {
+        tag: this.getTag(),
+        target: inputDescriptors,
         predicate: (inDescs: InputDescriptorV2[]) => this.shouldHaveUniqueIds(inDescs),
         message: 'input descriptor ids must be unique',
       },
@@ -121,5 +127,15 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }
     return [];
+  }
+
+  private shouldNotHaveSchema(inputDescriptors: InputDescriptorV2[]) {
+    let hasSchema = false;
+    inputDescriptors.forEach((id) => {
+      if (id['schema' as keyof InputDescriptorV2]) {
+        hasSchema = true;
+      }
+    });
+    return !hasSchema;
   }
 }

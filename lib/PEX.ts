@@ -1,5 +1,6 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pe-models';
 
+import { Checked } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { InternalVerifiableCredential, Presentation, Proof, VerifiablePresentation } from './types';
@@ -304,30 +305,25 @@ export class PEX {
     version?: PEVersion;
     error?: string;
   } {
-    let version = undefined;
-    for (const key of Object.keys(presentationDefinition)) {
-      if (key === 'frame') {
-        if (version === PEVersion.v1) {
-          return { error: 'This is not a valid PresentationDefinition' };
-        }
-        version = PEVersion.v2;
-      } else if (key === 'input_descriptors') {
-        for (const id of presentationDefinition['input_descriptors']) {
-          for (const idKey of Object.keys(id)) {
-            if (idKey === 'schema') {
-              if (version === PEVersion.v2) {
-                return { error: 'This is not a valid PresentationDefinition' };
-              }
-              version = PEVersion.v1;
-            }
-          }
-        }
-      }
+    const v1Validators = [];
+    const v2Validators = [];
+    v1Validators.push({
+      bundler: new PresentationDefinitionV1VB('root'),
+      target: presentationDefinition,
+    });
+    v2Validators.push({
+      bundler: new PresentationDefinitionV2VB('root'),
+      target: presentationDefinition,
+    });
+    const v1Result = new ValidationEngine().validate(v1Validators);
+    const v2Result = new ValidationEngine().validate(v2Validators);
+    if (Array.isArray(v1Result) && v1Result.length === 1 && (v1Result as Checked[])[0].message === 'ok') {
+      return { version: PEVersion.v1 };
+    } else if (Array.isArray(v2Result) && v2Result.length === 1 && (v2Result as Checked[])[0].message === 'ok') {
+      return { version: PEVersion.v2 };
+    } else {
+      return { error: 'This is not a valid PresentationDefinition' };
     }
-    if (!version) {
-      version = PEVersion.v2;
-    }
-    return { version: version };
   }
 
   private determineAndCastToInternalPresentationDefinition(

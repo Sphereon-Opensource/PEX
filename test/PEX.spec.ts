@@ -91,7 +91,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
     ).presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
-    pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
+    pdSchema.input_descriptors[0].schema = [{ uri: 'https://www.example.com/schema' }];
     const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result!.errors!.length).toEqual(2);
     expect(result!.errors!.map((e) => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);

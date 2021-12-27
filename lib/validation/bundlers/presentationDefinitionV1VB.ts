@@ -106,6 +106,12 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
           PresentationDefinitionV1VB.groupShouldMatchSubmissionRequirements(pd),
         message: 'input descriptor group should match the from in submission requirements.',
       },
+      {
+        tag: this.getTag(),
+        target: pd,
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.shouldNotHaveFrameProperty(pd),
+        message: 'input descriptor should not have frame property.',
+      },
     ];
   }
 
@@ -235,5 +241,9 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
       const valid = validate(presentationDefinition);
       return valid;
     };
+  }
+
+  private static shouldNotHaveFrameProperty(pd: PresentationDefinitionV1) {
+    return !pd['frame' as keyof PresentationDefinitionV1];
   }
 }
