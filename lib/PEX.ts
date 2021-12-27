@@ -95,7 +95,7 @@ export class PEX {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
-    verifiableCredentials: InternalVerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
