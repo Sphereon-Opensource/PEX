@@ -207,9 +207,8 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
         if (srs.from) {
           if (Array.isArray(srs.from)) {
             fromValues.push(...srs.from);
-          }
-          else {
-            fromValues.push(srs.from)
+          } else {
+            fromValues.push(srs.from);
           }
         }
       });
