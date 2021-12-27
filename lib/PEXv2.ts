@@ -87,7 +87,7 @@ export class PEXv2 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: InternalVerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
