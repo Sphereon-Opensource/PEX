@@ -97,13 +97,13 @@ export class PEJS {
   }
 
   /**
-   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
-   * the verifier after signing it.
+   * This method helps create a Presentation. A Presentation after signing becomes a Verifiable Presentation and can be sent to
+   * a verifier.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
+   * @param holderDID optional; the decentralized identifier of the Credential subject. This is used to identify the holder of the presentation.
    *
    * @return the presentation.
    */
@@ -132,8 +132,8 @@ export class PEJS {
         'https://identity.foundation/presentation-exchange/submission/v1',
       ],
       type: [
-        'VerifiablePresentation',
-        'PresentationSubmission', // This will be truly verifiable after the proof field is populated.
+        'VerifiablePresentation', // This will be truly verifiable after the proof field is populated.
+        'PresentationSubmission',
       ],
       holder,
       presentation_submission: presentationSubmission,
