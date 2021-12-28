@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 
 describe('testing schemas with ajv', () => {
   it('test dummy schema should fail', () => {
-    const ajv = new Ajv();
+    const ajv = new Ajv({strict: true, verbose: true});
 
     const schema = {
       type: 'object',
@@ -30,7 +30,7 @@ describe('testing schemas with ajv', () => {
   });
 
   it('test presentation definition v1 should fail', function () {
-    const ajv = new Ajv();
+    const ajv = new Ajv({verbose: true, allowUnionTypes: true, allErrors: true});
     const schema = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'Presentation Definition',
@@ -310,74 +310,83 @@ describe('testing schemas with ajv', () => {
     };
     const validate = ajv.compile(schema);
     const data = {
-      id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-      name: 'Conference Entry Requirements',
-      purpose:
-        'We can only allow people associated with Washington State business representatives into conference areas',
-      format: {
-        jwt: {
-          alg: ['ES384'],
-        },
-        jwt_vc: {
-          alg: ['ES384'],
-        },
-        jwt_vp: {
-          alg: ['ES384'],
-        },
-        ldp_vc: {
-          proof_type: [
-            'JsonWebSignature2020',
-            'Ed25519Signature2018',
-            'EcdsaSecp256k1Signature2019',
-            'RsaSignature2018',
-          ],
-        },
-        ldp_vp: {
-          proof_type: ['Ed25519Signature2018'],
-        },
-        ldp: {
-          proof_type: ['RsaSignature2018'],
-        },
-      },
-      input_descriptors: [
-        {
-          id: 'wa_driver_license',
-          name: 'Washington State Business License',
-          purpose:
-            'We can only allow licensed Washington State business representatives into the WA Business Conference',
-          constraints: {
-            limit_disclosure: 'required',
-            fields: [
-              {
-                path: ['$.issuer', '$.vc.issuer', '$.iss'],
-                purpose:
-                  'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
-                filter: {
-                  type: 'string',
-                  pattern: 'did:example:123|did:example:456',
-                },
-              },
+      presentation_definition: {
+        id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+        name: 'Conference Entry Requirements',
+        purpose:
+          'We can only allow people associated with Washington State business representatives into conference areas',
+        format: {
+          jwt: {
+            alg: ['ES384'],
+          },
+          jwt_vc: {
+            alg: ['ES384'],
+          },
+          jwt_vp: {
+            alg: ['ES384'],
+          },
+          ldp_vc: {
+            proof_type: [
+              'JsonWebSignature2020',
+              'Ed25519Signature2018',
+              'EcdsaSecp256k1Signature2019',
+              'RsaSignature2018',
             ],
           },
-        },
-      ],
-      frame: {
-        '@context': {
-          '@vocab': 'http://example.org/',
-          within: { '@reverse': 'contains' },
-        },
-        '@type': 'Chapter',
-        within: {
-          '@type': 'Book',
-          within: {
-            '@type': 'Library',
+          ldp_vp: {
+            proof_type: ['Ed25519Signature2018'],
+          },
+          ldp: {
+            proof_type: ['RsaSignature2018'],
           },
         },
-      },
+        input_descriptors: [
+          {
+            id: 'wa_driver_license',
+            name: 'Washington State Business License',
+            purpose:
+              'We can only allow licensed Washington State business representatives into the WA Business Conference',
+            schema: [ { uri: 'https://myschema.org' }],
+            constraints: {
+              limit_disclosure: 'required',
+              fields: [
+                {
+                  path: ['$.issuer', '$.vc.issuer', '$.iss'],
+                  purpose:
+                    'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+                  filter: {
+                    type: 'string',
+                    pattern: 'did:example:123|did:example:456',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        frame: {
+          '@context': {
+            '@vocab': 'http://example.org/',
+            within: { '@reverse': 'contains' },
+          },
+          '@type': 'Chapter',
+          within: {
+            '@type': 'Book',
+            within: {
+              '@type': 'Library',
+            },
+          },
+        },
+      }
     };
 
+
     const valid = validate(data);
-    // @nklomp this should be false but returning true
-    expect(valid).toBe(true);
+    expect(valid).toBe(false);
+
+    // Remove the offending frame to double check it is now okay
+    const {frame, ...rest} = {...data.presentation_definition}
+    const result = validate({presentation_definition: {...rest}})
+    expect(result).toBe(true)
+
   });
 });
