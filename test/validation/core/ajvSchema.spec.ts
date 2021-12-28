@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 
 describe('testing schemas with ajv', () => {
   it('test dummy schema should fail', () => {
-    const ajv = new Ajv({strict: true, verbose: true});
+    const ajv = new Ajv({ strict: true, verbose: true });
 
     const schema = {
       type: 'object',
@@ -30,7 +30,7 @@ describe('testing schemas with ajv', () => {
   });
 
   it('test presentation definition v1 should fail', function () {
-    const ajv = new Ajv({verbose: true, allowUnionTypes: true, allErrors: true});
+    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true });
     const schema = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'Presentation Definition',
@@ -346,7 +346,7 @@ describe('testing schemas with ajv', () => {
             name: 'Washington State Business License',
             purpose:
               'We can only allow licensed Washington State business representatives into the WA Business Conference',
-            schema: [ { uri: 'https://myschema.org' }],
+            schema: [{ uri: 'https://myschema.org' }],
             constraints: {
               limit_disclosure: 'required',
               fields: [
@@ -376,17 +376,15 @@ describe('testing schemas with ajv', () => {
             },
           },
         },
-      }
+      },
     };
-
 
     const valid = validate(data);
     expect(valid).toBe(false);
 
     // Remove the offending frame to double check it is now okay
-    const {frame, ...rest} = {...data.presentation_definition}
-    const result = validate({presentation_definition: {...rest}})
-    expect(result).toBe(true)
-
+    const { frame, ...rest } = { ...data.presentation_definition };
+    const result = validate({ presentation_definition: { ...rest } });
+    expect(result).toBe(true);
   });
 });
