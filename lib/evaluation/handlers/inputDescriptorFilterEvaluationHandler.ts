@@ -1,10 +1,12 @@
-import { Field, PresentationDefinition } from '@sphereon/pe-models';
+import { FieldV1, FieldV2 } from '@sphereon/pex-models';
 import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
+import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
+import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -19,9 +21,9 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    const fields: { path: PathComponent[]; value: Field }[] = jp.nodes(pd, '$..fields[*]');
-    vcs.forEach((vc: VerifiableCredential, vcIndex: number) => {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+    const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
+    vcs.forEach((vc: InternalVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
         let inputField = [];
@@ -30,10 +32,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
         if (!inputField.length) {
           const payload = { valid: false };
-          this.createResponse(field, vcIndex, payload, 'Input candidate does not contain property');
+          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
         } else if (!this.evaluateFilter(inputField[0], field.value)) {
           const payload = { result: { ...inputField[0] }, valid: false };
-          this.createResponse(field, vcIndex, payload, 'Input candidate failed filter evaluation');
+          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
         } else {
           const payload = { result: { ...inputField[0] }, valid: true };
           this.getResults().push({
@@ -45,8 +47,9 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.updatePresentationSubmission(pd);
   }
 
-  private createNoFieldResults(pd: PresentationDefinition, vcIndex: number) {
-    const noFields = pd.input_descriptors
+  private createNoFieldResults(pd: InternalPresentationDefinition, vcIndex: number) {
+    // PresentationDefinitionV2 is the common denominator
+    const noFields = (pd as InternalPresentationDefinitionV2).input_descriptors
       .map((inDesc, index) => {
         return { index, inDesc };
       })
@@ -60,7 +63,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private createResponse(
-    field: { path: PathComponent[]; value: Field },
+    field: { path: PathComponent[]; value: FieldV1 | FieldV2 },
     vcIndex: number,
     payload: { result?: { path: PathComponent[]; value: unknown }; valid: boolean },
     message: string
@@ -78,12 +81,12 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: `$[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload,
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: unknown }, field: Field): boolean {
+  private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
     if (field.filter) {
       return new Ajv().validate(field.filter, result.value);
     }

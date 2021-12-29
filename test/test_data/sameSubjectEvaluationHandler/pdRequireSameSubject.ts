@@ -1,7 +1,7 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { InternalPresentationDefinitionV1 } from '../../../lib/types/SSI.types';
 
 export class PdRequireSameSubject {
-  public getPresentationDefinition(): PresentationDefinition {
+  public getPresentationDefinition(): InternalPresentationDefinitionV1 {
     return {
       id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       input_descriptors: [
@@ -235,6 +235,6 @@ export class PdRequireSameSubject {
           },
         },
       ],
-    };
+    } as InternalPresentationDefinitionV1;
   }
 }

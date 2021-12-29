@@ -9,8 +9,9 @@
     "declaration": true,
     "inlineSourceMap": true,
     "esModuleInterop": true,
-    "downlevelIteration": true
-    /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
+    "downlevelIteration": true,
+    "strictPropertyInitialization": false,
+    /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     "resolveJsonModule": true
     /* Include modules imported with .json extension. */,
     //    "strict": true /* Enable all strict type-checking options. */,

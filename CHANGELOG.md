@@ -1,4 +1,30 @@
 # Release Notes
+
+## v0.6.0 - 2021-12-29
+Add Presentation Exchange v2 support, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
+
+**Breaking change: class and package renamed in v0.6.0!**
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
+library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
+
+- The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
+- The main class was changed from `PEJS` to `PEX`. The latter class has internal feature detection support on the
+  provided definition, delegating the actual implementation to the new `PEXv1` or `PEXv2` class internally. If you don't
+  want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
+
+
+- Added:
+  - presentation exchange v2 support
+    - supporting method for all the previous methods in v2
+    - presentation definition version discovery
+    - presentation definition validator for v2
+    - `frame` validation
+  - Updated:
+    - Json-LD and JWT verifiable credentials are separated internally
+    - All the messaged now come from an enum instead of literal strings
+    - Dependency versions
+
+
 ## v0.5.1 - 2021-12-03
 Fixed json path issue in library responses. 
 Added a verifiableCredential array to almost all responses that corresponds to the json paths in the same response
@@ -104,7 +130,7 @@ Some fixes regarding usage in React. Better error handling
 This is the second Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
 - Fixed:
-  * strict flag in projects gave errors on pe-js
+  * strict flag in projects gave errors on PEX
 
   
 ## v0.1.0 - 2021-09-03

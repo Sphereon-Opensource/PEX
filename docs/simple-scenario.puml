@@ -1,20 +1,20 @@
 @startuml
 
-header PE-JS
+header PEX
 
 title
-PE-JS
+PEX
 Data Flow Diagram - version 0.1.0
 end title
 
 
 autonumber
 
-participant "PE-JS-Verifier" as PE2 order 0 #ORANGE
+participant "PEX-Verifier" as PE2 order 0 #ORANGE
 participant "Verifier" as V order 1 #ORANGE
 participant "Alice" as A order 2 #PINK
 participant "Wallet" as W order 3 #YELLOW
-participant "PE-JS" as PE order 4 #YELLOW
+participant "PEX" as PE order 4 #YELLOW
 
 V -> W: PresentationDefinition
 W -> A: Notification

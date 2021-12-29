@@ -1,8 +1,8 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
 import { EvaluationResults } from '../evaluation';
-import { Presentation, Proof, VerifiableCredential } from '../types';
-import { ProofPurpose, ProofType } from '../types/SSI.types';
+import { Presentation, Proof, ProofPurpose, ProofType } from '../types';
+import { VerifiableCredential } from '../types/SSI.types';
 
 export interface ProofOptions {
   /**
@@ -92,12 +92,7 @@ export interface PresentationSignCallBackParams {
   options: PresentationSignOptions;
 
   /**
-   * The presentation definition
-   */
-  presentationDefinition: PresentationDefinition;
-
-  /**
-   * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
+   * The selected credentials to include in the eventual VP as determined by PEX and/or user
    */
   selectedCredentials: VerifiableCredential[];
 
@@ -111,6 +106,11 @@ export interface PresentationSignCallBackParams {
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already
    */
   proof: Partial<Proof>;
+
+  /**
+   * The presentation definition
+   */
+  presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2;
 
   /**
    * The presentation submission data, which can also be found in the presentation itself

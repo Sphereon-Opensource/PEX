@@ -1,6 +1,8 @@
-import { Constraints, InputDescriptor, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
 
 import { Status } from '../../ConstraintUtils';
+import PEMessages from '../../types/Messages';
+import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -15,16 +17,17 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     return 'PredicateRelatedFieldEvaluation';
   }
 
-  public handle(pd: PresentationDefinition): void {
-    pd.input_descriptors.forEach((inDesc: InputDescriptor, index: number) => {
+  public handle(pd: InternalPresentationDefinition): void {
+    // PresentationDefinitionV2 is the common denominator
+    (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (inDesc.constraints) {
         this.examinePredicateRelatedField(index, inDesc.constraints);
       }
     });
-    // this.updatePresentationSubmission(pd);
+    // this.updatePresentationSubmission(pdV1);
   }
 
-  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {
+  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: ConstraintsV1 | ConstraintsV2): void {
     if (constraints?.fields) {
       for (let i = 0; i < constraints.fields.length; i++) {
         for (let j = 0; j < this.getResults().length; j++) {
@@ -38,7 +41,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     results: HandlerCheckResult[],
     resultIdx: number,
     input_descriptor_idx: number,
-    constraints: Constraints,
+    constraints: ConstraintsV1 | ConstraintsV2,
     fieldIdx: number
   ) {
     const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[resultIdx].input_descriptor_path);
@@ -99,7 +102,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: results[resultIdx].verifiable_credential_path,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: evaluationResult,
     };
   }

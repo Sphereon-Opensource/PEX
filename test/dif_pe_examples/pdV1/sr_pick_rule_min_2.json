@@ -4,10 +4,11 @@
     "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
     "submission_requirements": [
       {
-        "name": "Submission of educational transcripts",
-        "purpose": "We need your complete educational transcripts to process your application",
-        "rule": "all",
-        "from": "A"
+        "name": "Eligibility to Work Proof",
+        "purpose": "We need to prove you are eligible for full-time employment in 2 or more of the following countries",
+        "rule": "pick",
+        "min": 2,
+        "from": "B"
       }
     ],
     "input_descriptors": [
@@ -15,7 +16,7 @@
         "id": "Educational transcripts",
         "name": "Submission of educational transcripts",
         "purpose": "We need your complete educational transcripts to process your application",
-        "group": "A",
+        "group": ["B"],
         "schema": [
           {
             "uri": "https://university.example.com/fulltranscript.json"

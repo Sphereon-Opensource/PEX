@@ -1,14 +1,9 @@
-import {
-  Descriptor,
-  PresentationDefinition,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pe-models';
+import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { VerifiableCredential } from '../types';
+import { InternalVerifiableCredential } from '../types';
+import { InternalPresentationDefinition } from '../types/SSI.types';
 import { JsonPathUtils } from '../utils';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
@@ -28,8 +23,8 @@ export class EvaluationClientWrapper {
   }
 
   public selectFrom(
-    presentationDefinition: PresentationDefinition,
-    verifiableCredentials: VerifiableCredential[],
+    presentationDefinition: InternalPresentationDefinition,
+    verifiableCredentials: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -51,7 +46,7 @@ export class EvaluationClientWrapper {
         marked
       );
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: VerifiableCredential[] = matches.map(
+      const credentials: InternalVerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
       selectResults = {
@@ -67,7 +62,7 @@ export class EvaluationClientWrapper {
       );
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: VerifiableCredential[] = matches.map(
+      const credentials: InternalVerifiableCredential[] = matches.map(
         (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
       );
       selectResults = {
@@ -88,7 +83,7 @@ export class EvaluationClientWrapper {
     return selectResults;
   }
 
-  private remapMatches(selectResults: SelectResults, verifiableCredentials: VerifiableCredential[]) {
+  private remapMatches(selectResults: SelectResults, verifiableCredentials: InternalVerifiableCredential[]) {
     selectResults.matches?.forEach((srm) => {
       srm.vc_path.forEach((match, index, matches) => {
         const vc = jp.query(verifiableCredentials, match)[0];
@@ -111,7 +106,7 @@ export class EvaluationClientWrapper {
   }
 
   private matchSubmissionRequirements(
-    pd: PresentationDefinition,
+    pd: InternalPresentationDefinition,
     submissionRequirements: SubmissionRequirement[],
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch[] {
@@ -141,7 +136,7 @@ export class EvaluationClientWrapper {
 
   private matchWithoutSubmissionRequirements(
     marked: HandlerCheckResult[],
-    pd: PresentationDefinition
+    pd: InternalPresentationDefinition
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
@@ -160,7 +155,7 @@ export class EvaluationClientWrapper {
   }
 
   private mapMatchingDescriptors(
-    pd: PresentationDefinition,
+    pd: InternalPresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
@@ -181,8 +176,8 @@ export class EvaluationClientWrapper {
   }
 
   public evaluate(
-    pd: PresentationDefinition,
-    vcs: VerifiableCredential[],
+    pd: InternalPresentationDefinition,
+    vcs: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
@@ -217,7 +212,10 @@ export class EvaluationClientWrapper {
       });
   }
 
-  public submissionFrom(pd: PresentationDefinition, vcs: VerifiableCredential[]): PresentationSubmission {
+  public submissionFrom(
+    pd: InternalPresentationDefinition,
+    vcs: InternalVerifiableCredential[]
+  ): PresentationSubmission {
     if (!this._client.results.length) {
       throw Error('You need to call evaluate() before pejs.presentationFrom()');
     }
@@ -261,7 +259,7 @@ export class EvaluationClientWrapper {
 
   private matchUserSelectedVcs(
     marked: HandlerCheckResult[],
-    vcs: VerifiableCredential[]
+    vcs: InternalVerifiableCredential[]
   ): [HandlerCheckResult[], [string, string][]] {
     const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
     const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
@@ -400,10 +398,10 @@ export class EvaluationClientWrapper {
 
   public fillSelectableCredentialsToVerifiableCredentialsMapping(
     selectResults: SelectResults,
-    verifiableCredentials: VerifiableCredential[]
+    verifiableCredentials: InternalVerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.verifiableCredential?.forEach((selectableCredential: VerifiableCredential) => {
+      selectResults.verifiableCredential?.forEach((selectableCredential: InternalVerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );

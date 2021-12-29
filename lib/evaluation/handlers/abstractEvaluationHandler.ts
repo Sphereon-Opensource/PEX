@@ -1,8 +1,9 @@
-import { InputDescriptor, PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
+import { InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -32,13 +33,13 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client;
   }
 
-  public abstract handle(d: PresentationDefinition, p: VerifiableCredential[]): void;
+  public abstract handle(d: InternalPresentationDefinition, p: InternalVerifiableCredential[]): void;
 
-  public get verifiableCredential(): VerifiableCredential[] {
+  public get verifiableCredential(): InternalVerifiableCredential[] {
     return this._client.verifiableCredential;
   }
 
-  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
+  public set verifiableCredential(verifiableCredential: InternalVerifiableCredential[]) {
     this._client.verifiableCredential = verifiableCredential;
   }
 
@@ -54,13 +55,13 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client.results;
   }
 
-  public updatePresentationSubmission(pd: PresentationDefinition) {
+  public updatePresentationSubmission(pd: InternalPresentationDefinition) {
     this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
       /**
          * TODO map the nested credential
          let vcPath = jp.stringify(e.payload.result.path)
          */
-      let inputDescriptor: InputDescriptor;
+      let inputDescriptor: InputDescriptorV1 | InputDescriptorV2;
       const result = this.getResults()
         .filter((r) => r.status === Status.ERROR && r.evaluator === this.getName())
         .find((result) => {

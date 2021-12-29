@@ -17,11 +17,6 @@
         "group": [
           "A"
         ],
-        "schema": [
-          {
-            "uri": "https://eu.com/claims/DriversLicense.json"
-          }
-        ],
         "constraints": {
           "fields": [
             {
@@ -56,11 +51,6 @@
         "name": "US Passport",
         "group": [
           "A"
-        ],
-        "schema": [
-          {
-            "uri": "did:foo:123/Collections/schema.us.gov/passport.json"
-          }
         ],
         "constraints": {
           "fields": [

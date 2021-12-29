@@ -1,9 +1,11 @@
-import { Constraints, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
-import { JsonPathUtils } from '../../utils/jsonPathUtils';
+import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
+import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
+import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -18,9 +20,10 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     return 'SubjectIsIssuerEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
-    pd.input_descriptors.forEach((inputDescriptor, index) => {
-      const constraints: Constraints | undefined = inputDescriptor.constraints;
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+    // PresentationDefinitionV2 is the common denominator
+    (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
+      const constraints: ConstraintsV1 | ConstraintsV2 | undefined = inputDescriptor.constraints;
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
       } else {
@@ -32,13 +35,14 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     this.updatePresentationSubmission(pd);
   }
 
-  private checkSubjectIsIssuer(inputDescriptorId: string, vcs: VerifiableCredential[], idIdx: number): void {
+  private checkSubjectIsIssuer(inputDescriptorId: string, vcs: InternalVerifiableCredential[], idIdx: number): void {
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc: { path: PathComponent[]; value: VerifiableCredential }[] = JsonPathUtils.extractInputField(vcs, [
-          currentDescriptor.path,
-        ]);
-        if (vc[0]?.value.issuer === vc[0]?.value.credentialSubject.id) {
+        const vc: { path: PathComponent[]; value: InternalVerifiableCredential }[] = JsonPathUtils.extractInputField(
+          vcs,
+          [currentDescriptor.path]
+        );
+        if (vc[0]?.value.issuer === vc[0]?.value.getBaseCredential().credentialSubject.id) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {
           this.getResults().push(this.generateErrorResult(idIdx, currentDescriptor.path));
@@ -52,7 +56,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: 'subject is not issuer',
+      message: PEMessages.SUBJECT_IS_NOT_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }
@@ -62,7 +66,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: message ?? 'subject is issuer',
+      message: message ?? PEMessages.SUBJECT_IS_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }

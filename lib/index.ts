@@ -1,4 +1,7 @@
 import { Checked, NonEmptyArray, Status } from './ConstraintUtils';
+import { PEX } from './PEX';
+import { PEXv1 } from './PEXv1';
+import { PEXv2 } from './PEXv2';
 import {
   EvaluationClient,
   EvaluationHandler,
@@ -7,7 +10,6 @@ import {
   SelectResults,
   SubmissionRequirementMatch,
 } from './evaluation';
-import { PEJS } from './pejs';
 import {
   KeyEncoding,
   PresentationSignCallBackParams,
@@ -16,16 +18,16 @@ import {
   SignatureOptions,
 } from './signing';
 import {
-  Credential,
   CredentialStatus,
   CredentialSubject,
   InputFieldType,
+  InternalCredential,
+  InternalVerifiableCredential,
   Issuer,
   Presentation,
   Proof,
   ProofPurpose,
   ProofType,
-  VerifiableCredential,
   VerifiablePresentation,
 } from './types';
 import {
@@ -48,8 +50,8 @@ export {
 export { PresentationSignCallBackParams, PresentationSignOptions, ProofOptions, SignatureOptions, KeyEncoding };
 export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine, ValidationBundler };
 export {
-  VerifiableCredential,
-  Credential,
+  InternalVerifiableCredential,
+  InternalCredential,
   CredentialSubject,
   CredentialStatus,
   VerifiablePresentation,
@@ -61,4 +63,4 @@ export {
   ProofPurpose,
 };
 export { Checked, Status, NonEmptyArray };
-export { PEJS };
+export { PEX, PEXv1, PEXv2 };

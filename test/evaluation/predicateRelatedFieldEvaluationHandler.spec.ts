@@ -1,9 +1,11 @@
 import fs from 'fs';
 
-import { Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { Optionality } from '@sphereon/pex-models';
 
 import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
 import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
+import PEMessages from '../../lib/types/Messages';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -11,8 +13,8 @@ function getFile(path: string) {
 
 describe('evaluate', () => {
   it('should return ok if payload value of PredicateRelatedField is integer', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
@@ -20,8 +22,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -32,7 +33,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -60,7 +61,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           path: ['$', 'credentialSubject', 'age'],
           value: 19,
@@ -70,8 +71,8 @@ describe('evaluate', () => {
   });
 
   it('should return ok if payload value of PredicateRelatedField is boolean', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -91,8 +92,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -103,7 +103,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -120,7 +120,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           path: ['$', 'credentialSubject', 'age'],
           value: true,
@@ -130,8 +130,8 @@ describe('evaluate', () => {
   });
 
   it('should return error if we process the predicate filter for this PD', function () {
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -151,8 +151,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -163,7 +162,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'error',
-      message: 'Input candidate does not contain property',
+      message: PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY,
       payload: {
         result: [],
         valid: false,
@@ -175,8 +174,8 @@ describe('evaluate', () => {
   });
 
   it("should return ok if verifiableCredential's age value is matching the specification in the input descriptor", function () {
-    const presentationDefinition: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-schema-multiple-constraints.json'
+    const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -196,8 +195,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'info',
-      message:
-        'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+      message: PEMessages.URI_EVALUATION_PASSED,
       payload: {
         presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types'],
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types'],
@@ -208,7 +206,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 19,
@@ -222,7 +220,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           path: ['$', 'credentialSubject', 'details', 'citizenship', 0],
@@ -236,7 +234,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'FilterEvaluation',
       status: 'info',
-      message: 'Input candidate valid for presentation submission',
+      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         result: {
           value: 'NLD',
@@ -253,7 +251,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         { value: true, path: ['$', 'credentialSubject', 'age'] }
       )
     );
@@ -263,7 +261,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         { value: 'eu', path: ['$', 'credentialSubject', 'details', 'citizenship', 0] }
       )
     );
@@ -273,7 +271,7 @@ describe('evaluate', () => {
         '$[0]',
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
-        'Input candidate valid for presentation submission',
+        PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         {
           value: 'NLD',
           path: ['$', 'credentialSubject', 'country', 0, 'abbr'],
