@@ -1,12 +1,12 @@
 {
-  "name": "@sphereon/pe-js",
+  "name": "@sphereon/pex",
   "version": "0.5.2-unstable.1",
   "description": "A Typescript implementation of the DIF Presentation Exchange specification.",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
   "browser": "dist/browser/index.js",
   "typings": "dist/main/index.d.ts",
-  "repository": "https://github.com/Sphereon-Opensource/pe-js.git",
+  "repository": "https://github.com/Sphereon-Opensource/pex.git",
   "license": "Apache-2.0",
   "keywords": [
     "SSI",

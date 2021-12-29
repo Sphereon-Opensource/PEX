@@ -92,7 +92,7 @@ export interface PresentationSignCallBackParams {
   options: PresentationSignOptions;
 
   /**
-   * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
+   * The selected credentials to include in the eventual VP as determined by PEX and/or user
    */
   selectedCredentials: VerifiableCredential[];
 

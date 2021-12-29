@@ -1,57 +1,59 @@
 <h1 align="center">
   <br>
   <a href="https://www.sphereon.com"><img src="https://sphereon.com/content/themes/sphereon/assets/img/logo.svg" alt="Sphereon" width="400"></a>
-  <br>PE-JS   DIF Presentation Exchange Type/JavaScript Library 
+  <br>Presentation Exchange v1 and v2
+  <br>Type/JavaScript Library
   <br>
 </h1>
 
-[![CI](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pe-js/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Sphereon-Opensource/pe-js/branch/develop/graph/badge.svg?token=9P1JGUYA35)](https://codecov.io/gh/Sphereon-Opensource/pe-js) [![NPM Version](https://img.shields.io/npm/v/@sphereon/pe-js.svg)](https://npm.im/@sphereon/pe-js)
+[![CI](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Sphereon-Opensource/pe-js/branch/develop/graph/badge.svg?token=9P1JGUYA35)](https://codecov.io/gh/Sphereon-Opensource/pe-js) [![NPM Version](https://img.shields.io/npm/v/@sphereon/pe-js.svg)](https://npm.im/@sphereon/pe-js)
 
 ## Active Development
 
-_IMPORTANT: This software still is in early development stage. As such you should expect breaking changes in APIs, we
-expect to keep that to a minimum though._
+_IMPORTANT: This software still is in development stage. Although the API is become more stable as of v0.6.0, you should
+expect breaking changes in APIs without notice, we expect to keep that to a minimum though._
 
 ## Background
 
-The PEX Library is a general use presentation exchange library that implements the functionality described in
-the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/). It is written
-in Typescript and can be compiled to any target JavaScript version.
+The Presentation Exchange (PEX) Library is a general use presentation exchange library that implements the functionality
+described in the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/) for both
+version 1.0.0 and 2.0.0. It is written in Typescript and can be compiled to any target JavaScript version.
 
 Sphereon's PEX Library is useful for both verifier systems and holders (e.g. wallets) and can be used in client side
 browsers and mobile applications as well as on server side technology such as REST APIs (e.g. built with NodeJS). It
 allows anyone to add DIF Presentation Exchange logic to their existing wallets, agents and/or verifiers, without making
 any further assumptions about the technologies used in their products.
 
-The presentation exchange operates generally as follows; The verifier creates a Presentation Definition asking for
-credentials from the holder. The definition for the credentials is sent to the holder, who returns a presentation as a
+A Presentation Exchange operates generally as follows; The verifier creates a Presentation Definition asking for
+credentials from the holder. The definition for the credentials is sent to the holder, who returns a Verifiable Presentation as a
 response. Now the verifier will verify the presentation by checking the signature and other accompanying proofs.
 
-The presentation exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
-ensures that the correct parts from the holders credentials are used to create the presentation. The PE contains all the
+The Presentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
+ensures that the correct parts from the holders credentials are used to create the presentation. The PEX contains all the
 logic to interpret the models, therefore removing the need for the verifier and holder to align their specific models.
 
-The data objects (models) used in PE-JS are generated from Sphereon's DIF PE OpenAPI Spec component. The code for the
-component can be seen at [PE-OpenAPI github repository](https://github.com/Sphereon-Opensource/pe-openapi). This allows
+The data objects (models) used in PEX are generated from Sphereon's DIF PEX OpenAPI Spec component. The code for the
+component can be seen at [PEX-OpenAPI github repository](https://github.com/Sphereon-Opensource/pex-openapi). This allows
 the generation of the objects in many languages and frameworks consistently by configuring the maven plugin.
 
 ### The PEX Library supports the following actions:
 
 * Creating a presentation definition / request
-* Validating a presentation definition / conforming to the specification
+* Validating a presentation definition / conforming to the specification v1 and v2
 * Creating a Presentation
 * Creating a Verifiable Presentation using a callback function
 * Validating a presentation (submission) when received
 * Input evaluations: Verification of presentation submissions conforming to the presentation definition
 * Utilities: to build and use different models compliant with
   the [DIF Presentation Exchange v2.0.0 specification](https://identity.foundation/presentation-exchange/).
-* Support for [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
+* Support
+  for [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
 
-Stateful storage, signature support or credential management should be implemented in separate libraries/ modules that
+Stateful storage, signature support or credential management should be implemented in separate libraries/modules that
 make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay
 platform-agnostic and lean regarding dependencies.
 
-## For PE-JS Users
+## For PEX Users
 
 The library can be installed direction from npmjs via:
 
@@ -121,7 +123,8 @@ const verifiablePresentation = {
   proof: { ... }
 }
 
-const { value, warnings, errors } = pe.evaluate(presentationDefinition, verifiablePresentation);
+// We are using the PEX class, to automatically detect the definition version. PEXv1 and PEXv2 are also available to use fixed PEX versions
+const { value, warnings, errors } = pex.evaluate(presentationDefinitionV2, verifiablePresentation);
 ```
 
 ### Credential Query
@@ -130,7 +133,7 @@ A credential query allows holders to filter their set of credentials for matches
 
 ```typescript
 import { PEX } from '@sphereon/pex';
-import {VerifiableCredential} from "./SSI.types";
+import { VerifiableCredential } from "./SSI.types";
 
 const pex: PEX = new PEX();
 
@@ -139,9 +142,11 @@ const presentationDefinition = {
   ...
 };
 // Finding out which version presentationDefinition is this:
-// The result is either v1, v2 or an erro
+// The result is either 'v1', 'v2' or an error
+// You only have to do this if you want to apply some custom logic. The PEX class uses feature detection on the definition to determine whether it is v1 or v2 internally
 const result = pex.definitionVersionDiscovery(pdSchema);
-// Example for loading credentials
+
+// Example for loading credentials from your secure storage
 const credentials: VerifiableCredential[] = await secureStore.getCredentials();
 
 // Find matching credentials
@@ -149,10 +154,10 @@ const srMatches = pex.selectFrom(presentationDefinition, credentials, holderDid)
 
 // An example that selects the first 'count' credentials from
 // the matches. in a real scenario, the user has to select which 
-// credentials to use. PE-JS did the first filtering, 
+// credentials to use. PEX did the first filtering, 
 // but there still could be multiple credentials satisfying a presentation definition
 const selectedCredentials = srMatches.map(
-  ({matches, count}) => matches.slice(0, count)
+  ({ matches, count }) => matches.slice(0, count)
 ).flat();
 
 
@@ -170,7 +175,7 @@ are different libraries that allow you to do this. You can also use the callback
 chapter for this.
 
 ```typescript
-import { PEX, Presentation } from '@sphereon/pe-js';
+import { PEX, Presentation } from '@sphereon/pex';
 
 const pex: PEX = new PEX();
 
@@ -196,8 +201,8 @@ const presentation: Presentation = pex.presentationFrom(presentationDefinition, 
 
 ### Verifiable Presentation with callback
 
-**NOTE:** PE-JS does not support the creation of signatures by itself. That has to do with the fact that we didn't want
-to rely on all kinds of signature suites and libraries. PE-JS has minimal dependencies currently, so that it can be used
+**NOTE:** PEX does not support the creation of signatures by itself. That has to do with the fact that we didn't want
+to rely on all kinds of signature suites and libraries. PEX has minimal dependencies currently, so that it can be used
 in all kinds of scenarios.
 
 How did we solve this? We have created a callback mechanism, allowing you to create a callback function that gets all
@@ -340,7 +345,7 @@ export interface PresentationSignCallBackParams {
   presentationDefinition: PresentationDefinition;
 
   /**
-   * The selected credentials to include in the eventual VP as determined by PE-JS and/or user
+   * The selected credentials to include in the eventual VP as determined by PEX and/or user
    */
   selectedCredentials: VerifiableCredential[];
 
@@ -417,7 +422,7 @@ function simpleSignedProofCallback(callBackParams: PresentationSignCallBackParam
    * }
    */
 
-    // Just an example. Obviously your lib will have a different method signature
+  // Just an example. Obviously your lib will have a different method signature
   const vp = myVPSignLibrary(presentation, { ...proof, privateKeyBase58 });
 
   return vp;
@@ -461,7 +466,9 @@ PEXv2.evaluatePresentation(presentationDefinition, verifiablePresentation)
 ```
 
 ##### Description
-These three methods are quite similar. The first One receives a presentation definition object, decides the version and act accordingly. The other two are specific to their version.
+
+These three methods are quite similar. The first One receives a presentation definition object, decides the version based upon feature detection and
+act accordingly. The other two are specific to their version.
 
 **For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
@@ -499,7 +506,9 @@ PEXv2.selectFrom(presentationDefinitionV2, credentials, holderDids)
 ```
 
 ##### Description
-These three methods are quite similar. The first One receives a presentation definition object, decides the version and act accordingly. The other two are specific to their version.
+
+These three methods are quite similar. The first One receives a presentation definition object, decides the version based upon feature detection and
+act accordingly. The other two are specific to their version.
 
 **For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
@@ -568,7 +577,9 @@ PEXv2.presentationFrom(presentationDefinitionV2, selectedCredentials, holderDID)
 ```
 
 ##### Description
-These three methods are quite similar. The first One receives a presentation definition object, decides the version and act accordingly. The other two are specific to their version.
+
+These three methods are quite similar. The first One receives a presentation definition object, decides the version based upon feature detection and
+act accordingly. The other two are specific to their version.
 
 **For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
 
@@ -618,8 +629,10 @@ validateSubmission(objToValidate)
 
 #### Description
 
-A validation utility function for `PresentationDefinition` and `PresentationSubmission` objects.
-If you know the version of your presentation definition you can call version-specific functiions. If not you can call the general one (located in PEX) to first determine the version and then validate the presentation definition object against that version's specific rules.
+A validation utility function for `PresentationDefinition` and `PresentationSubmission` objects. If you know the version
+of your presentation definition you can call version-specific functions. If not you can call the general one (located
+in PEX) to first determine the version and then validate the presentation definition object against that version's
+specific rules.
 
 #### Parameters
 
@@ -646,10 +659,11 @@ status can have following values `'info' | 'warn' | 'error'`
 ```typescript
 PEX.definitionVersionDiscovery(presentationDefinition)
 ```
+
 #### Description
 
-A utility function for `PresentationDefinition` objects. This method will determine the version of your presentationDefinition object.
-
+A utility function for `PresentationDefinition` objects. This method will determine the version of your
+presentationDefinition object.
 
 #### Parameters
 
@@ -663,8 +677,8 @@ The `definitionVersionDiscovery` method returns a version of an error, with foll
 
 ```typescript
 {
-  version?: PEVersion;
-  error?: string;
+  version ? : PEVersion;
+  error ? : string;
 }
 
 enum PEVersion {
@@ -674,20 +688,26 @@ enum PEVersion {
 ````
 
 ## From V1 to V2
-The following changes has been made in the v2:
-1. `schema` removed from `InputDescriptor` properties.
-2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing Document object 
+
+The following changes has been made in the v2 version of the Presentation Exchange specification:
+
+1. `schema` has been removed from `InputDescriptor` properties.
+2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing
+   Document object
 3. `filter` has several more options for filtering:
     - formatMaximum
     - formatMinimum
     - formatExclusiveMaximum
     - formatExclusiveMinimum
 
+As a result we introduced the `PEX` class to replace the former `PEJS` class. This class does feature detection on the presentation definition to determine whether it is a v1 or v2 spec. Then it delegates the functionality to the PEXv1 or PEXv2 class respectively. 
+
+
 ## Workflow Diagram
 
-![Flow diagram](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Sphereon-Opensource/pe-js/develop/docs/simple-scenario.puml)
+![Flow diagram](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Sphereon-Opensource/pex/develop/docs/simple-scenario.puml)
 
-## For PE-JS developers
+## For PEX developers
 
 This project has been created using:
 
@@ -743,6 +763,7 @@ Verifiable Presentation | Is a tamper-evident presentation encoded in such a way
 
 ## Further work:
 
-1. Implementation of presentation-exchange v2
-2. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are
+1. We know of some potential issues with JWT based (de)serialization
+2. Support for hashlinks is not incorporated. We do not inspect them and just treat them as normal URIs
+3. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are
    addressing `nested credentials` and `nested paths` these are currently not fully support yet.

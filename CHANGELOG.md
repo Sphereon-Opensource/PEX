@@ -119,7 +119,7 @@ Some fixes regarding usage in React. Better error handling
 This is the second Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
 - Fixed:
-  * strict flag in projects gave errors on pe-js
+  * strict flag in projects gave errors on PEX
 
   
 ## v0.1.0 - 2021-09-03
