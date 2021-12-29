@@ -8,7 +8,7 @@ import {
   LdpObject,
   PresentationDefinitionV2,
   SubmissionRequirement,
-} from '@sphereon/pe-models';
+} from '@sphereon/pex-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';

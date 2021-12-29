@@ -6,7 +6,7 @@ import {
   PresentationDefinitionV2,
   PresentationSubmission,
   SubmissionRequirement,
-} from '@sphereon/pe-models';
+} from '@sphereon/pex-models';
 
 export interface CredentialSubject {
   id?: string;

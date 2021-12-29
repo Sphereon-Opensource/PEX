@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Optionality } from '@sphereon/pe-models';
+import { Optionality } from '@sphereon/pex-models';
 
 import { EvaluationClient, InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
 import PEMessages from '../../lib/types/Messages';

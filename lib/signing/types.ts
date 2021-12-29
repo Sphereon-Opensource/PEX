@@ -1,4 +1,4 @@
-import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
 import { EvaluationResults } from '../evaluation';
 import { Presentation, Proof, ProofPurpose, ProofType } from '../types';

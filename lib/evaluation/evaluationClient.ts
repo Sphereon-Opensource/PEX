@@ -1,4 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { Status } from '../ConstraintUtils';
 import { InternalVerifiableCredential } from '../types';

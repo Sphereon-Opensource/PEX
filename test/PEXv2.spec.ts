@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinitionV2 } from '@sphereon/pe-models';
+import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 
 import { PEXv2, Validated, VerifiablePresentation } from '../lib';
 

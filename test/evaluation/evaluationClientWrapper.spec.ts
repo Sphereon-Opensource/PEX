@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Optionality, PresentationSubmission } from '@sphereon/pe-models';
+import { Optionality, PresentationSubmission } from '@sphereon/pex-models';
 
 import { InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';

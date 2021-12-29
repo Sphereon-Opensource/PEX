@@ -1,4 +1,4 @@
-import { PresentationSubmission, Rules } from '@sphereon/pe-models';
+import { PresentationSubmission, Rules } from '@sphereon/pex-models';
 
 import { HandlerCheckResult, InternalVerifiableCredential, SelectResults, Status } from '../../lib';
 import PEMessages from '../../lib/types/Messages';

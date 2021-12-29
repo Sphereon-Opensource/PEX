@@ -8,7 +8,7 @@ import {
   Optionality,
   PdStatus,
   Statuses,
-} from '@sphereon/pe-models';
+} from '@sphereon/pex-models';
 
 import { Validation, ValidationPredicate } from '../core';
 
@@ -210,7 +210,7 @@ export class ConstraintsVB extends ValidationBundler<
 
   private static isValidFieldId(constraints: ConstraintsV1 | ConstraintsV2, fieldId: string): boolean {
     if (constraints?.fields) {
-      return constraints.fields.map((field: FieldV2 | FieldV2) => field.id).includes(fieldId);
+      return constraints.fields.map((field: FieldV1 | FieldV2) => field.id).includes(fieldId);
     }
     return false;
   }

@@ -1,4 +1,4 @@
-import { HolderSubject, Optionality } from '@sphereon/pe-models';
+import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';

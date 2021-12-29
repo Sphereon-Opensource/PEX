@@ -1,4 +1,4 @@
-import { Descriptor, InputDescriptorV1 } from '@sphereon/pe-models';
+import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 

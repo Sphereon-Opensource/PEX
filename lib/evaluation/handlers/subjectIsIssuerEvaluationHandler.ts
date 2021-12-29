@@ -1,4 +1,4 @@
-import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';

@@ -1,4 +1,4 @@
-import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pe-models';
+import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pex-models';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';

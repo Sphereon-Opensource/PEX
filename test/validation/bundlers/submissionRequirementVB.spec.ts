@@ -1,4 +1,4 @@
-import { SubmissionRequirement } from '@sphereon/pe-models';
+import { SubmissionRequirement } from '@sphereon/pex-models';
 
 import { Checked, Status } from '../../../lib/ConstraintUtils';
 import { SubmissionRequirementVB, ValidationBundler, ValidationEngine } from '../../../lib/validation';

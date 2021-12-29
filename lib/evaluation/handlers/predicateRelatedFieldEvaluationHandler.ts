@@ -1,4 +1,4 @@
-import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
 
 import { Status } from '../../ConstraintUtils';
 import PEMessages from '../../types/Messages';

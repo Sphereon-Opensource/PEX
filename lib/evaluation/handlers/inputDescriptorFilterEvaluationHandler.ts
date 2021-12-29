@@ -1,4 +1,4 @@
-import { FieldV1, FieldV2 } from '@sphereon/pe-models';
+import { FieldV1, FieldV2 } from '@sphereon/pex-models';
 import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 

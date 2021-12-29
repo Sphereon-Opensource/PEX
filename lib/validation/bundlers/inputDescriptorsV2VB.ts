@@ -1,4 +1,4 @@
-import { ConstraintsV2, FieldV2, HolderSubject, InputDescriptorV2 } from '@sphereon/pe-models';
+import { ConstraintsV2, FieldV2, HolderSubject, InputDescriptorV2 } from '@sphereon/pex-models';
 
 import { ObjectValidationUtils } from '../../utils/ObjectValidationUtils';
 import { Validation } from '../core';

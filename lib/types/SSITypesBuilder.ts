@@ -1,4 +1,4 @@
-import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pe-models';
+import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
 
 import {
   InternalPresentationDefinitionV1,

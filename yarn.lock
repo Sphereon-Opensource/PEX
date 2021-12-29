@@ -1034,14 +1034,10 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sphereon/pe-models@./sphereon-pe-models-0.0.6.tgz":
-  version "0.0.6"
-  uid "76748b16ad2328a7c777400d7cb8d2090aa8cebf"
-  resolved "./sphereon-pe-models-0.0.6.tgz#76748b16ad2328a7c777400d7cb8d2090aa8cebf"
-
-"@sphereon/pe-models@file:../../programming/WebstormProjects/pe-openapi/target/sdks/models/typescript/sphereon-pe-models-0.0.6.tgz":
-  version "0.0.6"
-  resolved "file:../../programming/WebstormProjects/pe-openapi/target/sdks/models/typescript/sphereon-pe-models-0.0.6.tgz#76748b16ad2328a7c777400d7cb8d2090aa8cebf"
+"@sphereon/pex-models@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-1.1.0.tgz#716898344fd07400bbffaa0c34a1f7ecdda14166"
+  integrity sha512-kMslWspdqwuXGBFxOPXTAK8HlIHycBR/locYHMlYmyvdnau6bp40JXk2zviBRVOPfe8N3Dv2p5IPAjMk3pT77A==
 
 "@tokenizer/token@^0.3.0":
   version "0.3.0"
@@ -1649,15 +1645,10 @@ camelcase@^6.2.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-6.2.0.tgz#924af881c9d525ac9d87f40d964e5cea982a1809"
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
-caniuse-lite@^1.0.30001219:
-  version "1.0.30001234"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001234.tgz"
-  integrity sha512-a3gjUVKkmwLdNysa1xkUAwN2VfJUJyVW47rsi3aCbkRCtbHAfo+rOsCqVw29G6coQ8gzAPb5XBXwiGHwme3isA==
-
-caniuse-lite@^1.0.30001254:
-  version "1.0.30001257"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001257.tgz#150aaf649a48bee531104cfeda57f92ce587f6e5"
-  integrity sha512-JN49KplOgHSXpIsVSF+LUyhD8PUp6xPpAXeRrrcBh4KBeP7W864jHn6RvzJgDlrReyeVjMFJL3PLpPvKIxlIHA==
+caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.30001254:
+  version "1.0.30001294"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001294.tgz"
+  integrity sha512-LiMlrs1nSKZ8qkNhpUf5KD0Al1KCBE3zaT7OLOwEkagXMEDij98SiOovn9wxVGQpklk9vVC/pUSqgYmkmKOS8g==
 
 chalk@^2.0.0, chalk@^2.4.1:
   version "2.4.2"

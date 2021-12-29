@@ -1,4 +1,4 @@
-import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pe-models';
+import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
 import { InternalVerifiableCredential, PEX, Presentation } from '../../lib';
 

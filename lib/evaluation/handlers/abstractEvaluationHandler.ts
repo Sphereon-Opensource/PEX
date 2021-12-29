@@ -1,4 +1,4 @@
-import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@sphereon/pe-models';
+import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';

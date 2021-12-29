@@ -1,4 +1,4 @@
-import { FieldV1, Optionality } from '@sphereon/pe-models';
+import { FieldV1, Optionality } from '@sphereon/pex-models';
 
 import { Checked, Status, ValidationBundler, ValidationEngine } from '../../../lib';
 import { FieldsVB } from '../../../lib/validation';
