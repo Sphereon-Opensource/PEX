@@ -100,69 +100,6 @@ export class EvaluationClientWrapperData {
     };
   }
 
-  public getMax1FromBResult0(): PresentationSubmission {
-    return {
-      id: 'PresentationSubmission2021110403',
-      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-      descriptor_map: [{ format: 'ldp_vc', id: 'Educational transcripts 1', path: '$[0]' }],
-    };
-  }
-
-  public getSuccessError(): SelectResults {
-    return {
-      areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[1]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[2]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[1]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[2]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-      ],
-      warnings: [],
-    };
-  }
-
-  public getValue(): PresentationSubmission {
-    return {
-      id: 'PresentationSubmission2021110400',
-      definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-      descriptor_map: [
-        {
-          format: 'ldp_vc',
-          id: 'bankaccount_input',
-          path: '$[0]',
-        },
-      ],
-    };
-  }
-
   public getSuccess() {
     return {
       errors: [],
