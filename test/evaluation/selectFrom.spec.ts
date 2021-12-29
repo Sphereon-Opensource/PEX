@@ -2367,7 +2367,7 @@ describe('selectFrom tests', () => {
 
   it('Evaluate case without presentation submission', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
+      './test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const verifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
@@ -2390,8 +2390,9 @@ describe('selectFrom tests', () => {
   });
 
   it('Evaluate driver license name result', () => {
-    const pdSchema: InternalPresentationDefinitionV1 = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json')
-      .presentation_definition as InternalPresentationDefinitionV1;
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd_driver_license_name.json'
+    ).presentation_definition as InternalPresentationDefinitionV1;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const verifiableCredential: InternalVerifiableCredential = getFile(
       './test/dif_pe_examples/vc/vc-driverLicense.json'

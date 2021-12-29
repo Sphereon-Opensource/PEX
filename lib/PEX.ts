@@ -1,6 +1,6 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pe-models';
+import Ajv from 'ajv';
 
-import { Checked } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { InternalVerifiableCredential, Presentation, Proof, VerifiablePresentation } from './types';
@@ -13,6 +13,7 @@ import {
   Validated,
   ValidationEngine,
 } from './validation';
+import { PresentationDefinitionSchema } from './validation/core/presentationDefinitionSchema';
 
 /**
  * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
@@ -305,26 +306,19 @@ export class PEX {
     version?: PEVersion;
     error?: string;
   } {
-    const v1Validators = [];
-    const v2Validators = [];
-    v2Validators.push({
-      bundler: new PresentationDefinitionV2VB('root'),
-      target: presentationDefinition,
-    });
-    const v2Result = new ValidationEngine().validate(v2Validators);
-    if (Array.isArray(v2Result) && v2Result.length === 1 && (v2Result as Checked[])[0].message === 'ok') {
+    const data = { presentation_definition: presentationDefinition };
+    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true });
+    const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
+    let result = validateV2(data);
+    if (result) {
       return { version: PEVersion.v2 };
     }
-    v1Validators.push({
-      bundler: new PresentationDefinitionV1VB('root'),
-      target: presentationDefinition,
-    });
-    const v1Result = new ValidationEngine().validate(v1Validators);
-    if (Array.isArray(v1Result) && v1Result.length === 1 && (v1Result as Checked[])[0].message === 'ok') {
+    const validateV1 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV1());
+    result = validateV1(data);
+    if (result) {
       return { version: PEVersion.v1 };
-    } else {
-      return { error: 'This is not a valid PresentationDefinition' };
     }
+    return { error: 'This is not a valid PresentationDefinition' };
   }
 
   private determineAndCastToInternalPresentationDefinition(

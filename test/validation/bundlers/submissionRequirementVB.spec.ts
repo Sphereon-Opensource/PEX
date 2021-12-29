@@ -13,7 +13,7 @@ describe('validate', () => {
     ];
 
     const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB(
-      'pd'
+      'pdV1'
     ) as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: srs }]);
@@ -29,7 +29,7 @@ describe('validate', () => {
     ];
 
     const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB(
-      'pd'
+      'pdV1'
     ) as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: srs }]);
@@ -65,21 +65,21 @@ describe('validate', () => {
     ];
 
     const vb: ValidationBundler<SubmissionRequirement> = new SubmissionRequirementVB(
-      'pd'
+      'pdV1'
     ) as ValidationBundler<SubmissionRequirement>;
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: srs }]);
     expect(result).toEqual([
-      new Checked('pd.submission_requirements[0]', Status.ERROR, 'count must be a practical positive number'),
-      new Checked('pd.submission_requirements[0]', Status.ERROR, 'min must be a practical positive number'),
-      new Checked('pd.submission_requirements[0]', Status.ERROR, 'max must be a practical positive number'),
+      new Checked('pdV1.submission_requirements[0]', Status.ERROR, 'count must be a practical positive number'),
+      new Checked('pdV1.submission_requirements[0]', Status.ERROR, 'min must be a practical positive number'),
+      new Checked('pdV1.submission_requirements[0]', Status.ERROR, 'max must be a practical positive number'),
       new Checked(
-        'pd.submission_requirements[0].from_nested.submission_requirements[0]',
+        'pdV1.submission_requirements[0].from_nested.submission_requirements[0]',
         Status.ERROR,
         'min must be a practical positive number'
       ),
-      new Checked('pd.submission_requirements[1]', Status.ERROR, 'needs exactly one of from or from_nested'),
-      new Checked('pd.submission_requirements[1]', Status.ERROR, 'max must be a practical positive number'),
+      new Checked('pdV1.submission_requirements[1]', Status.ERROR, 'needs exactly one of from or from_nested'),
+      new Checked('pdV1.submission_requirements[1]', Status.ERROR, 'max must be a practical positive number'),
     ]);
   });
 });

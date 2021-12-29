@@ -7,12 +7,6 @@
         "id": "drivers_license_information",
         "name": "Verify Valid License",
         "purpose": "We need you to show that your driver's license will be valid through December of this year.",
-        "schema": [
-          {
-            "uri": "https://yourwatchful.gov/drivers-license-schema.json",
-            "required": true
-          }
-        ],
         "constraints": {
           "fields": [
             {

@@ -27,7 +27,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
 
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true, verbose: true });
   }
 
   public getValidations(
@@ -236,9 +236,9 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
   private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinitionV1> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinitionV1): boolean => {
-      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
+      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchemaV1();
       const validate = this.ajv.compile(presentationDefinitionSchema);
-      const valid = validate(presentationDefinition);
+      const valid = validate({ presentation_definition: presentationDefinition });
       return valid;
     };
   }

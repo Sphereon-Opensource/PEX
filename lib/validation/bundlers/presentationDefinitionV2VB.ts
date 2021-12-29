@@ -249,9 +249,9 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
   private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinitionV2> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinitionV2): boolean => {
-      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
+      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchemaV2();
       const validate = this.ajv.compile(presentationDefinitionSchema);
-      const valid = validate(presentationDefinition);
+      const valid = validate({ presentation_definition: presentationDefinition });
       return valid;
     };
   }

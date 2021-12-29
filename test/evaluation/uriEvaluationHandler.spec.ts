@@ -18,7 +18,7 @@ function getFile(path: string) {
 describe('evaluate', () => {
   it('should return ok if uris match in vpSimple.verifiableCredential[0].credentialSchema[0].id', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -33,7 +33,7 @@ describe('evaluate', () => {
 
   it('should return error for not matching (exactly) any URI for the schema of the candidate input with one of the Input Descriptor schema object uri values.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -60,7 +60,7 @@ describe('evaluate', () => {
 
   it('should generate 6 error result fo this test case.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
@@ -75,7 +75,7 @@ describe('evaluate', () => {
 
   it('should generate 5 error result and 1 info.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pd/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');

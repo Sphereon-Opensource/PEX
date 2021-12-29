@@ -14,8 +14,10 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const base = './test/dif_pe_examples/pd/';
-const files = fs.readdirSync(base);
+const baseV1 = './test/dif_pe_examples/pdV1/';
+const baseV2 = './test/dif_pe_examples/pdV2/';
+const filesV1 = fs.readdirSync(baseV1);
+const filesV2 = fs.readdirSync(baseV2);
 
 function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   return {
@@ -65,10 +67,22 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   };
 }
 describe('validate', () => {
-  test.each(files)('.validateKnownExample(%s)', (file) => {
-    const basicPD = getFile(base + file);
+  test.each(filesV1)('V1.validateKnownExample(%s)', (file) => {
+    if (file === 'sr_pick_rule.json') {
+      console.log('HERE');
+    }
+    const basicPD = getFile(baseV1 + file);
 
     const vb: ValidationBundler<PresentationDefinitionV1> = new PresentationDefinitionV1VB('root');
+
+    const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD.presentation_definition }]);
+    expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
+  });
+
+  test.each(filesV2)('V2.validateKnownExample(%s)', (file) => {
+    const basicPD = getFile(baseV2 + file);
+
+    const vb: ValidationBundler<PresentationDefinitionV2> = new PresentationDefinitionV2VB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD.presentation_definition }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
@@ -230,6 +244,11 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
+      new Checked(
+        'root.presentation_definition',
+        Status.ERROR,
+        'presentation_definition should be as per json schema.'
+      ),
       new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty'),
     ]);
   });
@@ -242,6 +261,11 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
+      new Checked(
+        'root.presentation_definition',
+        Status.ERROR,
+        'presentation_definition should be as per json schema.'
+      ),
       new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty'),
     ]);
   });
@@ -290,8 +314,7 @@ describe('validate', () => {
     basicPD.input_descriptors[1].constraints!.fields![0]!.id = 'uuid2021-05-04 00';
     basicPD.input_descriptors[1].constraints!.is_holder![0].field_id[0] = 'uuid2021-05-04 00';
     basicPD.input_descriptors[1].schema = [{ uri: 'https://www.w3.org/2018/credentials/v1' }];
-    delete basicPD.input_descriptors[2];
-    delete basicPD.input_descriptors[3];
+    basicPD.input_descriptors = [basicPD.input_descriptors[0], basicPD.input_descriptors[1]];
     const result = ve.validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
       new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique'),

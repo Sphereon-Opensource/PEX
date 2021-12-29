@@ -4,11 +4,10 @@
     "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
     "submission_requirements": [
       {
-        "name": "Citizenship Proof",
-        "purpose": "We need to confirm you are a citizen of one of the following countries before accepting your application",
-        "rule": "pick",
-        "count": 1,
-        "from": "B"
+        "name": "Submission of educational transcripts",
+        "purpose": "We need your complete educational transcripts to process your application",
+        "rule": "all",
+        "from": "A"
       }
     ],
     "input_descriptors": [
@@ -16,7 +15,7 @@
         "id": "Educational transcripts",
         "name": "Submission of educational transcripts",
         "purpose": "We need your complete educational transcripts to process your application",
-        "group": "B",
+        "group": ["A"],
         "schema": [
           {
             "uri": "https://university.example.com/fulltranscript.json"
