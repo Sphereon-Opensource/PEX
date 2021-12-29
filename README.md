@@ -10,7 +10,7 @@
 
 ## Active Development
 
-_IMPORTANT: This software still is in development stage. Although the API is become more stable as of v0.6.0, you should
+_IMPORTANT: This software still is in development stage. Although the API has become more stable as of v0.6.0, you should
 expect breaking changes in APIs without notice, we expect to keep that to a minimum though._
 
 ## Breaking change: class and package renamed in v0.6.0!
@@ -686,12 +686,12 @@ presentationDefinition object.
 
 #### Return value
 
-The `definitionVersionDiscovery` method returns a version of an error, with following structure:
+The `definitionVersionDiscovery` method returns a version or an error, with following structure:
 
 ```typescript
 {
-  version ? : PEVersion;
-  error ? : string;
+  version? : PEVersion;
+  error? : string;
 }
 
 enum PEVersion {
