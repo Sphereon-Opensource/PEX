@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { Checked, Status, ValidationBundler, ValidationEngine } from '../../../lib';
 import { PresentationSubmissionVB } from '../../../lib/validation';

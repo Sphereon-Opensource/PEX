@@ -1,14 +1,14 @@
 import {
-  Constraints,
-  Field,
+  ConstraintsV1,
+  FieldV1,
   Format,
   HolderSubject,
-  InputDescriptor,
+  InputDescriptorV1,
   JwtObject,
   LdpObject,
-  PresentationDefinition,
+  PresentationDefinitionV1,
   SubmissionRequirement,
-} from '@sphereon/pe-models';
+} from '@sphereon/pex-models';
 import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
@@ -16,43 +16,43 @@ import { JwtAlgos } from '../core/jwtAlgos';
 import { LdpTypes } from '../core/ldpTypes';
 import { PresentationDefinitionSchema } from '../core/presentationDefinitionSchema';
 
-import { InputDescriptorsVB } from './inputDescriptorsVB';
+import { InputDescriptorsV1VB } from './inputDescriptorsV1VB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { ValidationBundler } from './validationBundler';
 
-export class PresentationDefinitionVB extends ValidationBundler<
-  Field | HolderSubject | Constraints | InputDescriptor | PresentationDefinition | SubmissionRequirement
+export class PresentationDefinitionV1VB extends ValidationBundler<
+  FieldV1 | HolderSubject | ConstraintsV1 | InputDescriptorV1 | PresentationDefinitionV1 | SubmissionRequirement
 > {
   private ajv: Ajv;
 
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true, verbose: true });
   }
 
   public getValidations(
-    pd: PresentationDefinition
+    pd: PresentationDefinitionV1
   ): (
-    | Validation<Field>
+    | Validation<FieldV1>
     | Validation<HolderSubject>
-    | Validation<Constraints>
-    | Validation<InputDescriptor>
-    | Validation<InputDescriptor[]>
-    | Validation<PresentationDefinition>
+    | Validation<ConstraintsV1>
+    | Validation<InputDescriptorV1>
+    | Validation<InputDescriptorV1[]>
+    | Validation<PresentationDefinitionV1>
     | Validation<SubmissionRequirement>
   )[] {
     if (pd.submission_requirements) {
       return [
         ...this.myValidations(pd),
-        ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors),
+        ...new InputDescriptorsV1VB(this.myTag).getValidations(pd.input_descriptors),
         ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
       ];
     } else {
-      return [...this.myValidations(pd), ...new InputDescriptorsVB(this.myTag).getValidations(pd.input_descriptors)];
+      return [...this.myValidations(pd), ...new InputDescriptorsV1VB(this.myTag).getValidations(pd.input_descriptors)];
     }
   }
 
-  private myValidations(pd: PresentationDefinition): Validation<PresentationDefinition>[] {
+  private myValidations(pd: PresentationDefinitionV1): Validation<PresentationDefinitionV1>[] {
     return [
       // E Section 4.B   : The Input Descriptors (#term:input-descriptors) required for submission are described by the submission_requirements. If no submission_requirements value is present, all inputs listed in the input_descriptors array are required for submission.
       {
@@ -70,39 +70,47 @@ export class PresentationDefinitionVB extends ValidationBundler<
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.nonEmptyString(pd?.id),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.nonEmptyString(pd?.id),
         message: 'id should not be empty',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.optionalNonEmptyString(pd?.name),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.optionalNonEmptyString(pd?.name),
         message: 'name should be a non-empty string',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.optionalNonEmptyString(pd?.purpose),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.optionalNonEmptyString(pd?.purpose),
         message: 'purpose should be a non-empty string',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.formatValuesShouldNotBeEmpty(pd?.format),
+        predicate: (pd: PresentationDefinitionV1) =>
+          PresentationDefinitionV1VB.formatValuesShouldNotBeEmpty(pd?.format),
         message: 'formats values should not empty',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) =>
-          PresentationDefinitionVB.formatValuesShouldBeAmongKnownValues(pd?.format),
+        predicate: (pd: PresentationDefinitionV1) =>
+          PresentationDefinitionV1VB.formatValuesShouldBeAmongKnownValues(pd?.format),
         message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinition) => PresentationDefinitionVB.groupShouldMatchSubmissionRequirements(pd),
+        predicate: (pd: PresentationDefinitionV1) =>
+          PresentationDefinitionV1VB.groupShouldMatchSubmissionRequirements(pd),
         message: 'input descriptor group should match the from in submission requirements.',
+      },
+      {
+        tag: this.getTag(),
+        target: pd,
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.shouldNotHaveFrameProperty(pd),
+        message: 'input descriptor should not have frame property.',
       },
     ];
   }
@@ -151,9 +159,9 @@ export class PresentationDefinitionVB extends ValidationBundler<
       unknownProofsAndAlgorithms = [];
       for (const [key, value] of Object.entries(format)) {
         if (key.startsWith('jwt')) {
-          unknownProofsAndAlgorithms.push(...PresentationDefinitionVB.isJWTAlgoKnown(value, jwtAlgos));
+          unknownProofsAndAlgorithms.push(...PresentationDefinitionV1VB.isJWTAlgoKnown(value, jwtAlgos));
         } else {
-          unknownProofsAndAlgorithms.push(...PresentationDefinitionVB.isLDPProofKnown(value, ldpTypes));
+          unknownProofsAndAlgorithms.push(...PresentationDefinitionV1VB.isLDPProofKnown(value, ldpTypes));
         }
       }
     }
@@ -184,10 +192,10 @@ export class PresentationDefinitionVB extends ValidationBundler<
     return unknownProofType;
   }
 
-  private static groupShouldMatchSubmissionRequirements(pd: PresentationDefinition): boolean {
+  private static groupShouldMatchSubmissionRequirements(pd: PresentationDefinitionV1): boolean {
     if (pd.submission_requirements != null && pd.submission_requirements.length > 0) {
       const groups: string[] = [];
-      pd.input_descriptors.forEach((inDesc: InputDescriptor) => {
+      pd.input_descriptors.forEach((inDesc: InputDescriptorV1) => {
         if (inDesc.group) {
           groups.push(...inDesc.group);
         }
@@ -195,7 +203,7 @@ export class PresentationDefinitionVB extends ValidationBundler<
       const groupStrings: Set<string> = new Set<string>(groups);
 
       const fromValues: string[] = [];
-      PresentationDefinitionVB.flatten(pd.submission_requirements).forEach((srs: SubmissionRequirement) => {
+      PresentationDefinitionV1VB.flatten(pd.submission_requirements).forEach((srs: SubmissionRequirement) => {
         if (srs.from) {
           fromValues.push(...srs.from);
         }
@@ -225,13 +233,17 @@ export class PresentationDefinitionVB extends ValidationBundler<
     );
   }
 
-  private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinition> {
+  private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinitionV1> {
     // TODO can be be extracted as a generic function
-    return (presentationDefinition: PresentationDefinition): boolean => {
-      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchema();
+    return (presentationDefinition: PresentationDefinitionV1): boolean => {
+      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchemaV1();
       const validate = this.ajv.compile(presentationDefinitionSchema);
-      const valid = validate(presentationDefinition);
+      const valid = validate({ presentation_definition: presentationDefinition });
       return valid;
     };
+  }
+
+  private static shouldNotHaveFrameProperty(pd: PresentationDefinitionV1) {
+    return !pd['frame' as keyof PresentationDefinitionV1];
   }
 }

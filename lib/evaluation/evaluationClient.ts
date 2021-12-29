@@ -1,8 +1,9 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { Status } from '../ConstraintUtils';
-import { VerifiableCredential } from '../types';
-import { ProofType } from '../types/SSI.types';
+import { InternalVerifiableCredential } from '../types';
+import PEMessages from '../types/Messages';
+import { InternalPresentationDefinition, ProofType } from '../types/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -31,19 +32,19 @@ export class EvaluationClient {
   private failed_catched = {
     tag: 'root',
     status: Status.ERROR,
-    message: 'unknown exception occurred: ',
+    message: PEMessages.UNKNOWN_EXCEPTION as string,
     stacktrace: '',
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiableCredential: Partial<VerifiableCredential>[];
+  private _verifiableCredential: Partial<InternalVerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
 
   public evaluate(
-    pd: PresentationDefinition,
-    vcs: VerifiableCredential[],
+    pd: InternalPresentationDefinition,
+    vcs: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites?: string[]
   ): void {
@@ -83,11 +84,11 @@ export class EvaluationClient {
     this._presentationSubmission = presentationSubmission;
   }
 
-  public get verifiableCredential(): VerifiableCredential[] {
-    return this._verifiableCredential as VerifiableCredential[];
+  public get verifiableCredential(): InternalVerifiableCredential[] {
+    return this._verifiableCredential as InternalVerifiableCredential[];
   }
 
-  public set verifiableCredential(verifiableCredential: VerifiableCredential[]) {
+  public set verifiableCredential(verifiableCredential: InternalVerifiableCredential[]) {
     this._verifiableCredential = verifiableCredential;
   }
 

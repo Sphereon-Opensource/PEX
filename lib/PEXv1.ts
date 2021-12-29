@@ -1,14 +1,17 @@
-import { PresentationDefinition, PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
 
+import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { Presentation, Proof, VerifiableCredential, VerifiablePresentation } from './types';
-import { PresentationDefinitionVB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import { InternalVerifiableCredential, Presentation, Proof, VerifiablePresentation } from './types';
+import { VerifiableCredential } from './types/SSI.types';
+import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
 /**
- * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
+ * This is the main interfacing class for using this library for v1 of presentation exchange
  */
-export class PEJS {
+export class PEXv1 {
   private _evaluationClientWrapper: EvaluationClientWrapper;
 
   constructor() {
@@ -16,7 +19,7 @@ export class PEJS {
   }
 
   /***
-   * The evaluate compares what is expected from a presentation with the presentationDefinition.
+   * The evaluatePresentationV1 compares what is expected from a presentation with a presentationDefinitionV1.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param presentation the presentation which has to be evaluated in comparison of the definition.
@@ -26,17 +29,20 @@ export class PEJS {
    * were not fulfilled by the presentation.
    */
   public evaluatePresentation(
-    presentationDefinition: PresentationDefinition,
+    presentationDefinition: PresentationDefinitionV1,
     presentation: Presentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
+    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+      presentationCopy.verifiableCredential
+    );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
-      presentationDefinition,
-      presentationCopy.verifiableCredential,
+      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+      internalVCs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -45,7 +51,7 @@ export class PEJS {
   /***
    * The evaluate compares what is expected from a verifiableCredentials with the presentationDefinition.
    *
-   * @param presentationDefinition the definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
    * @param holderDIDs the list of the DIDs that the wallet holders controlls.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
@@ -54,7 +60,7 @@ export class PEJS {
    * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentials(
-    presentationDefinition: PresentationDefinition,
+    presentationDefinition: PresentationDefinitionV1,
     verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
@@ -62,18 +68,18 @@ export class PEJS {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
-      presentationDefinition,
-      verifiableCredentialCopy,
+      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
 
   /**
-   * The getSelectableCredentials method is a helper function that helps filter out the verifiable credentials which can not be selected and returns
+   * The selectFrom method is a helper function that helps filter out the verifiable credentials which can not be selected and returns
    * the selectable credentials.
    *
-   * @param presentationDefinition the definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
    * @param holderDIDs the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
@@ -81,16 +87,16 @@ export class PEJS {
    * @return the selectable credentials.
    */
   public selectFrom(
-    presentationDefinition: PresentationDefinition,
-    verifiableCredentials: VerifiableCredential[],
+    presentationDefinition: PresentationDefinitionV1,
+    verifiableCredentials: InternalVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
-      presentationDefinition,
-      verifiableCredentialCopy,
+      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -100,7 +106,7 @@ export class PEJS {
    * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
    * the verifier after signing it.
    *
-   * @param presentationDefinition the definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
    * @param holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
@@ -108,51 +114,33 @@ export class PEJS {
    * @return the presentation.
    */
   public presentationFrom(
-    presentationDefinition: PresentationDefinition,
+    presentationDefinition: PresentationDefinitionV1,
     selectedCredential: VerifiableCredential[],
     holderDID?: string
   ): Presentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
-      presentationDefinition,
-      selectedCredential
+      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential)
     );
-
-    return PEJS.getPresentation(presentationSubmission, selectedCredential, holderDID);
-  }
-
-  private static getPresentation(
-    presentationSubmission: PresentationSubmission,
-    selectedCredential: VerifiableCredential[],
-    holderDID?: string
-  ): Presentation {
-    const holder = holderDID;
-    return {
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1',
-        'https://identity.foundation/presentation-exchange/submission/v1',
-      ],
-      type: [
-        'VerifiablePresentation',
-        'PresentationSubmission', // This will be truly verifiable after the proof field is populated.
-      ],
-      holder,
-      presentation_submission: presentationSubmission,
-      verifiableCredential: selectedCredential,
-    };
+    return PEX.getPresentation(
+      presentationSubmission,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential),
+      holderDID
+    );
   }
 
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *
-   * @param presentationDefinition the object to be validated.
+   * @param presentationDefinitionV1 the object to be validated.
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: PresentationDefinition): Validated {
+  public validateDefinition(presentationDefinitionV1: PresentationDefinitionV1): Validated {
     return new ValidationEngine().validate([
       {
-        bundler: new PresentationDefinitionVB('root'),
-        target: presentationDefinition,
+        bundler: new PresentationDefinitionV1VB('root'),
+        target: presentationDefinitionV1,
       },
     ]);
   }
@@ -165,16 +153,11 @@ export class PEJS {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation submission
    */
   public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
-    return new ValidationEngine().validate([
-      {
-        bundler: new PresentationSubmissionVB('root'),
-        target: presentationSubmission,
-      },
-    ]);
+    return new PEX().validateSubmission(presentationSubmission);
   }
 
   /**
-   * This method can be used to combine a definition, selected Verifiable Credentials, together with
+   * This method can be used to combine a v1 definition, selected Verifiable Credentials, together with
    * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
    * Please note that PE-JS has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
@@ -182,7 +165,7 @@ export class PEJS {
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
    * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
    *
-   * @param presentationDefinition the Presentation Definition
+   * @param presentationDefinition the Presentation Definition V1
    * @param selectedCredentials the PE-JS and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
@@ -191,7 +174,7 @@ export class PEJS {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFrom(
-    presentationDefinition: PresentationDefinition,
+    presentationDefinition: PresentationDefinitionV1,
     selectedCredentials: VerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
     options: PresentationSignOptions
@@ -211,9 +194,18 @@ export class PEJS {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    this.evaluateCredentials(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holderDIDs,
+      limitDisclosureSignatureSuites
+    );
 
-    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
+    const presentation = this.presentationFrom(
+      presentationDefinition,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      holder
+    );
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,

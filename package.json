@@ -35,7 +35,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@sphereon/pe-models": "0.0.5",
+    "@sphereon/pex-models": "^1.1.0",
     "ajv": "^8.6.3",
     "ajv-formats": "^2.1.1",
     "jsonpath": "^1.1.1",

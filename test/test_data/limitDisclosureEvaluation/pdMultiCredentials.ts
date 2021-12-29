@@ -1,7 +1,7 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { InternalPresentationDefinitionV1 } from '../../../lib/types/SSI.types';
 
 export class PdMultiCredentials {
-  getPresentationDefinition(): PresentationDefinition {
+  getPresentationDefinition(): InternalPresentationDefinitionV1 {
     return {
       id: '31e2f0f1-6b70-411d-b239-56aed5321884',
       purpose: 'To sell you a drink we need to know that you are an adult.',
@@ -30,7 +30,7 @@ export class PdMultiCredentials {
                 id: 'age',
                 path: ['$.credentialSubject.age', '$.credentialSubject.details.age'],
                 filter: {
-                  type: 'integer',
+                  type: 'number',
                   minimum: 18,
                 },
                 predicate: 'required',
@@ -117,6 +117,6 @@ export class PdMultiCredentials {
           },
         },
       ],
-    };
+    } as InternalPresentationDefinitionV1;
   }
 }

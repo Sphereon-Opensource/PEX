@@ -1,4 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pe-models';
+import { PresentationSubmission } from '@sphereon/pex-models';
 
 export class SameSubjectPresentationSubmission {
   public getPresentationSubmission(): PresentationSubmission {

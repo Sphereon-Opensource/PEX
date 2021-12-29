@@ -1,8 +1,9 @@
-import { HolderSubject, Optionality, PresentationDefinition } from '@sphereon/pe-models';
+import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { CredentialSubject, VerifiableCredential } from '../../types';
+import { CredentialSubject, InternalVerifiableCredential } from '../../types';
+import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -37,7 +38,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     return 'IsHolderEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     this.findIsHolderFieldIdsToInputDescriptorsSets(pd);
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(
@@ -56,7 +57,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   /**
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
-  private findIsHolderFieldIdsToInputDescriptorsSets(pd: PresentationDefinition) {
+  private findIsHolderFieldIdsToInputDescriptorsSets(pd: InternalPresentationDefinition) {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.isHolder.push(...jp.nodes(pd, '$..is_holder[*]'));
     const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
@@ -101,7 +102,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     return error;
   }
 
-  private findAllCredentialSubjects(vcs: VerifiableCredential[]) {
+  private findAllCredentialSubjects(vcs: InternalVerifiableCredential[]) {
     //TODO handle nested path
     const credentialSubject: { path: PathComponent[]; value: CredentialSubject }[] = jp.nodes(
       vcs,

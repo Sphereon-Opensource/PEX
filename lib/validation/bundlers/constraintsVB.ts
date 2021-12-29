@@ -1,11 +1,23 @@
-import { Constraints, Directives, Field, HolderSubject, Optionality, PdStatus, Statuses } from '@sphereon/pe-models';
+import {
+  ConstraintsV1,
+  ConstraintsV2,
+  Directives,
+  FieldV1,
+  FieldV2,
+  HolderSubject,
+  Optionality,
+  PdStatus,
+  Statuses,
+} from '@sphereon/pex-models';
 
 import { Validation, ValidationPredicate } from '../core';
 
 import { FieldsVB } from './fieldsVB';
 import { ValidationBundler } from './validationBundler';
 
-export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Constraints> {
+export class ConstraintsVB extends ValidationBundler<
+  FieldV1 | FieldV2 | HolderSubject | ConstraintsV1 | ConstraintsV2
+> {
   private readonly disclosureLimitShouldHaveKnownValueMsg = 'limit_disclosure should have known value';
   private readonly statusShouldHaveKnownValueMsg = 'Unknown status property';
   private readonly statusDirectiveShouldHaveKnownValueMsg = 'status directive should have known value';
@@ -22,22 +34,35 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
   }
 
   public getValidations(
-    constraints: Constraints
-  ): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
-    let validations: (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] = [];
+    constraints: ConstraintsV1 | ConstraintsV2
+  ): (
+    | Validation<ConstraintsV1>
+    | Validation<ConstraintsV2>
+    | Validation<FieldV1>
+    | Validation<FieldV2>
+    | Validation<HolderSubject>
+  )[] {
+    let validations: (
+      | Validation<ConstraintsV1>
+      | Validation<ConstraintsV2>
+      | Validation<FieldV1>
+      | Validation<FieldV2>
+      | Validation<HolderSubject>
+    )[] = [];
     if (constraints) {
       validations = [
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
+          predicate: (constraints: ConstraintsV1 | ConstraintsV2) =>
             ConstraintsVB.disclosureLimitShouldHaveKnownValue(constraints.limit_disclosure),
           message: this.disclosureLimitShouldHaveKnownValueMsg,
         },
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) => ConstraintsVB.statusShouldHaveKnownValue(constraints.statuses),
+          predicate: (constraints: ConstraintsV1 | ConstraintsV2) =>
+            ConstraintsVB.statusShouldHaveKnownValue(constraints.statuses),
           message: this.statusShouldHaveKnownValueMsg,
         },
         {
@@ -49,20 +74,21 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) => ConstraintsVB.shouldBeKnownOption(constraints.is_holder),
+          predicate: (constraints: ConstraintsV1 | ConstraintsV2) =>
+            ConstraintsVB.shouldBeKnownOption(constraints.is_holder),
           message: this.subjectIsIssuerShouldBeKnownValueMsg,
         },
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
+          predicate: (constraints: ConstraintsV1 | ConstraintsV2) =>
             this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.is_holder),
           message: this.fieldIdMustCorrespondToFieldIdMsg,
         },
         {
           tag: this.getTag(),
           target: constraints,
-          predicate: (constraints: Constraints) =>
+          predicate: (constraints: ConstraintsV1 | ConstraintsV2) =>
             this.fieldIdInSubjectMustCorrespondToFieldId(constraints, constraints.same_subject),
           message: this.fieldIdMustCorrespondToFieldIdMsg,
         },
@@ -74,7 +100,7 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
     return validations;
   }
 
-  private getFieldsValidations(constraints: Constraints): Validation<Field>[] {
+  private getFieldsValidations(constraints: ConstraintsV1 | ConstraintsV2): Validation<FieldV1 | FieldV2>[] {
     if (constraints?.fields?.length) {
       return new FieldsVB(this.getTag()).getValidations(constraints.fields);
     }
@@ -89,8 +115,8 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
     return statuses == null || statuses.active != null || statuses.revoked != null || statuses.suspended != null;
   }
 
-  private static statusDirectiveShouldHaveKnownValue(): ValidationPredicate<Constraints> {
-    return (constraints: Constraints): boolean =>
+  private static statusDirectiveShouldHaveKnownValue(): ValidationPredicate<ConstraintsV1 | ConstraintsV2> {
+    return (constraints: ConstraintsV1 | ConstraintsV2): boolean =>
       this.pdStatusShouldBeKnown(constraints?.statuses?.active) &&
       this.pdStatusShouldBeKnown(constraints?.statuses?.revoked) &&
       this.pdStatusShouldBeKnown(constraints?.statuses?.suspended);
@@ -166,7 +192,10 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  fieldIdInSubjectMustCorrespondToFieldId(constraints: Constraints, subjects?: HolderSubject[]): boolean {
+  fieldIdInSubjectMustCorrespondToFieldId(
+    constraints: ConstraintsV1 | ConstraintsV2,
+    subjects?: HolderSubject[]
+  ): boolean {
     if (subjects) {
       for (const subject of subjects) {
         for (const fieldId of subject.field_id) {
@@ -179,9 +208,9 @@ export class ConstraintsVB extends ValidationBundler<Field | HolderSubject | Con
     return true;
   }
 
-  private static isValidFieldId(constraints: Constraints, fieldId: string): boolean {
+  private static isValidFieldId(constraints: ConstraintsV1 | ConstraintsV2, fieldId: string): boolean {
     if (constraints?.fields) {
-      return constraints.fields.map((field: Field) => field.id).includes(fieldId);
+      return constraints.fields.map((field: FieldV1 | FieldV2) => field.id).includes(fieldId);
     }
     return false;
   }

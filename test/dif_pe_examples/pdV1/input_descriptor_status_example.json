@@ -11,18 +11,7 @@
           {
             "uri": "https://licenses.example.com/business-license.json"
           }
-        ],
-        "statuses": {
-          "active": {
-            "directive": "required"
-          },
-          "suspended": {
-            "directive": "allowed"
-          },
-          "revoked": {
-            "directive": "disallowed"
-          }
-        }
+        ]
       }
     ]
   }

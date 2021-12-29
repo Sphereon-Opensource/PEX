@@ -19,7 +19,7 @@
         "id": "2021-05-19 01",
         "name": "Confirm banking relationship or employment and residence proofs",
         "purpose": "Recent bank statements or proofs of both employment and residence will be validated to initiate your loan application but not stored",
-        "group": "A",
+        "group": ["A"],
         "schema": [
           {
             "uri": "https://university.example.com/fulltranscript.json"
@@ -47,7 +47,7 @@
         "id": "2021-05-19 00",
         "name": "Confirm banking relationship or employment and residence proofs",
         "purpose": "Recent bank statements or proofs of both employment and residence will be validated to initiate your loan application but not stored",
-        "group": "B",
+        "group": ["B"],
         "schema": [
           {
             "uri": "https://university.example.com/fulltranscript.json"

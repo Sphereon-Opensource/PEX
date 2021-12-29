@@ -1,4 +1,4 @@
-import { Rules } from '@sphereon/pe-models';
+import { Rules } from '@sphereon/pex-models';
 
 import { SubmissionRequirementMatch } from '../../../lib';
 

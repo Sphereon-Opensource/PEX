@@ -45,6 +45,7 @@
                 "A"
               ],
               "filter": {
+                "type": "string",
                 "const": "Chad"
               }
             },
@@ -102,6 +103,7 @@
                 "A"
               ],
               "filter": {
+                "type": "string",
                 "not": {
                   "const": "Karen"
                 }
@@ -112,6 +114,7 @@
                 "A"
               ],
               "filter": {
+                "type": "string",
                 "not": {
                   "enum": [
                     "red",

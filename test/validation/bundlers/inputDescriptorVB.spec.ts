@@ -1,9 +1,9 @@
-import { InputDescriptor } from '@sphereon/pe-models';
+import { InputDescriptorV1 } from '@sphereon/pex-models';
 
 import { Checked, Status, ValidationEngine } from '../../../lib';
-import { InputDescriptorsVB } from '../../../lib/validation';
+import { InputDescriptorsV1VB } from '../../../lib/validation';
 
-function getTestableInputDescriptors(): InputDescriptor[] {
+function getTestableInputDescriptors(): InputDescriptorV1[] {
   return [
     {
       id: 'banking_input_1',
@@ -61,14 +61,14 @@ function toChecked(message: string) {
 
 describe('inputDescriptorsVB tests', () => {
   it('should be no error found in a completely valid input descriptor', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{ bundler: vb, target: getTestableInputDescriptors() }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
   it('should report error for an empty id', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
 
     const testableInputDescriptors = getTestableInputDescriptors();
@@ -79,7 +79,7 @@ describe('inputDescriptorsVB tests', () => {
   });
 
   it('should report error for an empty uri', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
 
     const testableInputDescriptors = getTestableInputDescriptors();
@@ -90,7 +90,7 @@ describe('inputDescriptorsVB tests', () => {
   });
 
   it('should report error for an empty name', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
 
     const testableInputDescriptors = getTestableInputDescriptors();
@@ -101,7 +101,7 @@ describe('inputDescriptorsVB tests', () => {
   });
 
   it('should report error for an empty purpose', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors[0].purpose = '';
@@ -110,7 +110,7 @@ describe('inputDescriptorsVB tests', () => {
   });
 
   it('should report error for duplicate id', () => {
-    const vb: InputDescriptorsVB = new InputDescriptorsVB('root');
+    const vb: InputDescriptorsV1VB = new InputDescriptorsV1VB('root');
     const ve = new ValidationEngine();
     const testableInputDescriptors = getTestableInputDescriptors();
     testableInputDescriptors![1]!.constraints!.fields![0]!.id = 'uuid2021-05-04 00';

@@ -1,9 +1,8 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
-import { PEJS, Presentation, VerifiableCredential } from '../../lib';
+import { InternalVerifiableCredential, PEX, Presentation } from '../../lib';
 
 import { Wallet } from './core/Wallet';
-
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 
 describe('1st scenario', () => {
@@ -16,8 +15,8 @@ describe('1st scenario', () => {
    * Alice has only one credential in her wallet that have the properties requested by Bob
    */
   it('should return ok get the right presentationSubmission', function () {
-    const pd: PresentationDefinition = getPresentationDefinition();
-    const pejs: PEJS = new PEJS();
+    const pd: PdV1 = getPresentationDefinition();
+    const pejs: PEX = new PEX();
     /**
      * optional, first we want to make sure that the presentationDefinition object that we got is correct
      */
@@ -27,7 +26,7 @@ describe('1st scenario', () => {
     /**
      * we get the verifiableCredentials from our wallet
      */
-    const holderWallet: { holder: string; verifiableCredentials: VerifiableCredential[] } = wallet.getWallet();
+    const holderWallet: { holder: string; verifiableCredentials: InternalVerifiableCredential[] } = wallet.getWallet();
     expect(holderWallet.holder).toEqual('did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd');
     /**
      * evaluation result will be:
@@ -257,12 +256,12 @@ describe('1st scenario', () => {
      As you can see, no matter what we pass, we will get the same result
      */
     expect(() => {
-      new PEJS().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
+      new PEX().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
     }).toThrowError('You need to call evaluate() before pejs.presentationFrom()');
   });
 });
 
-function getPresentationDefinition(): PresentationDefinition {
+function getPresentationDefinition(): PdV1 {
   return {
     id: '31e2f0f1-6b70-411d-b239-56aed5321884',
     purpose: 'To check if you have a valid college degree.',
@@ -308,5 +307,5 @@ function getPresentationDefinition(): PresentationDefinition {
         },
       },
     ],
-  };
+  } as PdV1;
 }
