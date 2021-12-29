@@ -1,4 +1,4 @@
-import { Field, Filter, Optionality } from '@sphereon/pe-models';
+import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
@@ -7,7 +7,7 @@ import { Validation, ValidationPredicate } from '../core';
 
 import { ValidationBundler } from './validationBundler';
 
-export class FieldsVB extends ValidationBundler<Field[]> {
+export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
   private readonly schemaValidator: Ajv;
 
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
@@ -26,8 +26,8 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     addFormats(this.schemaValidator);
   }
 
-  public getValidations(fields: Field[]): Validation<Field>[] {
-    let validations: Validation<Field>[] = [];
+  public getValidations(fields: FieldV1[] | FieldV2[]): Validation<FieldV1 | FieldV2>[] {
+    let validations: Validation<FieldV1 | FieldV2>[] = [];
     if (fields) {
       for (let srInd = 0; srInd < fields.length; srInd++) {
         validations = [...validations, ...this.getValidationsFor(fields[srInd], srInd)];
@@ -36,7 +36,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return validations;
   }
 
-  public getValidationsFor(field: Field, indx: number): Validation<Field>[] {
+  public getValidationsFor(field: FieldV1 | FieldV2, indx: number): Validation<FieldV1 | FieldV2>[] {
     return [
       {
         tag: this.getMyTag(indx),
@@ -59,13 +59,13 @@ export class FieldsVB extends ValidationBundler<Field[]> {
       {
         tag: this.getMyTag(indx),
         target: field,
-        predicate: (field: Field) => FieldsVB.optionalNonEmptyString(field?.purpose),
+        predicate: (field: FieldV1 | FieldV2) => FieldsVB.optionalNonEmptyString(field?.purpose),
         message: this.purposeShouldBeANonEmptyStringMsg,
       },
       {
         tag: this.getMyTag(indx),
         target: field,
-        predicate: (field: Field) => FieldsVB.shouldBeKnownOption(field?.predicate),
+        predicate: (field: FieldV1 | FieldV2) => FieldsVB.shouldBeKnownOption(field?.predicate),
         message: this.shouldBeKnownOptionMsg,
       },
     ];
@@ -76,8 +76,8 @@ export class FieldsVB extends ValidationBundler<Field[]> {
     return this.parentTag + '.' + this.myTag + '[' + srInd + ']';
   }
 
-  private mustHaveValidJsonPaths(): ValidationPredicate<Field> {
-    return (fieldObj: Field): boolean =>
+  private mustHaveValidJsonPaths(): ValidationPredicate<FieldV1 | FieldV2> {
+    return (fieldObj: FieldV1 | FieldV2): boolean =>
       fieldObj.path != null && fieldObj.path.length > 0 && this._validateJsonPaths(fieldObj.path);
   }
 
@@ -97,10 +97,10 @@ export class FieldsVB extends ValidationBundler<Field[]> {
   }
 
   private filterMustBeValidJsonSchema() {
-    return (fieldObj: Field): boolean => this._validateFilter(fieldObj.filter);
+    return (fieldObj: FieldV1 | FieldV2): boolean => this._validateFilter(fieldObj.filter);
   }
 
-  private _validateFilter(filter: Filter | undefined): boolean {
+  private _validateFilter(filter: FilterV1 | FilterV2 | undefined): boolean {
     if (filter == null) {
       return true;
     }
@@ -113,7 +113,7 @@ export class FieldsVB extends ValidationBundler<Field[]> {
   }
 
   private filterIsMustInPresenceOfPredicate() {
-    return (fieldObj: Field): boolean => !(fieldObj.predicate != null && fieldObj.filter == null);
+    return (fieldObj: FieldV1 | FieldV2): boolean => !(fieldObj.predicate != null && fieldObj.filter == null);
   }
 
   private static optionalNonEmptyString(str: string | undefined): boolean {

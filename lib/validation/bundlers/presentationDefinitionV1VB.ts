@@ -1,6 +1,6 @@
 import {
-  Constraints,
-  Field,
+  ConstraintsV1,
+  FieldV1,
   Format,
   HolderSubject,
   InputDescriptorV1,
@@ -21,7 +21,7 @@ import { SubmissionRequirementVB } from './submissionRequirementVB';
 import { ValidationBundler } from './validationBundler';
 
 export class PresentationDefinitionV1VB extends ValidationBundler<
-  Field | HolderSubject | Constraints | InputDescriptorV1 | PresentationDefinitionV1 | SubmissionRequirement
+  FieldV1 | HolderSubject | ConstraintsV1 | InputDescriptorV1 | PresentationDefinitionV1 | SubmissionRequirement
 > {
   private ajv: Ajv;
 
@@ -33,9 +33,9 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
   public getValidations(
     pd: PresentationDefinitionV1
   ): (
-    | Validation<Field>
+    | Validation<FieldV1>
     | Validation<HolderSubject>
-    | Validation<Constraints>
+    | Validation<ConstraintsV1>
     | Validation<InputDescriptorV1>
     | Validation<InputDescriptorV1[]>
     | Validation<PresentationDefinitionV1>

@@ -1,4 +1,4 @@
-import { Field } from '@sphereon/pe-models';
+import { FieldV1, FieldV2 } from '@sphereon/pe-models';
 import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
@@ -22,7 +22,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
-    const fields: { path: PathComponent[]; value: Field }[] = jp.nodes(pd, '$..fields[*]');
+    const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
     vcs.forEach((vc: InternalVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
@@ -63,7 +63,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private createResponse(
-    field: { path: PathComponent[]; value: Field },
+    field: { path: PathComponent[]; value: FieldV1 | FieldV2 },
     vcIndex: number,
     payload: { result?: { path: PathComponent[]; value: unknown }; valid: boolean },
     message: string
@@ -86,7 +86,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: unknown }, field: Field): boolean {
+  private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
     if (field.filter) {
       return new Ajv().validate(field.filter, result.value);
     }

@@ -1,4 +1,4 @@
-import { Constraints, Field, HolderSubject, InputDescriptorV2 } from '@sphereon/pe-models';
+import { ConstraintsV2, FieldV2, HolderSubject, InputDescriptorV2 } from '@sphereon/pe-models';
 
 import { ObjectValidationUtils } from '../../utils/ObjectValidationUtils';
 import { Validation } from '../core';
@@ -20,15 +20,15 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
   ): (
     | Validation<InputDescriptorV2>
     | Validation<InputDescriptorV2[]>
-    | Validation<Constraints>
-    | Validation<Field>
+    | Validation<ConstraintsV2>
+    | Validation<FieldV2>
     | Validation<HolderSubject>
   )[] {
     let validations: (
       | Validation<InputDescriptorV2>
       | Validation<InputDescriptorV2[]>
-      | Validation<Constraints>
-      | Validation<Field>
+      | Validation<ConstraintsV2>
+      | Validation<FieldV2>
       | Validation<HolderSubject>
     )[] = [];
 
@@ -89,7 +89,7 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
   private shouldHaveUniqueFieldsIds(inputDescriptors: InputDescriptorV2[]): boolean {
     const nonUniqueInputDescriptorFieldsIds: string[] = [];
     const uniqueInputDescriptorFieldsIds: Set<string> = new Set<string>();
-    const tmp: Field[] = [];
+    const tmp: FieldV2[] = [];
     inputDescriptors
       .map((e) => e.constraints?.fields)
       .forEach((e) => {
@@ -122,7 +122,7 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
   constraintsValidations(
     inputDescriptor: InputDescriptorV2,
     inDescInd: number
-  ): (Validation<Constraints> | Validation<Field> | Validation<HolderSubject>)[] {
+  ): (Validation<ConstraintsV2> | Validation<FieldV2> | Validation<HolderSubject>)[] {
     if (inputDescriptor.constraints) {
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);
     }

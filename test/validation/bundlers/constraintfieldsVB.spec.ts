@@ -1,9 +1,9 @@
-import { Constraints, Directives, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, Directives, Optionality } from '@sphereon/pe-models';
 
 import { Checked, Status, ValidationBundler } from '../../../lib';
 import { ConstraintsVB, ValidationEngine } from '../../../lib/validation';
 
-function getTestableConstraint(): Constraints {
+function getTestableConstraint(): ConstraintsV1 {
   return {
     limit_disclosure: Optionality.Required,
     statuses: {
@@ -47,21 +47,21 @@ function getTestableConstraint(): Constraints {
 
 describe('constraints tests', () => {
   it('There should be no error reported for fully valid constraints object', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{ bundler: vb, target: getTestableConstraint() }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
   it('There should be no error reported for a uninitialized constraints', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const result = ve.validate([{ bundler: vb, target: null }]);
     expect(result).toEqual([new Checked('root', Status.INFO, 'ok')]);
   });
 
   it('There should be no error reported for uninitialized status', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses = undefined;
@@ -70,7 +70,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for uninitialized active', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.active = undefined;
@@ -79,7 +79,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for uninitialized status suspended', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.suspended = undefined;
@@ -88,7 +88,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for uninitialized status suspended to be other', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     delete constraints!.statuses!.active;
@@ -98,7 +98,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for uninitialized status revoked', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.revoked = undefined;
@@ -107,7 +107,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for uninitialized active.directive', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.active!.directive = undefined;
@@ -116,7 +116,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for uninitialized suspended.directive', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.suspended!.directive = undefined;
@@ -125,7 +125,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for uninitialized revoked.directive', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.statuses!.revoked!.directive = undefined;
@@ -134,7 +134,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for uninitialized fields', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     delete constraints.fields;
@@ -146,7 +146,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for empty fields', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints.fields = [];
@@ -158,7 +158,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for subject_is_issuer uninitialized', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     delete constraints.subject_is_issuer;
@@ -167,7 +167,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for subject_is_issuer to be other', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints.subject_is_issuer = Optionality.Preferred;
@@ -176,7 +176,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for is_holder uninitialized', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     delete constraints.is_holder;
@@ -185,7 +185,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be no error reported for same_subject[0].field_id empty', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = [];
@@ -194,7 +194,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for same_subject[0].field_id object empty', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = [''];
@@ -205,7 +205,7 @@ describe('constraints tests', () => {
   });
 
   it('There should be error reported for same_subject[0].field_id missing', () => {
-    const vb: ValidationBundler<Constraints> = new ConstraintsVB('root');
+    const vb: ValidationBundler<ConstraintsV1> = new ConstraintsVB('root');
     const ve = new ValidationEngine();
     const constraints = getTestableConstraint();
     constraints!.same_subject![0]!.field_id = ['missing_fieldID'];

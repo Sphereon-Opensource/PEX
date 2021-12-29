@@ -1,4 +1,4 @@
-import { Constraints, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -23,7 +23,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
-      const constraints: Constraints | undefined = inputDescriptor.constraints;
+      const constraints: ConstraintsV1 | ConstraintsV2 | undefined = inputDescriptor.constraints;
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, vcs, index);
       } else {

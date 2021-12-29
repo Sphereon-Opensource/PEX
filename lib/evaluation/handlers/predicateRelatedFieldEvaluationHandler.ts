@@ -1,4 +1,4 @@
-import { Constraints, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
 
 import { Status } from '../../ConstraintUtils';
 import PEMessages from '../../types/Messages';
@@ -27,7 +27,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     // this.updatePresentationSubmission(pdV1);
   }
 
-  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: Constraints): void {
+  private examinePredicateRelatedField(input_descriptor_idx: number, constraints: ConstraintsV1 | ConstraintsV2): void {
     if (constraints?.fields) {
       for (let i = 0; i < constraints.fields.length; i++) {
         for (let j = 0; j < this.getResults().length; j++) {
@@ -41,7 +41,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     results: HandlerCheckResult[],
     resultIdx: number,
     input_descriptor_idx: number,
-    constraints: Constraints,
+    constraints: ConstraintsV1 | ConstraintsV2,
     fieldIdx: number
   ) {
     const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[resultIdx].input_descriptor_path);

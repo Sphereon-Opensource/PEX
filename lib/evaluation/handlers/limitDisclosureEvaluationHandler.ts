@@ -1,4 +1,4 @@
-import { Constraints, Field, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
+import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pe-models';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -58,10 +58,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private evaluateLimitDisclosure(
     verifiableCredential: InternalVerifiableCredential[],
-    constraints: Constraints,
+    constraints: ConstraintsV1 | ConstraintsV2,
     idIdx: number
   ): void {
-    const fields = constraints?.fields as Field[];
+    const fields = constraints?.fields as FieldV2[];
     const optionality = constraints.limit_disclosure;
     verifiableCredential.forEach((vc, index) => {
       if (optionality && this.isLimitDisclosureSupported(vc, index, idIdx, optionality)) {
@@ -72,7 +72,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private enforceLimitDisclosure(
     vc: InternalVerifiableCredential,
-    fields: Field[],
+    fields: FieldV2[],
     idIdx: number,
     index: number,
     verifiableCredential: InternalVerifiableCredential[],
@@ -90,7 +90,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private createVcWithRequiredFields(
     vc: InternalVerifiableCredential,
-    fields: Field[],
+    fields: FieldV2[],
     idIdx: number,
     vcIdx: number
   ): InternalVerifiableCredential | undefined {
