@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-[![CI](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Sphereon-Opensource/pe-js/branch/develop/graph/badge.svg?token=9P1JGUYA35)](https://codecov.io/gh/Sphereon-Opensource/pe-js) [![NPM Version](https://img.shields.io/npm/v/@sphereon/pe-js.svg)](https://npm.im/@sphereon/pe-js)
+[![CI](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml/badge.svg)](https://github.com/Sphereon-Opensource/pex/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Sphereon-Opensource/pex/branch/develop/graph/badge.svg?token=9P1JGUYA35)](https://codecov.io/gh/Sphereon-Opensource/pex) [![NPM Version](https://img.shields.io/npm/v/@sphereon/pex.svg)](https://npm.im/@sphereon/pex)
 
 ## Active Development
 
