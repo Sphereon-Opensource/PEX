@@ -1,7 +1,17 @@
 # Release Notes
 
-## v0.6.0 - 2021-12-21
-Update to PEv2, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
+## v0.6.0 - 2021-12-29
+Add Presentation Exchange v2 support, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
+
+**Breaking change: class and package renamed in v0.6.0!**
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
+library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
+
+- The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
+- The main class was changed from `PEJS` to `PEX`. The latter class has internal feature detection support on the
+  provided definition, delegating the actual implementation to the new `PEXv1` or `PEXv2` class internally. If you don't
+  want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
+
 
 - Added:
   - presentation exchange v2 support
@@ -12,6 +22,7 @@ Update to PEv2, separating JWT Verifiable Credentials and JSON-LD VerifiableCred
   - Updated:
     - Json-LD and JWT verifiable credentials are separated internally
     - All the messaged now come from an enum instead of literal strings
+    - Dependency versions
 
 
 ## v0.5.1 - 2021-12-03
