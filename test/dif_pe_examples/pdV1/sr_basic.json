@@ -41,7 +41,7 @@
         "id": "Educational transcripts",
         "name": "Submission of educational transcripts",
         "purpose": "We need your complete educational transcripts to process your application",
-        "group": "A",
+        "group": ["A"],
         "schema": [
           {
             "uri": "https://university.example.com/fulltranscript.json"
@@ -69,7 +69,7 @@
         "id": "Employment Information",
         "name": "Employment Information",
         "purpose": "We are only verifying one current employment relationship, not any other information about employment.",
-        "group": "B",
+        "group": ["B"],
         "schema": [
           {
             "uri": "https://company.example.com/letter.json"
@@ -97,7 +97,7 @@
         "id": "United States Citizenship Proofs",
         "name": "United States Citizenship Proofs",
         "purpose": "We need you to prove your US citizenship.",
-        "group": "C",
+        "group": ["C"],
         "schema": [
           {
             "uri": "https://us.example.com/id.json"
@@ -125,7 +125,7 @@
         "id": "European Union Citizenship Proofs",
         "name": "European Union Citizenship Proofs",
         "purpose": "We need you to prove you are a citizen of an EU member state.",
-        "group": "D",
+        "group": ["D"],
         "schema": [
           {
             "uri": "https://eu.example.com/id.json"

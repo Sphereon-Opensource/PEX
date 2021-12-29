@@ -1,8 +1,8 @@
 import fs from 'fs';
 
-import { PresentationDefinition } from '@sphereon/pe-models';
+import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 
-import { PEJS, Presentation, ProofType, Validated, VerifiablePresentation } from '../lib';
+import { PEXv1, Presentation, ProofType, Validated, VerifiablePresentation } from '../lib';
 
 import {
   assertedMockCallback,
@@ -19,63 +19,42 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate', () => {
   it('testing constructor', function () {
-    const pejs: PEJS = new PEJS();
-    expect(pejs).toBeInstanceOf(PEJS);
+    const pex: PEXv1 = new PEXv1();
+    expect(pex).toBeInstanceOf(PEXv1);
   });
 
   it('Evaluate case with error result', () => {
-    const pejs: PEJS = new PEJS();
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-PermanentResidentCard.json'
+    const pex: PEXv1 = new PEXv1();
+    const pdSchema: PresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json'
     ).presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
-    pdSchema.input_descriptors[0].schema = [{ uri: 'www.example.com/schema' }];
-    const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    pdSchema.input_descriptors[0].schema = [{ uri: 'https://www.example.com/schema' }];
+    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result!.errors!.length).toEqual(2);
     expect(result!.errors!.map((e) => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);
   });
 
-  it('Evaluate case without any error', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+  it('Evaluate case without any error 1', () => {
+    const pdSchema: PresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const pex: PEXv1 = new PEXv1();
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
 
-  it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
-    pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pejs: PEJS = new PEJS();
-    vpSimple.holder = HOLDER_DID;
-    pejs.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: Presentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, vpSimple.holder);
-    expect(presentation.presentation_submission).toEqual(
-      expect.objectContaining({
-        definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
-        descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
-          { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
-          { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
-        ],
-      })
-    );
-  });
-
-  it('Evaluate case without any error', () => {
-    const pdSchema: PresentationDefinition = getFile(
-      './test/dif_pe_examples/pd/pd-simple-schema-age-predicate.json'
+  it('Evaluate case without any error 2', () => {
+    const pdSchema: PresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pejs: PEJS = new PEJS();
-    const evaluationResults = pejs.evaluateCredentials(
+    const pex: PEXv1 = new PEXv1();
+    const evaluationResults = pex.evaluateCredentials(
       pdSchema,
       vpSimple.verifiableCredential,
       [vpSimple.holder as string],
@@ -86,13 +65,13 @@ describe('evaluate', () => {
   });
 
   it('Evaluate submission requirements all from group A', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pejs: PEJS = new PEJS();
-    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: Presentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    const pex: PEXv1 = new PEXv1();
+    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const presentation: Presentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -112,33 +91,33 @@ describe('evaluate', () => {
     ]);
   });
 
-  it('Evaluate pd schema of our sr_rules.json pd', () => {
-    const pdSchema: PresentationDefinition = getFile('./test/resources/sr_rules.json').presentation_definition;
+  it('Evaluate pdV1 schema of our sr_rules.json pdV1', () => {
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pejs: PEJS = new PEJS();
-    const result: Validated = pejs.validateDefinition(pdSchema);
+    const pex: PEXv1 = new PEXv1();
+    const result: Validated = pex.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const pejs: PEJS = new PEJS();
-    const result: Validated = pejs.validateSubmission(vpSimple.presentation_submission);
+    const pex: PEXv1 = new PEXv1();
+    const result: Validated = pex.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('Evaluate pd schema of our pd_driver_license_name.json pd', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
-    const pejs: PEJS = new PEJS();
-    const result: Validated = pejs.validateDefinition(pdSchema.presentation_definition);
+  it('Evaluate pdV1 schema of our pd_driver_license_name.json pdV1', () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
+    const pex: PEXv1 = new PEXv1();
+    const result: Validated = pex.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('should return a signed presentation', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const pejs: PEJS = new PEJS();
-    const vp: VerifiablePresentation = pejs.verifiablePresentationFrom(
+    const pex: PEXv1 = new PEXv1();
+    const vp: VerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -155,12 +134,12 @@ describe('evaluate', () => {
   });
 
   it('should throw exception if signing encounters a problem', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pd/pd_driver_license_name.json');
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
-    const pejs: PEJS = new PEJS();
+    const pex: PEXv1 = new PEXv1();
 
     expect(() => {
-      pejs.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
+      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
       });

@@ -1,8 +1,9 @@
-import { PresentationDefinition } from '@sphereon/pe-models';
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types';
+import { InternalVerifiableCredential } from '../../types';
+import PEMessages from '../../types/Messages';
+import { InternalPresentationDefinition } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -17,7 +18,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     return 'MarkForSubmissionEvaluation';
   }
 
-  public handle(pd: PresentationDefinition, vcs: VerifiableCredential[]): void {
+  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     const results: HandlerCheckResult[] = [...this.getResults()];
     const errors: HandlerCheckResult[] = results.filter((result: HandlerCheckResult) => result.status === Status.ERROR);
     const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors);
@@ -38,7 +39,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     );
   }
 
-  private produceSuccessResults(infos: HandlerCheckResult[], pd: PresentationDefinition) {
+  private produceSuccessResults(infos: HandlerCheckResult[], pd: InternalPresentationDefinition) {
     this.removeDuplicate(infos).forEach((info) => {
       const parsedPath = jp.nodes(pd, info.input_descriptor_path);
       const group = parsedPath[0].value.group;
@@ -48,7 +49,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         evaluator: this.getName(),
         status: Status.INFO,
         payload: { group },
-        message: 'The input candidate is eligible for submission',
+        message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       });
     });
   }
@@ -60,7 +61,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       this.getResults().push({
         ...error,
         evaluator: this.getName(),
-        message: 'The input candidate is not eligible for submission',
+        message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         payload: payload,
       });
     });

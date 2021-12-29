@@ -1,4 +1,19 @@
 # Release Notes
+
+## v0.6.0 - 2021-12-21
+Update to PEv2, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
+
+- Added:
+  - presentation exchange v2 support
+    - supporting method for all the previous methods in v2
+    - presentation definition version discovery
+    - presentation definition validator for v2
+    - `frame` validation
+  - Updated:
+    - Json-LD and JWT verifiable credentials are separated internally
+    - All the messaged now come from an enum instead of literal strings
+
+
 ## v0.5.1 - 2021-12-03
 Fixed json path issue in library responses. 
 Added a verifiableCredential array to almost all responses that corresponds to the json paths in the same response

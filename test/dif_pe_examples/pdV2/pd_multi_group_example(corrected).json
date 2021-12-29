@@ -32,16 +32,6 @@
         "group": [
           "A"
         ],
-        "schema": [
-          {
-            "uri": "https://bank-standards.example.com#accounts",
-            "required": true
-          },
-          {
-            "uri": "https://bank-standards.example.com#investments",
-            "required": true
-          }
-        ],
         "constraints": {
           "limit_disclosure": "required",
           "fields": [
@@ -91,14 +81,6 @@
         "group": [
           "A"
         ],
-        "schema": [
-          {
-            "uri": "https://bank-schemas.org/1.0.0/accounts.json"
-          },
-          {
-            "uri": "https://bank-schemas.org/2.0.0/accounts.json"
-          }
-        ],
         "constraints": {
           "fields": [
             {
@@ -147,11 +129,6 @@
         "group": [
           "B"
         ],
-        "schema": [
-          {
-            "uri": "https://business-standards.org/schemas/employment-history.json"
-          }
-        ],
         "constraints": {
           "limit_disclosure": "required",
           "fields": [
@@ -171,11 +148,6 @@
         "name": "EU Driver's License",
         "group": [
           "C"
-        ],
-        "schema": [
-          {
-            "uri": "https://schema.eu/claims/DriversLicense.json"
-          }
         ],
         "constraints": {
           "fields": [
@@ -212,11 +184,6 @@
         "name": "Driver's License from one of 50 US States",
         "group": [
           "C"
-        ],
-        "schema": [
-          {
-            "uri": "did:foo:123/Collections/schema.us.gov/american_drivers_license.json"
-          }
         ],
         "constraints": {
           "fields": [
