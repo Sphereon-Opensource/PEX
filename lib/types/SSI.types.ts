@@ -251,38 +251,6 @@ export class InternalVerifiableCredentialJwt extends InternalCredentialJWT {
 
 export type InternalVerifiableCredential = InternalVerifiableCredentialJsonLD | InternalVerifiableCredentialJwt;
 
-export interface Credential {
-  /**
-   * Below are the jwt related credentials
-   */
-  aud?: string;
-  exp?: string;
-  iss?: string;
-  jti?: string;
-  nbf?: string;
-  sub?: string;
-  vc?: InternalCredentialBase;
-  // JWT related fields end
-
-  /**
-   * Below are the json-ld related credentials
-   */
-  '@context'?: string[] | string;
-  credentialStatus?: CredentialStatus;
-  credentialSubject?: CredentialSubject;
-  description?: string;
-  expirationDate?: string;
-  id?: string;
-  issuanceDate?: string;
-  issuer?: unknown;
-  name?: string;
-  type?: string[];
-
-  // JSON-LD related fields end
-
-  [x: string]: unknown;
-}
-
 export interface JwtVerifiableCredential {
   aud?: string;
   exp?: string;
