@@ -1,118 +1,107 @@
-import { InternalVerifiableCredential } from '../../../lib';
-import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { VerifiableCredential } from '../../../lib/types/SSI.types';
 
-export class VcMultiCredentials {
-  getVerifiableCredentials(): InternalVerifiableCredential[] {
-    let vc0: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc0 = Object.assign(vc0, {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
-      credentialSchema: [
-        {
-          id: 'https://www.w3.org/TR/vc-data-model/#types',
+export class GatacaSelectedCredentials {
+  getVerifiableCredentials(): VerifiableCredential[] {
+    return [
+      {
+        id: 'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw',
+        type: ['VerifiableCredential', 'emailCredential'],
+        '@context': ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'],
+        issuer: 'did:gatc:acYseLtTEVeqF8oBhJEejbCVHJ8auVupaRuo6gw4hmXjcc77uCKqyM3imEJH',
+        issuanceDate: '2021-11-26T13:19:20.000Z',
+        credentialSubject: {
+          email: 'jose@gataca.io',
+          id: 'did:gatc:YzQxNjRjM2U4YTUzZGVkNjhmNjAxYzk5',
         },
-      ],
-      credentialSubject: {
-        id: 'VCSubject2020081200',
-        age: 19,
-      },
-      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      issuer: '',
-      issuanceDate: '',
-      type: ['VerifiableCredential'],
-      proof: {
-        type: 'BbsBlsSignatureProof2020',
-        created: '2020-04-25',
-        verificationMethod: 'did:example:489398593#test',
-        proofPurpose: 'assertionMethod',
-        proofValue:
-          'kTTbA3pmDa6Qia/JkOnIXDLmoBz3vsi7L5t3DWySI/VLmBqleJ/Tbus5RoyiDERDBEh5rnACXlnOqJ/U8yFQFtcp/mBCc2FtKNPHae9jKIv1dm9K9QK1F3GI1AwyGoUfjLWrkGDObO1ouNAhpEd0+et+qiOf2j8p3MTTtRRx4Hgjcl0jXCq7C7R5/nLpgimHAAAAdAx4ouhMk7v9dXijCIMaG0deicn6fLoq3GcNHuH5X1j22LU/hDu7vvPnk/6JLkZ1xQAAAAIPd1tu598L/K3NSy0zOy6obaojEnaqc1R5Ih/6ZZgfEln2a6tuUp4wePExI1DGHqwj3j2lKg31a/6bSs7SMecHBQdgIYHnBmCYGNQnu/LZ9TFV56tBXY6YOWZgFzgLDrApnrFpixEACM9rwrJ5ORtxAAAAAgE4gUIIC9aHyJNa5TBklMOh6lvQkMVLXa/vEl+3NCLXblxjgpM7UEMqBkE9/QcoD3Tgmy+z0hN+4eky1RnJsEg=',
-        nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
-      },
-    });
-    let vc1: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
-      credentialSchema: [
-        {
-          id: 'https://www.w3.org/TR/vc-data-model/#types',
-        },
-      ],
-      credentialSubject: {
-        id: 'VCSubject2020081200',
-        details: {
-          citizenship: ['eu'],
-        },
-      },
-      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      issuer: '',
-      issuanceDate: '',
-      type: ['VerifiableCredential'],
-      proof: {
-        type: 'BbsBlsSignatureProof2020',
-        created: '2020-04-25',
-        verificationMethod: 'did:example:489398593#test',
-        proofPurpose: 'assertionMethod',
-        proofValue:
-          'kTTbA3pmDa6Qia/JkOnIXDLmoBz3vsi7L5t3DWySI/VLmBqleJ/Tbus5RoyiDERDBEh5rnACXlnOqJ/U8yFQFtcp/mBCc2FtKNPHae9jKIv1dm9K9QK1F3GI1AwyGoUfjLWrkGDObO1ouNAhpEd0+et+qiOf2j8p3MTTtRRx4Hgjcl0jXCq7C7R5/nLpgimHAAAAdAx4ouhMk7v9dXijCIMaG0deicn6fLoq3GcNHuH5X1j22LU/hDu7vvPnk/6JLkZ1xQAAAAIPd1tu598L/K3NSy0zOy6obaojEnaqc1R5Ih/6ZZgfEln2a6tuUp4wePExI1DGHqwj3j2lKg31a/6bSs7SMecHBQdgIYHnBmCYGNQnu/LZ9TFV56tBXY6YOWZgFzgLDrApnrFpixEACM9rwrJ5ORtxAAAAAgE4gUIIC9aHyJNa5TBklMOh6lvQkMVLXa/vEl+3NCLXblxjgpM7UEMqBkE9/QcoD3Tgmy+z0hN+4eky1RnJsEg=',
-        nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
-      },
-    });
-    let vc2: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
-      credentialSchema: [
-        {
-          id: 'https://www.w3.org/TR/vc-data-model/#types',
-        },
-      ],
-      credentialSubject: {
-        id: 'VCSubject2020081200',
-        country: [
+        credentialStatus: undefined,
+        credentialSchema: undefined,
+        proof: [
           {
-            abbr: 'NLD',
+            created: '2021-11-26T13:18:27Z',
+            creator: 'did:gatc:24gsRbsURij3edoveHv81jt9EnhggrnR#keys-1',
+            domain: 'gataca.io',
+            nonce: 'CTVGGQJoCOvyCVi_SDQNXkHeQHvtk82IntgNNvjEB1A=',
+            proofPurpose: 'assertionMethod',
+            signatureValue: 'rB5FsoYnYR6M69lNMafDXoHdhUQEpA156y_D1ohVLxmhEmJswyyVUPVAZoPNsXshed7PXcp0mh27l18Mya9NDA',
+            type: 'JcsEd25519Signature2020',
+            verificationMethod: 'did:gatc:24gsRbsURij3edoveHv81jt9EnhggrnR#keys-1',
           },
         ],
       },
-      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      issuer: '',
-      issuanceDate: '',
-      type: ['VerifiableCredential'],
-      proof: {
-        type: 'BbsBlsSignatureProof2020',
-        created: '2020-04-25',
-        verificationMethod: 'did:example:489398593#test',
-        proofPurpose: 'assertionMethod',
-        proofValue:
-          'kTTbA3pmDa6Qia/JkOnIXDLmoBz3vsi7L5t3DWySI/VLmBqleJ/Tbus5RoyiDERDBEh5rnACXlnOqJ/U8yFQFtcp/mBCc2FtKNPHae9jKIv1dm9K9QK1F3GI1AwyGoUfjLWrkGDObO1ouNAhpEd0+et+qiOf2j8p3MTTtRRx4Hgjcl0jXCq7C7R5/nLpgimHAAAAdAx4ouhMk7v9dXijCIMaG0deicn6fLoq3GcNHuH5X1j22LU/hDu7vvPnk/6JLkZ1xQAAAAIPd1tu598L/K3NSy0zOy6obaojEnaqc1R5Ih/6ZZgfEln2a6tuUp4wePExI1DGHqwj3j2lKg31a/6bSs7SMecHBQdgIYHnBmCYGNQnu/LZ9TFV56tBXY6YOWZgFzgLDrApnrFpixEACM9rwrJ5ORtxAAAAAgE4gUIIC9aHyJNa5TBklMOh6lvQkMVLXa/vEl+3NCLXblxjgpM7UEMqBkE9/QcoD3Tgmy+z0hN+4eky1RnJsEg=',
-        nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
-      },
-    });
-    let vc3: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc3 = Object.assign(vc3, {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
-      credentialSchema: [
-        {
-          id: 'https://www.w3.org/TR/vc-data-model/#types',
+      {
+        id: 'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv',
+        type: ['VerifiableCredential', 'transcriptOfRecordsCredential'],
+        '@context': [
+          'https://www.w3.org/2018/credentials/v1',
+          'https://s3.eu-west-1.amazonaws.com/gataca.io/contexts/v1.json',
+        ],
+        issuer: 'did:gatc:2wihrrZCM5XWpFkkPLUABXSKP7pniNJ1',
+        issuanceDate: '2021-12-03T12:39:04.000Z',
+        credentialSubject: {
+          achieved: {
+            hasPart: {
+              learningAchievement: [
+                {
+                  id: 'urn:epass:learningAchievement:1bT69e7xs8L4wAIFlUZiVrKjpgD0ztm5',
+                  specifiedBy: {
+                    id: 'urn:epass:qualification:2',
+                    title: 'Advanced Time Series Analysis',
+                    volumeOfLearning: '6',
+                  },
+                  title: 'Advanced Time Series Analysis',
+                  wasDerivedFrom: {
+                    grade: '18',
+                    id: 'urn:epass:assessment:2',
+                    title: 'Advanced Time Series Analysis',
+                  },
+                },
+                {
+                  id: 'urn:epass:learningAchievement:hFm0pLoGlan7AqzOJiycMHbX16rYNTRE',
+                  specifiedBy: {
+                    id: 'urn:epass:qualification:3',
+                    title: 'Generalized Linear Models',
+                    volumeOfLearning: '6',
+                  },
+                  title: 'Generalized Linear Models',
+                  wasDerivedFrom: {
+                    grade: '15',
+                    id: 'urn:epass:assessment:3',
+                    title: 'Generalized Linear Models',
+                  },
+                },
+              ],
+            },
+            id: 'urn:epass:learningAchievement:RfnCAc0zo8p36VNG4PeKTE7LhHjMIFbx',
+            identifier: {
+              schemeID: 'Certificate ID',
+              value: '51016837',
+            },
+            title: 'Master of Statistics and Data Science',
+          },
+          id: 'did:gatc:YzQxNjRjM2U4YTUzZGVkNjhmNjAxYzk5',
+          identifier: {
+            schemeID: 'Student identification number',
+            value: 99201234,
+          },
         },
-      ],
-      credentialSubject: {
-        id: 'VCSubject2020081200',
-        birthPlace: 'Maarssen',
+        credentialStatus: {
+          id: 'https://icts-q-devops-gataca-certify.cloud.q.icts.kuleuven.be/api/v1/group/9016b9ec-8dae-4d57-9acb-fa90888fc6b4/status',
+          type: 'CredentialStatusList2017',
+        },
+        credentialSchema: null,
+        proof: [
+          {
+            created: '2021-12-03T12:39:04Z',
+            creator: 'did:gatc:2wihrrZCM5XWpFkkPLUABXSKP7pniNJ1#keys-1',
+            domain: 'gataca.io',
+            nonce: '7yx6qOCnemysuuEgD4P9VRnEsw89WkKTcOEM0-uINTs=',
+            proofPurpose: 'assertionMethod',
+            signatureValue: 'gXdaXrNedX92NNnKqQb7x-08_dKu59dzhTp3NPgLGOIImbMrvd6jVtvXJBhaX1_NRr4W1Od5L9kNudFyZdSDDA',
+            type: 'JcsEd25519Signature2020',
+            verificationMethod: 'did:gatc:2wihrrZCM5XWpFkkPLUABXSKP7pniNJ1#keys-1',
+          },
+        ],
       },
-      id: '2dc74354-e965-4883-be5e-bfec48bf60c7',
-      issuanceDate: '',
-      issuer: '',
-      type: ['VerifiableCredential'],
-      proof: {
-        type: 'BbsBlsSignatureProof2020',
-        created: '2020-04-25',
-        verificationMethod: 'did:example:489398593#test',
-        proofPurpose: 'assertionMethod',
-        proofValue:
-          'kTTbA3pmDa6Qia/JkOnIXDLmoBz3vsi7L5t3DWySI/VLmBqleJ/Tbus5RoyiDERDBEh5rnACXlnOqJ/U8yFQFtcp/mBCc2FtKNPHae9jKIv1dm9K9QK1F3GI1AwyGoUfjLWrkGDObO1ouNAhpEd0+et+qiOf2j8p3MTTtRRx4Hgjcl0jXCq7C7R5/nLpgimHAAAAdAx4ouhMk7v9dXijCIMaG0deicn6fLoq3GcNHuH5X1j22LU/hDu7vvPnk/6JLkZ1xQAAAAIPd1tu598L/K3NSy0zOy6obaojEnaqc1R5Ih/6ZZgfEln2a6tuUp4wePExI1DGHqwj3j2lKg31a/6bSs7SMecHBQdgIYHnBmCYGNQnu/LZ9TFV56tBXY6YOWZgFzgLDrApnrFpixEACM9rwrJ5ORtxAAAAAgE4gUIIC9aHyJNa5TBklMOh6lvQkMVLXa/vEl+3NCLXblxjgpM7UEMqBkE9/QcoD3Tgmy+z0hN+4eky1RnJsEg=',
-        nonce: '6i3dTz5yFfWJ8zgsamuyZa4yAHPm75tUOOXddR6krCvCYk77sbCOuEVcdBCDd/l6tIY=',
-      },
-    });
-    return [vc0, vc1, vc2, vc3];
+    ];
   }
 }
