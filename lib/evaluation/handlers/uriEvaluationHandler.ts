@@ -5,7 +5,12 @@ import { nanoid } from 'nanoid';
 import { Status } from '../../ConstraintUtils';
 import { InternalVerifiableCredential } from '../../types';
 import PEMessages from '../../types/Messages';
-import { InternalPresentationDefinition, InternalPresentationDefinitionV1, PEVersion } from '../../types/SSI.types';
+import {
+  CredentialSchema,
+  InternalPresentationDefinition,
+  InternalPresentationDefinitionV1,
+  PEVersion,
+} from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -25,7 +30,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
       vcs.forEach((vc: InternalVerifiableCredential, j: number) => {
-        this.evaluateUris(vc.getContext(), uris, i, j, d.getVersion());
+        const vcUris: string[] = UriEvaluationHandler.fetchVcUris(vc);
+        this.evaluateUris(vcUris, uris, i, j, d.getVersion());
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
@@ -46,7 +52,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private evaluateUris(
-    verifiableCredentialUris: string[] | string,
+    verifiableCredentialUris: string[],
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number,
@@ -54,15 +60,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   ): void {
     let hasAnyMatch = false;
     if (pdVersion === PEVersion.v1) {
-      let vcUris: string[] = [];
-      if (Array.isArray(verifiableCredentialUris)) {
-        vcUris = [...verifiableCredentialUris];
-      } else {
-        vcUris = [verifiableCredentialUris];
-      }
-
       for (let i = 0; i < verifiableCredentialUris.length; i++) {
-        if (inputDescriptorsUris.find((el) => el === vcUris[i]) != undefined) {
+        if (inputDescriptorsUris.find((el) => el === verifiableCredentialUris[i]) != undefined) {
           hasAnyMatch = true;
         }
       }
@@ -80,6 +79,21 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
+  private static fetchVcUris(vc: InternalVerifiableCredential) {
+    const uris: string[] = [];
+    if (Array.isArray(vc.getContext())) {
+      uris.push(...vc.getContext());
+    } else {
+      uris.push(<string>vc.getContext());
+    }
+    if (Array.isArray(vc.getCredentialSchema()) && (vc.getCredentialSchema() as CredentialSchema[]).length > 0) {
+      (vc.getCredentialSchema() as CredentialSchema[]).forEach((element) => uris.push(element.id));
+    } else if (vc.getCredentialSchema()) {
+      uris.push((vc.getCredentialSchema() as CredentialSchema).id);
+    }
+    return uris;
+  }
+
   private createSuccessResultObject(
     verifiableCredentialUris: string[] | string,
     inputDescriptorsUris: string[],
@@ -89,7 +103,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
     result.message = PEMessages.URI_EVALUATION_PASSED;
-    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
+    result.payload = { verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
 
@@ -102,10 +116,9 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
     result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
-    result.payload = { presentationDefinitionUris: verifiableCredentialUris, inputDescriptorsUris };
+    result.payload = { verifiableCredentialUris, inputDescriptorsUris };
     return result;
   }
-
   private createResult(idIdx: number, vcIdx: number): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,

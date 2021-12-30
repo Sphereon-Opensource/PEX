@@ -18,7 +18,10 @@ export class EvaluationClientWrapperData {
       message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
-        presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
+        verifiableCredentialUris: [
+          'https://www.w3.org/2018/credentials/v1',
+          'https://www.w3.org/TR/vc-data-model/#types',
+        ],
       },
     };
   }
@@ -33,7 +36,10 @@ export class EvaluationClientWrapperData {
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
-        presentationDefinitionUris: ['https://www.w3.org/2018/credentials/v1'],
+        verifiableCredentialUris: [
+          'https://www.w3.org/2018/credentials/v1',
+          'https://www.w3.org/TR/vc-data-model/#types',
+        ],
       },
     };
   }
@@ -47,7 +53,10 @@ export class EvaluationClientWrapperData {
       message: PEMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
-        presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+        verifiableCredentialUris: [
+          'https://www.w3.org/TR/vc-data-model/#types1',
+          'https://www.w3.org/TR/vc-data-model/#types',
+        ],
       },
     };
   }
@@ -62,7 +71,10 @@ export class EvaluationClientWrapperData {
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
-        presentationDefinitionUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
+        verifiableCredentialUris: [
+          'https://www.w3.org/TR/vc-data-model/#types1',
+          'https://www.w3.org/TR/vc-data-model/#types',
+        ],
       },
     };
   }

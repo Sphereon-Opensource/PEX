@@ -52,7 +52,7 @@ describe('evaluate', () => {
         PEMessages.URI_EVALUATION_DIDNT_PASS,
         {
           inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
-          presentationDefinitionUris: ['https://www.test.org/mock'],
+          verifiableCredentialUris: ['https://www.test.org/mock', 'https://www.w3.org/TR/vc-data-model/#types'],
         }
       )
     );
