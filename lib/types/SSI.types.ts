@@ -283,9 +283,35 @@ export interface Credential {
   [x: string]: unknown;
 }
 
-export interface VerifiableCredential extends Credential {
+export interface JwtVerifiableCredential {
+  aud?: string;
+  exp?: string;
+  iss: string;
+  jti?: string;
+  nbf?: string;
+  sub?: string;
+  vc: InternalCredentialBase;
+  [x: string]: unknown;
   proof: Proof | Proof[];
 }
+
+export interface JsonLdVerifiableCredential {
+  '@context': string[] | string;
+  credentialStatus?: CredentialStatus;
+  credentialSubject: CredentialSubject;
+  credentialSchema?: CredentialSchema | CredentialSchema[];
+  description?: string;
+  expirationDate?: string;
+  id: string;
+  issuanceDate: string;
+  issuer: unknown;
+  name?: string;
+  type: string[];
+  [x: string]: unknown;
+  proof: Proof | Proof[];
+}
+
+export type VerifiableCredential = JwtVerifiableCredential | JsonLdVerifiableCredential;
 
 export interface InternalPresentationDefinition {
   format?: Format;

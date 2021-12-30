@@ -164,7 +164,7 @@ describe('evaluate', () => {
   it('Evaluate presentationDefinition v2', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
     const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinitionV2(pd);
+    const result: Validated = pejs.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
@@ -172,7 +172,7 @@ describe('evaluate', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
     pd.frame = { '@id': 'this is not valid' };
     const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinitionV2(pd);
+    const result: Validated = pejs.validateDefinition(pd);
     expect(result).toEqual([
       { message: 'frame value is not valid', status: 'error', tag: 'presentation_definition.frame' },
     ]);
