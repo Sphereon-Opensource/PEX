@@ -43,38 +43,6 @@ export class SSITypesBuilder {
     return internalVCs;
   }
 
-  static mapInternalVerifiableCredentialsToExternal(
-    internalCredentials: InternalVerifiableCredential[]
-  ): VerifiableCredential[] {
-    const externalVCs: VerifiableCredential[] = [];
-    for (const internalCredential of internalCredentials) {
-      externalVCs.push(this.mapInternalVerifiableCredentialToExternal(internalCredential));
-    }
-    return externalVCs;
-  }
-
-  private static mapInternalVerifiableCredentialToExternal(
-    internalCredential: InternalVerifiableCredential
-  ): VerifiableCredential {
-    if (internalCredential.getType() === 'json-ld') {
-      return {
-        ...internalCredential.getBaseCredential(),
-        proof: internalCredential.proof,
-      };
-    } else {
-      return {
-        aud: internalCredential.getAudience(),
-        exp: internalCredential.getExpirationDate(),
-        iss: internalCredential.getIssuer() as string,
-        jti: internalCredential.getJti(),
-        nbf: internalCredential.getIssuanceDate(),
-        sub: internalCredential.getId(),
-        vc: internalCredential.getBaseCredential(),
-        proof: internalCredential.proof,
-      };
-    }
-  }
-
   private static mapExternalVerifiableCredentialToInternal(externalCredential: VerifiableCredential) {
     if (externalCredential.vc && externalCredential.iss) {
       const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
