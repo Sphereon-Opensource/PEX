@@ -101,7 +101,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.INFO;
     result.message = PEMessages.URI_EVALUATION_PASSED;
     result.payload = {
-      vcContextUri: vc.getContext(),
+      vcContext: vc.getContext(),
       vcCredentialSchema: vc.getCredentialSchema(),
       inputDescriptorsUris,
     };
@@ -118,7 +118,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.ERROR;
     result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
-      vcContextUri: vc.getContext(),
+      vcContext: vc.getContext(),
       vcCredentialSchema: vc.getCredentialSchema(),
       inputDescriptorsUris,
     };
