@@ -251,7 +251,7 @@ export class InternalVerifiableCredentialJwt extends InternalCredentialJWT {
 
 export type InternalVerifiableCredential = InternalVerifiableCredentialJsonLD | InternalVerifiableCredentialJwt;
 
-export interface JwtVerifiableCredential {
+export interface JwtCredential {
   aud?: string;
   exp?: string;
   iss: string;
@@ -260,10 +260,9 @@ export interface JwtVerifiableCredential {
   sub?: string;
   vc: InternalCredentialBase;
   [x: string]: unknown;
-  proof: Proof | Proof[];
 }
 
-export interface JsonLdVerifiableCredential {
+export interface JsonLdCredential {
   '@context': string[] | string;
   credentialStatus?: CredentialStatus;
   credentialSubject: CredentialSubject;
@@ -276,6 +275,15 @@ export interface JsonLdVerifiableCredential {
   name?: string;
   type: string[];
   [x: string]: unknown;
+}
+
+export type Credential = JwtCredential | JsonLdCredential;
+
+export interface JwtVerifiableCredential extends JwtCredential {
+  proof: Proof | Proof[];
+}
+
+export interface JsonLdVerifiableCredential extends JsonLdCredential {
   proof: Proof | Proof[];
 }
 
