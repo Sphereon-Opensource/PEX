@@ -14,6 +14,11 @@ export interface CredentialSubject {
   [x: string]: unknown;
 }
 
+export interface CredentialSchema {
+  id: string;
+  type: string;
+}
+
 export enum ProofType {
   Ed25519Signature2018 = 'Ed25519Signature2018',
   Ed25519Signature2020 = 'Ed25519Signature2020',
@@ -69,6 +74,8 @@ export interface InternalCredential {
 
   getContext(): string[] | string;
 
+  getCredentialSchema(): CredentialSchema | CredentialSchema[];
+
   getExpirationDate(): string | undefined;
 
   getId(): string | undefined;
@@ -88,6 +95,7 @@ export class InternalCredentialBase {
   '@context': string[] | string;
   credentialStatus?: CredentialStatus;
   credentialSubject: CredentialSubject;
+  credentialSchema?: CredentialSchema | CredentialSchema[];
   description?: string;
   expirationDate?: string;
   id: string;
@@ -143,6 +151,13 @@ export class InternalCredentialJWT implements InternalCredential {
     return this.vc['@context'];
   }
 
+  getCredentialSchema(): CredentialSchema | CredentialSchema[] {
+    if (this.vc.credentialSchema) {
+      return this.vc.credentialSchema;
+    }
+    return [];
+  }
+
   getType(): string {
     return 'jwt';
   }
@@ -179,6 +194,13 @@ export class InternalCredentialJsonLD extends InternalCredentialBase implements 
 
   getContext(): string[] | string {
     return this['@context'];
+  }
+
+  getCredentialSchema(): CredentialSchema[] | CredentialSchema {
+    if (this.credentialSchema) {
+      return this.credentialSchema;
+    }
+    return [];
   }
 
   getType(): string {
@@ -255,6 +277,7 @@ export interface Credential {
   issuer?: unknown;
   name?: string;
   type?: string[];
+
   // JSON-LD related fields end
 
   [x: string]: unknown;
