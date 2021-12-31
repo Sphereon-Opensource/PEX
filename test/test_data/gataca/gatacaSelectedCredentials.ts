@@ -88,7 +88,6 @@ export class GatacaSelectedCredentials {
           id: 'https://icts-q-devops-gataca-certify.cloud.q.icts.kuleuven.be/api/v1/group/9016b9ec-8dae-4d57-9acb-fa90888fc6b4/status',
           type: 'CredentialStatusList2017',
         },
-        credentialSchema: null,
         proof: [
           {
             created: '2021-12-03T12:39:04Z',
