@@ -1,5 +1,5 @@
 import { IVerifiablePresentation } from '../../../lib';
-import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/Internal.types';
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<IVerifiablePresentation> {
