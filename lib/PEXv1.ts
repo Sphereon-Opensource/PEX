@@ -106,6 +106,8 @@ export class PEXv1 {
    * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
    * the verifier after signing it.
    *
+   * IMPORTANT NOTE: this method creates a presentation object based on the SELECTED verifiable credentials. You can get the selected verifiable credentials using selectFrom method
+   *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).

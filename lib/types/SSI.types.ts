@@ -95,7 +95,7 @@ export class InternalCredentialBase {
   '@context': string[] | string;
   credentialStatus?: CredentialStatus;
   credentialSubject: CredentialSubject;
-  credentialSchema?: CredentialSchema | CredentialSchema[];
+  credentialSchema?: undefined | CredentialSchema | CredentialSchema[];
   description?: string;
   expirationDate?: string;
   id: string;

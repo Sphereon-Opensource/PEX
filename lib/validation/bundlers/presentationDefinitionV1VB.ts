@@ -205,7 +205,11 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
       const fromValues: string[] = [];
       PresentationDefinitionV1VB.flatten(pd.submission_requirements).forEach((srs: SubmissionRequirement) => {
         if (srs.from) {
-          fromValues.push(...srs.from);
+          if (Array.isArray(srs.from)) {
+            fromValues.push(...srs.from);
+          } else {
+            fromValues.push(srs.from);
+          }
         }
       });
 
