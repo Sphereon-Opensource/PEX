@@ -1,7 +1,7 @@
-import { PresentationDefinitionV1 } from '@sphereon/pe-models';
+import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 
 export class GatacaPresentationDefinition {
-  getPresentationDefinition(): PresentationDefinitionV1 {
+  static getPresentationDefinition(): PresentationDefinitionV1 {
     return {
       id: 'AxuMrbLyT1o88VcpzeBiXLT8Jtm6kYzvKksNEj6XWZPq',
       input_descriptors: [
