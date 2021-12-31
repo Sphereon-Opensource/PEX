@@ -251,41 +251,43 @@ export class InternalVerifiableCredentialJwt extends InternalCredentialJWT {
 
 export type InternalVerifiableCredential = InternalVerifiableCredentialJsonLD | InternalVerifiableCredentialJwt;
 
-export interface Credential {
-  /**
-   * Below are the jwt related credentials
-   */
+export interface JwtCredential {
   aud?: string;
   exp?: string;
-  iss?: string;
+  iss: string;
   jti?: string;
   nbf?: string;
   sub?: string;
-  vc?: InternalCredentialBase;
-  // JWT related fields end
-
-  /**
-   * Below are the json-ld related credentials
-   */
-  '@context'?: string[] | string;
-  credentialStatus?: CredentialStatus;
-  credentialSubject?: CredentialSubject;
-  description?: string;
-  expirationDate?: string;
-  id?: string;
-  issuanceDate?: string;
-  issuer?: unknown;
-  name?: string;
-  type?: string[];
-
-  // JSON-LD related fields end
-
+  vc: InternalCredentialBase;
   [x: string]: unknown;
 }
 
-export interface VerifiableCredential extends Credential {
+export interface JsonLdCredential {
+  '@context': string[] | string;
+  credentialStatus?: CredentialStatus;
+  credentialSubject: CredentialSubject;
+  credentialSchema?: CredentialSchema | CredentialSchema[];
+  description?: string;
+  expirationDate?: string;
+  id: string;
+  issuanceDate: string;
+  issuer: unknown;
+  name?: string;
+  type: string[];
+  [x: string]: unknown;
+}
+
+export type Credential = JwtCredential | JsonLdCredential;
+
+export interface JwtVerifiableCredential extends JwtCredential {
   proof: Proof | Proof[];
 }
+
+export interface JsonLdVerifiableCredential extends JsonLdCredential {
+  proof: Proof | Proof[];
+}
+
+export type VerifiableCredential = JwtVerifiableCredential | JsonLdVerifiableCredential;
 
 export interface InternalPresentationDefinition {
   format?: Format;

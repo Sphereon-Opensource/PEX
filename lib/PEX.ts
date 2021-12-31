@@ -95,7 +95,7 @@ export class PEX {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
-    verifiableCredentials: InternalVerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -142,7 +142,7 @@ export class PEX {
 
   public static getPresentation(
     presentationSubmission: PresentationSubmission,
-    selectedCredential: InternalVerifiableCredential[],
+    selectedCredential: VerifiableCredential[],
     holderDID?: string
   ): Presentation {
     const holder = holderDID;
@@ -157,7 +157,7 @@ export class PEX {
       ],
       holder,
       presentation_submission: presentationSubmission,
-      verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(selectedCredential),
+      verifiableCredential: selectedCredential,
     };
   }
 
@@ -184,22 +184,6 @@ export class PEX {
           target: presentationDefinition,
         });
     return new ValidationEngine().validate(validators);
-  }
-
-  /**
-   * This method validates whether an object is usable as a presentation definition or not.
-   *
-   * @param presentationDefinitionV2 the object to be validated.
-   *
-   * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
-   */
-  public validateDefinitionV2(presentationDefinitionV2: PresentationDefinitionV2): Validated {
-    return new ValidationEngine().validate([
-      {
-        bundler: new PresentationDefinitionV2VB('root'),
-        target: presentationDefinitionV2,
-      },
-    ]);
   }
 
   /**
@@ -256,7 +240,7 @@ export class PEX {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(
+    const evaluationResult = this.evaluateCredentials(
       presentationDefinition,
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
       holderDIDs,
@@ -265,7 +249,7 @@ export class PEX {
 
     const presentation = this.presentationFrom(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(evaluationResult.verifiableCredential),
       holder
     );
     const evaluationResults = this.evaluatePresentation(

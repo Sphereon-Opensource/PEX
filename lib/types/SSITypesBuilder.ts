@@ -43,6 +43,17 @@ export class SSITypesBuilder {
     return internalVCs;
   }
 
+  private static mapExternalVerifiableCredentialToInternal(externalCredential: VerifiableCredential) {
+    if (externalCredential.vc && externalCredential.iss) {
+      const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
+      return Object.assign(vc, externalCredential);
+    } else if (externalCredential.credentialSubject && externalCredential.id) {
+      const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+      return Object.assign(vc, externalCredential);
+    }
+    throw 'VerifiableCredential structure is incorrect.';
+  }
+
   static mapInternalVerifiableCredentialsToExternal(
     internalCredentials: InternalVerifiableCredential[]
   ): VerifiableCredential[] {
@@ -56,33 +67,6 @@ export class SSITypesBuilder {
   private static mapInternalVerifiableCredentialToExternal(
     internalCredential: InternalVerifiableCredential
   ): VerifiableCredential {
-    if (internalCredential.getType() === 'json-ld') {
-      return {
-        ...internalCredential.getBaseCredential(),
-        proof: internalCredential.proof,
-      };
-    } else {
-      return {
-        aud: internalCredential.getAudience(),
-        exp: internalCredential.getExpirationDate(),
-        iss: internalCredential.getIssuer() as string,
-        jti: internalCredential.getJti(),
-        nbf: internalCredential.getIssuanceDate(),
-        sub: internalCredential.getId(),
-        vc: internalCredential.getBaseCredential(),
-        proof: internalCredential.proof,
-      };
-    }
-  }
-
-  private static mapExternalVerifiableCredentialToInternal(externalCredential: VerifiableCredential) {
-    if (externalCredential.vc && externalCredential.iss) {
-      const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-      return Object.assign(vc, externalCredential);
-    } else if (externalCredential.credentialSubject && externalCredential.id) {
-      const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-      return Object.assign(vc, externalCredential);
-    }
-    throw 'VerifiableCredential structure is incorrect.';
+    return internalCredential as VerifiableCredential;
   }
 }

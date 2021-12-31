@@ -60,7 +60,7 @@ export class PEXv2 {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: InternalVerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
@@ -87,7 +87,7 @@ export class PEXv2 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: InternalVerifiableCredential[],
+    verifiableCredentials: VerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -114,14 +114,15 @@ export class PEXv2 {
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredential: InternalVerifiableCredential[],
+    selectedCredential: VerifiableCredential[],
     holderDID?: string
   ): Presentation {
+    const verifiableCredentialCopy = JSON.parse(JSON.stringify(selectedCredential));
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      selectedCredential
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy)
     );
-    return PEX.getPresentation(presentationSubmission, selectedCredential, holderDID);
+    return PEX.getPresentation(presentationSubmission, verifiableCredentialCopy, holderDID);
   }
 
   /**

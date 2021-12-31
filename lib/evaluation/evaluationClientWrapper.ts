@@ -3,7 +3,8 @@ import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { InternalVerifiableCredential } from '../types';
-import { InternalPresentationDefinition } from '../types/SSI.types';
+import { InternalPresentationDefinition, VerifiableCredential } from '../types/SSI.types';
+import { SSITypesBuilder } from '../types/SSITypesBuilder';
 import { JsonPathUtils } from '../utils';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
@@ -53,7 +54,7 @@ export class EvaluationClientWrapper {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: [...credentials],
+        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
         warnings,
       };
     } else {
@@ -69,7 +70,7 @@ export class EvaluationClientWrapper {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: [...credentials],
+        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
         warnings,
       };
     }
@@ -197,6 +198,7 @@ export class EvaluationClientWrapper {
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
+    result.verifiableCredential = this._client.verifiableCredential;
     return result;
   }
 
@@ -401,7 +403,7 @@ export class EvaluationClientWrapper {
     verifiableCredentials: InternalVerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.verifiableCredential?.forEach((selectableCredential: InternalVerifiableCredential) => {
+      selectResults.verifiableCredential?.forEach((selectableCredential: VerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );
