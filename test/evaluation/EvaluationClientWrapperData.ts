@@ -1,8 +1,8 @@
 import { PresentationSubmission, Rules } from '@sphereon/pex-models';
 
-import { HandlerCheckResult, InternalVerifiableCredential, SelectResults, Status } from '../../lib';
+import { HandlerCheckResult, SelectResults, Status } from '../../lib';
+import { InternalVerifiableCredential, InternalVerifiableCredentialJsonLD } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
-import { InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {

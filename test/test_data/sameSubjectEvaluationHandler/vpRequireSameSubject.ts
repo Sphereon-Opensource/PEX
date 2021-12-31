@@ -1,8 +1,8 @@
-import { VerifiablePresentation } from '../../../lib';
+import { IVerifiablePresentation } from '../../../lib';
 import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
 
 export class SrRules {
-  public getVerifiablePresentation(): Partial<VerifiablePresentation> {
+  public getVerifiablePresentation(): Partial<IVerifiablePresentation> {
     return {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',

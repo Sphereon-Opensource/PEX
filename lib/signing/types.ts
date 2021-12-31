@@ -1,8 +1,8 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
 import { EvaluationResults } from '../evaluation';
-import { Presentation, Proof, ProofPurpose, ProofType } from '../types';
-import { VerifiableCredential } from '../types/SSI.types';
+import { IPresentation, IProof, ProofPurpose, ProofType } from '../types';
+import { IVerifiableCredential } from '../types/SSI.types';
 
 export interface ProofOptions {
   /**
@@ -94,18 +94,18 @@ export interface PresentationSignCallBackParams {
   /**
    * The selected credentials to include in the eventual VP as determined by PEX and/or user
    */
-  selectedCredentials: VerifiableCredential[];
+  selectedCredentials: IVerifiableCredential[];
 
   /**
    * The presentation object created from the definition and verifiable credentials.
    * Can be used directly or in more complex situations can be discarded by using the definition, credentials, proof options, submission and evaluation results
    */
-  presentation: Presentation;
+  presentation: IPresentation;
 
   /**
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already
    */
-  proof: Partial<Proof>;
+  proof: Partial<IProof>;
 
   /**
    * The presentation definition

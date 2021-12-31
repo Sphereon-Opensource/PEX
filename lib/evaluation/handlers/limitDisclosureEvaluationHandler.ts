@@ -2,14 +2,14 @@ import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality }
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
-import PEMessages from '../../types/Messages';
 import {
-  InternalPresentationDefinition,
+  IInternalPresentationDefinition,
   InternalPresentationDefinitionV2,
+  InternalVerifiableCredential,
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
-} from '../../types/SSI.types';
+} from '../../types/Internal.types';
+import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -24,7 +24,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (

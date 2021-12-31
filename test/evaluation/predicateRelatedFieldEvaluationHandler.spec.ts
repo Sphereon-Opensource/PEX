@@ -2,10 +2,11 @@ import fs from 'fs';
 
 import { Optionality } from '@sphereon/pex-models';
 
-import { EvaluationClient, HandlerCheckResult, Status } from '../../lib';
+import { HandlerCheckResult, Status } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
 import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

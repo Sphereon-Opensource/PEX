@@ -1,6 +1,7 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
-import { InternalVerifiableCredential, PEX, Presentation } from '../../lib';
+import { IPresentation, PEX } from '../../lib';
+import { InternalVerifiableCredential } from '../../lib/types/Internal.types';
 
 import { Wallet } from './core/Wallet';
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
@@ -230,7 +231,7 @@ describe('1st scenario', () => {
 
      which is wrong in the case of our example, because the index of our verifiableCredential is no longer #2, but it's "1"
      */
-    const presentation: Presentation = pejs.presentationFrom(
+    const presentation: IPresentation = pejs.presentationFrom(
       pd,
       [holderWallet.verifiableCredentials[2]],
       'did:didMethod:2021112400'

@@ -1,9 +1,13 @@
 import fs from 'fs';
 
-import { InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
-import { EvaluationClient } from '../../lib';
+import { IVerifiablePresentation, Status } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
+import {
+  InternalPresentationDefinitionV1,
+  InternalVerifiableCredential,
+  InternalVerifiableCredentialJsonLD,
+} from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
-import { InternalPresentationDefinitionV1, InternalVerifiableCredentialJsonLD } from '../../lib/types/SSI.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
 import { PdMultiCredentials } from '../test_data/limitDisclosureEvaluation/pdMultiCredentials';
@@ -23,7 +27,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
@@ -37,7 +41,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
@@ -53,7 +57,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
@@ -79,7 +83,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });

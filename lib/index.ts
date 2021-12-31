@@ -2,14 +2,7 @@ import { Checked, NonEmptyArray, Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { PEXv1 } from './PEXv1';
 import { PEXv2 } from './PEXv2';
-import {
-  EvaluationClient,
-  EvaluationHandler,
-  EvaluationResults,
-  HandlerCheckResult,
-  SelectResults,
-  SubmissionRequirementMatch,
-} from './evaluation';
+import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './evaluation';
 import {
   KeyEncoding,
   PresentationSignCallBackParams,
@@ -18,49 +11,47 @@ import {
   SignatureOptions,
 } from './signing';
 import {
-  CredentialStatus,
-  CredentialSubject,
+  ICredential,
+  ICredentialSchema,
+  ICredentialStatus,
+  ICredentialSubject,
+  IIssuer,
+  IJsonLdCredential,
+  IJsonLdVerifiableCredential,
+  IJwtCredential,
+  IJwtVerifiableCredential,
   InputFieldType,
-  InternalCredential,
-  InternalVerifiableCredential,
-  Issuer,
-  Presentation,
-  Proof,
+  IPresentation,
+  IProof,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  PEVersion,
   ProofPurpose,
   ProofType,
-  VerifiablePresentation,
 } from './types';
-import {
-  Validated,
-  Validation,
-  ValidationBundler,
-  ValidationEngine,
-  ValidationPredicate,
-  Validator,
-} from './validation';
+import { Validated, Validation, ValidationEngine, ValidationPredicate, Validator } from './validation';
 
-export {
-  SubmissionRequirementMatch,
-  HandlerCheckResult,
-  EvaluationHandler,
-  EvaluationResults,
-  SelectResults,
-  EvaluationClient,
-};
+export { SubmissionRequirementMatch, HandlerCheckResult, EvaluationResults, SelectResults };
 export { PresentationSignCallBackParams, PresentationSignOptions, ProofOptions, SignatureOptions, KeyEncoding };
-export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine, ValidationBundler };
+export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine };
 export {
-  InternalVerifiableCredential,
-  InternalCredential,
-  CredentialSubject,
-  CredentialStatus,
-  VerifiablePresentation,
-  Presentation,
-  Proof,
+  ICredentialSubject,
+  ICredentialStatus,
+  IVerifiablePresentation,
+  IPresentation,
+  IProof,
   InputFieldType,
-  Issuer,
+  IIssuer,
   ProofType,
   ProofPurpose,
+  IJwtVerifiableCredential,
+  PEVersion,
+  ICredential,
+  ICredentialSchema,
+  IVerifiableCredential,
+  IJsonLdVerifiableCredential,
+  IJwtCredential,
+  IJsonLdCredential,
 };
 export { Checked, Status, NonEmptyArray };
 export { PEX, PEXv1, PEXv2 };

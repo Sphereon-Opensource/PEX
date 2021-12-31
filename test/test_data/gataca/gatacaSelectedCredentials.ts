@@ -1,7 +1,7 @@
-import { VerifiableCredential } from '../../../lib/types/SSI.types';
+import { IVerifiableCredential } from '../../../lib/types/SSI.types';
 
 export class GatacaSelectedCredentials {
-  static getVerifiableCredentials(): VerifiableCredential[] {
+  static getVerifiableCredentials(): IVerifiableCredential[] {
     return [
       {
         id: 'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw',

@@ -2,8 +2,7 @@ import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@s
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
-import { InternalPresentationDefinition } from '../../types/SSI.types';
+import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -33,7 +32,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client;
   }
 
-  public abstract handle(d: InternalPresentationDefinition, p: InternalVerifiableCredential[]): void;
+  public abstract handle(d: IInternalPresentationDefinition, p: InternalVerifiableCredential[]): void;
 
   public get verifiableCredential(): InternalVerifiableCredential[] {
     return this._client.verifiableCredential;
@@ -55,7 +54,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client.results;
   }
 
-  public updatePresentationSubmission(pd: InternalPresentationDefinition) {
+  public updatePresentationSubmission(pd: IInternalPresentationDefinition) {
     this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
       /**
          * TODO map the nested credential

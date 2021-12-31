@@ -1,5 +1,4 @@
-import { InternalVerifiableCredential } from '../../../lib';
-import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/SSI.types';
+import { InternalVerifiableCredential, InternalVerifiableCredentialJsonLD } from '../../../lib/types/Internal.types';
 
 export class SameSubjectVerifiableCredential {
   public getVerifiableCredential(): InternalVerifiableCredential[] {

@@ -1,5 +1,5 @@
 import { Checked, Status } from '../../ConstraintUtils';
-import { VerifiableCredential } from '../../types/SSI.types';
+import { IVerifiableCredential } from '../../types/SSI.types';
 
 import { SubmissionRequirementMatch } from './submissionRequirementMatch';
 
@@ -18,7 +18,7 @@ export interface SelectResults {
   /**
    * All matched/selectable credentials
    */
-  verifiableCredential?: VerifiableCredential[];
+  verifiableCredential?: IVerifiableCredential[];
   /**
    * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
    */

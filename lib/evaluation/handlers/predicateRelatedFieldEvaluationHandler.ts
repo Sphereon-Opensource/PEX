@@ -1,8 +1,8 @@
 import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
 
 import { Status } from '../../ConstraintUtils';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
-import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -17,7 +17,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     return 'PredicateRelatedFieldEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition): void {
+  public handle(pd: IInternalPresentationDefinition): void {
     // PresentationDefinitionV2 is the common denominator
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (inDesc.constraints) {

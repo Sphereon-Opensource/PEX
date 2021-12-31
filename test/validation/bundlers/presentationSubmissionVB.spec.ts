@@ -2,8 +2,8 @@ import fs from 'fs';
 
 import { PresentationSubmission } from '@sphereon/pex-models';
 
-import { Checked, Status, ValidationBundler, ValidationEngine } from '../../../lib';
-import { PresentationSubmissionVB } from '../../../lib/validation';
+import { Checked, Status, ValidationEngine } from '../../../lib';
+import { PresentationSubmissionVB, ValidationBundler } from '../../../lib/validation';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));

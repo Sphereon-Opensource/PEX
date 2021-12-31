@@ -3,8 +3,9 @@ import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { InternalVerifiableCredential, Presentation, Proof, VerifiablePresentation } from './types';
-import { VerifiableCredential } from './types/SSI.types';
+import { IPresentation, IProof, IVerifiablePresentation } from './types';
+import { IVerifiableCredential } from './types';
+import { InternalVerifiableCredential } from './types/Internal.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { PresentationDefinitionV2VB, Validated, ValidationEngine } from './validation';
 
@@ -30,10 +31,10 @@ export class PEXv2 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV2,
-    presentation: Presentation,
+    presentation: IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const presentationCopy: Presentation = JSON.parse(JSON.stringify(presentation));
+    const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
       presentationCopy.verifiableCredential
     );
@@ -60,7 +61,7 @@ export class PEXv2 {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: VerifiableCredential[],
+    verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
@@ -87,7 +88,7 @@ export class PEXv2 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: VerifiableCredential[],
+    verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
@@ -114,9 +115,9 @@ export class PEXv2 {
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredential: VerifiableCredential[],
+    selectedCredential: IVerifiableCredential[],
     holderDID?: string
-  ): Presentation {
+  ): IPresentation {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(selectedCredential));
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
@@ -171,10 +172,10 @@ export class PEXv2 {
    */
   public verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: VerifiableCredential[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => VerifiablePresentation,
+    selectedCredentials: IVerifiableCredential[],
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
-  ): VerifiablePresentation {
+  ): IVerifiablePresentation {
     const { holder, signatureOptions, proofOptions } = options;
 
     function limitedDisclosureSuites() {
@@ -211,7 +212,7 @@ export class PEXv2 {
       throw new Error('Could not get evaluation results from presentation');
     }
 
-    const proof: Partial<Proof> = {
+    const proof: Partial<IProof> = {
       type: proofOptions?.type,
       verificationMethod: signatureOptions?.verificationMethod,
       created: proofOptions?.created ? proofOptions.created : new Date().toISOString(),

@@ -2,8 +2,8 @@ import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { InternalVerifiableCredential } from '../types';
-import { InternalPresentationDefinition, VerifiableCredential } from '../types/SSI.types';
+import { IVerifiableCredential } from '../types';
+import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../types/Internal.types';
 import { SSITypesBuilder } from '../types/SSITypesBuilder';
 import { JsonPathUtils } from '../utils';
 
@@ -24,7 +24,7 @@ export class EvaluationClientWrapper {
   }
 
   public selectFrom(
-    presentationDefinition: InternalPresentationDefinition,
+    presentationDefinition: IInternalPresentationDefinition,
     verifiableCredentials: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites: string[]
@@ -107,7 +107,7 @@ export class EvaluationClientWrapper {
   }
 
   private matchSubmissionRequirements(
-    pd: InternalPresentationDefinition,
+    pd: IInternalPresentationDefinition,
     submissionRequirements: SubmissionRequirement[],
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch[] {
@@ -137,7 +137,7 @@ export class EvaluationClientWrapper {
 
   private matchWithoutSubmissionRequirements(
     marked: HandlerCheckResult[],
-    pd: InternalPresentationDefinition
+    pd: IInternalPresentationDefinition
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
@@ -156,7 +156,7 @@ export class EvaluationClientWrapper {
   }
 
   private mapMatchingDescriptors(
-    pd: InternalPresentationDefinition,
+    pd: IInternalPresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
@@ -177,7 +177,7 @@ export class EvaluationClientWrapper {
   }
 
   public evaluate(
-    pd: InternalPresentationDefinition,
+    pd: IInternalPresentationDefinition,
     vcs: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites?: string[]
@@ -215,7 +215,7 @@ export class EvaluationClientWrapper {
   }
 
   public submissionFrom(
-    pd: InternalPresentationDefinition,
+    pd: IInternalPresentationDefinition,
     vcs: InternalVerifiableCredential[]
   ): PresentationSubmission {
     if (!this._client.results.length) {
@@ -403,7 +403,7 @@ export class EvaluationClientWrapper {
     verifiableCredentials: InternalVerifiableCredential[]
   ) {
     if (selectResults) {
-      selectResults.verifiableCredential?.forEach((selectableCredential: VerifiableCredential) => {
+      selectResults.verifiableCredential?.forEach((selectableCredential: IVerifiableCredential) => {
         const foundIndex: number = verifiableCredentials.findIndex(
           (verifiableCredential) => selectableCredential.id === verifiableCredential.id
         );

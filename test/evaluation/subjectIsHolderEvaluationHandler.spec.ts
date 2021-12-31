@@ -2,19 +2,20 @@ import fs from 'fs';
 
 import { PresentationSubmission } from '@sphereon/pex-models';
 
-import { EvaluationClient, InternalVerifiableCredential, VerifiablePresentation } from '../../lib';
+import { IVerifiablePresentation } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/handlers';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/SSI.types';
+import { InternalPresentationDefinitionV1, InternalVerifiableCredential } from '../../lib/types/Internal.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(
   path: string
-): InternalPresentationDefinitionV1 | VerifiablePresentation | InternalVerifiableCredential {
+): InternalPresentationDefinitionV1 | IVerifiablePresentation | InternalVerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));
   if (Object.keys(file).includes('presentation_definition')) {
     return file.presentation_definition as InternalPresentationDefinitionV1;
   } else if (Object.keys(file).includes('presentation_submission')) {
-    return file as VerifiablePresentation;
+    return file as IVerifiablePresentation;
   } else {
     return file as InternalVerifiableCredential;
   }
@@ -30,9 +31,9 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const results = getFile('./test/resources/isHolderEvaluationResults.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    const presentation: VerifiablePresentation = getFile(
+    const presentation: IVerifiablePresentation = getFile(
       './test/dif_pe_examples/vp/vp_subject_is_holder.json'
-    ) as VerifiablePresentation;
+    ) as IVerifiablePresentation;
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     evaluationClient.verifiableCredential = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
       presentation.verifiableCredential

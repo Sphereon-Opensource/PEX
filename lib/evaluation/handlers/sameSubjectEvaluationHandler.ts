@@ -2,8 +2,7 @@ import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
-import { InternalPresentationDefinition } from '../../types/SSI.types';
+import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -30,7 +29,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return 'SameSubjectEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     const sameSubjectInDesc = this.mapSameSubjectFieldIdsToInputDescriptors(pd);
     const handlerCheckResults = this.mapCredentialsToResultObjecs(vcs, sameSubjectInDesc);
     const fieldIdOccurrencesCount = this.countSameSubjectOccurrences(sameSubjectInDesc, handlerCheckResults);
@@ -39,7 +38,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapSameSubjectFieldIdsToInputDescriptors(
-    pd: InternalPresentationDefinition
+    pd: IInternalPresentationDefinition
   ): [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][] {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.sameSubject.push(...jp.nodes(pd, '$..same_subject[*]'));

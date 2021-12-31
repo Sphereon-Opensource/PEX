@@ -1,25 +1,25 @@
 import {
+  IProof,
+  IVerifiablePresentation,
   KeyEncoding,
   PresentationSignCallBackParams,
-  Proof,
   ProofOptions,
   SignatureOptions,
-  VerifiablePresentation,
 } from '../../lib';
 import { ProofPurpose, ProofType } from '../../lib/types/SSI.types';
 
-export function mockCallback(opts: PresentationSignCallBackParams): VerifiablePresentation {
+export function mockCallback(opts: PresentationSignCallBackParams): IVerifiablePresentation {
   return {
     ...opts.presentation,
     proof: {
       ...opts.proof,
       proofValue: 'fake',
       created: new Date(Date.UTC(2021, 11, 1, 20, 10, 45)).toISOString(),
-    } as Proof,
+    } as IProof,
   };
 }
 
-export function assertedMockCallback(callBackParams: PresentationSignCallBackParams): VerifiablePresentation {
+export function assertedMockCallback(callBackParams: PresentationSignCallBackParams): IVerifiablePresentation {
   expect(callBackParams.proof).toBeDefined();
   expect(callBackParams.proof.proofValue).toBeUndefined();
   expect(callBackParams.proof.created).toBeDefined();
@@ -43,7 +43,7 @@ export function assertedMockCallback(callBackParams: PresentationSignCallBackPar
   return vp;
 }
 
-export function getErrorThrown(): VerifiablePresentation {
+export function getErrorThrown(): IVerifiablePresentation {
   throw new Error('Could not sign because of missing fields');
 }
 

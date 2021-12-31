@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { PEXv2, Validated, VerifiablePresentation } from '../lib';
+import { IVerifiablePresentation, PEXv2, Validated } from '../lib';
 
 import {
   assertedMockCallback,
@@ -108,10 +108,10 @@ describe('evaluate', () => {
 
   it('should return a signed presentation with PdV2', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as VerifiablePresentation;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: VerifiablePresentation = pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,

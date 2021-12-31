@@ -1,14 +1,16 @@
 import fs from 'fs';
 
-import { InternalVerifiableCredential, Status, VerifiablePresentation } from '../../lib';
-import { EvaluationClient, HandlerCheckResult } from '../../lib';
+import { IVerifiablePresentation, Status } from '../../lib';
+import { HandlerCheckResult } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
 import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
-import PEMessages from '../../lib/types/Messages';
 import {
   InternalPresentationDefinitionV1,
+  InternalVerifiableCredential,
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
-} from '../../lib/types/SSI.types';
+} from '../../lib/types/Internal.types';
+import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {
@@ -21,7 +23,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
@@ -36,7 +38,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     vc['@context'] = ['https://www.test.org/mock'];
@@ -68,7 +70,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -83,7 +85,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: VerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
     vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();

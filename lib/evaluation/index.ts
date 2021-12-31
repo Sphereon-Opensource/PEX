@@ -6,6 +6,6 @@ import { EvaluationHandler } from './handlers';
 export { EvaluationClient };
 export { SubmissionRequirementMatch, SelectResults };
 export { EvaluationHandler };
-export * from './evaluationClientWrapper';
+export { EvaluationClientWrapper } from './evaluationClientWrapper';
 export { EvaluationResults };
 export { HandlerCheckResult };

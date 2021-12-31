@@ -1,7 +1,7 @@
 import { FieldV1, Optionality } from '@sphereon/pex-models';
 
-import { Checked, Status, ValidationBundler, ValidationEngine } from '../../../lib';
-import { FieldsVB } from '../../../lib/validation';
+import { Checked, Status, ValidationEngine } from '../../../lib';
+import { FieldsVB, ValidationBundler } from '../../../lib/validation';
 
 const fieldObjExample: FieldV1 = {
   path: ['$.issuer', '$.vc.issuer', '$.iss'],

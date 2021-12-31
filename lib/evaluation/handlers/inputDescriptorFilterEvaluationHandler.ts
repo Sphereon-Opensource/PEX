@@ -3,9 +3,12 @@ import Ajv from 'ajv';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
+import {
+  IInternalPresentationDefinition,
+  InternalPresentationDefinitionV2,
+  InternalVerifiableCredential,
+} from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
-import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -21,7 +24,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
     vcs.forEach((vc: InternalVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
@@ -47,7 +50,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.updatePresentationSubmission(pd);
   }
 
-  private createNoFieldResults(pd: InternalPresentationDefinition, vcIndex: number) {
+  private createNoFieldResults(pd: IInternalPresentationDefinition, vcIndex: number) {
     // PresentationDefinitionV2 is the common denominator
     const noFields = (pd as InternalPresentationDefinitionV2).input_descriptors
       .map((inDesc, index) => {

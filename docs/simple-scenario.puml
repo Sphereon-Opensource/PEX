@@ -29,12 +29,12 @@ W -> PE: submissionFrom(selectableCredentials)
 PE -> W: submissionFrom response
 
 W -> PE: createPresentation(selectFromResult)
-PE -> W: get an actual Presentation object
+PE -> W: get an actual IPresentation object
 W -> W: signPresentation(presentation)
 
-W -> V: VerifiablePresentation
+W -> V: IVerifiablePresentation
 
-V -> PE2: evaluate(VerifiableCredential)
+V -> PE2: evaluate(IVerifiableCredential)
 PE2 -> V: evaluation result
 V -> W: Pass/Fail response
 W -> A: Pass/Fail notification

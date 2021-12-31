@@ -1,4 +1,4 @@
-import { EvaluationClient } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
 import { SameSubjectEvaluationHandler } from '../../lib/evaluation/handlers';
 import { PdRequireSameSubject } from '../test_data/sameSubjectEvaluationHandler/pdRequireSameSubject';
 import { SameSubjectHandlerCheckResults } from '../test_data/sameSubjectEvaluationHandler/sameSubjectEvaluationResults';

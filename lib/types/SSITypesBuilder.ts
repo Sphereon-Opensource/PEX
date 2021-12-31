@@ -6,8 +6,8 @@ import {
   InternalVerifiableCredential,
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
-  VerifiableCredential,
-} from './SSI.types';
+} from './Internal.types';
+import { IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -34,7 +34,7 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiableCredentialsToInternal(
-    externalCredentials: VerifiableCredential[]
+    externalCredentials: IVerifiableCredential[]
   ): InternalVerifiableCredential[] {
     const internalVCs: InternalVerifiableCredential[] = [];
     for (const externalCredential of externalCredentials) {
@@ -43,7 +43,7 @@ export class SSITypesBuilder {
     return internalVCs;
   }
 
-  private static mapExternalVerifiableCredentialToInternal(externalCredential: VerifiableCredential) {
+  private static mapExternalVerifiableCredentialToInternal(externalCredential: IVerifiableCredential) {
     if (externalCredential.vc && externalCredential.iss) {
       const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
       return Object.assign(vc, externalCredential);
@@ -56,8 +56,8 @@ export class SSITypesBuilder {
 
   static mapInternalVerifiableCredentialsToExternal(
     internalCredentials: InternalVerifiableCredential[]
-  ): VerifiableCredential[] {
-    const externalVCs: VerifiableCredential[] = [];
+  ): IVerifiableCredential[] {
+    const externalVCs: IVerifiableCredential[] = [];
     for (const internalCredential of internalCredentials) {
       externalVCs.push(this.mapInternalVerifiableCredentialToExternal(internalCredential));
     }
@@ -66,7 +66,7 @@ export class SSITypesBuilder {
 
   private static mapInternalVerifiableCredentialToExternal(
     internalCredential: InternalVerifiableCredential
-  ): VerifiableCredential {
-    return internalCredential as VerifiableCredential;
+  ): IVerifiableCredential {
+    return internalCredential as IVerifiableCredential;
   }
 }

@@ -2,9 +2,12 @@ import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models'
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
+import {
+  IInternalPresentationDefinition,
+  InternalPresentationDefinitionV2,
+  InternalVerifiableCredential,
+} from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
-import { InternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/SSI.types';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -20,7 +23,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     return 'SubjectIsIssuerEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inputDescriptor, index) => {
       const constraints: ConstraintsV1 | ConstraintsV2 | undefined = inputDescriptor.constraints;

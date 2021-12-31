@@ -1,9 +1,9 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { Status } from '../ConstraintUtils';
-import { InternalVerifiableCredential } from '../types';
+import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../types/Internal.types';
 import PEMessages from '../types/Messages';
-import { InternalPresentationDefinition, ProofType } from '../types/SSI.types';
+import { ProofType } from '../types/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -43,7 +43,7 @@ export class EvaluationClient {
   private _limitDisclosureSignatureSuites: string[] | undefined;
 
   public evaluate(
-    pd: InternalPresentationDefinition,
+    pd: IInternalPresentationDefinition,
     vcs: InternalVerifiableCredential[],
     holderDids: string[],
     limitDisclosureSignatureSuites?: string[]

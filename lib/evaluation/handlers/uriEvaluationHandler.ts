@@ -3,14 +3,13 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { InternalVerifiableCredential } from '../../types';
-import PEMessages from '../../types/Messages';
 import {
-  CredentialSchema,
-  InternalPresentationDefinition,
+  IInternalPresentationDefinition,
   InternalPresentationDefinitionV1,
-  PEVersion,
-} from '../../types/SSI.types';
+  InternalVerifiableCredential,
+} from '../../types/Internal.types';
+import PEMessages from '../../types/Messages';
+import { ICredentialSchema, PEVersion } from '../../types/SSI.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -25,7 +24,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return 'UriEvaluation';
   }
 
-  public handle(d: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(d: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     // This filter is removed in V2
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
@@ -83,10 +82,10 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     } else {
       uris.push(<string>vc.getContext());
     }
-    if (Array.isArray(vc.getCredentialSchema()) && (vc.getCredentialSchema() as CredentialSchema[]).length > 0) {
-      (vc.getCredentialSchema() as CredentialSchema[]).forEach((element) => uris.push(element.id));
+    if (Array.isArray(vc.getCredentialSchema()) && (vc.getCredentialSchema() as ICredentialSchema[]).length > 0) {
+      (vc.getCredentialSchema() as ICredentialSchema[]).forEach((element) => uris.push(element.id));
     } else if (vc.getCredentialSchema()) {
-      uris.push((vc.getCredentialSchema() as CredentialSchema).id);
+      uris.push((vc.getCredentialSchema() as ICredentialSchema).id);
     }
     return uris;
   }

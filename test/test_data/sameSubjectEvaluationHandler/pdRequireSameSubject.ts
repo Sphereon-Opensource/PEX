@@ -1,4 +1,4 @@
-import { InternalPresentationDefinitionV1 } from '../../../lib/types/SSI.types';
+import { InternalPresentationDefinitionV1 } from '../../../lib/types/Internal.types';
 
 export class PdRequireSameSubject {
   public getPresentationDefinition(): InternalPresentationDefinitionV1 {

@@ -1,13 +1,14 @@
 import fs from 'fs';
 
-import { InternalVerifiableCredential, Status } from '../../lib';
+import { Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
-import PEMessages from '../../lib/types/Messages';
 import {
   InternalPresentationDefinitionV1,
+  InternalVerifiableCredential,
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
-} from '../../lib/types/SSI.types';
+} from '../../lib/types/Internal.types';
+import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {

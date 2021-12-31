@@ -2,8 +2,8 @@ import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { CredentialSubject, InternalVerifiableCredential } from '../../types';
-import { InternalPresentationDefinition } from '../../types/SSI.types';
+import { ICredentialSubject } from '../../types';
+import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -15,7 +15,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIds: { path: PathComponent[]; value: string }[];
   private readonly isHolder: { path: PathComponent[]; value: HolderSubject }[];
 
-  private credentialsSubjects: Map<string, CredentialSubject>;
+  private credentialsSubjects: Map<string, ICredentialSubject>;
 
   private messages: Map<Status, string>;
 
@@ -26,7 +26,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<string, string[]>();
     this.isHolder = [];
     this.fieldIds = [];
-    this.credentialsSubjects = new Map<string, CredentialSubject>();
+    this.credentialsSubjects = new Map<string, ICredentialSubject>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
@@ -38,7 +38,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     return 'IsHolderEvaluation';
   }
 
-  public handle(pd: InternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
     this.findIsHolderFieldIdsToInputDescriptorsSets(pd);
     this.findAllCredentialSubjects(vcs);
     this.confirmAllFieldSetHasSameSubject(
@@ -57,7 +57,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   /**
    * We have input descriptor to field ids mapping. This function gets a (reverse) map from field id to input descriptor
    */
-  private findIsHolderFieldIdsToInputDescriptorsSets(pd: InternalPresentationDefinition) {
+  private findIsHolderFieldIdsToInputDescriptorsSets(pd: IInternalPresentationDefinition) {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.isHolder.push(...jp.nodes(pd, '$..is_holder[*]'));
     const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
@@ -104,7 +104,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private findAllCredentialSubjects(vcs: InternalVerifiableCredential[]) {
     //TODO handle nested path
-    const credentialSubject: { path: PathComponent[]; value: CredentialSubject }[] = jp.nodes(
+    const credentialSubject: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
       vcs,
       '$..credentialSubject'
     );
@@ -156,7 +156,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     const credentialsToInputDescriptors: Map<string, string> = new Map<string, string>();
     this.fieldIds?.forEach((id: { path: PathComponent[]; value: string }) => {
       const inDescPath = jp.stringify(id.path.slice(0, 3));
-      this.credentialsSubjects.forEach((cs: CredentialSubject, credentialPath: string) => {
+      this.credentialsSubjects.forEach((cs: ICredentialSubject, credentialPath: string) => {
         const hs = this.isHolder.find((e) => jp.stringify(e.path.slice(0, 3)) === inDescPath);
         if (Object.keys(cs).includes(id.value) && hs?.value.directive === directive) {
           credentialsToInputDescriptors.set(credentialPath, inDescPath);
@@ -169,7 +169,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private createResult(
     fieldIdSet: string[],
     inputDescriptorPath: string,
-    credentialSub: [string, CredentialSubject],
+    credentialSub: [string, ICredentialSubject],
     myStatus: Status,
     message?: string
   ): HandlerCheckResult {
