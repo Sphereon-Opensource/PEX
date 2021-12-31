@@ -1,5 +1,29 @@
 # Release Notes
 
+## v0.6.1 - 2021-12-31
+Small improvements in the Credential interfaces, removal of exposure of internal structures in the PEX class. Small bugfixes
+
+
+---
+**Breaking change: class and package renamed in v0.6.0!**
+
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
+library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
+- The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
+- The main class was changed from `PEJS` to `PEX`. The latter class has internal feature detection support on the
+    provided definition, delegating the actual implementation to the new `PEXv1` or `PEXv2` class internally. If you don't
+    want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
+
+---
+
+- Changed:
+  - Next to `@context` evaluation for V1 schema values, we now look at the `credentialSchema`
+  - Seperated Credentials and VerifiableCredential public interfaces into JSON-LD and JWT versions
+
+- Fixed:
+  - We were exposing some internal structures in the PEX class
+  - Group validation assumed an array being present, which could be a string
+
 ## v0.6.0 - 2021-12-29
 Add Presentation Exchange v2 support, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
 
