@@ -53,4 +53,20 @@ export class SSITypesBuilder {
     }
     throw 'VerifiableCredential structure is incorrect.';
   }
+
+  static mapInternalVerifiableCredentialsToExternal(
+    internalCredentials: InternalVerifiableCredential[]
+  ): VerifiableCredential[] {
+    const externalVCs: VerifiableCredential[] = [];
+    for (const internalCredential of internalCredentials) {
+      externalVCs.push(this.mapInternalVerifiableCredentialToExternal(internalCredential));
+    }
+    return externalVCs;
+  }
+
+  private static mapInternalVerifiableCredentialToExternal(
+    internalCredential: InternalVerifiableCredential
+  ): VerifiableCredential {
+    return internalCredential as VerifiableCredential;
+  }
 }

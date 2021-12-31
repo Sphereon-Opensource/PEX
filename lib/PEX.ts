@@ -240,7 +240,7 @@ export class PEX {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(
+    const evaluationResult = this.evaluateCredentials(
       presentationDefinition,
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
       holderDIDs,
@@ -249,7 +249,7 @@ export class PEX {
 
     const presentation = this.presentationFrom(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(evaluationResult.verifiableCredential),
       holder
     );
     const evaluationResults = this.evaluatePresentation(
