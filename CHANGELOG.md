@@ -2,7 +2,7 @@
 ---
 **Breaking change: class and package renamed as of v0.6.0!**
 
-As part of introducing IPresentation Exchange v1 and v2 feature based detection support to our IPresentation Exchange
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
 library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
 - The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
 - The main class was changed from `PEJS` to `PEX`. The latter class has internal feature detection support on the
@@ -19,21 +19,21 @@ No exports of internal structures anymore. Split internal and external interface
   - Only export external interfaces and types
 
 ## v0.6.1 - 2021-12-31
-Small improvements in the ICredential interfaces, removal of exposure of internal structures in the PEX class. Small bugfixes
+Small improvements in the Credential interfaces, removal of exposure of internal structures in the PEX class. Small bugfixes
 
 - Changed:
   - Next to `@context` evaluation for V1 schema values, we now look at the `credentialSchema`
-  - Seperated Credentials and IVerifiableCredential public interfaces into JSON-LD and JWT versions
+  - Seperated Credentials and VerifiableCredential public interfaces into JSON-LD and JWT versions
 
 - Fixed:
   - We were exposing some internal structures in the PEX class
   - Group validation assumed an array being present, which could be a string
 
 ## v0.6.0 - 2021-12-29
-Add IPresentation Exchange v2 support, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
+Add Presentation Exchange v2 support, separating JWT Verifiable Credentials and JSON-LD VerifiableCredentials
 
 **Breaking change: class and package renamed in v0.6.0!**
-As part of introducing IPresentation Exchange v1 and v2 feature based detection support to our IPresentation Exchange
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
 library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
 
 - The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
@@ -75,7 +75,7 @@ Refactor verifiable presentation support using callbacks
   - Documentation on the above as well as general improvements
 
 - Fixed:
-  - ICredential and IPresentation interfaces were not fully conforming
+  - Credential and Presentation interfaces were not fully conforming
   - Explicit imports and exports added
   - Selective disclosure errors fixed
   - Releases contained too many files 
@@ -87,7 +87,7 @@ Improve selective disclosure, add sign callback, several fixes
 - Added:
   - Add status object to SelectResults informing the user whether to continue submission to the verifier or not
   - Allow user to pass in ZKP based signature suite types, so that PE can determine whether limited/selective disclosure can be applied. Note you still need to create the proofs yourself
-  - Create a Verifiable IPresentation with PresentationSubmission object that accepts a signature callback
+  - Create a Verifiable Presentation with PresentationSubmission object that accepts a signature callback
 
 - Fixed:
   - Ensure supplied params are final and not mutated
@@ -100,7 +100,7 @@ This release has been pulled, because of issues in the release process.
 Bugfix release (refactoring)
 
 - Fixed:
-  - Remove IPresentation Definition from VP as these are separate types 
+  - Remove Presentation Definition from VP as these are separate types 
   - Fix creation of VP from submissionFrom
   - Fix sameSubject and issuerIsOwner handling 
   - Fix JSON paths in matches 
@@ -156,14 +156,14 @@ Some fixes regarding usage in React. Better error handling
   * Return stacktraces
 
 ## v0.1.1 - 2021-09-09
-This is the second Beta release of the IPresentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
+This is the second Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
 - Fixed:
   * strict flag in projects gave errors on PEX
 
   
 ## v0.1.0 - 2021-09-03
-This is the first Beta release of the IPresentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
+This is the first Beta release of the Presentation Exchange typescript library. Please note that the interfaces might still slightly change as the software still is in active development.
 
 - Added:
   * pejs.selectFrom() method
@@ -184,11 +184,11 @@ This is the first Beta release of the IPresentation Exchange typescript library.
 
 
 ## v0.0.1 - 2021-08-17
-This is the first Alpha release of the IPresentation Exchange typescript library. Please note that the interfaces might still change a bit as the software still is in active development.
+This is the first Alpha release of the Presentation Exchange typescript library. Please note that the interfaces might still change a bit as the software still is in active development.
 
 - Alpha release:
   * Input Evaluation
-  * ICredential Query (partially available)
+  * Credential Query (partially available)
   * Utilities
 
 - Planned for Beta:

@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
   <a href="https://www.sphereon.com"><img src="https://sphereon.com/content/themes/sphereon/assets/img/logo.svg" alt="Sphereon" width="400"></a>
-  <br>IPresentation Exchange v1 and v2
+  <br>Presentation Exchange v1 and v2
   <br>Type/JavaScript Library
   <br>
 </h1>
@@ -15,7 +15,7 @@ expect breaking changes in APIs without notice, we expect to keep that to a mini
 
 ## Breaking change: class and package renamed in v0.6.0!
 
-As part of introducing IPresentation Exchange v1 and v2 feature based detection support to our IPresentation Exchange
+As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
 library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
 
 - The package was changed from `@sphereon/pe-js` to `@sphereon/pex`
@@ -25,21 +25,21 @@ library and not reaching version 1.X yet, we decided to change the name of both 
 
 ## Background
 
-The IPresentation Exchange (PEX) Library is a general use presentation exchange library that implements the functionality
-described in the [DIF IPresentation Exchange specification](https://identity.foundation/presentation-exchange/) for both
+The Presentation Exchange (PEX) Library is a general use presentation exchange library that implements the functionality
+described in the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/) for both
 version 1.0.0 and 2.0.0. It is written in Typescript and can be compiled to any target JavaScript version.
 
 Sphereon's PEX Library is useful for both verifier systems and holders (e.g. wallets) and can be used in client side
 browsers and mobile applications as well as on server side technology such as REST APIs (e.g. built with NodeJS). It
-allows anyone to add DIF IPresentation Exchange logic to their existing wallets, agents and/or verifiers, without making
+allows anyone to add DIF Presentation Exchange logic to their existing wallets, agents and/or verifiers, without making
 any further assumptions about the technologies used in their products.
 
-A IPresentation Exchange operates generally as follows; The verifier creates a IPresentation Definition asking for
+A Presentation Exchange operates generally as follows; The verifier creates a Presentation Definition asking for
 credentials from the holder. The definition for the credentials is sent to the holder, who returns a Verifiable
-IPresentation as a response. Now the verifier will verify the presentation by checking the signature and other
+Presentation as a response. Now the verifier will verify the presentation by checking the signature and other
 accompanying proofs.
 
-The IPresentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
+The Presentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
 ensures that the correct parts from the holders credentials are used to create the presentation. The PEX contains all
 the logic to interpret the models, therefore removing the need for the verifier and holder to align their specific
 models.
@@ -52,17 +52,17 @@ allows the generation of the objects in many languages and frameworks consistent
 
 - Creating a presentation definition / request
 - Validating a presentation definition / conforming to the specification v1 and v2
-- Creating a IPresentation
-- Creating a Verifiable IPresentation using a callback function
+- Creating a Presentation
+- Creating a Verifiable Presentation using a callback function
 - Validating a presentation (submission) when received
 - Input evaluations: Verification of presentation submissions conforming to the presentation definition
 - Utilities: to build and use different models compliant with
-  the [DIF IPresentation Exchange v2.0.0 specification](https://identity.foundation/presentation-exchange/).
+  the [DIF Presentation Exchange v2.0.0 specification](https://identity.foundation/presentation-exchange/).
 - Support
-  for [DIF IPresentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
+  for [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
 
 Stateful storage, signature support or credential management should be implemented in separate libraries/modules that
-make use of the underlying DIF IPresentation Exchange implementation. By keeping these separate, the library will stay
+make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay
 platform-agnostic and lean regarding dependencies.
 
 ## For PEX Users
@@ -77,11 +77,11 @@ The library can be installed direction from npmjs via:
   npm install @sphereon/pex
 ```
 
-The core functionality of the DIF IPresentation Exchange can be outlined as follows:
+The core functionality of the DIF Presentation Exchange can be outlined as follows:
 
 - Input Evaluation
-- ICredential Query
-- IPresentation and Verifiable IPresentation creation
+- Credential Query
+- Presentation and Verifiable Presentation creation
 - Utilities
 
 ### Input Evaluation
@@ -94,7 +94,7 @@ import { PEX } from '@sphereon/pex';
 
 const pex: PEX = new PEX();
 
-// Example of IPresentation Definition V1
+// Example of Presentation Definition V1
 const presentationDefinitionV1 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -109,7 +109,7 @@ const presentationDefinitionV1 = {
   ]
 };
 
-// Example of IPresentation Definition V2
+// Example of Presentation Definition V2
 const presentationDefinitionV2 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -139,7 +139,7 @@ const verifiablePresentation = {
 const { value, warnings, errors } = pex.evaluate(presentationDefinitionV2, verifiablePresentation);
 ```
 
-### ICredential Query
+### Credential Query
 
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
 
@@ -175,9 +175,9 @@ const selectedCredentials = srMatches.map(
 
 ```
 
-### IPresentation creation (non verifiable)
+### Presentation creation (non verifiable)
 
-To create a IPresentation without IProof (for Proofs, see Verifiable IPresentation below) you have to pass in the
+To create a Presentation without IProof (for Proofs, see Verifiable Presentation below) you have to pass in the
 IPresentation Definition, selected Verifiable Credentials and an optional holder (DID). The result will be a Verifiable
 IPresentation, without proofs, so actually a IPresentation. It also contains the presentation submission data that the
 verifier can use.
@@ -702,7 +702,7 @@ enum PEVersion {
 
 ## From V1 to V2
 
-The following changes has been made in the v2 version of the IPresentation Exchange specification:
+The following changes has been made in the v2 version of the Presentation Exchange specification:
 
 1. `schema` has been removed from `InputDescriptor` properties.
 2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing
@@ -765,8 +765,8 @@ There are several other utility scripts that help with development.
 
 | Term                    | Definition                                                                                                                                                                                                                                                                 |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ICredential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                             |
-| Verifiable ICredential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
+| Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                             |
+| Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
 | IPresentation Definition | IPresentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                      |
 | Holder                  | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a IPresentation Definition.                                                   |
 | Holder's Did            | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet                                                             |
