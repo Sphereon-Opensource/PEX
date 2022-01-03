@@ -16,7 +16,7 @@ import {
 import { PresentationDefinitionSchema } from './validation/core/presentationDefinitionSchema';
 
 /**
- * This is the main interfacing class to be used from out side the library to use the functionality provided by the library.
+ * This is the main interfacing class to be used by developers using the PEX library.
  */
 export class PEX {
   private _evaluationClientWrapper: EvaluationClientWrapper;
@@ -85,12 +85,12 @@ export class PEX {
   }
 
   /**
-   * The selectFromV1 method is a helper function that helps filter out the verifiable credentials which can not be selected and returns
+   * The selectFrom method is a helper function that helps filter out the verifiable credentials which can not be selected and returns
    * the selectable credentials.
    *
-   * @param presentationDefinition the v1 definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param holderDIDs the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param holderDIDs the decentralized identifier(s) of the wallet holder. This is used to identify the credentials issued to the holder of wallet in certain scenario's.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
@@ -115,10 +115,10 @@ export class PEX {
   }
 
   /**
-   * This method helps create a submittablePresentation. A submittablePresentation after signing becomes a Presentation. And can be sent to
+   * This method helps create an Unsigned Presentation. An Unsigned Presentation after signing becomes a Presentation. And can be sent to
    * the verifier after signing it.
    *
-   * @param presentationDefinition the v1 definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
    * @param holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
@@ -216,7 +216,7 @@ export class PEX {
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
    * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
    *
-   * @param presentationDefinition the Presentation Definition V1
+   * @param presentationDefinition the Presentation Definition V1 or V2
    * @param selectedCredentials the PE-JS and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
@@ -225,7 +225,7 @@ export class PEX {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFrom(
-    presentationDefinition: PresentationDefinitionV1,
+    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
     selectedCredentials: IVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
