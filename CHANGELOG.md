@@ -1,4 +1,5 @@
 # Release Notes
+
 ---
 **Breaking change: class and package renamed as of v0.6.0!**
 
