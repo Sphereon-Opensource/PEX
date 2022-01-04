@@ -43,6 +43,12 @@ export function assertedMockCallback(callBackParams: PresentationSignCallBackPar
   return vp;
 }
 
+export function assertedMockCallbackWithoutProofType(
+  callBackParams: PresentationSignCallBackParams
+): IVerifiablePresentation {
+  const vp = mockCallback(callBackParams);
+  return vp;
+}
 export function getErrorThrown(): IVerifiablePresentation {
   throw new Error('Could not sign because of missing fields');
 }
