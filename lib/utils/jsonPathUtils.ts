@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jp from 'jsonpath';
 
+import { IInternalPresentationDefinition } from '../types/Internal.types';
 import { InputFieldType } from '../types/SSI.types';
 
 export class JsonPathUtils {
@@ -57,5 +58,49 @@ export class JsonPathUtils {
       }
     }
     return result;
+  }
+
+  public static changePropertyNameRecursively(
+    obj: IInternalPresentationDefinition,
+    currentPropertyName: string,
+    newPropertyName: string
+  ): any {
+    console.log(newPropertyName);
+    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(obj, [
+      '$..' + currentPropertyName,
+    ]);
+    const newPd = { ...obj };
+    for (const existingPath of existingPaths) {
+      this.copyResultPathToDestinationDefinition(existingPath.path, newPd, newPd, newPropertyName);
+    }
+
+    return newPd;
+  }
+
+  private static copyResultPathToDestinationDefinition(
+    pathDetails: (string | number)[],
+    pd: IInternalPresentationDefinition,
+    pdToSend: IInternalPresentationDefinition,
+    newPropertyName: string
+  ) {
+    let objectCursor: any = pd;
+    let currentCursorInToSendObj: any = { ...pdToSend };
+    for (let i = 1; i < pathDetails.length; i++) {
+      objectCursor = objectCursor[pathDetails[i]];
+      if (pathDetails.length == i + 1) {
+        currentCursorInToSendObj[pathDetails[i]] = objectCursor;
+        delete currentCursorInToSendObj[pathDetails[i]];
+        currentCursorInToSendObj[newPropertyName] = objectCursor;
+      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] === 'string') {
+        //currentCursorInToSendObj[pathDetails[i]] = {};
+        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] !== 'string') {
+        //currentCursorInToSendObj[pathDetails[i]] = [{}];
+        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+      } else {
+        //currentCursorInToSendObj[pathDetails[i]] = {};
+        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+      }
+    }
   }
 }

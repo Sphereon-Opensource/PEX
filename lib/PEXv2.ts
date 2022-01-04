@@ -5,8 +5,9 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiablePresentation } from './types';
 import { IVerifiableCredential } from './types';
-import { InternalVerifiableCredential } from './types/Internal.types';
+import { InternalPresentationDefinitionV2, InternalVerifiableCredential } from './types/Internal.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { JsonPathUtils } from './utils';
 import { PresentationDefinitionV2VB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -134,10 +135,16 @@ export class PEXv2 {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
   public validateDefinition(presentationDefinitionV2: PresentationDefinitionV2): Validated {
+    let pd = JsonPathUtils.changePropertyNameRecursively(
+      presentationDefinitionV2 as InternalPresentationDefinitionV2,
+      '_const',
+      'const'
+    );
+    pd = JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
-        target: presentationDefinitionV2,
+        target: pd,
       },
     ]);
   }

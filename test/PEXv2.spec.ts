@@ -1,8 +1,11 @@
 import fs from 'fs';
 
-import { PresentationDefinitionV2 } from '@sphereon/pex-models';
+import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, Validated } from '../lib';
+import { IVerifiablePresentation, PEXv2, Validated, ValidationEngine } from '../lib';
+import { InternalPresentationDefinitionV2 } from '../lib/types/Internal.types';
+import { JsonPathUtils } from '../lib/utils';
+import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
   assertedMockCallback,
@@ -14,7 +17,7 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-function getPresentationDefinitionV2(): PresentationDefinitionV2 {
+function getPresentationDefinitionV2_1(): PresentationDefinitionV2 {
   return {
     id: '32f54163-7166-48f1-93d8-ff217bdb0653',
     name: 'Conference Entry Requirements',
@@ -76,6 +79,135 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   };
 }
 
+function getPresentationDefinitionV2_2(): PresentationDefinitionV2 {
+  return {
+    id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+    name: 'Conference Entry Requirements',
+    purpose: 'We can only allow people associated with Washington State business representatives into conference areas',
+    format: {
+      jwt: {
+        alg: ['ES384'],
+      },
+      jwt_vc: {
+        alg: ['ES384'],
+      },
+      jwt_vp: {
+        alg: ['ES384'],
+      },
+      ldp_vc: {
+        proof_type: ['JsonWebSignature2020', 'Ed25519Signature2018', 'EcdsaSecp256k1Signature2019', 'RsaSignature2018'],
+      },
+      ldp_vp: {
+        proof_type: ['Ed25519Signature2018'],
+      },
+      ldp: {
+        proof_type: ['RsaSignature2018'],
+      },
+    },
+    input_descriptors: [
+      {
+        id: 'wa_driver_license',
+        name: 'Washington State Business License',
+        purpose: 'We can only allow licensed Washington State business representatives into the WA Business Conference',
+        constraints: {
+          limit_disclosure: 'required',
+          fields: [
+            {
+              path: ['$.issuer', '$.vc.issuer', '$.iss'],
+              purpose:
+                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              filter: {
+                type: 'string',
+                _enum: ['red'],
+              },
+            },
+          ],
+        },
+      },
+    ],
+    frame: {
+      '@context': {
+        '@vocab': 'http://example.org/',
+        within: { '@reverse': 'contains' },
+      },
+      '@type': 'Chapter',
+      within: {
+        '@type': 'Book',
+        within: {
+          '@type': 'Library',
+        },
+      },
+    },
+  };
+}
+
+function getPresentationDefinitionV2_3(): PresentationDefinitionV2 {
+  return {
+    id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+    name: 'Conference Entry Requirements',
+    purpose: 'We can only allow people associated with Washington State business representatives into conference areas',
+    format: {
+      jwt: {
+        alg: ['ES384'],
+      },
+      jwt_vc: {
+        alg: ['ES384'],
+      },
+      jwt_vp: {
+        alg: ['ES384'],
+      },
+      ldp_vc: {
+        proof_type: ['JsonWebSignature2020', 'Ed25519Signature2018', 'EcdsaSecp256k1Signature2019', 'RsaSignature2018'],
+      },
+      ldp_vp: {
+        proof_type: ['Ed25519Signature2018'],
+      },
+      ldp: {
+        proof_type: ['RsaSignature2018'],
+      },
+    },
+    input_descriptors: [
+      {
+        id: 'wa_driver_license',
+        name: 'Washington State Business License',
+        purpose: 'We can only allow licensed Washington State business representatives into the WA Business Conference',
+        constraints: {
+          limit_disclosure: 'required',
+          fields: [
+            {
+              path: ['$.issuer', '$.vc.issuer', '$.iss'],
+              purpose:
+                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              filter: {
+                type: 'string',
+                _enum: ['red'],
+              },
+            },
+            {
+              path: ['$.color', '$.vc.color'],
+              purpose:
+                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              filter: {
+                type: 'string',
+                _enum: ['red'],
+              },
+            },
+            {
+              path: ['$.name', '$.vc.name'],
+              purpose:
+                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              filter: {
+                type: 'string',
+                _const: 'Washington State',
+              },
+            },
+          ],
+        },
+      },
+    ]
+  };
+}
+
 describe('evaluate', () => {
   it('testing constructor', function () {
     const pex: PEXv2 = new PEXv2();
@@ -83,14 +215,14 @@ describe('evaluate', () => {
   });
 
   it('Evaluate presentationDefinition v2', () => {
-    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
     const pex: PEXv2 = new PEXv2();
     const result: Validated = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate presentationDefinition v2 should fail for frame', () => {
-    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
     pd.frame = { '@id': 'this is not valid' };
     const pex: PEXv2 = new PEXv2();
     const result: Validated = pex.validateDefinition(pd);
@@ -125,5 +257,53 @@ describe('evaluate', () => {
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
+  });
+
+  it('should return ok if presentation definition with _const is valid', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
+    const pex: PEXv2 = new PEXv2();
+    pd.input_descriptors![0].constraints!.fields![0].filter = {
+      type: 'string',
+      _const: 'https://yourwatchful.gov/drivers-license-schema.json',
+    };
+    const result1 = new ValidationEngine().validate([
+      {
+        bundler: new PresentationDefinitionV2VB('root'),
+        target: pd,
+      },
+    ]);
+    expect(result1).toEqual([
+      {
+        message: 'field object "filter" property must be valid json schema',
+        status: 'error',
+        tag: 'presentation_definition.input_descriptor[0].constraints.fields[0]',
+      },
+    ]);
+    const newPd = JsonPathUtils.changePropertyNameRecursively(
+      pd as InternalPresentationDefinitionV2,
+      '_const',
+      'const'
+    );
+    const result2 = pex.validateDefinition(newPd);
+    expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV2]).toEqual(
+      'https://yourwatchful.gov/drivers-license-schema.json'
+    );
+  });
+
+  it('should return ok if presentation definition with enum is valid', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_2();
+    const pex: PEXv2 = new PEXv2();
+    const result = pex.validateDefinition(pd);
+    expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
+  });
+
+  it('should return ok if presentation definition with enum and const are valid', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
+    const pex: PEXv2 = new PEXv2();
+    const result = pex.validateDefinition(pd);
+    expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
   });
 });

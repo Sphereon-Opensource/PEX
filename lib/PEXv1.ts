@@ -4,9 +4,10 @@ import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiablePresentation } from './types';
-import { InternalVerifiableCredential } from './types/Internal.types';
+import { InternalPresentationDefinitionV1, InternalVerifiableCredential } from './types/Internal.types';
 import { IVerifiableCredential } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { JsonPathUtils } from './utils';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -140,6 +141,12 @@ export class PEXv1 {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
   public validateDefinition(presentationDefinitionV1: PresentationDefinitionV1): Validated {
+    let pd = JsonPathUtils.changePropertyNameRecursively(
+      presentationDefinitionV1 as InternalPresentationDefinitionV1,
+      '_const',
+      'const'
+    );
+    pd = JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV1VB('root'),
