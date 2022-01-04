@@ -204,7 +204,7 @@ function getPresentationDefinitionV2_3(): PresentationDefinitionV2 {
           ],
         },
       },
-    ]
+    ],
   };
 }
 
