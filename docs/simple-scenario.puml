@@ -1,41 +1,52 @@
 @startuml
 
-header PEX
+header Presentation Exchange
 
 title
-PEX
-Data Flow Diagram - version 0.1.0
+Presentation Exchange
+General PEX Flow between a holder and verifier
 end title
 
 
 autonumber
 
-participant "PEX-Verifier" as PE2 order 0 #ORANGE
+participant "PEX-Lib Verifier" as PEXV order 0 #ORANGE
 participant "Verifier" as V order 1 #ORANGE
 participant "Alice" as A order 2 #PINK
 participant "Wallet" as W order 3 #YELLOW
-participant "PEX" as PE order 4 #YELLOW
+participant "PEX-Lib Wallet" as PE order 4 #YELLOW
 
 V -> W: PresentationDefinition
 W -> A: Notification
 A -> W: Accepts PresentationDefinition
 W -> PE: evaluate(presentationDefinition, allAvailableCredentials[])
 PE -> W: evaluation results
-W -> A: from the credentials that you've selected, \na combination of these are acceptable
-A -> W: selects a combination of credentials
+W -> A: from the credentials in your wallet, \na combination is acceptable
+loop
+A -> W: selects a more specific combination of credentials
 W -> PE: selectFrom(2ndSetOfCredentials[])
+note left
+    Could be called in multiple rounds until,
+    areRequiredCredentialsPresent contains Status.INFO
+end note
 PE -> W: selectFrom response
-W -> PE: submissionFrom(selectableCredentials)
-PE -> W: submissionFrom response
+W -> A: Inform success/error selection
+end
 
-W -> PE: createPresentation(selectFromResult)
-PE -> W: get an actual IPresentation object
+A -> W: Create presentation with selection and definition
+
+alt Unsigned Presentation
+W -> PE: createPresentation(presentationDefinition, selectFromResult)
+PE -> W: returns an Unsigned Presentation object
 W -> W: signPresentation(presentation)
+else Verifiable Presentation
+W -> PE: createVerifiablePresentation\n(presentationDefinition, selectFromResult, signCallback)
+PE -> W: returns a Verifiable Presentation object
+end
+W -> V: VerifiablePresentation containing Presentation Submission
 
-W -> V: IVerifiablePresentation
-
-V -> PE2: evaluate(IVerifiableCredential)
-PE2 -> V: evaluation result
+V -> PEXV: evaluate(verifiablePresentation)
+PEXV -> V: evaluation result
 V -> W: Pass/Fail response
 W -> A: Pass/Fail notification
 @enduml
