@@ -2,10 +2,11 @@ import fs from 'fs';
 
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, Validated } from '../lib';
+import { IVerifiablePresentation, PEXv2, ProofType, Validated } from '../lib';
 
 import {
   assertedMockCallback,
+  assertedMockCallbackWithoutProofType,
   getProofOptionsMock,
   getSingatureOptionsMock,
 } from './test_data/PresentationSignUtilMock';
@@ -13,6 +14,8 @@ import {
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
+
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
 function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   return {
@@ -125,5 +128,63 @@ describe('evaluate', () => {
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
+  });
+
+  it("should throw error if proofOptions doesn't have a type", () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pejs: PEXv2 = new PEXv2();
+    delete pdSchema.presentation_definition.input_descriptors[0].schema;
+    const proofOptions = getProofOptionsMock();
+    delete proofOptions['type'];
+    proofOptions.typeSupportsSelectiveDisclosure = true;
+    expect(() =>
+      pejs.verifiablePresentationFrom(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        assertedMockCallbackWithoutProofType,
+        {
+          proofOptions,
+          signatureOptions: getSingatureOptionsMock(),
+          holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        }
+      )
+    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+  });
+
+  it('Evaluate selectFrom', () => {
+    const pex: PEXv2 = new PEXv2();
+    const pdSchema: PresentationDefinitionV2 = getFile(
+      './test/dif_pe_examples/pdV2/vc_expiration(corrected).json'
+    ).presentation_definition;
+    const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
+    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    expect(result!.errors!.length).toEqual(0);
+    expect(JSON.stringify(result!.matches)).toBe(
+      JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }])
+    );
+    expect(result!.areRequiredCredentialsPresent).toBe('info');
+  });
+
+  it("should throw error if proofOptions doesn't have a type", () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pdV2/vc_expiration(corrected).json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pejs: PEXv2 = new PEXv2();
+    delete pdSchema.presentation_definition.input_descriptors[0].schema;
+    const proofOptions = getProofOptionsMock();
+    delete proofOptions['type'];
+    proofOptions.typeSupportsSelectiveDisclosure = true;
+    expect(() =>
+      pejs.verifiablePresentationFrom(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        assertedMockCallbackWithoutProofType,
+        {
+          proofOptions,
+          signatureOptions: getSingatureOptionsMock(),
+          holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        }
+      )
+    ).toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 });

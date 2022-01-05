@@ -207,6 +207,25 @@ describe('selectFrom tests', () => {
     });
   });
 
+  it('Evaluate without submission requirements', () => {
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/resources/sr_rules.json'
+    ).presentation_definition;
+    delete pdSchema.submission_requirements;
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const result = evaluationClientWrapper.selectFrom(pd, [vc0, vc1, vc2], dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    expect(result.matches?.length).toBe(3);
+    expect(result.areRequiredCredentialsPresent).toBe('info');
+  });
+
   it('Evaluate submission requirements min 2 from group B', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/resources/sr_rules.json'

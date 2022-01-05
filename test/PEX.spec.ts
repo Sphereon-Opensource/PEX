@@ -6,6 +6,7 @@ import { IPresentation, IVerifiablePresentation, PEX, ProofType, Validated } fro
 
 import {
   assertedMockCallback,
+  assertedMockCallbackWithoutProofType,
   getErrorThrown,
   getProofOptionsMock,
   getSingatureOptionsMock,
@@ -233,6 +234,28 @@ describe('evaluate', () => {
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
+  it("should throw error if proofOptions doesn't have a type", () => {
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pejs: PEX = new PEX();
+    delete pdSchema.presentation_definition.input_descriptors[0].schema;
+    const proofOptions = getProofOptionsMock();
+    delete proofOptions['type'];
+    proofOptions.typeSupportsSelectiveDisclosure = true;
+    expect(() =>
+      pejs.verifiablePresentationFrom(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        assertedMockCallbackWithoutProofType,
+        {
+          proofOptions,
+          signatureOptions: getSingatureOptionsMock(),
+          holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        }
+      )
+    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+  });
+
   it('should throw exception if signing encounters a problem', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
@@ -274,5 +297,17 @@ describe('evaluate', () => {
     const pejs: PEX = new PEX();
     const result = pejs.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v2');
+  });
+
+  it('should throw error when calling with mixed version', function () {
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json').presentation_definition;
+    pdSchema.input_descriptors[0].constraints!.fields[0]['filter'] = {
+      type: 'string',
+      format: 'date-time',
+      formatExclusiveMinimum: '2013-01-01T00:00Z',
+    };
+    const pejs: PEX = new PEX();
+    const result = pejs.definitionVersionDiscovery(pdSchema);
+    expect(result.error).toEqual('This is not a valid PresentationDefinition');
   });
 });

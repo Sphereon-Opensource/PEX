@@ -68,9 +68,6 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
 }
 describe('validate', () => {
   test.each(filesV1)('V1.validateKnownExample(%s)', (file) => {
-    if (file === 'sr_pick_rule.json') {
-      console.log('HERE');
-    }
     const basicPD = getFile(baseV1 + file);
 
     const vb: ValidationBundler<PresentationDefinitionV1> = new PresentationDefinitionV1VB('root');
