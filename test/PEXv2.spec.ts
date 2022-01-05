@@ -2,11 +2,12 @@ import fs from 'fs';
 
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, Validated, ValidationEngine } from '../lib';
+import { IVerifiablePresentation, PEXv2, ProofType, Validated, ValidationEngine } from '../lib';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
   assertedMockCallback,
+  assertedMockCallbackWithoutProofType,
   getProofOptionsMock,
   getSingatureOptionsMock,
 } from './test_data/PresentationSignUtilMock';
@@ -14,6 +15,8 @@ import {
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
+
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
 function getPresentationDefinitionV2_1(): PresentationDefinitionV2 {
   return {
