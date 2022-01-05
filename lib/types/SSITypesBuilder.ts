@@ -59,32 +59,36 @@ export class SSITypesBuilder {
     result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof
   ): InternalVerifiableCredentialJwt & IJwtCredential & IHasProof {
     if (result.exp) {
-      if (result.expirationDate && result.expirationDate !== result.exp) {
+      if (result.getBaseCredential().credentialSubject?.expirationDate !== result.exp) {
         throw new Error('Inconsistent expiration dates');
       }
-      result.expirationDate = new Date(result.exp as string | number | Date).toISOString();
+      result.getBaseCredential().credentialSubject.expirationDate = new Date(
+        result.exp as string | number | Date
+      ).toISOString();
     }
-    if (result.issuer !== result.iss) {
-      throw new Error('Inconsistent issuers');
+    if (result.iss) {
+      if (result.getBaseCredential().issuer !== result.iss) {
+        throw new Error('Inconsistent issuers');
+      }
+      result.getBaseCredential().issuer = result.iss;
     }
-    result.issuer = result.iss;
     if (result.nbf) {
-      if (result.issuanceDate && result.issuanceDate !== result.nbf) {
+      if (result.getBaseCredential().issuanceDate !== result.nbf) {
         throw new Error('Inconsistent issuance dates');
       }
-      result.issuanceDate = new Date(result.nbf as string | number | Date).toISOString();
+      result.getBaseCredential().issuanceDate = new Date(result.nbf as string | number | Date).toISOString();
     }
     if (result.sub) {
-      if (result.vc.credentialSubject.id && result.vc.credentialSubject.id !== result.sub) {
+      if (result.getBaseCredential().credentialSubject?.id !== result.sub) {
         throw new Error('Inconsistent credential subject ids');
       }
-      result.vc.credentialSubject.id = result.sub;
+      result.getBaseCredential().credentialSubject.id = result.sub;
     }
     if (result.jti) {
-      if (result.id && result.id !== result.jti) {
+      if (result.getBaseCredential().id !== result.jti) {
         throw new Error('Inconsistent credential ids');
       }
-      result.id = result.jti;
+      result.getBaseCredential().id = result.jti;
     }
     return result;
   }
