@@ -335,14 +335,16 @@ describe('evaluate', () => {
 
   it('should set issuance date if nbf is present in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.nbf = jwtVc.vc.issuanceDate;
+    jwtVc.nbf = (+new Date()).toString();
+    jwtVc.vc.issuanceDate = (+new Date()).toString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().issuanceDate).toEqual(jwtVc.nbf);
+    expect(vcs[0].getBaseCredential().issuanceDate).toEqual(new Date(parseInt(jwtVc.nbf)).toISOString());
   });
 
   it('should throw an error if issuance date and nbf are different in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.nbf = new Date().toISOString();
+    jwtVc.vc.issuanceDate = (+new Date() + 2).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
       'Inconsistent issuance dates'
     );

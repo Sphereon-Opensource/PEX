@@ -72,20 +72,23 @@ export class SSITypesBuilder {
       result.getBaseCredential().issuer = result.iss;
     }
     if (result.nbf) {
-      if (result.getBaseCredential().issuanceDate !== result.nbf) {
+      const issuanceDate = result.getBaseCredential().issuanceDate;
+      if (issuanceDate && issuanceDate !== result.nbf) {
         throw new Error('Inconsistent issuance dates');
       }
       const nbf = result.nbf.match(/^\d+$/) ? parseInt(result.nbf) : result.nbf;
       result.getBaseCredential().issuanceDate = new Date(nbf).toISOString();
     }
     if (result.sub) {
-      if (result.getBaseCredential().credentialSubject?.id !== result.sub) {
+      const csId = result.getBaseCredential().credentialSubject?.id;
+      if (csId && csId !== result.sub) {
         throw new Error('Inconsistent credential subject ids');
       }
       result.getBaseCredential().credentialSubject.id = result.sub;
     }
     if (result.jti) {
-      if (result.getBaseCredential().id !== result.jti) {
+      const id = result.getBaseCredential().id;
+      if (id && id !== result.jti) {
         throw new Error('Inconsistent credential ids');
       }
       result.getBaseCredential().id = result.jti;
