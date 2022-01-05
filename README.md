@@ -13,7 +13,7 @@
 _IMPORTANT: This software still is in development stage. Although the API has become more stable as of v0.6.0, you should
 expect breaking changes in APIs without notice, we expect to keep that to a minimum though._
 
-## Breaking change: class and package renamed in v0.6.0!
+### Breaking change: class and package renamed in v0.6.0!
 
 As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
 library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
@@ -40,18 +40,18 @@ Presentation as a response. Now the verifier will verify the presentation by che
 accompanying proofs.
 
 The Presentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
-ensures that the correct parts from the holders credentials are used to create the presentation. The PEX contains all
+ensures that the correct parts from the holders credentials are used to create the presentation. The PEX-library contains all
 the logic to interpret the models, therefore removing the need for the verifier and holder to align their specific
 models.
 
-The data objects (models) used in PEX are generated from Sphereon's DIF PEX OpenAPI Spec component. The code for the
-component can be seen at [PEX-OpenAPI github repository](https://github.com/Sphereon-Opensource/pex-openapi). This
+The Typescript data objects (models) used in PEX are generated from Sphereon's DIF PEX OpenAPI Spec component. The code for the
+component can be found at [PEX-OpenAPI github repository](https://github.com/Sphereon-Opensource/pex-openapi). This
 allows the generation of the objects in many languages and frameworks consistently by configuring the maven plugin.
 
 ### The PEX Library supports the following actions:
 
 - Creating a presentation definition / request
-- Validating a presentation definition / conforming to the specification v1 and v2
+- Validating a presentation definition / conforming to the specifications v1 and v2
 - Creating a Presentation
 - Creating a Verifiable Presentation using a callback function
 - Validating a presentation (submission) when received
@@ -62,12 +62,12 @@ allows the generation of the objects in many languages and frameworks consistent
   for [DIF Presentation Exchange v1.0.0 specification](https://identity.foundation/presentation-exchange/spec/v1.0.0/).
 
 Stateful storage, signature support or credential management should be implemented in separate libraries/modules that
-make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the library will stay
+make use of the underlying DIF Presentation Exchange implementation. By keeping these separate, the PEX library will stay
 platform-agnostic and lean regarding dependencies.
 
 ## For PEX Users
 
-The library can be installed direction from npmjs via:
+The library can be installed directly from npmjs via:
 
 ```shell
 # install via yarn
@@ -79,22 +79,29 @@ The library can be installed direction from npmjs via:
 
 The core functionality of the DIF Presentation Exchange can be outlined as follows:
 
-- Input Evaluation
-- Credential Query
-- Presentation and Verifiable Presentation creation
-- Utilities
+- Verifiers/Agents:
+  - [Input Evaluation](#verifier-input-evaluation)
+  - [Utilities](#utilities)
 
-### Input Evaluation
 
-Input evaluation is the primary mechanism by which a verifier determines whether a presentation submission from a holder
-matches the requested presentation definition from the request.
+- Holders/Wallets:
+  - [Credential Query](#holder-credential-query)
+  - [Non-Verifiable Presentation creation](#holder-presentation-creation-non-verifiable)
+  - [Verifiable Presentation creation](#holder-verifiable-presentation-with-callback)
+  - [Utilities](#utilities)
+
+
+### Verifier: Input Evaluation
+
+Input evaluation is the primary mechanism by which a verifier determines whether a Verifiable Presentation and Presentation Submission from a holder
+matches the requested presentation definition from the request. Obviously a holder/wallet could also use the method to verify whether its submission would be valid, before contacting the verifier.
 
 ```typescript
 import { PEX } from '@sphereon/pex';
 
 const pex: PEX = new PEX();
 
-// Example of Presentation Definition V1
+// Example of Presentation Definition V1 (notice the required schema for V1)
 const presentationDefinitionV1 = {
   "id": "32f54163-7166-48f1-93d8-ff217bdb0653",
   "input_descriptors": [
@@ -127,7 +134,7 @@ const verifiablePresentation = {
     "https://identity.foundation/presentation-exchange/submission/v1"
   ],
   type: [
-    "IVerifiablePresentation",
+    "VerifiablePresentation",
     "PresentationSubmission"
   ],
   presentation_submission: { ... },
@@ -139,9 +146,10 @@ const verifiablePresentation = {
 const { value, warnings, errors } = pex.evaluate(presentationDefinitionV2, verifiablePresentation);
 ```
 
-### Credential Query
+### Holder: Credential Query
 
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
+This filters out any non-matching Credentials that are passed in. Please note that multiple credentials could be satisfying the definition.
 
 ```typescript
 import { PEX } from '@sphereon/pex';
@@ -172,17 +180,16 @@ const selectedCredentials = srMatches.map(
   ({ matches, count }) => matches.slice(0, count)
 ).flat();
 
-
 ```
 
-### Presentation creation (non verifiable)
+### Holder: Presentation creation (non-verifiable)
 
-To create a Presentation without IProof (for Proofs, see Verifiable Presentation below) you have to pass in the
-IPresentation Definition, selected Verifiable Credentials and an optional holder (DID). The result will be a Verifiable
-IPresentation, without proofs, so actually a IPresentation. It also contains the presentation submission data that the
+To create a Presentation without Proof (for Proofs, see [Verifiable Presentation below](#holder-verifiable-presentation-with-callback)) you have to pass in the
+Presentation Definition, selected Verifiable Credentials and an optional holder (DID). The result will be a Verifiable
+Presentation, without proofs, so actually a Presentation. It also contains the presentation submission data that the
 verifier can use.
 
-It is left up to you to sign the IPresentation and adding the proof and make it a truly Verifiable IPresentation. There
+It is left up to you to sign the Presentation and adding the proof and make it a truly Verifiable Presentation. There
 are different libraries that allow you to do this. You can also use the callback integration mentioned in the next
 chapter for this.
 
@@ -201,17 +208,17 @@ const presentation: IPresentation = pex.presentationFrom(presentationDefinition,
  *       "https://identity.foundation/presentation-exchange/submission/v1"
  *     ],
  *     "type": [
- *       "IVerifiablePresentation",
+ *       "VerifiablePresentation",
  *       "PresentationSubmission"
  *     ],
  *     presentation_submission: presentationSubmission,
  *     verifiableCredential: selectedCredentials
  *   };
  */
-// IPresentation would need to be signed and sent to verifier
+// Presentation would need to be signed and sent to verifier
 ```
 
-### Verifiable IPresentation with callback
+### Holder: Verifiable Presentation with callback
 
 **NOTE:** PEX does not support the creation of signatures by itself. That has to do with the fact that we didn't want to
 rely on all kinds of signature suites and libraries. PEX has minimal dependencies currently, so that it can be used in
@@ -239,7 +246,7 @@ does mean you would have to create the IPresentation first and sign that, which 
 callback. If you do not provide these values, the `Partial<IProof>`, will still be populated without the proofValue and
 jws, based upon your options.
 
-#### IPresentation Sign Options
+#### Presentation Sign Options
 
 The options accepted by the `verifiablePresentationFrom` are:
 
@@ -331,15 +338,15 @@ the `PresentationSignCallBackParams`.
 
 #### Callback params object
 
-The callback params gets supplied as the single argument to your callback function. It contains the `IPresentation`, a
-partial 'IProof' typically missing the proofValue/jws signature. It also contains the initially supplied Verifiable
-Credentials and IPresentation Definition as well as your supplied options.
+The callback params gets supplied as the single argument to your callback function. It contains the `Presentation`, a
+partial 'Proof' typically missing the proofValue/jws signature. It also contains the initially supplied Verifiable
+Credentials and Presentation Definition as well as your supplied options.
 
-If contains the IPresentation Submission object, which is also found in the presentation. You can use this to create your
+If contains the Presentation Submission object, which is also found in the presentation. You can use this to create your
 own IPresentation object if you want. Lastly it contains the evaluation results, which includes the mappings and logs
 about the evaluation.
 
-You can either choose to use the `IPresentation` and partial `IProof` together with the `options`, or in more elaborate
+You can either choose to use the `Presentation` and partial `Proof` together with the `options`, or in more elaborate
 use cases opt to use the `PresentationSubmission`, `EvaluationResults` and the `options` for instance.
 
 ```typescript
@@ -481,12 +488,12 @@ PEXv2.evaluatePresentation(presentationDefinition, verifiablePresentation);
 ##### Description
 
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
-based upon feature detection and act accordingly. The other two are specific to their version.
+based upon feature detection and acts accordingly. The other two are specific to their Presentation Exchange definition version.
 
-**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
+**For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
 
 Evaluates whether a presentation submission meets the requested presentation definition Since this method will be used
-both **before** and **after** creating a IVerifiablePresentation, we accept both _signed_ and _unsigned_ version of a
+both **before** and **after** creating a VerifiablePresentation, we accept both _signed_ and _unsigned_ version of a
 presentation here.
 
 #### Parameters
@@ -494,7 +501,7 @@ presentation here.
 | name                     | type                     | description                                                                                                                                    |
 | ------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier                                                                       |
-| `presentation`           | `IPresentation`           | the IPresentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
+| `presentation`           | `IPresentation`          | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
 
 #### Return value
 
@@ -521,19 +528,20 @@ PEXv2.selectFrom(presentationDefinitionV2, credentials, holderDids);
 ##### Description
 
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
-based upon feature detection and act accordingly. The other two are specific to their version.
+based upon feature detection and acts accordingly. The other two are specific to their version.
 
-**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
+**For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
 
-Gathers the matching credentials that fit a given presentation definition
+Gathers the matching credentials that fit a given presentation definition. Please note that there could be multiple results fitting the same criteria. This basically only filters out the credentials that do not match the definition. 
+You, or rather the user, typically has to do a final selection.
 
 #### selectFrom Parameters
 
-| name                     | type                     | description                                                                                                                                                  |
-| ------------------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier                                                                                     |
-| `credentials`            | `IVerifiableCredential[]` | the array of verifiable credentials to select from                                                                                                           |
-| `holderDids`             | `string[]`               | the holder's dids. this can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
+| name                     | type                       | description                                                                                                                                                  |
+| ------------------------ |----------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `presentationDefinition` | `PresentationDefinition`   | the presentation definition that initiated the request from the verifier                                                                                     |
+| `credentials`            | `IVerifiableCredential[]`  | the array of verifiable credentials to select from                                                                                                           |
+| `holderDids`             | `string[]`                 | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
 
 #### Return value
 
@@ -550,12 +558,12 @@ interface SelectResults {
   errors?: Checked[];
   matches?: SubmissionRequirementMatch[];
   /**
-   * This is the parameter that pejs library user should look into to determine what to do next
+   * This is the parameter that the PEX library user should look into to determine what to do next
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required.
    *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
-   *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object
+   *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object. Do not submit!
    */
   areRequiredCredentialsPresent: Status;
   /**
@@ -577,7 +585,7 @@ interface SubmissionRequirementMatch {
   max?: number;
   vc_path: string[];
   from?: string[];
-  from_nested?: SubmissionRequirementMatch[]; // IVerifiableCredential Address
+  from_nested?: SubmissionRequirementMatch[]; // VerifiableCredential Address
 }
 ```
 
@@ -592,33 +600,33 @@ PEXv2.presentationFrom(presentationDefinitionV2, selectedCredentials, holderDID)
 ##### Description
 
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
-based upon feature detection and act accordingly. The other two are specific to their version.
+based upon feature detection and acts accordingly. The other two are specific to their version.
 
-**For more detailed difference between v1 and v2 please read the From V1 to V2 section**.
+**For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
 
-Creates the corresponding IPresentation Submission object to be included in the Verifiable IPresentation response, which
+Creates the corresponding Presentation Submission object to be included in the Verifiable Presentation response, which
 maps the submitted credentials to the requested inputs in the `presentationDefinition` input parameter.
 
 #### presentationFromV1 Parameters
 
-| name                     | type                     | description                                                                                                                                                 |
-| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `presentationDefinition` | `PresentationDefinition` | the v1 presentation definition that initiated the request from the verifier                                                                                 |
-| `selectedCredentials`    | `IVerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
-| `holderDid`              | `string`                 | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| name                     | type                       | description                                                                                                                                                 |
+| ------------------------ |----------------------------| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `presentationDefinition` | `PresentationDefinitionV1` | the v1 presentation definition that initiated the request from the verifier                                                                                 |
+| `selectedCredentials`    | `IVerifiableCredential[]`  | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
+| `holderDid`              | `string`                   | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### presentationFromV2 Parameters
 
-| name                     | type                     | description                                                                                                                                                 |
-| ------------------------ | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `presentationDefinition` | `PresentationDefinition` | the v2 presentation definition that initiated the request from the verifier                                                                                 |
-| `selectedCredentials`    | `IVerifiableCredential[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
-| `holderDid`              | `string`                 | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| name                     | type                       | description                                                                                                                                                 |
+| ------------------------ |----------------------------| ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `presentationDefinition` | `PresentationDefinitionV2` | the v2 presentation definition that initiated the request from the verifier                                                                                 |
+| `selectedCredentials`    | `IVerifiableCredential[]`  | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                    |
+| `holderDid`              | `string`                   | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### Return value
 
 If the selected credentials successfully match the submission requirements in the presentation definition, the return
-value will be a non-null `PresentationSubmission`
+value will be a non-null 'Presentation' containing a `PresentationSubmission`
 
 ```typescript
 interface PresentationSubmission {
@@ -702,11 +710,11 @@ enum PEVersion {
 
 ## From V1 to V2
 
-The following changes has been made in the v2 version of the Presentation Exchange specification:
+The following changes has been made in the v2 version of the Presentation Exchange specification. We advise people to use V2 whenever they can.
 
-1. `schema` has been removed from `InputDescriptor` properties.
+1. The required `schema` has been removed altogether from `InputDescriptor` properties, because it was confusing and redundant.
 2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing
-   Document object
+   Document object. Used for selective disclosure. Although this library does not use it currently, as we can perform it without frames.
 3. `filter` has several more options for filtering:
    - formatMaximum
    - formatMinimum
@@ -718,6 +726,8 @@ presentation definition to determine whether it is a v1 or v2 spec. Then it dele
 PEXv2 class respectively.
 
 ## Workflow Diagram
+The below diagram shows how a typical interaction between a verifier and a wallet looks like. 
+It makes no assumptions about the actual transport (DIDComm, SIOPv2/OIDC4VP, CHAPI, REST)
 
 ![Flow diagram](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Sphereon-Opensource/pex/develop/docs/simple-scenario.puml)
 
@@ -763,21 +773,21 @@ There are several other utility scripts that help with development.
 
 # Glossary
 
-| Term                    | Definition                                                                                                                                                                                                                                                                 |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                             |
-| Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
-| IPresentation Definition | IPresentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                      |
-| Holder                  | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a IPresentation Definition.                                                   |
-| Holder's Did            | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet                                                             |
-| Verifier                | Verifiers are entities that define what proofs they require from a Holder (via a IPresentation Definition) in order to proceed with an interaction.                                                                                                                         |
-| IIssuer                  | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder.                                                                                   |
-| IPresentation            | Data derived from one or more verifiable credentials, issued by one or more issuers                                                                                                                                                                                        |
-| Verifiable IPresentation | Is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification.                                                                                                                           |
+| Term                    | Definition                                                                                                                                                                                                                                                                |
+| ----------------------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                            |
+| Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build Verifiable Presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
+| Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                     |
+| Holder                  | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a Presentation Definition.                                                  |
+| Holder's Did            | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet                                                            |
+| Verifier                | Verifiers are entities that define what proofs they require from a Holder (via a Presentation Definition) in order to proceed with an interaction.                                                                                                                        |
+| Issuer                  | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder.                                                                                  |
+| Presentation            | Data derived from one or more verifiable credentials, issued by one or more issuers                                                                                                                                                                                       |
+| Verifiable Presentation | Is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification.                                                                                                                          |
 
 ## Further work:
 
 1. We know of some potential issues with JWT based (de)serialization
-2. Support for hashlinks is not incorporated. We do not inspect them and just treat them as normal URIs
+2. Support for hashlink verification is not incorporated. We do not inspect them and just treat them as normal URIs
 3. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are
-   addressing `nested credentials` and `nested paths` these are currently not fully support yet.
+   addressing `nested credentials` and `nested paths` these are currently not fully supported yet.
