@@ -55,19 +55,18 @@ export class SSITypesBuilder {
     throw 'VerifiableCredential structure is incorrect.';
   }
 
-  private static setJWTAdditionalFields(
-    result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof
-  ): InternalVerifiableCredentialJwt & IJwtCredential & IHasProof {
+  private static setJWTAdditionalFields(result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof) {
     if (result.exp) {
-      if (result.getBaseCredential().credentialSubject?.expirationDate !== result.exp) {
+      const expDate = result.getBaseCredential().credentialSubject?.expirationDate;
+      if (expDate && expDate !== result.exp) {
         throw new Error('Inconsistent expiration dates');
       }
-      result.getBaseCredential().credentialSubject.expirationDate = new Date(
-        result.exp as string | number | Date
-      ).toISOString();
+      const exp = result.exp.match(/^\d+$/) ? parseInt(result.exp) : result.exp;
+      result.getBaseCredential().credentialSubject.expirationDate = new Date(exp).toISOString();
     }
     if (result.iss) {
-      if (result.getBaseCredential().issuer !== result.iss) {
+      const issuer = result.getBaseCredential().issuer;
+      if (issuer && issuer !== result.iss) {
         throw new Error('Inconsistent issuers');
       }
       result.getBaseCredential().issuer = result.iss;
@@ -76,7 +75,8 @@ export class SSITypesBuilder {
       if (result.getBaseCredential().issuanceDate !== result.nbf) {
         throw new Error('Inconsistent issuance dates');
       }
-      result.getBaseCredential().issuanceDate = new Date(result.nbf as string | number | Date).toISOString();
+      const nbf = result.nbf.match(/^\d+$/) ? parseInt(result.nbf) : result.nbf;
+      result.getBaseCredential().issuanceDate = new Date(nbf).toISOString();
     }
     if (result.sub) {
       if (result.getBaseCredential().credentialSubject?.id !== result.sub) {
