@@ -5,7 +5,7 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiablePresentation } from './types';
 import { IVerifiableCredential } from './types';
-import { InternalPresentationDefinitionV2, InternalVerifiableCredential } from './types/Internal.types';
+import { InternalVerifiableCredential } from './types/Internal.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { JsonPathUtils } from './utils';
 import { PresentationDefinitionV2VB, Validated, ValidationEngine } from './validation';
@@ -36,13 +36,14 @@ export class PEXv2 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const presentationDefinitionCopy: PresentationDefinitionV2 = JSON.parse(JSON.stringify(presentationDefinition));
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
       presentationCopy.verifiableCredential
     );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
+      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionCopy),
       internalVCs,
       holderDIDs,
       limitDisclosureSignatureSuites
@@ -67,9 +68,10 @@ export class PEXv2 {
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
+    const presentationDefinitionCopy: PresentationDefinitionV2 = JSON.parse(JSON.stringify(presentationDefinition));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
+      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionCopy),
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
@@ -94,9 +96,10 @@ export class PEXv2 {
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
+    const presentationDefinitionCopy: PresentationDefinitionV2 = JSON.parse(JSON.stringify(presentationDefinition));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
+      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionCopy),
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
@@ -120,8 +123,9 @@ export class PEXv2 {
     holderDID?: string
   ): IPresentation {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(selectedCredential));
+    const presentationDefinitionCopy: PresentationDefinitionV2 = JSON.parse(JSON.stringify(presentationDefinition));
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
+      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionCopy),
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy)
     );
     return PEX.getPresentation(presentationSubmission, verifiableCredentialCopy, holderDID);
@@ -135,16 +139,12 @@ export class PEXv2 {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
   public validateDefinition(presentationDefinitionV2: PresentationDefinitionV2): Validated {
-    let pd = JsonPathUtils.changePropertyNameRecursively(
-      presentationDefinitionV2 as InternalPresentationDefinitionV2,
-      '_const',
-      'const'
-    );
-    pd = JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionV2, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionV2, '_enum', 'enum');
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
-        target: pd,
+        target: presentationDefinitionV2,
       },
     ]);
   }

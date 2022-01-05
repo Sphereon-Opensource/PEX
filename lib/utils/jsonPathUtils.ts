@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
-import { IInternalPresentationDefinition } from '../types/Internal.types';
 import { InputFieldType } from '../types/SSI.types';
 
 export class JsonPathUtils {
@@ -61,45 +61,34 @@ export class JsonPathUtils {
   }
 
   public static changePropertyNameRecursively(
-    obj: IInternalPresentationDefinition,
+    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
     currentPropertyName: string,
     newPropertyName: string
   ): any {
-    console.log(newPropertyName);
-    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(obj, [
+    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, [
       '$..' + currentPropertyName,
     ]);
-    const newPd = { ...obj };
     for (const existingPath of existingPaths) {
-      this.copyResultPathToDestinationDefinition(existingPath.path, newPd, newPd, newPropertyName);
+      this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
     }
 
-    return newPd;
+    return pd;
   }
 
   private static copyResultPathToDestinationDefinition(
     pathDetails: (string | number)[],
-    pd: IInternalPresentationDefinition,
-    pdToSend: IInternalPresentationDefinition,
+    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
     newPropertyName: string
   ) {
     let objectCursor: any = pd;
-    let currentCursorInToSendObj: any = { ...pdToSend };
     for (let i = 1; i < pathDetails.length; i++) {
-      objectCursor = objectCursor[pathDetails[i]];
+      if (i + 1 < pathDetails.length) {
+        objectCursor = objectCursor[pathDetails[i]];
+      }
       if (pathDetails.length == i + 1) {
-        currentCursorInToSendObj[pathDetails[i]] = objectCursor;
-        delete currentCursorInToSendObj[pathDetails[i]];
-        currentCursorInToSendObj[newPropertyName] = objectCursor;
-      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] === 'string') {
-        //currentCursorInToSendObj[pathDetails[i]] = {};
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
-      } else if (typeof pathDetails[i] === 'string' && typeof pathDetails[i + 1] !== 'string') {
-        //currentCursorInToSendObj[pathDetails[i]] = [{}];
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
-      } else {
-        //currentCursorInToSendObj[pathDetails[i]] = {};
-        currentCursorInToSendObj = currentCursorInToSendObj[pathDetails[i]];
+        objectCursor[newPropertyName] = objectCursor[pathDetails[i]];
+        delete objectCursor[pathDetails[i]];
+        break;
       }
     }
   }

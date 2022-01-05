@@ -3,8 +3,6 @@ import fs from 'fs';
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, PEXv2, Validated, ValidationEngine } from '../lib';
-import { InternalPresentationDefinitionV2 } from '../lib/types/Internal.types';
-import { JsonPathUtils } from '../lib/utils';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -279,12 +277,7 @@ describe('evaluate', () => {
         tag: 'presentation_definition.input_descriptor[0].constraints.fields[0]',
       },
     ]);
-    const newPd = JsonPathUtils.changePropertyNameRecursively(
-      pd as InternalPresentationDefinitionV2,
-      '_const',
-      'const'
-    );
-    const result2 = pex.validateDefinition(newPd);
+    const result2 = pex.validateDefinition(pd);
     expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV2]).toEqual(
       'https://yourwatchful.gov/drivers-license-schema.json'

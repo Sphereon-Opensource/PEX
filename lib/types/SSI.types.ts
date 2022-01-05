@@ -1,4 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pex-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
 import { BaseCredential, IInternalPresentationDefinition, InternalVerifiableCredential } from './Internal.types';
 
@@ -113,7 +113,9 @@ export type InputFieldType =
   | IVerifiablePresentation
   | InternalVerifiableCredential
   | InternalVerifiableCredential[]
-  | IInternalPresentationDefinition;
+  | IInternalPresentationDefinition
+  | PresentationDefinitionV1
+  | PresentationDefinitionV2;
 
 export enum PEVersion {
   v1 = 'v1',
