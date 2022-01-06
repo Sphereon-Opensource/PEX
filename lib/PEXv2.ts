@@ -134,10 +134,11 @@ export class PEXv2 {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
   public validateDefinition(presentationDefinitionV2: PresentationDefinitionV2): Validated {
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionV2);
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
-        target: presentationDefinitionV2,
+        target: pd,
       },
     ]);
   }
