@@ -170,9 +170,8 @@ export class PEX {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
-    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
-    const result = this.definitionVersionDiscovery(presentationDefinitionCopy);
+  public validateDefinition(p: IPresentationDefinition): Validated {
+    const result = this.definitionVersionDiscovery(p);
     if (result.error) {
       throw result.error;
     }
@@ -180,11 +179,11 @@ export class PEX {
     result.version === PEVersion.v1
       ? validators.push({
           bundler: new PresentationDefinitionV1VB('root'),
-          target: presentationDefinition,
+          target: SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(p as PresentationDefinitionV1),
         })
       : validators.push({
           bundler: new PresentationDefinitionV2VB('root'),
-          target: presentationDefinition,
+          target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(p as PresentationDefinitionV2),
         });
     return new ValidationEngine().validate(validators);
   }
