@@ -135,12 +135,10 @@ export class PEXv2 {
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
   public validateDefinition(presentationDefinitionV2: PresentationDefinitionV2): Validated {
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionV2, '_const', 'const');
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionV2, '_enum', 'enum');
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
-        target: presentationDefinitionV2,
+        target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionV2),
       },
     ]);
   }
