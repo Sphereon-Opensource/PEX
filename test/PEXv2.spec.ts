@@ -340,7 +340,7 @@ describe('evaluate', () => {
     ]);
     const result2 = pex.validateDefinition(pd);
     expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV2]).toEqual(
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_const' as keyof FilterV2]).toEqual(
       'https://yourwatchful.gov/drivers-license-schema.json'
     );
   });
@@ -350,7 +350,7 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const result = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
   });
 
   it('should return ok if presentation definition with enum and const are valid', () => {
@@ -358,6 +358,6 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const result = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
   });
 });

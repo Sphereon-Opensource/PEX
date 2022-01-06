@@ -9,36 +9,38 @@ import {
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
 } from './Internal.types';
-import { IVerifiableCredential } from './SSI.types';
+import { IPresentationDefinition, IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
-    const presentationDefinitionCopy: PdV1 = JSON.parse(JSON.stringify(p));
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
+    const pd: PdV1 = SSITypesBuilder.createCopyAndChangePropertyName(p) as PdV1;
     return new InternalPresentationDefinitionV1(
-      presentationDefinitionCopy.id,
-      presentationDefinitionCopy.input_descriptors,
-      presentationDefinitionCopy.format,
-      presentationDefinitionCopy.name,
-      presentationDefinitionCopy.purpose,
-      presentationDefinitionCopy.submission_requirements
+      pd.id,
+      pd.input_descriptors,
+      pd.format,
+      pd.name,
+      pd.purpose,
+      pd.submission_requirements
     );
   }
 
   public static createInternalPresentationDefinitionV2FromModelEntity(p: PdV2): InternalPresentationDefinitionV2 {
-    const presentationDefinitionCopy: PdV2 = JSON.parse(JSON.stringify(p));
-    JsonPathUtils.changePropertyNameRecursively(p, '_const', 'const');
-    JsonPathUtils.changePropertyNameRecursively(p, '_enum', 'enum');
+    const pd: PdV2 = SSITypesBuilder.createCopyAndChangePropertyName(p);
     return new InternalPresentationDefinitionV2(
-      presentationDefinitionCopy.id,
-      presentationDefinitionCopy.input_descriptors,
-      presentationDefinitionCopy.format,
-      presentationDefinitionCopy.frame,
-      presentationDefinitionCopy.name,
-      presentationDefinitionCopy.purpose,
-      presentationDefinitionCopy.submission_requirements
+      pd.id,
+      pd.input_descriptors,
+      pd.format,
+      pd.frame,
+      pd.name,
+      pd.purpose,
+      pd.submission_requirements
     );
+  }
+  static createCopyAndChangePropertyName(p: IPresentationDefinition): IPresentationDefinition {
+    const pd: IPresentationDefinition = JSON.parse(JSON.stringify(p));
+    JsonPathUtils.changePropertyNameRecursively(pd, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
+    return pd;
   }
 
   static mapExternalVerifiableCredentialsToInternal(
