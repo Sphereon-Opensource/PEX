@@ -314,7 +314,7 @@ describe('evaluate', () => {
     jwtVc.exp = (+new Date()).toString();
     jwtVc.vc.credentialSubject.expirationDate = (+new Date() + 2).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      'Inconsistent expiration dates'
+      `Inconsistent expiration dates between JWT claim (${jwtVc.exp} and VC value (${jwtVc.vc.credentialSubject.expirationDate})`
     );
   });
 
@@ -329,14 +329,14 @@ describe('evaluate', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.iss = 'did:test:456';
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      'Inconsistent issuers'
+      `Inconsistent issuers between JWT claim (${jwtVc.iss} and VC value (${jwtVc.vc.issuer})`
     );
   });
 
   it('should set issuance date if nbf is present in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.nbf = (+new Date()).toString();
-    jwtVc.vc.issuanceDate = (+new Date()).toString();
+    jwtVc.vc.issuanceDate = jwtVc.nbf;
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
     expect(vcs[0].getBaseCredential().issuanceDate).toEqual(new Date(parseInt(jwtVc.nbf)).toISOString());
   });
@@ -346,7 +346,7 @@ describe('evaluate', () => {
     jwtVc.nbf = new Date().toISOString();
     jwtVc.vc.issuanceDate = (+new Date() + 2).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      'Inconsistent issuance dates'
+      `Inconsistent issuance dates between JWT claim (${jwtVc.nbf} and VC value (${jwtVc.vc.issuanceDate})`
     );
   });
 
@@ -361,7 +361,7 @@ describe('evaluate', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.sub = 'did:test:123';
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      'Inconsistent credential subject ids'
+      `Inconsistent credential subject ids between JWT claim (${jwtVc.sub} and VC value (${jwtVc.vc.credentialSubject.id})`
     );
   });
 
@@ -376,7 +376,7 @@ describe('evaluate', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.jti = 'test';
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      'Inconsistent credential ids'
+      `Inconsistent credential ids between JWT claim (${jwtVc.jti} and VC value (${jwtVc.vc.id})`
     );
   });
 
