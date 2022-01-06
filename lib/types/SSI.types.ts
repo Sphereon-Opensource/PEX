@@ -93,6 +93,8 @@ export interface IHasProof {
 
 export type ICredential = IJwtCredential | IJsonLdCredential;
 
+export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDefinitionV2;
+
 export type IJwtVerifiableCredential = IJwtCredential & IHasProof;
 
 export type IJsonLdVerifiableCredential = IJsonLdCredential & IHasProof;

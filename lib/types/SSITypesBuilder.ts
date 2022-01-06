@@ -13,29 +13,31 @@ import { IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
-    let pd = JsonPathUtils.changePropertyNameRecursively(p as InternalPresentationDefinitionV1, '_const', 'const');
-    pd = JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
+    const presentationDefinitionCopy: PdV1 = JSON.parse(JSON.stringify(p));
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
     return new InternalPresentationDefinitionV1(
-      pd.id,
-      pd.input_descriptors,
-      pd.format,
-      pd.name,
-      pd.purpose,
-      pd.submission_requirements
+      presentationDefinitionCopy.id,
+      presentationDefinitionCopy.input_descriptors,
+      presentationDefinitionCopy.format,
+      presentationDefinitionCopy.name,
+      presentationDefinitionCopy.purpose,
+      presentationDefinitionCopy.submission_requirements
     );
   }
 
   public static createInternalPresentationDefinitionV2FromModelEntity(p: PdV2): InternalPresentationDefinitionV2 {
-    let pd = JsonPathUtils.changePropertyNameRecursively(p as InternalPresentationDefinitionV2, '_const', 'const');
-    pd = JsonPathUtils.changePropertyNameRecursively(pd, '_enum', 'enum');
+    const presentationDefinitionCopy: PdV2 = JSON.parse(JSON.stringify(p));
+    JsonPathUtils.changePropertyNameRecursively(p, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(p, '_enum', 'enum');
     return new InternalPresentationDefinitionV2(
-      pd.id,
-      pd.input_descriptors,
-      pd.format,
-      pd.frame,
-      pd.name,
-      pd.purpose,
-      pd.submission_requirements
+      presentationDefinitionCopy.id,
+      presentationDefinitionCopy.input_descriptors,
+      presentationDefinitionCopy.format,
+      presentationDefinitionCopy.frame,
+      presentationDefinitionCopy.name,
+      presentationDefinitionCopy.purpose,
+      presentationDefinitionCopy.submission_requirements
     );
   }
 

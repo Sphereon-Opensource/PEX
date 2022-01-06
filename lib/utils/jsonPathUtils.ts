@@ -64,15 +64,13 @@ export class JsonPathUtils {
     pd: PresentationDefinitionV1 | PresentationDefinitionV2,
     currentPropertyName: string,
     newPropertyName: string
-  ): any {
+  ) {
     const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, [
       '$..' + currentPropertyName,
     ]);
     for (const existingPath of existingPaths) {
       this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
     }
-
-    return pd;
   }
 
   private static copyResultPathToDestinationDefinition(

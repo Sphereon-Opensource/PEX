@@ -84,6 +84,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
@@ -92,7 +93,6 @@ describe('evaluate', () => {
     vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
-    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pd, [vc0, vc1, vc2]);

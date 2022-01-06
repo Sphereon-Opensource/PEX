@@ -5,7 +5,9 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiableCredential, IVerifiablePresentation, PEVersion } from './types';
 import { IInternalPresentationDefinition, InternalVerifiableCredential } from './types/Internal.types';
+import { IPresentationDefinition } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { JsonPathUtils } from './utils';
 import {
   PresentationDefinitionV1VB,
   PresentationDefinitionV2VB,
@@ -37,13 +39,12 @@ export class PEX {
    * were not fulfilled by the presentation.
    */
   public evaluatePresentation(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     presentation: IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
     const pd: IInternalPresentationDefinition =
-      this.determineAndCastToInternalPresentationDefinition(presentationDefinitionCopy);
+      this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
       presentationCopy.verifiableCredential
@@ -66,16 +67,15 @@ export class PEX {
    * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentials(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd: IInternalPresentationDefinition =
-      this.determineAndCastToInternalPresentationDefinition(presentationDefinitionCopy);
+      this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     return this._evaluationClientWrapper.evaluate(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
@@ -96,15 +96,14 @@ export class PEX {
    * @return the selectable credentials.
    */
   public selectFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
     const pd: IInternalPresentationDefinition =
-      this.determineAndCastToInternalPresentationDefinition(presentationDefinitionCopy);
+      this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       pd,
@@ -126,13 +125,12 @@ export class PEX {
    * @return the presentation.
    */
   public presentationFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     selectedCredential: IVerifiableCredential[],
     holderDID?: string
   ): IPresentation {
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
     const pd: IInternalPresentationDefinition =
-      this.determineAndCastToInternalPresentationDefinition(presentationDefinitionCopy);
+      this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential)
@@ -172,8 +170,8 @@ export class PEX {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2): Validated {
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
+  public validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
     const result = this.definitionVersionDiscovery(presentationDefinitionCopy);
     if (result.error) {
       throw result.error;
@@ -225,7 +223,7 @@ export class PEX {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     selectedCredentials: IVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
@@ -291,11 +289,13 @@ export class PEX {
     return signingCallBack(callBackParams);
   }
 
-  public definitionVersionDiscovery(presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2): {
+  public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): {
     version?: PEVersion;
     error?: string;
   } {
-    const presentationDefinitionCopy: PresentationDefinitionV1 = JSON.parse(JSON.stringify(presentationDefinition));
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
     const data = { presentation_definition: presentationDefinitionCopy };
     const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true });
     const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
@@ -312,18 +312,19 @@ export class PEX {
   }
 
   private determineAndCastToInternalPresentationDefinition(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2
+    presentationDefinition: IPresentationDefinition
   ): IInternalPresentationDefinition {
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
     const versionResult: { version?: PEVersion; error?: string } =
-      this.definitionVersionDiscovery(presentationDefinition);
+      this.definitionVersionDiscovery(presentationDefinitionCopy);
     if (versionResult.error) throw versionResult.error;
     if (versionResult.version == PEVersion.v1) {
       return SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(
-        presentationDefinition as PresentationDefinitionV1
+        presentationDefinitionCopy as PresentationDefinitionV1
       );
     }
     return SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(
-      presentationDefinition as PresentationDefinitionV2
+      presentationDefinitionCopy as PresentationDefinitionV2
     );
   }
 }
