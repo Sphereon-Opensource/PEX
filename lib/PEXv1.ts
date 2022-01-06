@@ -7,7 +7,6 @@ import { IPresentation, IProof, IVerifiablePresentation } from './types';
 import { InternalVerifiableCredential } from './types/Internal.types';
 import { IVerifiableCredential } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
-import { JsonPathUtils } from './utils';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
 /**
