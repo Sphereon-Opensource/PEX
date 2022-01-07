@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { InputFieldType } from '../types/SSI.types';
@@ -57,5 +58,36 @@ export class JsonPathUtils {
       }
     }
     return result;
+  }
+
+  public static changePropertyNameRecursively(
+    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
+    currentPropertyName: string,
+    newPropertyName: string
+  ) {
+    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, [
+      '$..' + currentPropertyName,
+    ]);
+    for (const existingPath of existingPaths) {
+      this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
+    }
+  }
+
+  private static copyResultPathToDestinationDefinition(
+    pathDetails: (string | number)[],
+    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
+    newPropertyName: string
+  ) {
+    let objectCursor: any = pd;
+    for (let i = 1; i < pathDetails.length; i++) {
+      if (i + 1 < pathDetails.length) {
+        objectCursor = objectCursor[pathDetails[i]];
+      }
+      if (pathDetails.length == i + 1) {
+        objectCursor[newPropertyName] = objectCursor[pathDetails[i]];
+        delete objectCursor[pathDetails[i]];
+        break;
+      }
+    }
   }
 }

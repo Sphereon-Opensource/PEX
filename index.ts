@@ -6,6 +6,7 @@ import {
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
+  IHasProof,
   IIssuer,
   IJsonLdCredential,
   IJsonLdVerifiableCredential,
@@ -13,6 +14,7 @@ import {
   IJwtVerifiableCredential,
   InputFieldType,
   IPresentation,
+  IPresentationDefinition,
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
@@ -75,5 +77,7 @@ export {
   IJsonLdCredential,
   IJsonLdVerifiableCredential,
   IVerifiableCredential,
+  IPresentationDefinition,
+  IHasProof,
   HandlerCheckResult
 };

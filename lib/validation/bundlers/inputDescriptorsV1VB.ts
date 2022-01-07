@@ -136,7 +136,6 @@ export class InputDescriptorsV1VB extends ValidationBundler<InputDescriptorV1[]>
     try {
       new URL(uri);
     } catch (err) {
-      // console.log(err)
       return ObjectValidationUtils.isValidDIDURI(uri);
     }
     return true;

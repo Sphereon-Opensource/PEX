@@ -5,7 +5,9 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiableCredential, IVerifiablePresentation, PEVersion } from './types';
 import { IInternalPresentationDefinition, InternalVerifiableCredential } from './types/Internal.types';
+import { IPresentationDefinition } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { JsonPathUtils } from './utils';
 import {
   PresentationDefinitionV1VB,
   PresentationDefinitionV2VB,
@@ -37,7 +39,7 @@ export class PEX {
    * were not fulfilled by the presentation.
    */
   public evaluatePresentation(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     presentation: IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
@@ -65,7 +67,7 @@ export class PEX {
    * were not fulfilled by the verifiable credentials.
    */
   public evaluateCredentials(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
@@ -94,7 +96,7 @@ export class PEX {
    * @return the selectable credentials.
    */
   public selectFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
     holderDIDs: string[],
     limitDisclosureSignatureSuites: string[]
@@ -123,7 +125,7 @@ export class PEX {
    * @return the presentation.
    */
   public presentationFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     selectedCredential: IVerifiableCredential[],
     holderDID?: string
   ): IPresentation {
@@ -168,8 +170,8 @@ export class PEX {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2): Validated {
-    const result = this.definitionVersionDiscovery(presentationDefinition);
+  public validateDefinition(p: IPresentationDefinition): Validated {
+    const result = this.definitionVersionDiscovery(p);
     if (result.error) {
       throw result.error;
     }
@@ -177,11 +179,11 @@ export class PEX {
     result.version === PEVersion.v1
       ? validators.push({
           bundler: new PresentationDefinitionV1VB('root'),
-          target: presentationDefinition,
+          target: SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(p as PresentationDefinitionV1),
         })
       : validators.push({
           bundler: new PresentationDefinitionV2VB('root'),
-          target: presentationDefinition,
+          target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(p as PresentationDefinitionV2),
         });
     return new ValidationEngine().validate(validators);
   }
@@ -220,7 +222,7 @@ export class PEX {
    * @return the signed and thus Verifiable Presentation.
    */
   public verifiablePresentationFrom(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2,
+    presentationDefinition: IPresentationDefinition,
     selectedCredentials: IVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
@@ -286,11 +288,14 @@ export class PEX {
     return signingCallBack(callBackParams);
   }
 
-  public definitionVersionDiscovery(presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2): {
+  public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): {
     version?: PEVersion;
     error?: string;
   } {
-    const data = { presentation_definition: presentationDefinition };
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
+    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
+    const data = { presentation_definition: presentationDefinitionCopy };
     const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true });
     const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
     let result = validateV2(data);
@@ -306,18 +311,19 @@ export class PEX {
   }
 
   private determineAndCastToInternalPresentationDefinition(
-    presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2
+    presentationDefinition: IPresentationDefinition
   ): IInternalPresentationDefinition {
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
     const versionResult: { version?: PEVersion; error?: string } =
-      this.definitionVersionDiscovery(presentationDefinition);
+      this.definitionVersionDiscovery(presentationDefinitionCopy);
     if (versionResult.error) throw versionResult.error;
     if (versionResult.version == PEVersion.v1) {
       return SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(
-        presentationDefinition as PresentationDefinitionV1
+        presentationDefinitionCopy as PresentationDefinitionV1
       );
     }
     return SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(
-      presentationDefinition as PresentationDefinitionV2
+      presentationDefinitionCopy as PresentationDefinitionV2
     );
   }
 }

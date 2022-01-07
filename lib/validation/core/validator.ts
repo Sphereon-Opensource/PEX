@@ -35,7 +35,6 @@ export const validate: ValidateAll = <T>(validations: Validation<T>[]): Validate
         result = toChecked(validation);
       }
     } catch (error) {
-      // console.log(error.message);
       result = toChecked(validation);
     }
     return result;
