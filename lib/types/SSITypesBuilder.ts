@@ -9,7 +9,6 @@ import {
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
 } from './Internal.types';
-
 import { IHasProof, IJwtCredential, IPresentationDefinition, IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
