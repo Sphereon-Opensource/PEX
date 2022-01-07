@@ -59,7 +59,7 @@ export class SSITypesBuilder {
     if (result.exp) {
       const expDate = result.getBaseCredential().credentialSubject?.expirationDate;
       if (expDate && expDate !== result.exp) {
-        throw new Error(`Inconsistent expiration dates between JWT claim (${result.exp} and VC value (${expDate})`);
+        throw new Error(`Inconsistent expiration dates between JWT claim (${result.exp}) and VC value (${expDate})`);
       }
       const exp = result.exp.match(/^\d+$/) ? parseInt(result.exp) : result.exp;
       result.getBaseCredential().credentialSubject.expirationDate = new Date(exp).toISOString();
@@ -67,14 +67,14 @@ export class SSITypesBuilder {
     if (result.iss) {
       const issuer = result.getBaseCredential().issuer;
       if (issuer && issuer !== result.iss) {
-        throw new Error(`Inconsistent issuers between JWT claim (${result.iss} and VC value (${issuer})`);
+        throw new Error(`Inconsistent issuers between JWT claim (${result.iss}) and VC value (${issuer})`);
       }
       result.getBaseCredential().issuer = result.iss;
     }
     if (result.nbf) {
       const issuanceDate = result.getBaseCredential().issuanceDate;
       if (issuanceDate && issuanceDate !== result.nbf) {
-        throw new Error(`Inconsistent issuance dates between JWT claim (${result.nbf} and VC value (${issuanceDate})`);
+        throw new Error(`Inconsistent issuance dates between JWT claim (${result.nbf}) and VC value (${issuanceDate})`);
       }
       const nbf = result.nbf.match(/^\d+$/) ? parseInt(result.nbf) : result.nbf;
       result.getBaseCredential().issuanceDate = new Date(nbf).toISOString();
@@ -82,14 +82,14 @@ export class SSITypesBuilder {
     if (result.sub) {
       const csId = result.getBaseCredential().credentialSubject?.id;
       if (csId && csId !== result.sub) {
-        throw new Error(`Inconsistent credential subject ids between JWT claim (${result.sub} and VC value (${csId})`);
+        throw new Error(`Inconsistent credential subject ids between JWT claim (${result.sub}) and VC value (${csId})`);
       }
       result.getBaseCredential().credentialSubject.id = result.sub;
     }
     if (result.jti) {
       const id = result.getBaseCredential().id;
       if (id && id !== result.jti) {
-        throw new Error(`Inconsistent credential ids between JWT claim (${result.jti} and VC value (${id})`);
+        throw new Error(`Inconsistent credential ids between JWT claim (${result.jti}) and VC value (${id})`);
       }
       result.getBaseCredential().id = result.jti;
     }
