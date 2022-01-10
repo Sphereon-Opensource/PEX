@@ -360,4 +360,62 @@ describe('evaluate', () => {
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
   });
+
+  it('should return ok if presentation definition @ in path works properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$.@context', '$.vc.@context'],
+        purpose:
+          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const pex: PEXv2 = new PEXv2();
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const result = pex.evaluateCredentials(pd, vpSimple.verifiableCredential, [], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    console.log(JSON.stringify(result, null, 2));
+  });
+
+  it('should return ok if presentation definition @ in path escapes properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ["$..['@context']", "$.vc..['@context']"],
+        purpose:
+          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const pex: PEXv2 = new PEXv2();
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const result = pex.evaluateCredentials(pd, vpSimple.verifiableCredential, [], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    console.log(JSON.stringify(result, null, 2));
+  });
+
+  it('testing', () => {
+    const str3 = 'Chapter 2.7 This text contains references to chapter 4.2.1 & also to chapter 5';
+    const str = "$..['@context']";
+    const regExp3 = /chapter \d+(\.\d)*/gi;
+    const regExp = /@\w+/gi;
+    console.log('MATCH()');
+    console.log(str3.match(regExp3));
+    // return 1 array with 3 found matches (no added data of matches)
+    console.log('MATCHALL()');
+    console.log(...str.matchAll(regExp));
+    // returns 3 arrays with additional details about matches
+    console.log('EASY ACCESS TO ADDITIONAL INFORMATION');
+    const matches = str3.matchAll(regExp3);
+    for (const match of matches) {
+      console.log('MATCH: ' + match[0]);
+      console.log('START: ' + match.index);
+      console.log('  END: ' + (match.index + '' + match[0].length));
+    }
+  });
 });

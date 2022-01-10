@@ -2,7 +2,7 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
-import { InputFieldType } from '../types/SSI.types';
+import { InputFieldType, IPresentationDefinition } from '../types';
 
 export class JsonPathUtils {
   /**
@@ -75,7 +75,7 @@ export class JsonPathUtils {
 
   private static copyResultPathToDestinationDefinition(
     pathDetails: (string | number)[],
-    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
+    pd: IPresentationDefinition,
     newPropertyName: string
   ) {
     let objectCursor: any = pd;
@@ -89,5 +89,66 @@ export class JsonPathUtils {
         break;
       }
     }
+  }
+
+  static changeSpecialPathsRecursively(pd: IPresentationDefinition) {
+    const paths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..path']);
+    for (const path of paths) {
+      this.modifyPathsWithSpecialCharacter(path.path, pd);
+    }
+  }
+
+  private static modifyPathsWithSpecialCharacter(pathDetails: (string | number)[], pd: IPresentationDefinition) {
+    let objectCursor: any = pd;
+    for (let i = 1; i < pathDetails.length; i++) {
+      if (i + 1 < pathDetails.length) {
+        objectCursor = objectCursor[pathDetails[i]];
+      }
+      if (pathDetails.length == i + 1) {
+        const paths: string[] = objectCursor[pathDetails[i]];
+        const editedPaths: string[] = [];
+        for (let j = 0; j < paths.length; j++) {
+          editedPaths.push(this.modifyPathWithSpecialCharacter(paths[j]));
+        }
+        objectCursor[pathDetails[i]] = editedPaths;
+        break;
+      }
+    }
+  }
+
+  private static modifyPathWithSpecialCharacter(path: string): string {
+    const REGEX_PATH_ESCAPED = /\['@\w+']/g;
+    const REGEX_PATH = /@\w+/g;
+    const resultEscaped = path.matchAll(REGEX_PATH_ESCAPED);
+    const resultNotEscaped = path.matchAll(REGEX_PATH);
+    let nextExist = true;
+    const escapedIndices = [];
+    while (nextExist) {
+      const next = resultEscaped.next();
+      if (!next.done) {
+        escapedIndices.push(next.value['index']);
+        nextExist = true;
+      } else {
+        nextExist = false;
+      }
+    }
+    nextExist = true;
+    const indices: Map<number, string> = new Map<number, string>();
+    while (nextExist) {
+      const next = resultNotEscaped.next();
+      if (!next.done) {
+        indices.set(<number>next.value['index'], next.value[0]);
+        nextExist = true;
+      } else {
+        nextExist = false;
+      }
+    }
+    for (let i = 0; i < indices.size; i++) {
+      const value = indices.entries().next();
+      if (!escapedIndices.find((el) => el == value.value[0] - 2)) {
+        path = path.replace(REGEX_PATH, ".['" + value.value[1] + "']");
+      }
+    }
+    return path;
   }
 }
