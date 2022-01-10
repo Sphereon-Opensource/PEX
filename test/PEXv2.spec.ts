@@ -3,6 +3,7 @@ import fs from 'fs';
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, PEXv2, ProofType, Validated, ValidationEngine } from '../lib';
+import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -399,23 +400,22 @@ describe('evaluate', () => {
     console.log(JSON.stringify(result, null, 2));
   });
 
-  it('testing', () => {
-    const str3 = 'Chapter 2.7 This text contains references to chapter 4.2.1 & also to chapter 5';
-    const str = "$..['@context']";
-    const regExp3 = /chapter \d+(\.\d)*/gi;
-    const regExp = /@\w+/gi;
-    console.log('MATCH()');
-    console.log(str3.match(regExp3));
-    // return 1 array with 3 found matches (no added data of matches)
-    console.log('MATCHALL()');
-    console.log(...str.matchAll(regExp));
-    // returns 3 arrays with additional details about matches
-    console.log('EASY ACCESS TO ADDITIONAL INFORMATION');
-    const matches = str3.matchAll(regExp3);
-    for (const match of matches) {
-      console.log('MATCH: ' + match[0]);
-      console.log('START: ' + match.index);
-      console.log('  END: ' + (match.index + '' + match[0].length));
-    }
+  it("other valid paths in json-ld shouldn't be affected by regex subs", () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$..book[(@.length-1)]', '$..book[?(@.price<30 && @.category=="fiction")]', '$..book[?(@.price==8.95)]'],
+        purpose:
+          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(
+      pd.input_descriptors[0].constraints!.fields[0].path
+    );
   });
 });
