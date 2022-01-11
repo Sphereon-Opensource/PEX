@@ -787,7 +787,4 @@ There are several other utility scripts that help with development.
 
 ## Further work:
 
-1. We know of some potential issues with JWT based (de)serialization
-2. Support for hashlink verification is not incorporated. We do not inspect them and just treat them as normal URIs
-3. In the [DIF documentation](https://identity.foundation/presentation-exchange/#input-evaluation) some entries are
-   addressing `nested credentials` and `nested paths` these are currently not fully supported yet.
+1. Support for hashlink verification is not incorporated. We do not inspect them and just treat them as normal URIs
