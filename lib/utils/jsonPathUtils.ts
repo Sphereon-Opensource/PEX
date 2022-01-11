@@ -117,36 +117,16 @@ export class JsonPathUtils {
   }
 
   private static modifyPathWithSpecialCharacter(path: string): string {
-    const REGEX_PATH_ESCAPED = /\['@\w+']/g;
-    const REGEX_PATH = /@\w+/g;
-    const resultEscaped = path.matchAll(REGEX_PATH_ESCAPED);
-    const resultNotEscaped = path.matchAll(REGEX_PATH);
+    const REGEX_PATH = /(^((?!\[').)*)(@\w+)/g;
+    const matches = path.matchAll(REGEX_PATH);
     let nextExist = true;
-    const escapedIndices = [];
     while (nextExist) {
-      const next = resultEscaped.next();
+      const next = matches.next();
       if (!next.done) {
-        escapedIndices.push(next.value['index']);
+        path = path.replace(next.value[3], ".['" + next.value[3] + "']");
         nextExist = true;
       } else {
         nextExist = false;
-      }
-    }
-    nextExist = true;
-    const indices: Map<number, string> = new Map<number, string>();
-    while (nextExist) {
-      const next = resultNotEscaped.next();
-      if (!next.done) {
-        indices.set(<number>next.value['index'], next.value[0]);
-        nextExist = true;
-      } else {
-        nextExist = false;
-      }
-    }
-    for (let i = 0; i < indices.size; i++) {
-      const value = indices.entries().next();
-      if (!escapedIndices.find((el) => el == value.value[0] - 2)) {
-        path = path.replace(REGEX_PATH, ".['" + value.value[1] + "']");
       }
     }
     return path;

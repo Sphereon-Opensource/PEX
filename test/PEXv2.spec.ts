@@ -3,7 +3,6 @@ import fs from 'fs';
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, PEXv2, ProofType, Validated, ValidationEngine } from '../lib';
-import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -360,62 +359,5 @@ describe('evaluate', () => {
     const result = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
-  });
-
-  it('should return ok if presentation definition @ in path works properly', () => {
-    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
-    pd.input_descriptors[0].constraints!.fields = [
-      {
-        path: ['$.@context', '$.vc.@context'],
-        purpose:
-          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
-        filter: {
-          type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
-        },
-      },
-    ];
-    const pex: PEXv2 = new PEXv2();
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const result = pex.evaluateCredentials(pd, vpSimple.verifiableCredential, [], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    console.log(JSON.stringify(result, null, 2));
-  });
-
-  it('should return ok if presentation definition @ in path escapes properly', () => {
-    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
-    pd.input_descriptors[0].constraints!.fields = [
-      {
-        path: ["$..['@context']", "$.vc..['@context']"],
-        purpose:
-          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
-        filter: {
-          type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
-        },
-      },
-    ];
-    const pex: PEXv2 = new PEXv2();
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const result = pex.evaluateCredentials(pd, vpSimple.verifiableCredential, [], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    console.log(JSON.stringify(result, null, 2));
-  });
-
-  it("other valid paths in json-ld shouldn't be affected by regex subs", () => {
-    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
-    pd.input_descriptors[0].constraints!.fields = [
-      {
-        path: ['$..book[(@.length-1)]', '$..book[?(@.price<30 && @.category=="fiction")]', '$..book[?(@.price==8.95)]'],
-        purpose:
-          'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
-        filter: {
-          type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
-        },
-      },
-    ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(
-      pd.input_descriptors[0].constraints!.fields[0].path
-    );
   });
 });

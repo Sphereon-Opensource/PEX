@@ -1,5 +1,6 @@
-import { FilterV1, PresentationDefinitionV1 } from '@sphereon/pex-models';
+import { FilterV1, PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
+import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 import { JsonPathUtils } from '../../lib/utils';
 
 function getPresentationDefinitionV1(): PresentationDefinitionV1 {
@@ -42,6 +43,74 @@ describe('should test jsonPathUtils function', () => {
     JsonPathUtils.changePropertyNameRecursively(pdSchema, '_const', 'const');
     expect(pdSchema.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV1]).toEqual(
       'did:example:123|did:example:456'
+    );
+  });
+
+  it('should return ok if presentation definition @ in path escapes first and not second', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$.@book.accessModeSufficient[(@.length-1)]'],
+        purpose: 'We only want books which have the certain access mode.',
+        filter: {
+          type: 'string',
+          _const: 'auditory',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual([
+      "$..['@book'].accessModeSufficient[(@.length-1)]",
+    ]);
+  });
+
+  it('should return ok if presentation definition @ in path escapes properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ["$..['@context']", "$.vc..['@context']"],
+        purpose: 'We can only verify driver licensed if they have a certain context',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
+  });
+
+  it('should return ok if presentation definition @ in path works properly', () => {
+    const pd: PresentationDefinitionV1 = getPresentationDefinitionV1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$.@context', '$.vc.@context'],
+        purpose: 'We can only verify driver licensed if they have a certain context.',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
+  });
+
+  it("other valid paths in json-ld shouldn't be affected by regex subs", () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$..book[(@.length-1)]', '$..book[?(@.price<30 && @.category=="fiction")]', '$..book[?(@.price==8.95)]'],
+        purpose: 'We only want books which have the category fiction and their price is 8.95.',
+        filter: {
+          type: 'string',
+          _const: 'https://schema.org/Book',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(
+      pd.input_descriptors[0].constraints!.fields[0].path
     );
   });
 });
