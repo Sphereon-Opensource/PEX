@@ -122,11 +122,10 @@ export class JsonPathUtils {
     let next = matches.next();
     while (next && !next.done) {
       const atIdx = (next.value[0] as string).indexOf('@');
-      if (atIdx <= 1) {
-        path = path.replace(next.value[0], "['" + next.value[2] + "']");
-      } else if (atIdx > 1) {
-        path = path.replace(next.value[0], "..['" + next.value[2] + "']");
-      }
+      path =
+        atIdx <= 1
+          ? path.replace(next.value[0], "['" + next.value[2] + "']")
+          : path.replace(next.value[0], "..['" + next.value[2] + "']");
       next = matches.next();
     }
     return path;
