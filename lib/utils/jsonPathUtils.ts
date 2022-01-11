@@ -2,7 +2,7 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
-import { InputFieldType } from '../types/SSI.types';
+import { InputFieldType, IPresentationDefinition } from '../types';
 
 export class JsonPathUtils {
   /**
@@ -75,7 +75,7 @@ export class JsonPathUtils {
 
   private static copyResultPathToDestinationDefinition(
     pathDetails: (string | number)[],
-    pd: PresentationDefinitionV1 | PresentationDefinitionV2,
+    pd: IPresentationDefinition,
     newPropertyName: string
   ) {
     let objectCursor: any = pd;
@@ -89,5 +89,45 @@ export class JsonPathUtils {
         break;
       }
     }
+  }
+
+  static changeSpecialPathsRecursively(pd: IPresentationDefinition) {
+    const paths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..path']);
+    for (const path of paths) {
+      this.modifyPathsWithSpecialCharacter(path.path, pd);
+    }
+  }
+
+  private static modifyPathsWithSpecialCharacter(pathDetails: (string | number)[], pd: IPresentationDefinition) {
+    let objectCursor: any = pd;
+    for (let i = 1; i < pathDetails.length; i++) {
+      if (i + 1 < pathDetails.length) {
+        objectCursor = objectCursor[pathDetails[i]];
+      }
+      if (pathDetails.length == i + 1) {
+        const paths: string[] = objectCursor[pathDetails[i]];
+        const editedPaths: string[] = [];
+        for (let j = 0; j < paths.length; j++) {
+          editedPaths.push(this.modifyPathWithSpecialCharacter(paths[j]));
+        }
+        objectCursor[pathDetails[i]] = editedPaths;
+        break;
+      }
+    }
+  }
+
+  private static modifyPathWithSpecialCharacter(path: string): string {
+    const REGEX_PATH = /(\.{0,2})(?<!\[')(@\w+)(?!\w'])/g;
+    const matches = path.matchAll(REGEX_PATH);
+    let next = matches.next();
+    while (next && !next.done) {
+      const atIdx = (next.value[0] as string).indexOf('@');
+      path =
+        atIdx <= 1
+          ? path.replace(next.value[0], "['" + next.value[2] + "']")
+          : path.replace(next.value[0], "..['" + next.value[2] + "']");
+      next = matches.next();
+    }
+    return path;
   }
 }
