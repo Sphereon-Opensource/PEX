@@ -195,8 +195,8 @@ describe('evaluate', () => {
   });
 
   it('should return a signed presentation', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pejs: PEX = new PEX();
     const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(
       pdSchema.presentation_definition,
@@ -215,8 +215,8 @@ describe('evaluate', () => {
   });
 
   it('should return a signed presentation with PdV2', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pejs: PEX = new PEX();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(

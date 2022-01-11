@@ -79,4 +79,67 @@ describe('evaluate gataca tests', () => {
       'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv'
     );
   });
+
+  it('should return v1 in version discovery second example', function () {
+    const pex: PEX = new PEX();
+    const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
+    const result = pex.definitionVersionDiscovery(pdSchema);
+    expect(result.version).toEqual('v1');
+  });
+
+  it('selectFrom should return two credentials', () => {
+    const pex: PEXv1 = new PEXv1();
+    const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
+    const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
+    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(result.matches).toEqual([
+      {
+        rule: 'all',
+        from: ['mandatory'],
+        vc_path: ['$.verifiableCredential[0]'],
+        name: 'transcriptOfRecordsCredential',
+      },
+      {
+        rule: 'pick',
+        from: ['optional'],
+        vc_path: ['$.verifiableCredential[1]'],
+        name: 'transcriptOfRecordsCredential',
+      },
+    ]);
+    expect(result.verifiableCredential?.length).toEqual(2);
+  });
+
+  it('should pick 1 from mandatory group and 1 from the optional group', function () {
+    const pex: PEXv1 = new PEXv1();
+    const presentationDefinition: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
+    const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
+    const selectFromResult = pex.selectFrom(
+      presentationDefinition,
+      vcs,
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    const presentationFromResult = pex.presentationFrom(
+      presentationDefinition,
+      selectFromResult.verifiableCredential as IVerifiableCredential[],
+      undefined
+    );
+    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+      {
+        format: 'ldp_vc',
+        id: 'emailCredential',
+        path: '$.verifiableCredential[0]',
+      },
+      {
+        format: 'ldp_vc',
+        id: 'transcriptOfRecordsCredential',
+        path: '$.verifiableCredential[1]',
+      },
+    ]);
+    expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
+    expect((presentationFromResult.verifiableCredential[0] as IJsonLdVerifiableCredential).id).toEqual(
+      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
+    );
+  });
 });

@@ -228,9 +228,25 @@ export class EvaluationClientWrapper {
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
+      const groupCount = new Map<string, number>();
+      //TODO instanceof fails in some cases, need to check how to fix it
+      if (Object.keys(pd).includes('input_descriptors')) {
+        (pd as any).input_descriptors.forEach((e: any) => {
+          if (e.group) {
+            e.group.forEach((key: any) => {
+              if (groupCount.has(key)) {
+                groupCount.set(key, (groupCount.get(key) as number) + 1);
+              } else {
+                groupCount.set(key, 1);
+              }
+            });
+          }
+        });
+      }
       const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
         pd.submission_requirements,
         updatedMarked,
+        groupCount,
         0
       );
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
@@ -292,6 +308,7 @@ export class EvaluationClientWrapper {
   private evaluateRequirements(
     submissionRequirement: SubmissionRequirement[],
     marked: HandlerCheckResult[],
+    groupCount: Map<string, number>,
     level: number
   ): [number, HandlerCheckResult[]] {
     let total = 0;
@@ -300,7 +317,7 @@ export class EvaluationClientWrapper {
       if (sr.from) {
         if (sr.rule === Rules.All) {
           const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
-          if (count !== marked.length) {
+          if (count !== groupCount.get(sr.from)) {
             throw Error(`Not all input descriptors are members of group ${sr.from}`);
           }
           total++;
@@ -316,7 +333,7 @@ export class EvaluationClientWrapper {
           result.push(...matched);
         }
       } else if (sr.from_nested) {
-        const [count, matched] = this.evaluateRequirements(sr.from_nested, marked, ++level);
+        const [count, matched] = this.evaluateRequirements(sr.from_nested, marked, groupCount, ++level);
         total += count;
         result.push(...matched);
         this.handleCount(sr, count, level);

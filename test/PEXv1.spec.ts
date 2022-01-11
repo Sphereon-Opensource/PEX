@@ -115,8 +115,8 @@ describe('evaluate', () => {
   });
 
   it('should return a signed presentation', () => {
-    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
     const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
