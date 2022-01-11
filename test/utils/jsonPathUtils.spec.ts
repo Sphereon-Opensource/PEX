@@ -80,7 +80,7 @@ describe('should test jsonPathUtils function', () => {
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
   });
 
-  it('should return ok if presentation definition @ in path works properly', () => {
+  it('should return ok if presentation definition @ in path works properly - 1', () => {
     const pd: PresentationDefinitionV1 = getPresentationDefinitionV1();
     pd.input_descriptors[0].constraints!.fields = [
       {
@@ -94,6 +94,22 @@ describe('should test jsonPathUtils function', () => {
     ];
     const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']", "$.vc['@context']"]);
+  });
+
+  it('should return ok if presentation definition @ in path works properly - 2', () => {
+    const pd: PresentationDefinitionV1 = getPresentationDefinitionV1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$@context'],
+        purpose: 'We can only verify driver licensed if they have a certain context.',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']"]);
   });
 
   it("other valid paths in json-ld shouldn't be affected by regex subs", () => {
