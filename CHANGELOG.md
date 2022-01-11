@@ -11,7 +11,7 @@ library and not reaching version 1.X yet, we decided to change the name of both 
   want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
 
 ---
-## v0.7.0 - 2022-01-1x
+## v0.7.0 - 2022-01-11
 Escape JsonLD terms in json-paths. This allows path constructs like `$..@context` to be used in definitions. Improved JWT VC handling. 
 
 - Added:
@@ -23,6 +23,7 @@ Escape JsonLD terms in json-paths. This allows path constructs like `$..@context
 - Fixed:
   - Format minimum was not properly handled the schema check
   - We translate _const and _enum from the OpenAPI models internally to their actual protected typescript keys (const and enum)
+  - Different submission requirements and definition combinations where not counted properly
 
 
 ## v0.6.2 - 2021-12-31
