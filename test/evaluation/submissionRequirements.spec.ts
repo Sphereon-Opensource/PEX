@@ -220,12 +220,28 @@ describe('Submission requirements tests', () => {
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
     vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(() =>
+    expect(
       evaluationClientWrapper.submissionFrom(
         pd,
         SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
       )
-    ).toThrowError('Not all input descriptors are members of group B');
+    ).toEqual(
+      expect.objectContaining({
+        definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
+        descriptor_map: [
+          {
+            format: 'ldp_vc',
+            id: 'Educational transcripts 1',
+            path: '$.verifiableCredential[1]',
+          },
+          {
+            format: 'ldp_vc',
+            id: 'Educational transcripts 2',
+            path: '$.verifiableCredential[2]',
+          },
+        ],
+      })
+    );
   });
 
   it('Evaluate submission requirements all from group A and 2 from group B', () => {
