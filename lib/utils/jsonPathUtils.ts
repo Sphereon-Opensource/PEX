@@ -117,17 +117,17 @@ export class JsonPathUtils {
   }
 
   private static modifyPathWithSpecialCharacter(path: string): string {
-    const REGEX_PATH = /(^((?!\[').)*)(@\w+)/g;
+    const REGEX_PATH = /(\.{0,2})(?<!\[')(@\w+)(?!\w'])/g;
     const matches = path.matchAll(REGEX_PATH);
-    let nextExist = true;
-    while (nextExist) {
-      const next = matches.next();
-      if (!next.done) {
-        path = path.replace(next.value[3], ".['" + next.value[3] + "']");
-        nextExist = true;
-      } else {
-        nextExist = false;
+    let next = matches.next();
+    while (next && !next.done) {
+      const atIdx = (next.value[0] as string).indexOf('@');
+      if (atIdx == 1) {
+        path = path.replace(next.value[0], "['" + next.value[2] + "']");
+      } else if (atIdx > 1) {
+        path = path.replace(next.value[0], "..['" + next.value[2] + "']");
       }
+      next = matches.next();
     }
     return path;
   }

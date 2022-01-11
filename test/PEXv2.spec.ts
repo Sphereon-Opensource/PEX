@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, ProofType, Validated, ValidationEngine } from '../lib';
+import { IVerifiablePresentation, PEXv2, ProofType, Status, Validated, ValidationEngine } from '../lib';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -359,5 +359,83 @@ describe('evaluate', () => {
     const result = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
+  });
+
+  it('should return ok if presentation definition @ is already escaped properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ["$['@context']", "$.vc['@context']"],
+        purpose: 'We can only verify driver licensed if they have a certain context',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    delete pd.input_descriptors[0].constraints!.limit_disclosure;
+
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pex: PEXv2 = new PEXv2();
+    const result = pex.selectFrom(
+      pd,
+      [vpSimple.verifiableCredential[0]],
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
+    expect(result.errors?.length).toEqual(0);
+  });
+
+  it('should return ok if presentation definition @ in path escapes properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$.@context', '$.vc.@context'],
+        purpose: 'We can only verify driver licensed if they have a certain context',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    delete pd.input_descriptors[0].constraints!.limit_disclosure;
+
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pex: PEXv2 = new PEXv2();
+    const result = pex.selectFrom(
+      pd,
+      [vpSimple.verifiableCredential[0]],
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
+    expect(result.errors?.length).toEqual(0);
+  });
+
+  it('should return ok if presentation definition @ in path escapes properly', () => {
+    const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
+    pd.input_descriptors[0].constraints!.fields = [
+      {
+        path: ['$..@context', '$.vc..@context'],
+        purpose: 'We can only verify driver licensed if they have a certain context',
+        filter: {
+          type: 'string',
+          _const: 'https://eu.com/claims/DriversLicense',
+        },
+      },
+    ];
+    delete pd.input_descriptors[0].constraints!.limit_disclosure;
+
+    const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+    const pex: PEXv2 = new PEXv2();
+    const result = pex.selectFrom(
+      pd,
+      [vpSimple.verifiableCredential[0]],
+      ['FAsYneKJhWBP2n5E21ZzdY'],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
+    expect(result.errors?.length).toEqual(0);
   });
 });

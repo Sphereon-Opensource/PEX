@@ -60,7 +60,7 @@ describe('should test jsonPathUtils function', () => {
     ];
     const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual([
-      "$..['@book'].accessModeSufficient[(@.length-1)]",
+      "$['@book'].accessModeSufficient[(@.length-1)]",
     ]);
   });
 
@@ -93,7 +93,7 @@ describe('should test jsonPathUtils function', () => {
       },
     ];
     const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']", "$.vc['@context']"]);
   });
 
   it("other valid paths in json-ld shouldn't be affected by regex subs", () => {
