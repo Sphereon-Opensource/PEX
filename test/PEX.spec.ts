@@ -320,14 +320,18 @@ describe('evaluate', () => {
   it('should throw an error if expiration date and exp are different in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.exp = (+new Date()).toString();
-    jwtVc.vc.credentialSubject.expirationDate = (+new Date() + 2).toString();
+    jwtVc.vc.credentialSubject.expirationDate = (+new Date(jwtVc.exp + 2)).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent expiration dates between JWT claim (${jwtVc.exp}) and VC value (${jwtVc.vc.credentialSubject.expirationDate})`
+      `Inconsistent expiration dates between JWT claim (${new Date(parseInt(jwtVc.exp)).toISOString()}) and VC value (${
+        jwtVc.vc.credentialSubject.expirationDate
+      })`
     );
   });
 
   it('should set issuer if iss is present in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     delete jwtVc.vc.issuer;
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
     expect(vcs[0].getBaseCredential().issuer).toEqual(jwtVc.iss);
@@ -344,17 +348,20 @@ describe('evaluate', () => {
   it('should set issuance date if nbf is present in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.nbf = (+new Date()).toString();
-    jwtVc.vc.issuanceDate = jwtVc.nbf;
+    jwtVc.vc.issuanceDate = new Date(parseInt(jwtVc.nbf)).toISOString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
     expect(vcs[0].getBaseCredential().issuanceDate).toEqual(new Date(parseInt(jwtVc.nbf)).toISOString());
   });
 
   it('should throw an error if issuance date and nbf are different in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.nbf = new Date().toISOString();
-    jwtVc.vc.issuanceDate = (+new Date() + 2).toString();
+    const nbf = new Date().valueOf();
+    jwtVc.nbf = nbf / 1000;
+    jwtVc.vc.issuanceDate = new Date(+new Date() + 2).toISOString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent issuance dates between JWT claim (${jwtVc.nbf}) and VC value (${jwtVc.vc.issuanceDate})`
+      `Inconsistent issuance dates between JWT claim (${new Date(nbf)
+        .toISOString()
+        .replace(/\.\d\d\dZ/, 'Z')}) and VC value (${jwtVc.vc.issuanceDate})`
     );
   });
 

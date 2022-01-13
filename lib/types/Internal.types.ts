@@ -11,6 +11,7 @@ import {
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
+  IIssuer,
   IJsonLdCredential,
   IProof,
   PEVersion,
@@ -129,7 +130,7 @@ export abstract class BaseCredential implements IJsonLdCredential {
   expirationDate?: string;
   id: string;
   issuanceDate: string;
-  issuer: unknown;
+  issuer: string | IIssuer;
   name?: string;
   type: string[];
 

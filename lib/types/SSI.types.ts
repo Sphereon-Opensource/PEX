@@ -81,7 +81,7 @@ export interface IJsonLdCredential {
   expirationDate?: string;
   id: string;
   issuanceDate: string;
-  issuer: unknown;
+  issuer: string | IIssuer;
   name?: string;
   type: string[];
   [x: string]: unknown;

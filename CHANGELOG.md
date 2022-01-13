@@ -1,8 +1,11 @@
 # Release Notes
 ## v1.0.1 - TBD
+Some JWT VC related fixes in the deserialization and VC claim comparisons
 
 - Fixed:
   - JWT exp and nbf values can be numbers
+  - JWT issuer can be an object with id. Ensure we also check this value against the VC claim
+  - Always ensure JWT timestamps are serialized as ISO date strings in the resulting VC
 
 ## v1.0.0 - 2022-01-13
 

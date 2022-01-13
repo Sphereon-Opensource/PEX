@@ -36,6 +36,7 @@ export class SSITypesBuilder {
       pd.submission_requirements
     );
   }
+
   static createCopyAndModifyPresentationDefinition(p: IPresentationDefinition): IPresentationDefinition {
     const pd: IPresentationDefinition = JSON.parse(JSON.stringify(p));
     JsonPathUtils.changePropertyNameRecursively(pd, '_const', 'const');
@@ -69,27 +70,50 @@ export class SSITypesBuilder {
   private static setJWTAdditionalFields(result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof) {
     if (result.exp) {
       const expDate = result.getBaseCredential().credentialSubject?.expirationDate;
-      if (expDate && expDate !== result.exp) {
-        throw new Error(`Inconsistent expiration dates between JWT claim (${result.exp}) and VC value (${expDate})`);
+      const jwtExp = parseInt(result.exp.toString());
+      // fix seconds to millisecs for the date
+      const expAsDateStr =
+        jwtExp < 9999999999
+          ? new Date(jwtExp * 1000).toISOString().replace(/\.000Z/, 'Z')
+          : new Date(jwtExp).toISOString();
+      if (expDate && expDate !== expAsDateStr) {
+        throw new Error(`Inconsistent expiration dates between JWT claim (${expAsDateStr}) and VC value (${expDate})`);
       }
-      const exp = result.exp.toString().match(/^\d+$/) ? parseInt(result.exp.toString()) : result.exp;
-      result.getBaseCredential().credentialSubject.expirationDate = new Date(exp).toISOString();
+      result.getBaseCredential().credentialSubject.expirationDate = expAsDateStr;
     }
+
+    if (result.nbf) {
+      const issuanceDate = result.getBaseCredential().issuanceDate;
+      const jwtNbf = parseInt(result.nbf.toString());
+      // fix seconds to millisecs for the date
+      const nbfAsDateStr =
+        jwtNbf < 9999999999
+          ? new Date(jwtNbf * 1000).toISOString().replace(/\.000Z/, 'Z')
+          : new Date(jwtNbf).toISOString();
+      if (issuanceDate && issuanceDate !== nbfAsDateStr) {
+        throw new Error(
+          `Inconsistent issuance dates between JWT claim (${nbfAsDateStr}) and VC value (${issuanceDate})`
+        );
+      }
+      result.getBaseCredential().issuanceDate = nbfAsDateStr;
+    }
+
     if (result.iss) {
       const issuer = result.getBaseCredential().issuer;
-      if (issuer && issuer !== result.iss) {
-        throw new Error(`Inconsistent issuers between JWT claim (${result.iss}) and VC value (${issuer})`);
+      if (issuer) {
+        if (typeof issuer === 'string') {
+          if (issuer !== result.iss) {
+            throw new Error(`Inconsistent issuers between JWT claim (${result.iss}) and VC value (${issuer})`);
+          }
+        } else {
+          if (issuer.id !== result.iss) {
+            throw new Error(`Inconsistent issuers between JWT claim (${result.iss}) and VC value (${issuer.id})`);
+          }
+        }
       }
       result.getBaseCredential().issuer = result.iss;
     }
-    if (result.nbf) {
-      const issuanceDate = result.getBaseCredential().issuanceDate;
-      if (issuanceDate && issuanceDate !== result.nbf) {
-        throw new Error(`Inconsistent issuance dates between JWT claim (${result.nbf}) and VC value (${issuanceDate})`);
-      }
-      const nbf = result.nbf.toString().match(/^\d+$/) ? parseInt(result.nbf.toString()) : result.nbf;
-      result.getBaseCredential().issuanceDate = new Date(nbf).toISOString();
-    }
+
     if (result.sub) {
       const csId = result.getBaseCredential().credentialSubject?.id;
       if (csId && csId !== result.sub) {
