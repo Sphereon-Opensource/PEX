@@ -60,7 +60,7 @@ export class PEX {
    *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
-   * @param holderDIDs the list of the DIDs that the wallet holders controlls.
+   * @param holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holder check.
    * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
@@ -69,8 +69,8 @@ export class PEX {
   public evaluateCredentials(
     presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
-    holderDIDs: string[],
-    limitDisclosureSignatureSuites: string[]
+    holderDIDs?: string[],
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -98,8 +98,8 @@ export class PEX {
   public selectFrom(
     presentationDefinition: IPresentationDefinition,
     verifiableCredentials: IVerifiableCredential[],
-    holderDIDs: string[],
-    limitDisclosureSignatureSuites: string[]
+    holderDIDs?: string[],
+    limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     const pd: IInternalPresentationDefinition =

@@ -63,8 +63,8 @@ export class PEXv1 {
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV1,
     verifiableCredentials: IVerifiableCredential[],
-    holderDIDs: string[],
-    limitDisclosureSignatureSuites: string[]
+    holderDIDs?: string[],
+    limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -90,8 +90,8 @@ export class PEXv1 {
   public selectFrom(
     presentationDefinition: PresentationDefinitionV1,
     verifiableCredentials: IVerifiableCredential[],
-    holderDIDs: string[],
-    limitDisclosureSignatureSuites: string[]
+    holderDIDs?: string[],
+    limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();

@@ -26,8 +26,8 @@ export class EvaluationClientWrapper {
   public selectFrom(
     presentationDefinition: IInternalPresentationDefinition,
     verifiableCredentials: InternalVerifiableCredential[],
-    holderDids: string[],
-    limitDisclosureSignatureSuites: string[]
+    holderDids?: string[],
+    limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
@@ -179,7 +179,7 @@ export class EvaluationClientWrapper {
   public evaluate(
     pd: IInternalPresentationDefinition,
     vcs: InternalVerifiableCredential[],
-    holderDids: string[],
+    holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);

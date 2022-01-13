@@ -45,10 +45,10 @@ export class EvaluationClient {
   public evaluate(
     pd: IInternalPresentationDefinition,
     vcs: InternalVerifiableCredential[],
-    holderDids: string[],
+    holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): void {
-    this._dids = holderDids;
+    this._dids = holderDids || [];
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, vcs);
