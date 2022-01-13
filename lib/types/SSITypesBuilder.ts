@@ -72,7 +72,7 @@ export class SSITypesBuilder {
       if (expDate && expDate !== result.exp) {
         throw new Error(`Inconsistent expiration dates between JWT claim (${result.exp}) and VC value (${expDate})`);
       }
-      const exp = result.exp.match(/^\d+$/) ? parseInt(result.exp) : result.exp;
+      const exp = result.exp.toString().match(/^\d+$/) ? parseInt(result.exp.toString()) : result.exp;
       result.getBaseCredential().credentialSubject.expirationDate = new Date(exp).toISOString();
     }
     if (result.iss) {
@@ -87,7 +87,7 @@ export class SSITypesBuilder {
       if (issuanceDate && issuanceDate !== result.nbf) {
         throw new Error(`Inconsistent issuance dates between JWT claim (${result.nbf}) and VC value (${issuanceDate})`);
       }
-      const nbf = result.nbf.match(/^\d+$/) ? parseInt(result.nbf) : result.nbf;
+      const nbf = result.nbf.toString().match(/^\d+$/) ? parseInt(result.nbf.toString()) : result.nbf;
       result.getBaseCredential().issuanceDate = new Date(nbf).toISOString();
     }
     if (result.sub) {

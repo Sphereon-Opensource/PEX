@@ -309,6 +309,14 @@ describe('evaluate', () => {
     );
   });
 
+  it('should set expiration date if exp is present in JWT vc as number', () => {
+    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+
+    jwtVc.exp = new Date().valueOf();
+    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
+    expect(vcs[0].getBaseCredential().credentialSubject.expirationDate).toEqual(new Date(jwtVc.exp).toISOString());
+  });
+
   it('should throw an error if expiration date and exp are different in JWT vc', () => {
     const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc.exp = (+new Date()).toString();

@@ -1,4 +1,8 @@
 # Release Notes
+## v1.0.1 - TBD
+
+- Fixed:
+  - JWT exp and nbf values can be numbers
 
 ## v1.0.0 - 2022-01-13
 

@@ -50,7 +50,7 @@ export class InternalCredentialJWT implements IInternalCredential {
   /**
    * MUST represent the expirationDate property, encoded as a UNIX timestamp (NumericDate).
    */
-  exp?: string;
+  exp?: string | number;
 
   /**
    * MUST represent the issuer property of a verifiable credential or the holder property of a verifiable presentation.
@@ -65,7 +65,7 @@ export class InternalCredentialJWT implements IInternalCredential {
   /**
    * MUST represent issuanceDate, encoded as a UNIX timestamp (NumericDate).
    */
-  nbf?: string;
+  nbf?: string | number;
 
   /**
    * MUST represent the id property contained in the verifiable credential subject.
@@ -100,7 +100,7 @@ export class InternalCredentialJWT implements IInternalCredential {
   }
 
   getExpirationDate(): string | undefined {
-    return this.exp;
+    return this.exp?.toString();
   }
 
   getId(): string | undefined {
@@ -112,7 +112,7 @@ export class InternalCredentialJWT implements IInternalCredential {
   }
 
   getIssuanceDate(): string | undefined {
-    return this.nbf;
+    return this.nbf?.toString();
   }
 
   getJti(): string | undefined {

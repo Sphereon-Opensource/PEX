@@ -63,10 +63,10 @@ export interface IIssuer {
 
 export interface IJwtCredential {
   aud?: string;
-  exp?: string;
+  exp?: string | number;
   iss: string;
   jti?: string;
-  nbf?: string;
+  nbf?: string | number;
   sub?: string;
   vc: BaseCredential;
   [x: string]: unknown;
