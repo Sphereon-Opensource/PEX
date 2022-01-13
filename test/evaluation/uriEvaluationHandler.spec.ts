@@ -101,4 +101,48 @@ describe('evaluate', () => {
     expect(errorResults.length).toEqual(5);
     expect(infoResults.length).toEqual(1);
   });
+
+  it('should generate 3 warn for Regular Hashlink (with URL encoded)', () => {
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+    ).presentation_definition;
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
+    pdSchema.input_descriptors[0].schema.push({
+      uri: 'hl:zm9YZpCjPLPJ4Epc:z3TSgXTuaHxY2tsArhUreJ4ixgw9NW7DYuQ9QTPQyLHy',
+    });
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationHandler = new UriEvaluationHandler(evaluationClient);
+    evaluationHandler.handle(pd, [vc0, vc1, vc2]);
+    const warnResults = evaluationClient.results.filter((result) => result.status === Status.WARN);
+    expect(warnResults.length).toEqual(3);
+  });
+
+  it('should generate 3 warn for Hashlink as a query parameter', () => {
+    const pdSchema: InternalPresentationDefinitionV1 = getFile(
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+    ).presentation_definition;
+    pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://example.com/hw.txt?hl=zm9YZpCjPLPJ4Epc' });
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
+    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
+    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
+    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const evaluationClient: EvaluationClient = new EvaluationClient();
+    const evaluationHandler = new UriEvaluationHandler(evaluationClient);
+    evaluationHandler.handle(pd, [vc0, vc1, vc2]);
+    const warnResults = evaluationClient.results.filter((result) => result.status === Status.WARN);
+    expect(warnResults.length).toEqual(3);
+  });
 });
