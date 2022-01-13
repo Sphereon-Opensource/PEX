@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { InputFieldType, IPresentationDefinition } from '../types';
 
 export class JsonPathUtils {
+  static REGEX_PATH = /@\w+/g;
   /**
-   * @param verifiableCredential: a vc object can be found in verifiablePresentation.verifiableCredential[i]
+   * @param obj: any object can be found in verifiablePresentation.verifiableCredential[i]
    * @param paths: paths that can be found in Field object
    * @return a result object containing value of the correct path in the verifiableCredential and the correct path
    * @example(success result): if you call this method with 1. verifiableCredential:
@@ -117,15 +117,39 @@ export class JsonPathUtils {
   }
 
   private static modifyPathWithSpecialCharacter(path: string): string {
-    const REGEX_PATH = /(\.{0,2})(?<!\[')(@\w+)(?!\w'])/g;
-    const matches = path.matchAll(REGEX_PATH);
+    const matches = path.matchAll(this.REGEX_PATH);
+    path = this.modifyPathRecursive(matches, path);
+    return path;
+  }
+
+  private static modifyPathRecursive(matches: IterableIterator<RegExpMatchArray>, path: string) {
     let next = matches.next();
-    while (next && !next.done) {
-      const atIdx = (next.value[0] as string).indexOf('@');
-      path =
-        atIdx <= 1
-          ? path.replace(next.value[0], "['" + next.value[2] + "']")
-          : path.replace(next.value[0], "..['" + next.value[2] + "']");
+    let indexChanged = false;
+    while (next && !next.done && !indexChanged) {
+      const atIdx: number | undefined = next.value.index;
+      if (atIdx && atIdx == 1) {
+        path = path.charAt(0) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+        indexChanged = true;
+        this.modifyPathRecursive(matches, path);
+      } else if (
+        atIdx &&
+        atIdx > 1 &&
+        path.substring(atIdx - 2, atIdx) !== "['" &&
+        path.substring(atIdx - 2, atIdx) !== '["'
+      ) {
+        if (path.substring(atIdx - 2, atIdx) === '..') {
+          path =
+            path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          indexChanged = true;
+          const matches = path.matchAll(this.REGEX_PATH);
+          this.modifyPathRecursive(matches, path);
+        } else if (path.charAt(atIdx - 1) === '.') {
+          path =
+            path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          indexChanged = true;
+          this.modifyPathRecursive(matches, path);
+        }
+      }
       next = matches.next();
     }
     return path;
