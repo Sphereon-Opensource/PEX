@@ -32,7 +32,7 @@ describe('should test HashlinkUtils functions', () => {
     });
 
     it('should return ok if hashlink verifies', async function () {
-        const url = "https://schema.org/docs/jsonldcontext.json.txt?hl=E4D9C4E6736A236480A184A630D44A0E0BC4FA688D76B53CE15D039A26896D15685A6FEF22770D461FBF3ACC7C689A68BCF297D733EBBFB88A039608CAF36262";
+        const url = "https://schema.org/docs/jsonldcontext.json.txt?hl=zm9YZpCjPLPJ4Epc";
         const result = await HashlinkUtils.verifyHashlink(url);
         console.log(result)
     });
