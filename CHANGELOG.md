@@ -1,5 +1,5 @@
 # Release Notes
-## v1.0.1 - TBD
+## v1.0.1 - 2022-01-13
 Some JWT VC related fixes in the deserialization and VC claim comparisons
 
 - Fixed:
