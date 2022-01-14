@@ -4,6 +4,7 @@ import jp from 'jsonpath';
 import { InputFieldType, IPresentationDefinition } from '../types';
 
 export class JsonPathUtils {
+  static matchAll = require('string.prototype.matchall');
   static REGEX_PATH = /@\w+/g;
   /**
    * @param obj: any object can be found in verifiablePresentation.verifiableCredential[i]
@@ -117,7 +118,7 @@ export class JsonPathUtils {
   }
 
   private static modifyPathWithSpecialCharacter(path: string): string {
-    const matches = path.matchAll(this.REGEX_PATH);
+    const matches = this.matchAll(path, this.REGEX_PATH);
     path = this.modifyPathRecursive(matches, path);
     return path;
   }
@@ -141,7 +142,7 @@ export class JsonPathUtils {
           path =
             path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
-          const matches = path.matchAll(this.REGEX_PATH);
+          const matches = this.matchAll(path, this.REGEX_PATH);
           this.modifyPathRecursive(matches, path);
         } else if (path.charAt(atIdx - 1) === '.') {
           path =
