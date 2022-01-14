@@ -1,4 +1,12 @@
 # Release Notes
+
+## v1.0.2 - 2022-01-14
+Added String.matchAll shim for React-Native compatibility. Will be removed later and updated with another solution, to keep the deps to a minumum
+
+- Fixed:
+  - React-Native not working with matchAll regexes
+
+
 ## v1.0.1 - 2022-01-13
 Some JWT VC related fixes in the deserialization and VC claim comparisons
 
