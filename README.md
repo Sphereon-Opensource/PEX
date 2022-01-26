@@ -128,7 +128,7 @@ const verifiablePresentation = {
 }
 
 // We are using the PEX class, to automatically detect the definition version. PEXv1 and PEXv2 are also available to use fixed PEX versions
-const { value, warnings, errors } = pex.evaluate(presentationDefinitionV2, verifiablePresentation);
+const { value, warnings, errors } = pex.evaluatePresentation(presentationDefinitionV2, verifiablePresentation);
 ```
 
 ### Holder: Credential Query
