@@ -786,3 +786,12 @@ library and not reaching version 1.X yet, we decided to change the name of both 
 - The main class was changed from `PEJS` to `PEX`. The latter class has internal feature detection support on the
   provided definition, delegating the actual implementation to the new `PEXv1` or `PEXv2` class internally. If you don't
   want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
+
+
+## License
+
+This Presentation Exchange library Open Source software released under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).
+
+## Funded & supported by
+
+<img src="logos-supporter.png">
