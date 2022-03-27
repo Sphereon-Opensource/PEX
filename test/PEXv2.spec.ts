@@ -2,7 +2,15 @@ import fs from 'fs';
 
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, ProofType, Status, Validated, ValidationEngine } from '../lib';
+import {
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  PEXv2,
+  ProofType,
+  Status,
+  Validated,
+  ValidationEngine,
+} from '../lib';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -247,7 +255,7 @@ describe('evaluate', () => {
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       assertedMockCallback,
       {
         proofOptions: getProofOptionsMock(),
@@ -272,7 +280,7 @@ describe('evaluate', () => {
     expect(() =>
       pejs.verifiablePresentationFrom(
         pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
         assertedMockCallbackWithoutProofType,
         {
           proofOptions,
@@ -308,7 +316,7 @@ describe('evaluate', () => {
     expect(() =>
       pejs.verifiablePresentationFrom(
         pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
         assertedMockCallbackWithoutProofType,
         {
           proofOptions,
@@ -380,7 +388,7 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const result = pex.selectFrom(
       pd,
-      [vpSimple.verifiableCredential[0]],
+      [(vpSimple.verifiableCredential as IVerifiableCredential[])[0]],
       ['FAsYneKJhWBP2n5E21ZzdY'],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -406,7 +414,7 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const result = pex.selectFrom(
       pd,
-      [vpSimple.verifiableCredential[0]],
+      [(vpSimple.verifiableCredential as IVerifiableCredential[])[0]],
       ['FAsYneKJhWBP2n5E21ZzdY'],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -432,7 +440,7 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const result = pex.selectFrom(
       pd,
-      [vpSimple.verifiableCredential[0]],
+      [(vpSimple.verifiableCredential as IVerifiableCredential[])[0]],
       ['FAsYneKJhWBP2n5E21ZzdY'],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );

@@ -2,7 +2,15 @@ import fs from 'fs';
 
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IJwtVerifiableCredential, IPresentation, IVerifiablePresentation, PEX, ProofType, Validated } from '../lib';
+import {
+  IJwtVerifiableCredential,
+  IPresentation,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  PEX,
+  ProofType,
+  Validated,
+} from '../lib';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 
 import {
@@ -120,7 +128,7 @@ describe('evaluate', () => {
     const pejs: PEX = new PEX();
     const evaluationResults = pejs.evaluateCredentials(
       pdSchema,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       [vpSimple.holder as string],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -134,8 +142,17 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pejs: PEX = new PEX();
-    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: IPresentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    pejs.evaluateCredentials(
+      pdSchema,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
+      [HOLDER_DID],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    const presentation: IPresentation = pejs.presentationFrom(
+      pdSchema,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
+      HOLDER_DID
+    );
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -200,7 +217,7 @@ describe('evaluate', () => {
     const pejs: PEX = new PEX();
     const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(
       pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       assertedMockCallback,
       {
         proofOptions: getProofOptionsMock(),
@@ -221,7 +238,7 @@ describe('evaluate', () => {
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(
       pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       assertedMockCallback,
       {
         proofOptions: getProofOptionsMock(),
@@ -246,7 +263,7 @@ describe('evaluate', () => {
     expect(() =>
       pejs.verifiablePresentationFrom(
         pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
         assertedMockCallbackWithoutProofType,
         {
           proofOptions,
@@ -263,10 +280,15 @@ describe('evaluate', () => {
     const pejs: PEX = new PEX();
 
     expect(() => {
-      pejs.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-      });
+      pejs.verifiablePresentationFrom(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
+        getErrorThrown,
+        {
+          proofOptions: getProofOptionsMock(),
+          signatureOptions: getSingatureOptionsMock(),
+        }
+      );
     }).toThrow(Error);
   });
 

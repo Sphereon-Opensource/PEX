@@ -1,7 +1,7 @@
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 
 import { PEX, PEXv1, ProofType, Status } from '../../lib';
-import { IJsonLdVerifiableCredential, IVerifiableCredential } from '../../lib/types/SSI.types';
+import { IJsonLDPresentation, IJsonLdVerifiableCredential, IVerifiableCredential } from '../../lib/types/SSI.types';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
 import { GatacaSelectedCredentials } from '../test_data/gataca/gatacaSelectedCredentials';
 
@@ -55,17 +55,17 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect((presentationFromResult as IJsonLDPresentation).presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
         path: '$.verifiableCredential[0]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect((presentationFromResult.verifiableCredential[0] as IJsonLdVerifiableCredential).id).toEqual(
-      'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
-    );
+    expect((presentationFromResult as IJsonLDPresentation).verifiableCredential?.length).toEqual(1);
+    expect(
+      ((presentationFromResult as IJsonLDPresentation).verifiableCredential[0] as IJsonLdVerifiableCredential).id
+    ).toEqual('cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw');
   });
 
   it('Gataca example just pick.pick', function () {
@@ -125,7 +125,7 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect((presentationFromResult as IJsonLDPresentation).presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
@@ -137,9 +137,9 @@ describe('evaluate gataca tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect((presentationFromResult.verifiableCredential[0] as IJsonLdVerifiableCredential).id).toEqual(
-      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
-    );
+    expect((presentationFromResult as IJsonLDPresentation).verifiableCredential?.length).toEqual(2);
+    expect(
+      ((presentationFromResult as IJsonLDPresentation).verifiableCredential[0] as IJsonLdVerifiableCredential).id
+    ).toEqual('cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk');
   });
 });

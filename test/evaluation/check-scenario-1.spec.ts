@@ -1,9 +1,11 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
 import { IPresentation, PEX } from '../../lib';
+import { IJsonLDPresentation } from '../../lib/types';
 import { InternalVerifiableCredential } from '../../lib/types/Internal.types';
 
 import { Wallet } from './core/Wallet';
+
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 
 describe('1st scenario', () => {
@@ -236,11 +238,12 @@ describe('1st scenario', () => {
       [holderWallet.verifiableCredentials[2]],
       'did:didMethod:2021112400'
     );
-    expect(presentation!.presentation_submission!.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
-    expect(presentation!.presentation_submission!.descriptor_map.map((dm) => dm.id).sort()).toEqual([
-      '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
-      'e73646de-43e2-4d72-ba4f-090d01c11eac',
-    ]);
+    expect((presentation as IJsonLDPresentation)!.presentation_submission!.definition_id).toEqual(
+      '31e2f0f1-6b70-411d-b239-56aed5321884'
+    );
+    expect(
+      (presentation as IJsonLDPresentation)!.presentation_submission!.descriptor_map.map((dm) => dm.id).sort()
+    ).toEqual(['867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', 'e73646de-43e2-4d72-ba4f-090d01c11eac']);
     /**
      * But what happens if we pass another VerifiableCredential and not the right one?
      {

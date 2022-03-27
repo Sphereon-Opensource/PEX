@@ -4,7 +4,7 @@ import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiablePresentation } from './types';
-import { InternalVerifiableCredential } from './types/Internal.types';
+import { InternalPresentation, InternalVerifiableCredential } from './types/Internal.types';
 import { IVerifiableCredential } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
@@ -35,12 +35,14 @@ export class PEXv1 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const internalPresentation: InternalPresentation =
+      SSITypesBuilder.mapExternalVerifiablePresentationToInternal(presentationCopy);
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentationCopy.verifiableCredential
+      internalPresentation.getBasePresentation().verifiableCredential
     );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDIDs = presentation.holder ? [presentation.holder] : [];
+    const holderDIDs = presentation.holder ? [presentation.holder as string] : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
       internalVCs,

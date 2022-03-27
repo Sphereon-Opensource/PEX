@@ -101,13 +101,28 @@ export type IJsonLdVerifiableCredential = IJsonLdCredential & IHasProof;
 
 export type IVerifiableCredential = IJwtVerifiableCredential | IJsonLdVerifiableCredential;
 
-export interface IPresentation {
+export interface IJsonLDPresentation {
   '@context': string[];
+  holder?: string;
+  presentation_submission?: PresentationSubmission;
   type: string[];
   verifiableCredential: IVerifiableCredential[];
-  presentation_submission?: PresentationSubmission;
-  holder?: string;
 }
+
+export interface IJwtPresentation {
+  aud?: string;
+  exp?: string | number;
+  iss: string;
+  jti?: string;
+  nbf?: string | number;
+  sub?: string;
+  iat?: string | number;
+  nonce?: string;
+  vp: IPresentation;
+  [x: string]: unknown;
+}
+
+export type IPresentation = IJsonLDPresentation | IJwtPresentation;
 
 export type IVerifiablePresentation = IPresentation & IHasProof;
 

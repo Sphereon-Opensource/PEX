@@ -46,12 +46,13 @@ export class PEX {
     const pd: IInternalPresentationDefinition =
       this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const internalPresentation = SSITypesBuilder.mapExternalVerifiablePresentationToInternal(presentationCopy);
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentationCopy.verifiableCredential
+      internalPresentation.getBasePresentation().verifiableCredential
     );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDIDs = presentation.holder ? [presentation.holder] : [];
+    const holderDIDs = presentation.holder ? [presentation.holder as string] : [];
     return this._evaluationClientWrapper.evaluate(pd, internalVCs, holderDIDs, limitDisclosureSignatureSuites);
   }
 
@@ -166,9 +167,9 @@ export class PEX {
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *
-   * @param presentationDefinition of V1 or v2 to be validated.
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
+   * @param p
    */
   public validateDefinition(p: IPresentationDefinition): Validated {
     const result = this.definitionVersionDiscovery(p);

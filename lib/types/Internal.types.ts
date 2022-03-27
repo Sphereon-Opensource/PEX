@@ -4,6 +4,7 @@ import {
   InputDescriptorV2,
   PresentationDefinitionV1,
   PresentationDefinitionV2,
+  PresentationSubmission,
   SubmissionRequirement,
 } from '@sphereon/pex-models';
 
@@ -13,9 +14,168 @@ import {
   ICredentialSubject,
   IIssuer,
   IJsonLdCredential,
+  IJsonLDPresentation,
   IProof,
+  IVerifiableCredential,
   PEVersion,
 } from './SSI.types';
+
+export abstract class BasePresentation implements IJsonLDPresentation {
+  '@context': string[];
+  holder: string;
+  presentation_submission?: PresentationSubmission;
+  type: string[];
+  verifiableCredential: IVerifiableCredential[];
+  [x: string]: unknown;
+}
+
+export interface InternalPresentation {
+  getAudience(): string | undefined;
+
+  getBasePresentation(): BasePresentation;
+
+  getContext(): string[] | string;
+
+  getExpirationDate(): string | undefined;
+
+  getIat(): string | undefined;
+
+  getIssuer(): unknown;
+
+  getIssuanceDate(): string | undefined; // not sure if we need this, what do you think @nlklomp
+
+  getJti(): string | undefined;
+
+  getNonce(): string | undefined;
+
+  getType(): string;
+
+  [x: string]: unknown;
+}
+
+export class InternalPresentationJWT implements InternalPresentation {
+  /**
+   * aud MUST represent (i.e., identify) the intended audience of the verifiable presentation
+   * (i.e., the verifier intended by the presenting holder to receive and verify the verifiable presentation).
+   */
+  aud?: string;
+
+  /**
+   * MUST represent the expirationDate property, encoded as a UNIX timestamp (NumericDate).
+   */
+  exp?: string | number;
+
+  /**
+   *
+   */
+  iat: string | undefined;
+
+  /**
+   * MUST represent the issuer property of a verifiable credential or the holder property of a verifiable presentation.
+   */
+  iss: string;
+
+  /**
+   * MUST represent the id property of the verifiable credential or verifiable presentation.
+   */
+  jti?: string;
+
+  /**
+   * MUST represent issuanceDate, encoded as a UNIX timestamp (NumericDate).
+   */
+  nbf?: string | number;
+
+  nonce?: string;
+
+  vp: BasePresentation;
+
+  [x: string]: unknown;
+
+  getAudience(): string | undefined {
+    return this.aud;
+  }
+
+  getBasePresentation(): BasePresentation {
+    return this.vp;
+  }
+
+  getContext(): string[] | string {
+    return this.vp['@context'];
+  }
+
+  getExpirationDate(): string | undefined {
+    return this.exp?.toString();
+  }
+
+  getIat(): string | undefined {
+    return this.iat;
+  }
+
+  getIssuanceDate(): string | undefined {
+    return this.nbf?.toString();
+  }
+
+  getIssuer(): unknown {
+    return this.iss;
+  }
+
+  getJti(): string | undefined {
+    return this.jti;
+  }
+
+  getNonce(): string | undefined {
+    return this.nonce;
+  }
+
+  getType(): string {
+    return 'jwt';
+  }
+}
+
+export class InternalPresentationJsonLD extends BasePresentation implements InternalPresentation {
+  // TODO: see if there's any equivalent for jwt's aud in JSON-LD standard, I couldn't find anything
+  getAudience(): string | undefined {
+    return undefined;
+  }
+
+  getBasePresentation(): BasePresentation {
+    return this;
+  }
+
+  getContext(): string[] | string {
+    return this['@context'];
+  }
+
+  // TODO: see if there's any equivalent for jwt's exp in JSON-LD standard, I couldn't find anything
+  getExpirationDate(): string | undefined {
+    return undefined;
+  }
+
+  getIat(): string | undefined {
+    return undefined;
+  }
+
+  getIssuanceDate(): string | undefined {
+    return undefined;
+  }
+
+  // TODO: see if there's any equivalent for jwt's iss in JSON-LD standard, I couldn't find anything
+  getIssuer(): unknown {
+    return undefined;
+  }
+
+  getJti(): string | undefined {
+    return undefined;
+  }
+
+  getNonce(): string | undefined {
+    return undefined;
+  }
+
+  getType(): string {
+    return 'json-ld';
+  }
+}
 
 export interface IInternalCredential {
   getAudience(): string | undefined;

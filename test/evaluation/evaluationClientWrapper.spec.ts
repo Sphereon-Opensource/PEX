@@ -4,6 +4,7 @@ import { Optionality, PresentationSubmission } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
+import { IJsonLDPresentation } from '../../lib/types';
 import {
   InternalPresentationDefinitionV1,
   InternalVerifiableCredential,
@@ -33,7 +34,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -56,7 +57,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -76,11 +77,13 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
+    (vpSimple as IJsonLDPresentation).verifiableCredential[0]['@context'] = [
+      'https://www.w3.org/TR/vc-data-model/#types1',
+    ];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -103,11 +106,13 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
+    (vpSimple as IJsonLDPresentation).verifiableCredential[0][`@context`] = [
+      'https://www.w3.org/TR/vc-data-model/#types1',
+    ];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -130,7 +135,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -153,7 +158,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -178,7 +183,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -203,7 +208,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -228,7 +233,7 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -255,7 +260,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       [vc],
@@ -282,11 +287,11 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pd,
       [vc0, vc1, vc2],
@@ -295,7 +300,7 @@ describe('evaluate', () => {
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result.descriptor_map).toEqual(
       expect.objectContaining(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().descriptor_map)
@@ -317,12 +322,12 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     vc0.getBaseCredential().issuer = 'did:foo:123';
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pd,
       [vc0, vc1, vc2],
@@ -361,12 +366,12 @@ describe('evaluate', () => {
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     vc0.getBaseCredential().issuer = 'did:foo:123';
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(
       pd,
       [vc0, vc1, vc2],
@@ -394,13 +399,15 @@ describe('evaluate', () => {
     delete pdSchema!.submission_requirements;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    const vcAttr: InternalVerifiableCredentialJwt = <InternalVerifiableCredentialJwt>vpSimple.verifiableCredential[0];
+    const vcAttr: InternalVerifiableCredentialJwt = <InternalVerifiableCredentialJwt>(
+      (vpSimple as IJsonLDPresentation).verifiableCredential[0]
+    );
     vc0 = Object.assign(vc0, vcAttr);
     vc0.getBaseCredential().issuer = 'did:foo:123';
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     evaluationClientWrapper.evaluate(
@@ -410,8 +417,8 @@ describe('evaluate', () => {
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [
-      { ...vpSimple.verifiableCredential[1] } as InternalVerifiableCredentialJsonLD,
-      { ...vpSimple.verifiableCredential[2] } as InternalVerifiableCredentialJsonLD,
+      { ...(vpSimple as IJsonLDPresentation).verifiableCredential[1] } as InternalVerifiableCredentialJsonLD,
+      { ...(vpSimple as IJsonLDPresentation).verifiableCredential[2] } as InternalVerifiableCredentialJsonLD,
     ]);
     expect(result).toEqual(
       expect.objectContaining({

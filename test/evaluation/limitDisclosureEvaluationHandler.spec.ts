@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
+import { IJsonLDPresentation } from '../../lib/types';
 import {
   InternalPresentationDefinitionV1,
   InternalVerifiableCredential,
@@ -30,7 +31,7 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as InternalVerifiableCredentialJsonLD).credentialSubject['etc']
@@ -43,7 +44,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -59,7 +60,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     if ('type' in vc.proof) {
@@ -85,7 +86,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     delete vc.getBaseCredential().credentialSubject['details'];

@@ -4,6 +4,7 @@ import { IVerifiablePresentation } from '../../lib';
 import { HandlerCheckResult } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers';
+import { IJsonLDPresentation } from '../../lib/types';
 import { InternalPresentationDefinitionV1, InternalVerifiableCredential } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
@@ -89,7 +90,9 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+        (presentation as IJsonLDPresentation).verifiableCredential
+      )
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
@@ -115,7 +118,9 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+        (presentation as IJsonLDPresentation).verifiableCredential
+      )
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({

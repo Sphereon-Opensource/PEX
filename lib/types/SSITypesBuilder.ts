@@ -1,15 +1,20 @@
 import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
+import jwt_decode from 'jwt-decode';
 
 import { JsonPathUtils } from '../utils';
+import { ObjectUtils } from '../utils/ObjectUtils';
 
 import {
+  InternalPresentation,
   InternalPresentationDefinitionV1,
   InternalPresentationDefinitionV2,
+  InternalPresentationJsonLD,
+  InternalPresentationJWT,
   InternalVerifiableCredential,
   InternalVerifiableCredentialJsonLD,
   InternalVerifiableCredentialJwt,
 } from './Internal.types';
-import { IHasProof, IJwtCredential, IPresentationDefinition, IVerifiableCredential } from './SSI.types';
+import { IHasProof, IJwtCredential, IPresentation, IPresentationDefinition, IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -45,6 +50,21 @@ export class SSITypesBuilder {
     return pd;
   }
 
+  static mapExternalVerifiablePresentationToInternal(externalVP: IPresentation): InternalPresentation {
+    // unpacked jwt vp
+    if (ObjectUtils.isString(externalVP)) {
+      const externalPresentationJwt: InternalPresentationJWT = jwt_decode(externalVP as unknown as string);
+      const vp: InternalPresentation = new InternalPresentationJWT();
+      return Object.assign(vp, externalPresentationJwt);
+    } else if (externalVP['vp' as keyof IPresentation]) {
+      const vp: InternalPresentation = new InternalPresentationJWT();
+      return Object.assign(vp, externalVP);
+    } else {
+      const vp: InternalPresentation = new InternalPresentationJsonLD();
+      return Object.assign(vp, externalVP);
+    }
+  }
+
   static mapExternalVerifiableCredentialsToInternal(
     externalCredentials: IVerifiableCredential[]
   ): InternalVerifiableCredential[] {
@@ -56,10 +76,16 @@ export class SSITypesBuilder {
   }
 
   private static mapExternalVerifiableCredentialToInternal(externalCredential: IVerifiableCredential) {
-    if (externalCredential.vc && externalCredential.iss) {
+    if (ObjectUtils.isString(externalCredential)) {
+      const externalCredentialJwt: InternalVerifiableCredentialJwt = jwt_decode(
+        externalCredential as unknown as string
+      );
+      const vp: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
+      return Object.assign(vp, externalCredentialJwt);
+    } else if (externalCredential.vc && externalCredential.iss) {
       const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
       const result = Object.assign(vc, externalCredential);
-      return SSITypesBuilder.setJWTAdditionalFields(result);
+      return SSITypesBuilder.setCredentialJWTAdditionalFields(result);
     } else if (externalCredential.credentialSubject && externalCredential.id) {
       const vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
       return Object.assign(vc, externalCredential);
@@ -67,7 +93,9 @@ export class SSITypesBuilder {
     throw 'VerifiableCredential structure is incorrect.';
   }
 
-  private static setJWTAdditionalFields(result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof) {
+  private static setCredentialJWTAdditionalFields(
+    result: InternalVerifiableCredentialJwt & IJwtCredential & IHasProof
+  ) {
     if (result.exp) {
       const expDate = result.getBaseCredential().credentialSubject?.expirationDate;
       const jwtExp = parseInt(result.exp.toString());

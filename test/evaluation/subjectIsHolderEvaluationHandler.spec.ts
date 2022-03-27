@@ -5,6 +5,7 @@ import { PresentationSubmission } from '@sphereon/pex-models';
 import { IVerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/handlers';
+import { IJsonLDPresentation } from '../../lib/types';
 import { InternalPresentationDefinitionV1, InternalVerifiableCredential } from '../../lib/types/Internal.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
@@ -36,12 +37,14 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     ) as IVerifiablePresentation;
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     evaluationClient.verifiableCredential = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentation.verifiableCredential
+      (presentation as IJsonLDPresentation).verifiableCredential
     );
     evaluationClient.dids = [HOLDER_DID];
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+        (presentation as IJsonLDPresentation).verifiableCredential
+      )
     );
     expect(evaluationHandler.client.results).toEqual(results);
   });

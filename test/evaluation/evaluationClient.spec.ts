@@ -4,6 +4,7 @@ import { Optionality } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
+import { IJsonLDPresentation } from '../../lib/types';
 import {
   InternalPresentationDefinitionV1,
   InternalVerifiableCredential,
@@ -30,7 +31,7 @@ describe('evaluate', () => {
     presentationDefinition.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationClient.results[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
@@ -54,7 +55,7 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
@@ -67,9 +68,11 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.verifiableCredential[0]['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
+    (vpSimple as IJsonLDPresentation).verifiableCredential[0]['@context'] = [
+      'https://www.w3.org/TR/vc-data-model/#types1',
+    ];
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationClient.results[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
@@ -96,9 +99,11 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    vpSimple.verifiableCredential[0][`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
+    (vpSimple as IJsonLDPresentation).verifiableCredential[0][`@context`] = [
+      'https://www.w3.org/TR/vc-data-model/#types1',
+    ];
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
@@ -111,7 +116,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
@@ -125,7 +130,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
@@ -142,7 +147,7 @@ describe('evaluate', () => {
     delete presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as InternalVerifiableCredentialJsonLD).credentialSubject['etc']
@@ -158,7 +163,7 @@ describe('evaluate', () => {
     presentationDefinition!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as InternalVerifiableCredentialJsonLD).credentialSubject['etc']
@@ -174,7 +179,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as InternalVerifiableCredentialJsonLD).credentialSubject['birthPlace']
@@ -189,7 +194,7 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    vc = Object.assign(vc, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     evaluationClient.evaluate(pd, [vc], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       (evaluationClient.verifiableCredential[0] as InternalVerifiableCredentialJsonLD).credentialSubject['etc']

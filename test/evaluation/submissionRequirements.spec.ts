@@ -4,6 +4,7 @@ import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
+import { IJsonLDPresentation } from '../../lib/types';
 import {
   InternalPresentationDefinitionV1,
   InternalVerifiableCredential,
@@ -30,15 +31,15 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -61,16 +62,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toEqual(
       expect.objectContaining({
@@ -92,16 +95,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Count: expected: 1 actual: 2 at level: 1');
   });
@@ -115,15 +120,15 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -145,16 +150,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Min: expected: 3 actual: 2 at level: 0');
   });
@@ -168,16 +175,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Max: expected: 1 actual: 2 at level: 0');
   });
@@ -191,16 +200,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Count: expected: 1 actual: 2 at level: 0');
   });
@@ -214,16 +225,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toEqual(
       expect.objectContaining({
@@ -253,15 +266,15 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -284,15 +297,15 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -315,15 +328,15 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal((vpSimple as IJsonLDPresentation).verifiableCredential)
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -346,16 +359,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Min: expected: 3 actual: 2 at level: 1');
   });
@@ -369,16 +384,18 @@ describe('Submission requirements tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
+    vc0 = Object.assign(vc0, (vpSimple as IJsonLDPresentation).verifiableCredential[0]);
     let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
+    vc1 = Object.assign(vc1, (vpSimple as IJsonLDPresentation).verifiableCredential[1]);
     let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    vc2 = Object.assign(vc2, (vpSimple as IJsonLDPresentation).verifiableCredential[2]);
     evaluationClientWrapper.evaluate(pd, [vc0, vc1, vc2], HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(() =>
       evaluationClientWrapper.submissionFrom(
         pd,
-        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(vpSimple.verifiableCredential)
+        SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+          (vpSimple as IJsonLDPresentation).verifiableCredential
+        )
       )
     ).toThrowError('Max: expected: 1 actual: 2 at level: 1');
   });

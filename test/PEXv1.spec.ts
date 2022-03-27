@@ -2,7 +2,15 @@ import fs from 'fs';
 
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 
-import { IPresentation, IVerifiablePresentation, PEXv1, ProofType, Validated } from '../lib';
+import {
+  EvaluationResults,
+  IPresentation,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  PEXv1,
+  ProofType,
+  Validated,
+} from '../lib';
 
 import {
   assertedMockCallback,
@@ -14,6 +22,10 @@ import {
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
+}
+
+function getFileSimple(path: string) {
+  return fs.readFileSync(path, 'utf-8');
 }
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
@@ -57,7 +69,7 @@ describe('evaluate', () => {
     const pex: PEXv1 = new PEXv1();
     const evaluationResults = pex.evaluateCredentials(
       pdSchema,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       [vpSimple.holder as string],
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
@@ -71,8 +83,17 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pex: PEXv1 = new PEXv1();
-    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    pex.evaluateCredentials(
+      pdSchema,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
+      [HOLDER_DID],
+      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+    );
+    const presentation: IPresentation = pex.presentationFrom(
+      pdSchema,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
+      HOLDER_DID
+    );
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -120,7 +141,7 @@ describe('evaluate', () => {
     const pex: PEXv1 = new PEXv1();
     const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
+      vpSimple.verifiableCredential as IVerifiableCredential[],
       assertedMockCallback,
       {
         proofOptions: getProofOptionsMock(),
@@ -145,7 +166,7 @@ describe('evaluate', () => {
     expect(() =>
       pejs.verifiablePresentationFrom(
         pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
         assertedMockCallbackWithoutProofType,
         {
           proofOptions,
@@ -162,10 +183,36 @@ describe('evaluate', () => {
     const pex: PEXv1 = new PEXv1();
 
     expect(() => {
-      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-      });
+      pex.verifiablePresentationFrom(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential as IVerifiableCredential[],
+        getErrorThrown,
+        {
+          proofOptions: getProofOptionsMock(),
+          signatureOptions: getSingatureOptionsMock(),
+        }
+      );
     }).toThrow(Error);
+  });
+
+  it('should return a signed presentation', () => {
+    const pd: PresentationDefinitionV1 = {
+      id: 'pd-degree',
+      input_descriptors: [
+        {
+          id: 'BachelorDegree-Baccalauréat-en-musiques-numériques',
+          schema: [{ uri: 'https://www.w3.org/2018/credentials/v1' }],
+        },
+      ],
+    };
+    const vpSimple = getFileSimple('./test/dif_pe_examples/vp/vp-jwt.jwt') as unknown as IVerifiablePresentation;
+    const pex: PEXv1 = new PEXv1();
+    const result: EvaluationResults = pex.evaluatePresentation(pd, vpSimple);
+    expect(result.errors?.length).toEqual(0);
+    expect(result.value?.descriptor_map[0]).toEqual({
+      id: 'BachelorDegree-Baccalauréat-en-musiques-numériques',
+      format: 'ldp_vc',
+      path: '$.verifiableCredential[0]',
+    });
   });
 });

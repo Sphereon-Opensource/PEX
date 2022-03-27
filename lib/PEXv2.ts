@@ -35,11 +35,12 @@ export class PEXv2 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const internalPresentation = SSITypesBuilder.mapExternalVerifiablePresentationToInternal(presentationCopy);
     const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentationCopy.verifiableCredential
+      internalPresentation.getBasePresentation().verifiableCredential
     );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    const holderDIDs = presentation.holder ? [presentation.holder] : [];
+    const holderDIDs = presentation.holder ? [presentation.holder as string] : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
       internalVCs,
