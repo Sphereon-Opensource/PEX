@@ -3,7 +3,11 @@ import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { IVerifiableCredential } from '../types';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../types/Internal.types';
+import {
+  IInternalPresentationDefinition,
+  InternalVerifiableCredential,
+  WrappedVerifiableCredential
+} from '../types/Internal.types';
 import { SSITypesBuilder } from '../types/SSITypesBuilder';
 import { JsonPathUtils } from '../utils';
 
@@ -178,7 +182,7 @@ export class EvaluationClientWrapper {
 
   public evaluate(
     pd: IInternalPresentationDefinition,
-    vcs: InternalVerifiableCredential[],
+    vcs: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {

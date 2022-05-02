@@ -4,7 +4,11 @@ import Ajv from 'ajv';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { IPresentation, IProof, IVerifiableCredential, IVerifiablePresentation, PEVersion } from './types';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from './types/Internal.types';
+import {
+  IInternalPresentationDefinition,
+  InternalVerifiableCredential,
+  WrappedVerifiablePresentation
+} from './types/Internal.types';
 import { IPresentationDefinition } from './types/SSI.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { JsonPathUtils } from './utils';
@@ -46,13 +50,14 @@ export class PEX {
     const pd: IInternalPresentationDefinition =
       this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
-    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
+    const wrappedVerifiablePresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
+    /*const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
       presentationCopy.verifiableCredential
-    );
+    );*/
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
-    return this._evaluationClientWrapper.evaluate(pd, internalVCs, holderDIDs, limitDisclosureSignatureSuites);
+    return this._evaluationClientWrapper.evaluate(pd, wrappedVerifiablePresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
   }
 
   /***
@@ -73,6 +78,7 @@ export class PEX {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
+    const wrappedVerifiablePresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVc(verifiableCredentials);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd: IInternalPresentationDefinition =
       this.determineAndCastToInternalPresentationDefinition(presentationDefinition);

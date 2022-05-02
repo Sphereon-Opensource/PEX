@@ -1,15 +1,23 @@
-import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
+import {PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2} from '@sphereon/pex-models';
+import jwt_decode from 'jwt-decode';
 
-import { JsonPathUtils } from '../utils';
+import {JsonPathUtils} from '../utils';
+import {ObjectUtils} from "../utils/ObjectUtils";
 
 import {
+  InternalCredential,
   InternalPresentationDefinitionV1,
   InternalPresentationDefinitionV2,
-  InternalVerifiableCredential,
-  InternalVerifiableCredentialJsonLD,
-  InternalVerifiableCredentialJwt,
+  VerifiableDataExchangeType,
+  WrappedVerifiableCredential,
+  WrappedVerifiablePresentation
 } from './Internal.types';
-import { IHasProof, IJwtCredential, IPresentationDefinition, IVerifiableCredential } from './SSI.types';
+import {
+  IPresentation,
+  IPresentationDefinition,
+  IVerifiableCredential,
+  IVerifiablePresentation
+} from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -45,7 +53,7 @@ export class SSITypesBuilder {
     return pd;
   }
 
-  static mapExternalVerifiableCredentialsToInternal(
+  /*static mapExternalVerifiableCredentialsToInternal(
     externalCredentials: IVerifiableCredential[]
   ): InternalVerifiableCredential[] {
     const internalVCs: InternalVerifiableCredential[] = [];
@@ -129,21 +137,89 @@ export class SSITypesBuilder {
       result.getBaseCredential().id = result.jti;
     }
     return result;
+  }*/
+
+  static mapExternalVerifiablePresentationToWrappedVP(presentationCopy: IPresentation): WrappedVerifiablePresentation {
+    const isjwtEncoded: boolean = ObjectUtils.isString(presentationCopy);
+    const type: VerifiableDataExchangeType = isjwtEncoded ? VerifiableDataExchangeType.JWT_ENCODED : VerifiableDataExchangeType.JSONLD
+    const vp = isjwtEncoded ? this.decodeJwtVerifiablePresentation(presentationCopy as unknown as string) : presentationCopy;
+    return {
+      type: type,
+      original: isjwtEncoded ? jwt_decode(presentationCopy as unknown as string) : presentationCopy,
+      decoded: vp,
+      vcs: this.mapExternalVerifiableCredentialsToWrappedVc(vp.verifiableCredential)
+    };
   }
 
-  static mapInternalVerifiableCredentialsToExternal(
-    internalCredentials: InternalVerifiableCredential[]
-  ): IVerifiableCredential[] {
-    const externalVCs: IVerifiableCredential[] = [];
-    for (const internalCredential of internalCredentials) {
-      externalVCs.push(this.mapInternalVerifiableCredentialToExternal(internalCredential));
+  private static decodeJwtVerifiablePresentation(jwtvp: string): IPresentation {
+    const externalPresentationJwt: {
+      vp: unknown,
+      exp: string,
+      iss: string,
+      nbf: string,
+      sub: string,
+      jti: string
+    } = jwt_decode(jwtvp as unknown as string);
+    return {
+      ...externalPresentationJwt,
+      expirationDate: externalPresentationJwt.exp,
+      holder: externalPresentationJwt.iss,
+      issuanceDate: externalPresentationJwt.nbf,
+      id: externalPresentationJwt.jti
+    } as unknown as IPresentation;
+  }
+
+  static mapExternalVerifiableCredentialsToWrappedVc(verifiableCredentials: IVerifiableCredential[]): WrappedVerifiableCredential[] {
+    const wrappedVcs: WrappedVerifiableCredential[] = [];
+    for (let i = 0; i < verifiableCredentials.length; i++) {
+      wrappedVcs.push(this.mapExternalVerifiableCredentialToWrappedVc(verifiableCredentials[i]));
     }
-    return externalVCs;
+    return wrappedVcs;
   }
 
-  private static mapInternalVerifiableCredentialToExternal(
-    internalCredential: InternalVerifiableCredential
-  ): IVerifiableCredential {
-    return internalCredential as IVerifiableCredential;
+  private static mapExternalVerifiableCredentialToWrappedVc(verifiableCredential: IVerifiableCredential): WrappedVerifiableCredential {
+    if (ObjectUtils.isString(verifiableCredential)) {
+      const externalCredentialJwt: {
+        vc: unknown,
+        exp: string,
+        iss: string,
+        nbf: string,
+        sub: string,
+        jti: string
+      } = jwt_decode(verifiableCredential as unknown as string)
+      return {
+        original: verifiableCredential,
+        decoded: jwt_decode(verifiableCredential as unknown as string),
+        type: VerifiableDataExchangeType.JWT_ENCODED,
+        internalCredential: {
+          ...externalCredentialJwt,
+          expirationDate: externalCredentialJwt.exp,
+          issuer: externalCredentialJwt.iss,
+          issuanceDate: externalCredentialJwt.nbf,
+          id: externalCredentialJwt.jti
+        } as unknown as InternalCredential
+      }
+    }
+    else if (verifiableCredential["vc"]) {
+      return {
+        original: verifiableCredential,
+        decoded: verifiableCredential,
+        type: VerifiableDataExchangeType.JWT_DECODED,
+        internalCredential: {
+          ...verifiableCredential,
+          expirationDate: verifiableCredential.exp,
+          issuer: verifiableCredential.iss,
+          issuanceDate: verifiableCredential.nbf,
+          id: verifiableCredential.jti
+        } as unknown as InternalCredential
+      }
+    } else {
+      return {
+        original: verifiableCredential,
+        decoded: verifiableCredential,
+        type: VerifiableDataExchangeType.JSONLD,
+        internalCredential: verifiableCredential as InternalCredential
+      }
+    }
   }
 }
