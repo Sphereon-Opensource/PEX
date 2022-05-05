@@ -5,10 +5,9 @@ import { Checked, Status } from '../ConstraintUtils';
 import { IVerifiableCredential } from '../types';
 import {
   IInternalPresentationDefinition,
-  InternalVerifiableCredential,
-  WrappedVerifiableCredential
+  InternalCredential,
+  WrappedVerifiableCredential,
 } from '../types/Internal.types';
-import { SSITypesBuilder } from '../types/SSITypesBuilder';
 import { JsonPathUtils } from '../utils';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
@@ -29,13 +28,18 @@ export class EvaluationClientWrapper {
 
   public selectFrom(
     presentationDefinition: IInternalPresentationDefinition,
-    verifiableCredentials: InternalVerifiableCredential[],
+    wrappedVerifiableCredentials: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids, limitDisclosureSignatureSuites);
+    this._client.evaluate(
+      presentationDefinition,
+      wrappedVerifiableCredentials,
+      holderDids,
+      limitDisclosureSignatureSuites
+    );
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -51,14 +55,18 @@ export class EvaluationClientWrapper {
         marked
       );
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: InternalVerifiableCredential[] = matches.map(
-        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      const credentials: IVerifiableCredential[] = matches.map(
+        (e) =>
+          jp.nodes(
+            this._client.wrappedVcs.map((wrapped) => wrapped.decoded),
+            e
+          )[0].value
       );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
+        verifiableCredential: credentials,
         warnings,
       };
     } else {
@@ -67,32 +75,41 @@ export class EvaluationClientWrapper {
       );
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: InternalVerifiableCredential[] = matches.map(
-        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      const credentials: IVerifiableCredential[] = matches.map(
+        (e) =>
+          jp.nodes(
+            this._client.wrappedVcs.map((wrapped) => wrapped.internalCredential),
+            e
+          )[0].value
       );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
+        verifiableCredential: credentials,
         warnings,
       };
     }
 
-    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
-    this.remapMatches(selectResults, verifiableCredentials);
+    this.remapMatches(
+      selectResults,
+      wrappedVerifiableCredentials.map((wrapped) => wrapped.decoded as IVerifiableCredential)
+    );
     selectResults.matches?.forEach((m) => {
       this.updateSubmissionRequirementMatchPathToAlias(m, 'verifiableCredential');
     });
     return selectResults;
   }
 
-  private remapMatches(selectResults: SelectResults, verifiableCredentials: InternalVerifiableCredential[]) {
+  private remapMatches(selectResults: SelectResults, verifiableCredentials: IVerifiableCredential[]) {
     selectResults.matches?.forEach((srm) => {
       srm.vc_path.forEach((match, index, matches) => {
         const vc = jp.query(verifiableCredentials, match)[0];
-        const newIndex = selectResults.verifiableCredential?.findIndex((svc) => svc.id === vc.id);
+        const newIndex = selectResults.verifiableCredential?.findIndex(
+          (svc) => svc['id' as keyof IVerifiableCredential] === vc.id
+        );
         matches[index] = `$[${newIndex}]`;
       });
       srm.name;
@@ -182,12 +199,14 @@ export class EvaluationClientWrapper {
 
   public evaluate(
     pd: IInternalPresentationDefinition,
-    vcs: WrappedVerifiableCredential[],
+    wvcs: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
-    const result: EvaluationResults = { verifiableCredential: [...vcs] };
+    this._client.evaluate(pd, wvcs, holderDids, limitDisclosureSignatureSuites);
+    const result: EvaluationResults = {
+      verifiableCredential: wvcs.map((wrapped) => wrapped.decoded as IVerifiableCredential),
+    };
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
     if (this._client.presentationSubmission?.descriptor_map.length) {
@@ -202,7 +221,7 @@ export class EvaluationClientWrapper {
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
-    result.verifiableCredential = this._client.verifiableCredential;
+    result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.decoded as IVerifiableCredential);
     return result;
   }
 
@@ -210,17 +229,18 @@ export class EvaluationClientWrapper {
     return this._client.results
       .filter((result) => result.status === status)
       .map((x) => {
+        const vcPath = x.verifiable_credential_path.substring(1);
         return {
           tag: x.evaluator,
           status: x.status,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+          message: `${x.message}: ${x.input_descriptor_path}: $.verifiableCredential${vcPath}`,
         };
       });
   }
 
   public submissionFrom(
     pd: IInternalPresentationDefinition,
-    vcs: InternalVerifiableCredential[]
+    vcs: WrappedVerifiableCredential[]
   ): PresentationSubmission {
     if (!this._client.results.length) {
       throw Error('You need to call evaluate() before pejs.presentationFrom()');
@@ -281,13 +301,10 @@ export class EvaluationClientWrapper {
 
   private matchUserSelectedVcs(
     marked: HandlerCheckResult[],
-    vcs: InternalVerifiableCredential[]
+    vcs: WrappedVerifiableCredential[]
   ): [HandlerCheckResult[], [string, string][]] {
     const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
-    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
-      index,
-      JSON.stringify(vc),
-    ]);
+    const allCredentials: [number, string][] = this._client.wrappedVcs.map((vc, index) => [index, JSON.stringify(vc)]);
     const updatedIndexes: [string, string][] = [];
     userSelected.forEach((us, i) => {
       allCredentials.forEach((ac, j) => {
@@ -421,12 +438,12 @@ export class EvaluationClientWrapper {
 
   public fillSelectableCredentialsToVerifiableCredentialsMapping(
     selectResults: SelectResults,
-    verifiableCredentials: InternalVerifiableCredential[]
+    wrappedVcs: WrappedVerifiableCredential[]
   ) {
     if (selectResults) {
       selectResults.verifiableCredential?.forEach((selectableCredential: IVerifiableCredential) => {
-        const foundIndex: number = verifiableCredentials.findIndex(
-          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        const foundIndex: number = wrappedVcs.findIndex(
+          (wrappedVc) => (selectableCredential as InternalCredential).id === wrappedVc.internalCredential.id
         );
         selectResults.vcIndexes?.push(foundIndex);
       });

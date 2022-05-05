@@ -11,16 +11,11 @@ import {
   SignatureOptions,
 } from './signing';
 import {
-  ICredential,
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
   IHasProof,
   IIssuer,
-  IJsonLdCredential,
-  IJsonLdVerifiableCredential,
-  IJwtCredential,
-  IJwtVerifiableCredential,
   InputFieldType,
   IPresentation,
   IPresentationDefinition,
@@ -48,14 +43,9 @@ export {
   IIssuer,
   ProofType,
   ProofPurpose,
-  IJwtVerifiableCredential,
   PEVersion,
-  ICredential,
   ICredentialSchema,
   IVerifiableCredential,
-  IJsonLdVerifiableCredential,
-  IJwtCredential,
-  IJsonLdCredential,
 };
 export { Checked, Status, NonEmptyArray };
 export { PEX, PEXv1, PEXv2 };

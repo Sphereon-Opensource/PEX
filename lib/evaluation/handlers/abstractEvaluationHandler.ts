@@ -2,7 +2,7 @@ import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@s
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -32,14 +32,14 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
     return this._client;
   }
 
-  public abstract handle(d: IInternalPresentationDefinition, p: InternalVerifiableCredential[]): void;
+  public abstract handle(d: IInternalPresentationDefinition, p: WrappedVerifiableCredential[]): void;
 
-  public get verifiableCredential(): InternalVerifiableCredential[] {
-    return this._client.verifiableCredential;
+  public get wrappedVcs(): WrappedVerifiableCredential[] {
+    return this._client.wrappedVcs;
   }
 
-  public set verifiableCredential(verifiableCredential: InternalVerifiableCredential[]) {
-    this._client.verifiableCredential = verifiableCredential;
+  public set wrappedVcs(wrappedVcs: WrappedVerifiableCredential[]) {
+    this._client.wrappedVcs = wrappedVcs;
   }
 
   public get presentationSubmission(): PresentationSubmission {

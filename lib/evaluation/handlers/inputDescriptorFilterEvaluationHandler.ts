@@ -7,7 +7,7 @@ import { Status } from '../../ConstraintUtils';
 import {
   IInternalPresentationDefinition,
   InternalPresentationDefinitionV2,
-  InternalVerifiableCredential,
+  WrappedVerifiableCredential,
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
@@ -25,14 +25,14 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
-    vcs.forEach((vc: InternalVerifiableCredential, vcIndex: number) => {
+    wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
         let inputField = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(vc, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.decoded, field.value.path);
         }
         if (!inputField.length) {
           const payload = { valid: false };

@@ -1,8 +1,8 @@
-import {PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2} from '@sphereon/pex-models';
+import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
 import jwt_decode from 'jwt-decode';
 
-import {JsonPathUtils} from '../utils';
-import {ObjectUtils} from "../utils/ObjectUtils";
+import { JsonPathUtils } from '../utils';
+import { ObjectUtils } from '../utils/ObjectUtils';
 
 import {
   InternalCredential,
@@ -10,14 +10,9 @@ import {
   InternalPresentationDefinitionV2,
   VerifiableDataExchangeType,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation
+  WrappedVerifiablePresentation,
 } from './Internal.types';
-import {
-  IPresentation,
-  IPresentationDefinition,
-  IVerifiableCredential,
-  IVerifiablePresentation
-} from './SSI.types';
+import { IPresentation, IPresentationDefinition, IVerifiableCredential } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -141,35 +136,41 @@ export class SSITypesBuilder {
 
   static mapExternalVerifiablePresentationToWrappedVP(presentationCopy: IPresentation): WrappedVerifiablePresentation {
     const isjwtEncoded: boolean = ObjectUtils.isString(presentationCopy);
-    const type: VerifiableDataExchangeType = isjwtEncoded ? VerifiableDataExchangeType.JWT_ENCODED : VerifiableDataExchangeType.JSONLD
-    const vp = isjwtEncoded ? this.decodeJwtVerifiablePresentation(presentationCopy as unknown as string) : presentationCopy;
+    const type: VerifiableDataExchangeType = isjwtEncoded
+      ? VerifiableDataExchangeType.JWT_ENCODED
+      : VerifiableDataExchangeType.JSONLD;
+    const vp = isjwtEncoded
+      ? this.decodeJwtVerifiablePresentation(presentationCopy as unknown as string)
+      : presentationCopy;
     return {
       type: type,
       original: isjwtEncoded ? jwt_decode(presentationCopy as unknown as string) : presentationCopy,
       decoded: vp,
-      vcs: this.mapExternalVerifiableCredentialsToWrappedVc(vp.verifiableCredential)
+      vcs: this.mapExternalVerifiableCredentialsToWrappedVcs(vp.verifiableCredential),
     };
   }
 
   private static decodeJwtVerifiablePresentation(jwtvp: string): IPresentation {
     const externalPresentationJwt: {
-      vp: unknown,
-      exp: string,
-      iss: string,
-      nbf: string,
-      sub: string,
-      jti: string
+      vp: unknown;
+      exp: string;
+      iss: string;
+      nbf: string;
+      sub: string;
+      jti: string;
     } = jwt_decode(jwtvp as unknown as string);
     return {
       ...externalPresentationJwt,
       expirationDate: externalPresentationJwt.exp,
       holder: externalPresentationJwt.iss,
       issuanceDate: externalPresentationJwt.nbf,
-      id: externalPresentationJwt.jti
+      id: externalPresentationJwt.jti,
     } as unknown as IPresentation;
   }
 
-  static mapExternalVerifiableCredentialsToWrappedVc(verifiableCredentials: IVerifiableCredential[]): WrappedVerifiableCredential[] {
+  static mapExternalVerifiableCredentialsToWrappedVcs(
+    verifiableCredentials: IVerifiableCredential[]
+  ): WrappedVerifiableCredential[] {
     const wrappedVcs: WrappedVerifiableCredential[] = [];
     for (let i = 0; i < verifiableCredentials.length; i++) {
       wrappedVcs.push(this.mapExternalVerifiableCredentialToWrappedVc(verifiableCredentials[i]));
@@ -177,49 +178,138 @@ export class SSITypesBuilder {
     return wrappedVcs;
   }
 
-  private static mapExternalVerifiableCredentialToWrappedVc(verifiableCredential: IVerifiableCredential): WrappedVerifiableCredential {
+  private static mapExternalVerifiableCredentialToWrappedVc(
+    verifiableCredential: IVerifiableCredential
+  ): WrappedVerifiableCredential {
     if (ObjectUtils.isString(verifiableCredential)) {
       const externalCredentialJwt: {
-        vc: unknown,
-        exp: string,
-        iss: string,
-        nbf: string,
-        sub: string,
-        jti: string
-      } = jwt_decode(verifiableCredential as unknown as string)
-      return {
+        vc: unknown;
+        exp: string;
+        iss: string;
+        nbf: string;
+        sub: string;
+        jti: string;
+      } = jwt_decode(verifiableCredential as unknown as string);
+      this.createInternalCredentialFromJwtDecoded(externalCredentialJwt);
+      const wrappedVc: WrappedVerifiableCredential = {
         original: verifiableCredential,
         decoded: jwt_decode(verifiableCredential as unknown as string),
         type: VerifiableDataExchangeType.JWT_ENCODED,
-        internalCredential: {
-          ...externalCredentialJwt,
-          expirationDate: externalCredentialJwt.exp,
-          issuer: externalCredentialJwt.iss,
-          issuanceDate: externalCredentialJwt.nbf,
-          id: externalCredentialJwt.jti
-        } as unknown as InternalCredential
-      }
-    }
-    else if (verifiableCredential["vc"]) {
+        internalCredential: this.createInternalCredentialFromJwtDecoded(externalCredentialJwt),
+      };
+      return wrappedVc;
+    } else if (verifiableCredential['vc' as keyof IVerifiableCredential]) {
       return {
         original: verifiableCredential,
         decoded: verifiableCredential,
         type: VerifiableDataExchangeType.JWT_DECODED,
-        internalCredential: {
-          ...verifiableCredential,
-          expirationDate: verifiableCredential.exp,
-          issuer: verifiableCredential.iss,
-          issuanceDate: verifiableCredential.nbf,
-          id: verifiableCredential.jti
-        } as unknown as InternalCredential
-      }
+        internalCredential: this.createInternalCredentialFromJwtDecoded(
+          verifiableCredential as unknown as JwtCredential
+        ),
+      };
     } else {
       return {
         original: verifiableCredential,
         decoded: verifiableCredential,
         type: VerifiableDataExchangeType.JSONLD,
-        internalCredential: verifiableCredential as InternalCredential
-      }
+        internalCredential: verifiableCredential as InternalCredential,
+      };
     }
   }
+
+  private static createInternalCredentialFromJwtDecoded(externalCredentialJwt: JwtCredential): InternalCredential {
+    const internalCredential: InternalCredential = {
+      ...(externalCredentialJwt.vc as InternalCredential),
+    };
+    if (!internalCredential.expirationDate && externalCredentialJwt.exp) {
+      internalCredential.expirationDate = externalCredentialJwt.exp;
+    }
+    if (!internalCredential.issuer && externalCredentialJwt.iss) {
+      internalCredential.issuer = externalCredentialJwt.iss;
+    }
+    if (!internalCredential.issuanceDate && externalCredentialJwt.nbf) {
+      internalCredential.issuanceDate = externalCredentialJwt.nbf;
+    }
+    if (!internalCredential.id && externalCredentialJwt.jti) {
+      internalCredential.id = externalCredentialJwt.jti;
+    }
+
+    if (externalCredentialJwt.exp) {
+      const expDate = internalCredential.credentialSubject?.expirationDate;
+      const jwtExp = parseInt(externalCredentialJwt.exp.toString());
+      // fix seconds to millisecs for the date
+      const expAsDateStr =
+        jwtExp < 9999999999
+          ? new Date(jwtExp * 1000).toISOString().replace(/\.000Z/, 'Z')
+          : new Date(jwtExp).toISOString();
+      if (expDate && expDate !== expAsDateStr) {
+        throw new Error(`Inconsistent expiration dates between JWT claim (${expAsDateStr}) and VC value (${expDate})`);
+      }
+      internalCredential.credentialSubject.expirationDate = expAsDateStr;
+    }
+
+    if (externalCredentialJwt.nbf) {
+      const issuanceDate = internalCredential.issuanceDate;
+      const jwtNbf = parseInt(externalCredentialJwt.nbf.toString());
+      // fix seconds to millisecs for the date
+      const nbfAsDateStr =
+        jwtNbf < 9999999999
+          ? new Date(jwtNbf * 1000).toISOString().replace(/\.000Z/, 'Z')
+          : new Date(jwtNbf).toISOString();
+      if (issuanceDate && issuanceDate !== nbfAsDateStr) {
+        throw new Error(
+          `Inconsistent issuance dates between JWT claim (${nbfAsDateStr}) and VC value (${issuanceDate})`
+        );
+      }
+      internalCredential.issuanceDate = nbfAsDateStr;
+    }
+
+    if (externalCredentialJwt.iss) {
+      const issuer = internalCredential.issuer;
+      if (issuer) {
+        if (typeof issuer === 'string') {
+          if (issuer !== externalCredentialJwt.iss) {
+            throw new Error(
+              `Inconsistent issuers between JWT claim (${externalCredentialJwt.iss}) and VC value (${issuer})`
+            );
+          }
+        } else {
+          if (issuer.id !== externalCredentialJwt.iss) {
+            throw new Error(
+              `Inconsistent issuers between JWT claim (${externalCredentialJwt.iss}) and VC value (${issuer.id})`
+            );
+          }
+        }
+      }
+      internalCredential.issuer = externalCredentialJwt.iss;
+    }
+
+    if (externalCredentialJwt.sub) {
+      const csId = internalCredential.credentialSubject?.id;
+      if (csId && csId !== externalCredentialJwt.sub) {
+        throw new Error(
+          `Inconsistent credential subject ids between JWT claim (${externalCredentialJwt.sub}) and VC value (${csId})`
+        );
+      }
+      internalCredential.credentialSubject.id = externalCredentialJwt.sub;
+    }
+    if (externalCredentialJwt.jti) {
+      const id = internalCredential.id;
+      if (id && id !== externalCredentialJwt.jti) {
+        throw new Error(
+          `Inconsistent credential ids between JWT claim (${externalCredentialJwt.jti}) and VC value (${id})`
+        );
+      }
+      internalCredential.id = externalCredentialJwt.jti;
+    }
+    return internalCredential;
+  }
+}
+export interface JwtCredential {
+  vc: unknown;
+  exp: string;
+  iss: string;
+  nbf: string;
+  sub: string;
+  jti: string;
 }

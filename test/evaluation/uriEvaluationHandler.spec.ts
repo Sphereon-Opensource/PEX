@@ -1,14 +1,13 @@
 import fs from 'fs';
 
-import { IVerifiablePresentation, Status } from '../../lib';
-import { HandlerCheckResult } from '../../lib';
+import { HandlerCheckResult, IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
 import {
+  InternalCredential,
   InternalPresentationDefinitionV1,
-  InternalVerifiableCredential,
-  InternalVerifiableCredentialJsonLD,
-  InternalVerifiableCredentialJwt,
+  VerifiableDataExchangeType,
+  WrappedVerifiableCredential,
 } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
@@ -26,9 +25,13 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
-    evaluationHandler.handle(pd, [vc]);
+    const wvc: WrappedVerifiableCredential = {
+      decoded: vpSimple.verifiableCredential[0],
+      original: vpSimple.verifiableCredential[0],
+      internalCredential: vpSimple.verifiableCredential[0] as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
+    evaluationHandler.handle(pd, [wvc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
   });
@@ -39,12 +42,17 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
-    vc['@context'] = ['https://www.test.org/mock'];
+    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0];
+    vc['@context' as keyof IVerifiableCredential] = ['https://www.test.org/mock'];
+    const wvc: WrappedVerifiableCredential = {
+      decoded: vc,
+      original: vc,
+      internalCredential: vc as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pd, [vc]);
+    evaluationHandler.handle(pd, [wvc]);
     expect(evaluationHandler.getResults()[0]).toEqual(
       new HandlerCheckResult(
         '$.input_descriptors[0]',
@@ -71,11 +79,16 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc = Object.assign(vc, vpSimple.verifiableCredential[0]);
+    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0];
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pd, [vc]);
+    const wvc: WrappedVerifiableCredential = {
+      decoded: vc,
+      original: vc,
+      internalCredential: vc as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
+    evaluationHandler.handle(pd, [wvc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
   });
@@ -87,15 +100,30 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const vc0: IVerifiableCredential = vpSimple.verifiableCredential[0];
+    const wvc0: WrappedVerifiableCredential = {
+      decoded: vc0,
+      original: vc0,
+      internalCredential: vc0 as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
+    const vc1: IVerifiableCredential = vpSimple.verifiableCredential[1];
+    const wvc1: WrappedVerifiableCredential = {
+      decoded: vc1,
+      original: vc1,
+      internalCredential: vc1 as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
+    const vc2: IVerifiableCredential = vpSimple.verifiableCredential[2];
+    const wvc2: WrappedVerifiableCredential = {
+      decoded: vc2,
+      original: vc2,
+      internalCredential: vc2 as InternalCredential,
+      type: VerifiableDataExchangeType.JSONLD,
+    };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pd, [vc0, vc1, vc2]);
+    evaluationHandler.handle(pd, [wvc0, wvc1, wvc2]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     const infoResults = evaluationClient.results.filter((result) => result.status === Status.INFO);
     expect(errorResults.length).toEqual(5);
@@ -112,15 +140,14 @@ describe('evaluate', () => {
     });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
+      vpSimple.verifiableCredential[0],
+      vpSimple.verifiableCredential[1],
+      vpSimple.verifiableCredential[2],
+    ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pd, [vc0, vc1, vc2]);
+    evaluationHandler.handle(pd, wvcs);
     const warnResults = evaluationClient.results.filter((result) => result.status === Status.WARN);
     expect(warnResults.length).toEqual(3);
   });
@@ -133,15 +160,14 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://example.com/hw.txt?hl=zm9YZpCjPLPJ4Epc' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    let vc0: InternalVerifiableCredential = new InternalVerifiableCredentialJwt();
-    vc0 = Object.assign(vc0, vpSimple.verifiableCredential[0]);
-    let vc1: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, vpSimple.verifiableCredential[1]);
-    let vc2: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, vpSimple.verifiableCredential[2]);
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
+      vpSimple.verifiableCredential[0],
+      vpSimple.verifiableCredential[1],
+      vpSimple.verifiableCredential[2],
+    ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
-    evaluationHandler.handle(pd, [vc0, vc1, vc2]);
+    evaluationHandler.handle(pd, wvcs);
     const warnResults = evaluationClient.results.filter((result) => result.status === Status.WARN);
     expect(warnResults.length).toEqual(3);
   });

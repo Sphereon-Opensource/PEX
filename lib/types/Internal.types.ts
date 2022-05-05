@@ -7,13 +7,7 @@ import {
   SubmissionRequirement,
 } from '@sphereon/pex-models';
 
-import {
-  ICredentialSchema,
-  ICredentialStatus,
-  ICredentialSubject,
-  IIssuer,
-  PEVersion,
-} from './SSI.types';
+import { ICredentialSchemaType, ICredentialStatus, ICredentialSubject, IIssuer, PEVersion } from './SSI.types';
 
 export interface IInternalPresentationDefinition {
   format?: Format;
@@ -114,7 +108,9 @@ export interface WrappedVerifiablePresentation {
 }
 
 export enum VerifiableDataExchangeType {
-  JSONLD, JWT_ENCODED, JWT_DECODED
+  JSONLD,
+  JWT_ENCODED,
+  JWT_DECODED,
 }
 
 export interface InternalCredential {
@@ -130,7 +126,7 @@ export interface InternalCredential {
   id: string;
   '@context': string[] | string;
   credentialStatus?: ICredentialStatus;
-  credentialSchema?: undefined | ICredentialSchema | ICredentialSchema[];
+  credentialSchema?: undefined | ICredentialSchemaType | ICredentialSchemaType[];
   description?: string;
   name?: string;
   type: string[];

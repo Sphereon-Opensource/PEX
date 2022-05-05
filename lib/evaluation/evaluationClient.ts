@@ -1,9 +1,9 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
 
 import { Status } from '../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../types/Internal.types';
+import { ProofType } from '../types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
 import PEMessages from '../types/Messages';
-import { ProofType } from '../types/SSI.types';
 
 import { HandlerCheckResult } from './handlerCheckResult';
 import {
@@ -23,7 +23,7 @@ const DEFAULT_LIMIT_DISCLOSURE_TYPES = [ProofType.BbsBlsSignatureProof2020];
 export class EvaluationClient {
   constructor() {
     this._results = [];
-    this._verifiableCredential = [];
+    this._wrappedVcs = [];
     this._presentationSubmission = {};
     this._dids = [];
     this._limitDisclosureSignatureSuites = DEFAULT_LIMIT_DISCLOSURE_TYPES;
@@ -37,25 +37,25 @@ export class EvaluationClient {
   };
 
   private _results: HandlerCheckResult[];
-  private _verifiableCredential: Partial<InternalVerifiableCredential>[];
+  private _wrappedVcs: Partial<WrappedVerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
 
   public evaluate(
     pd: IInternalPresentationDefinition,
-    vcs: InternalVerifiableCredential[],
+    wvcs: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): void {
     this._dids = holderDids || [];
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
-    currentHandler?.handle(pd, vcs);
+    currentHandler?.handle(pd, wvcs);
     while (currentHandler?.hasNext()) {
       currentHandler = currentHandler.getNext();
       try {
-        currentHandler?.handle(pd, vcs);
+        currentHandler?.handle(pd, wvcs);
       } catch (e) {
         this.failed_catched.message += (e as Error).message;
         this.failed_catched.stacktrace = e as string;
@@ -84,12 +84,12 @@ export class EvaluationClient {
     this._presentationSubmission = presentationSubmission;
   }
 
-  public get verifiableCredential(): InternalVerifiableCredential[] {
-    return this._verifiableCredential as InternalVerifiableCredential[];
+  public get wrappedVcs(): WrappedVerifiableCredential[] {
+    return this._wrappedVcs as WrappedVerifiableCredential[];
   }
 
-  public set verifiableCredential(verifiableCredential: InternalVerifiableCredential[]) {
-    this._verifiableCredential = verifiableCredential;
+  public set wrappedVcs(wrappedVcs: WrappedVerifiableCredential[]) {
+    this._wrappedVcs = wrappedVcs;
   }
 
   public get limitDisclosureSignatureSuites() {

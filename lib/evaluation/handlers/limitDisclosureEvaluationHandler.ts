@@ -2,12 +2,12 @@ import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality }
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
+import { IVerifiablePresentation } from '../../types';
 import {
   IInternalPresentationDefinition,
+  InternalCredential,
   InternalPresentationDefinitionV2,
-  InternalVerifiableCredential,
-  InternalVerifiableCredentialJsonLD,
-  InternalVerifiableCredentialJwt,
+  WrappedVerifiableCredential,
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
@@ -24,7 +24,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return 'LimitDisclosureEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     // PresentationDefinitionV2 is the common denominator
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (
@@ -32,22 +32,23 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         (inDesc.constraints?.limit_disclosure === Optionality.Required ||
           inDesc.constraints?.limit_disclosure === Optionality.Preferred)
       ) {
-        this.evaluateLimitDisclosure(vcs, inDesc.constraints, index);
+        this.evaluateLimitDisclosure(wrappedVcs, inDesc.constraints, index);
       }
     });
   }
 
   private isLimitDisclosureSupported(
-    vc: InternalVerifiableCredential,
+    wvc: WrappedVerifiableCredential,
     vcIdx: number,
     idIdx: number,
     optionality: Optionality
   ): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
-    if (!vc.proof || Array.isArray(vc.proof) || !vc.proof.type) {
+    const proof = (wvc.decoded as IVerifiablePresentation).proof;
+    if (!proof || Array.isArray(proof) || !proof.type) {
       // todo: Support/inspect array based proofs
       return false;
-    } else if (!limitDisclosureSignatures?.includes(vc.proof.type)) {
+    } else if (!limitDisclosureSignatures?.includes(proof.type)) {
       if (optionality == Optionality.Required) {
         this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       }
@@ -57,84 +58,77 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private evaluateLimitDisclosure(
-    verifiableCredential: InternalVerifiableCredential[],
+    wrappedVcs: WrappedVerifiableCredential[],
     constraints: ConstraintsV1 | ConstraintsV2,
     idIdx: number
   ): void {
     const fields = constraints?.fields as FieldV2[];
     const optionality = constraints.limit_disclosure;
-    verifiableCredential.forEach((vc, index) => {
-      if (optionality && this.isLimitDisclosureSupported(vc, index, idIdx, optionality)) {
-        this.enforceLimitDisclosure(vc, fields, idIdx, index, verifiableCredential, optionality);
+    wrappedVcs.forEach((wvc, index) => {
+      if (optionality && this.isLimitDisclosureSupported(wvc, index, idIdx, optionality)) {
+        this.enforceLimitDisclosure(wvc.internalCredential, fields, idIdx, index, wrappedVcs, optionality);
       }
     });
   }
 
   private enforceLimitDisclosure(
-    vc: InternalVerifiableCredential,
+    vc: InternalCredential,
     fields: FieldV2[],
     idIdx: number,
     index: number,
-    verifiableCredential: InternalVerifiableCredential[],
+    wrappedVcs: WrappedVerifiableCredential[],
     limitDisclosure: Optionality
   ) {
-    const verifiableCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
+    const internalCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
     /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
      * remain untouched and the verifiable credential won't be submitted.
      */
-    if (verifiableCredentialToSend) {
-      verifiableCredential[index] = verifiableCredentialToSend;
+    if (internalCredentialToSend) {
+      wrappedVcs[index].internalCredential = internalCredentialToSend;
       this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
     }
   }
 
   private createVcWithRequiredFields(
-    vc: InternalVerifiableCredential,
+    vc: InternalCredential,
     fields: FieldV2[],
     idIdx: number,
     vcIdx: number
-  ): InternalVerifiableCredential | undefined {
-    let vcToSend: InternalVerifiableCredential;
-    if (vc.getType() === 'jwt') {
-      vcToSend = new InternalVerifiableCredentialJwt();
-      vcToSend = { ...vc } as unknown as InternalVerifiableCredentialJwt;
-      vcToSend = Object.assign(vcToSend, vc);
-      vcToSend.getBaseCredential().credentialSubject = {};
-    } else {
-      vcToSend = new InternalVerifiableCredentialJsonLD();
-      vcToSend = Object.assign(vcToSend, vc);
-      vcToSend.getBaseCredential().credentialSubject = {};
-    }
+  ): InternalCredential | undefined {
+    let credentialToSend: InternalCredential = {} as InternalCredential;
+    credentialToSend = Object.assign(credentialToSend, vc);
+    credentialToSend.credentialSubject = {};
+
     for (const field of fields) {
       if (field.path) {
         const inputField = JsonPathUtils.extractInputField(vc, field.path);
         if (inputField.length > 0) {
-          vcToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, vcToSend);
+          credentialToSend = this.copyResultPathToDestinationCredential(inputField[0], vc, credentialToSend);
         } else {
           this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
           return undefined;
         }
       }
     }
-    return vcToSend;
+    return credentialToSend;
   }
 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
-    verifiableCredential: InternalVerifiableCredential,
-    verifiableCredentialToSend: InternalVerifiableCredential
-  ): InternalVerifiableCredential {
-    let credentialSubject = { ...verifiableCredential?.getBaseCredential().credentialSubject };
+    internalCredential: InternalCredential,
+    internalCredentialToSend: InternalCredential
+  ): InternalCredential {
+    let credentialSubject = { ...internalCredential.credentialSubject };
     requiredField.path.forEach((e) => {
       if (credentialSubject[e]) {
         credentialSubject = { [e]: credentialSubject[e] } as { [x: string]: unknown };
       }
     });
-    verifiableCredentialToSend.getBaseCredential().credentialSubject = {
-      ...verifiableCredentialToSend.getBaseCredential().credentialSubject,
+    internalCredentialToSend.credentialSubject = {
+      ...internalCredentialToSend.credentialSubject,
       ...credentialSubject,
     };
-    return verifiableCredentialToSend;
+    return internalCredentialToSend;
   }
 
   private createSuccessResult(idIdx: number, path: string, limitDisclosure: Optionality) {

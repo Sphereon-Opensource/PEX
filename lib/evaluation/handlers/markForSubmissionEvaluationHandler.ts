@@ -1,7 +1,7 @@
 import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
@@ -17,11 +17,11 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
     return 'MarkForSubmissionEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const results: HandlerCheckResult[] = [...this.getResults()];
     const errors: HandlerCheckResult[] = results.filter((result: HandlerCheckResult) => result.status === Status.ERROR);
     const infos: HandlerCheckResult[] = this.retrieveNoErrorStatus(results, errors);
-    this.client.verifiableCredential = vcs;
+    this.client.wrappedVcs = wrappedVcs;
     this.produceErrorResults(errors);
     this.produceSuccessResults(infos, pd);
   }

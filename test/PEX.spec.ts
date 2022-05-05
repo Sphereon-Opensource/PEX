@@ -2,7 +2,8 @@ import fs from 'fs';
 
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IJwtVerifiableCredential, IPresentation, IVerifiablePresentation, PEX, ProofType, Validated } from '../lib';
+import { IPresentation, IVerifiableCredential, IVerifiablePresentation, PEX, ProofType, Validated } from '../lib';
+import { InternalCredential } from '../lib/types/Internal.types';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 
 import {
@@ -83,18 +84,18 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
 
 describe('evaluate', () => {
   it('testing constructor', function () {
-    const pejs: PEX = new PEX();
-    expect(pejs).toBeInstanceOf(PEX);
+    const pex: PEX = new PEX();
+    expect(pex).toBeInstanceOf(PEX);
   });
 
   it('Evaluate case with error result', () => {
-    const pejs: PEX = new PEX();
+    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json'
     ).presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'https://www.example.com/schema' }];
-    const result = pejs.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result!.errors!.length).toEqual(2);
     expect(result!.errors!.map((e) => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);
   });
@@ -105,8 +106,8 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pejs: PEX = new PEX();
-    const evaluationResults = pejs.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const pex: PEX = new PEX();
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -117,8 +118,8 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pejs: PEX = new PEX();
-    const evaluationResults = pejs.evaluateCredentials(
+    const pex: PEX = new PEX();
+    const evaluationResults = pex.evaluateCredentials(
       pdSchema,
       vpSimple.verifiableCredential,
       [vpSimple.holder as string],
@@ -133,9 +134,9 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pejs: PEX = new PEX();
-    pejs.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: IPresentation = pejs.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    const pex: PEX = new PEX();
+    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -158,23 +159,23 @@ describe('evaluate', () => {
   it('Evaluate pdV1 schema of our sr_rules.json pdV1', () => {
     const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinition(pdSchema);
+    const pex: PEX = new PEX();
+    const result: Validated = pex.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate presentationDefinition v2', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
-    const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinition(pd);
+    const pex: PEX = new PEX();
+    const result: Validated = pex.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate presentationDefinition v2 should fail for frame', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
     pd.frame = { '@id': 'this is not valid' };
-    const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinition(pd);
+    const pex: PEX = new PEX();
+    const result: Validated = pex.validateDefinition(pd);
     expect(result).toEqual([
       { message: 'frame value is not valid', status: 'error', tag: 'presentation_definition.frame' },
     ]);
@@ -182,23 +183,23 @@ describe('evaluate', () => {
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateSubmission(vpSimple.presentation_submission);
+    const pex: PEX = new PEX();
+    const result: Validated = pex.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate pdV1 schema of our pd_driver_license_name.json pdV1', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const pejs: PEX = new PEX();
-    const result: Validated = pejs.validateDefinition(pdSchema.presentation_definition);
+    const pex: PEX = new PEX();
+    const result: Validated = pex.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('should return a signed presentation', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
-    const pejs: PEX = new PEX();
-    const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(
+    const pex: PEX = new PEX();
+    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -217,9 +218,9 @@ describe('evaluate', () => {
   it('should return a signed presentation with PdV2', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
-    const pejs: PEX = new PEX();
+    const pex: PEX = new PEX();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = pejs.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -238,13 +239,13 @@ describe('evaluate', () => {
   it("should throw error if proofOptions doesn't have a type", () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEX = new PEX();
+    const pex: PEX = new PEX();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     expect(() =>
-      pejs.verifiablePresentationFrom(
+      pex.verifiablePresentationFrom(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,
@@ -260,10 +261,10 @@ describe('evaluate', () => {
   it('should throw exception if signing encounters a problem', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEX = new PEX();
+    const pex: PEX = new PEX();
 
     expect(() => {
-      pejs.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
+      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
       });
@@ -272,126 +273,146 @@ describe('evaluate', () => {
 
   it('should return v1 when calling version discovery', function () {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const pejs: PEX = new PEX();
-    const result = pejs.definitionVersionDiscovery(pdSchema.presentation_definition);
+    const pex: PEX = new PEX();
+    const result = pex.definitionVersionDiscovery(pdSchema.presentation_definition);
     expect(result.version).toEqual('v1');
   });
 
   it('should return v2 when calling version discovery', function () {
     const pdSchema = getPresentationDefinitionV2();
-    const pejs: PEX = new PEX();
-    const result = pejs.definitionVersionDiscovery(pdSchema);
+    const pex: PEX = new PEX();
+    const result = pex.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v2');
   });
 
   it('should return error when called with a mixed version', function () {
     const pdSchema = getPresentationDefinitionV2();
     (pdSchema as PresentationDefinitionV1).input_descriptors[0]['schema'] = [{ uri: 'schema' }];
-    const pejs: PEX = new PEX();
-    const result = pejs.definitionVersionDiscovery(pdSchema);
+    const pex: PEX = new PEX();
+    const result = pex.definitionVersionDiscovery(pdSchema);
     expect(result.error).toEqual('This is not a valid PresentationDefinition');
   });
 
   it('should return v2 when calling without schema', function () {
     const pdSchema = getPresentationDefinitionV2();
     delete pdSchema.frame;
-    const pejs: PEX = new PEX();
-    const result = pejs.definitionVersionDiscovery(pdSchema);
+    const pex: PEX = new PEX();
+    const result = pex.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v2');
   });
 
   it('should set expiration date if exp is present in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.exp = (+new Date()).toString();
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().credentialSubject.expirationDate).toEqual(
-      new Date(parseInt(jwtVc.exp)).toISOString()
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
+    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(vcs[0].internalCredential.credentialSubject.expirationDate).toEqual(
+      new Date(parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)).toISOString()
     );
   });
 
   it('should set expiration date if exp is present in JWT vc as number', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
 
-    jwtVc.exp = new Date().valueOf();
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().credentialSubject.expirationDate).toEqual(new Date(jwtVc.exp).toISOString());
+    jwtVc['exp' as keyof IVerifiableCredential] = new Date().valueOf();
+    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(vcs[0].internalCredential.credentialSubject.expirationDate).toEqual(
+      new Date(jwtVc['exp' as keyof IVerifiableCredential] as string).toISOString()
+    );
   });
 
   it('should throw an error if expiration date and exp are different in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.exp = (+new Date()).toString();
-    jwtVc.vc.credentialSubject.expirationDate = (+new Date(jwtVc.exp + 2)).toString();
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent expiration dates between JWT claim (${new Date(parseInt(jwtVc.exp)).toISOString()}) and VC value (${
-        jwtVc.vc.credentialSubject.expirationDate
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
+    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate = (+new Date(
+      (jwtVc['exp' as keyof IVerifiableCredential] as string) + 2
+    )).toString();
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
+      `Inconsistent expiration dates between JWT claim (${new Date(
+        parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)
+      ).toISOString()}) and VC value (${
+        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate
       })`
     );
   });
 
   it('should set issuer if iss is present in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    delete jwtVc.vc.issuer;
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().issuer).toEqual(jwtVc.iss);
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer;
+    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(vcs[0].internalCredential.issuer).toEqual(jwtVc['iss' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if issuer and iss are different in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.iss = 'did:test:456';
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent issuers between JWT claim (${jwtVc.iss}) and VC value (${jwtVc.vc.issuer})`
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['iss' as keyof IVerifiableCredential] = 'did:test:456';
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
+      `Inconsistent issuers between JWT claim (${jwtVc['iss' as keyof IVerifiableCredential]}) and VC value (${
+        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer
+      })`
     );
   });
 
   it('should set issuance date if nbf is present in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.nbf = (+new Date()).toString();
-    jwtVc.vc.issuanceDate = new Date(parseInt(jwtVc.nbf)).toISOString();
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().issuanceDate).toEqual(new Date(parseInt(jwtVc.nbf)).toISOString());
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['nbf' as keyof IVerifiableCredential] = (+new Date()).toString();
+    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
+      parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)
+    ).toISOString();
+    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(vcs[0].internalCredential.issuanceDate).toEqual(
+      new Date(parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)).toISOString()
+    );
   });
 
   it('should throw an error if issuance date and nbf are different in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     const nbf = new Date().valueOf();
-    jwtVc.nbf = nbf / 1000;
-    jwtVc.vc.issuanceDate = new Date(+new Date() + 2).toISOString();
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
+    jwtVc['nbf' as keyof IVerifiableCredential] = nbf / 1000;
+    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
+      +new Date() + 2
+    ).toISOString();
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent issuance dates between JWT claim (${new Date(nbf)
         .toISOString()
-        .replace(/\.\d\d\dZ/, 'Z')}) and VC value (${jwtVc.vc.issuanceDate})`
+        .replace(/\.\d\d\dZ/, 'Z')}) and VC value (${
+        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate
+      })`
     );
   });
 
   it('should set credentialSubject.id if sub is present in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.sub = jwtVc.vc.credentialSubject.id;
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().credentialSubject.id).toEqual(jwtVc.sub);
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['sub' as keyof IVerifiableCredential] = (<InternalCredential>(
+      jwtVc['vc' as keyof IVerifiableCredential]
+    )).credentialSubject.id;
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(wvcs[0].internalCredential.credentialSubject.id).toEqual(jwtVc['sub' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if credentialSubject.id and sub are different in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.sub = 'did:test:123';
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent credential subject ids between JWT claim (${jwtVc.sub}) and VC value (${jwtVc.vc.credentialSubject.id})`
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['sub' as keyof IVerifiableCredential] = 'did:test:123';
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
+      `Inconsistent credential subject ids between JWT claim (${
+        jwtVc['sub' as keyof IVerifiableCredential]
+      }) and VC value (${(<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.id})`
     );
   });
 
   it('should set id if jti is present in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.jti = jwtVc.vc.id;
-    const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc]);
-    expect(vcs[0].getBaseCredential().id).toEqual(jwtVc.jti);
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['jti' as keyof IVerifiableCredential] = (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).id;
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
+    expect(wvcs[0].internalCredential.id).toEqual(jwtVc['jti' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if id and jti are different in JWT vc', () => {
-    const jwtVc: IJwtVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    jwtVc.jti = 'test';
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToInternal([jwtVc])).toThrowError(
-      `Inconsistent credential ids between JWT claim (${jwtVc.jti}) and VC value (${jwtVc.vc.id})`
+    const jwtVc: IVerifiableCredential = getFile('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
+    jwtVc['jti' as keyof IVerifiableCredential] = 'test';
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
+      `Inconsistent credential ids between JWT claim (${jwtVc['jti' as keyof IVerifiableCredential]}) and VC value (${
+        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).id
+      })`
     );
   });
 
@@ -402,8 +423,8 @@ describe('evaluate', () => {
       format: 'date-time',
       formatExclusiveMinimum: '2013-01-01T00:00Z',
     };
-    const pejs: PEX = new PEX();
-    const result = pejs.definitionVersionDiscovery(pdSchema);
+    const pex: PEX = new PEX();
+    const result = pex.definitionVersionDiscovery(pdSchema);
     expect(result.error).toEqual('This is not a valid PresentationDefinition');
   });
 });

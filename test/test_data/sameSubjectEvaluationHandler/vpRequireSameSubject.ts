@@ -1,5 +1,4 @@
-import { IVerifiablePresentation } from '../../../lib';
-import { InternalVerifiableCredentialJsonLD } from '../../../lib/types/Internal.types';
+import { IVerifiableCredential, IVerifiablePresentation } from '../../../lib';
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<IVerifiablePresentation> {
@@ -59,7 +58,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as InternalVerifiableCredentialJsonLD,
+        } as unknown as IVerifiableCredential,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -83,7 +82,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as InternalVerifiableCredentialJsonLD,
+        } as unknown as IVerifiableCredential,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -107,7 +106,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110801',
           },
-        } as unknown as InternalVerifiableCredentialJsonLD,
+        } as IVerifiableCredential,
         {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           credentialSchema: [
@@ -131,7 +130,7 @@ export class SrRules {
             proofPurpose: 'assertionMethod',
             proofValue: 'proofValue2021110804',
           },
-        } as unknown as InternalVerifiableCredentialJsonLD,
+        } as IVerifiableCredential,
       ],
     };
   }

@@ -1,7 +1,7 @@
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 
 import { PEX, PEXv1, ProofType, Status } from '../../lib';
-import { IJsonLdVerifiableCredential, IVerifiableCredential } from '../../lib/types/SSI.types';
+import { IVerifiableCredential } from '../../lib';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
 import { GatacaSelectedCredentials } from '../test_data/gataca/gatacaSelectedCredentials';
 
@@ -63,7 +63,7 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect((presentationFromResult.verifiableCredential[0] as IJsonLdVerifiableCredential).id).toEqual(
+    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
     );
   });
@@ -75,7 +75,7 @@ describe('evaluate gataca tests', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements![1]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
     const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect((result.verifiableCredential![0] as IJsonLdVerifiableCredential).id).toEqual(
+    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual(
       'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv'
     );
   });
@@ -138,7 +138,7 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect((presentationFromResult.verifiableCredential[0] as IJsonLdVerifiableCredential).id).toEqual(
+    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
     );
   });

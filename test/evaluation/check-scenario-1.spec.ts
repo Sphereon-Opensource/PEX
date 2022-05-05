@@ -1,7 +1,6 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
-import { IPresentation, PEX } from '../../lib';
-import { InternalVerifiableCredential } from '../../lib/types/Internal.types';
+import { IPresentation, IVerifiableCredential, PEX } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
@@ -27,7 +26,7 @@ describe('1st scenario', () => {
     /**
      * we get the verifiableCredentials from our wallet
      */
-    const holderWallet: { holder: string; verifiableCredentials: InternalVerifiableCredential[] } = wallet.getWallet();
+    const holderWallet: { holder: string; verifiableCredentials: IVerifiableCredential[] } = wallet.getWallet();
     expect(holderWallet.holder).toEqual('did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd');
     /**
      * evaluation result will be:

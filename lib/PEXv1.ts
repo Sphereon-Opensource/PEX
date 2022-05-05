@@ -3,9 +3,8 @@ import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { IPresentation, IProof, IVerifiablePresentation } from './types';
-import { InternalVerifiableCredential } from './types/Internal.types';
-import { IVerifiableCredential } from './types/SSI.types';
+import { IPresentation, IProof, IVerifiableCredential, IVerifiablePresentation } from './types';
+import { WrappedVerifiableCredential } from './types/Internal.types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
@@ -35,15 +34,14 @@ export class PEXv1 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
-    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentationCopy.verifiableCredential
-    );
+    const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentationCopy.verifiableCredential);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = presentation.holder ? [presentation.holder] : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      internalVCs,
+      wrappedVerifiableCredentials,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -66,11 +64,10 @@ export class PEXv1 {
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -97,7 +94,7 @@ export class PEXv1 {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -123,11 +120,11 @@ export class PEXv1 {
   ): IPresentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential)
     );
     return PEX.getPresentation(
       presentationSubmission,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential),
       holderDID
     );
   }
@@ -198,18 +195,9 @@ export class PEXv1 {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(
-      presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
 
-    const presentation = this.presentationFrom(
-      presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
-      holder
-    );
+    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,

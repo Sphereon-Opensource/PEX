@@ -1,13 +1,11 @@
 import fs from 'fs';
 
+import { IVerifiableCredential } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
-import {
-  InternalPresentationDefinitionV1,
-  InternalVerifiableCredential,
-  InternalVerifiableCredentialJsonLD,
-} from '../../lib/types/Internal.types';
+import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
+import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -33,8 +31,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, {
+    const vc: IVerifiableCredential = {
       credentialSubject: {
         id: 'did:example:123',
         age: 19,
@@ -50,9 +47,9 @@ describe('evaluate', () => {
       ],
       issuanceDate: '2021-04-12T23:20:50.52Z',
       proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
-    });
-
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, [vc]);
+    };
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, wvcs);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       input_descriptor_path: '$.input_descriptors[0]',
       verifiable_credential_path: '$[0]',
@@ -81,8 +78,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    let vc: InternalVerifiableCredential = new InternalVerifiableCredentialJsonLD();
-    vc = Object.assign(vc, {
+    const vc: IVerifiableCredential = {
       credentialSubject: {
         id: 'did:example:123',
         age: 19,
@@ -98,9 +94,9 @@ describe('evaluate', () => {
       ],
       issuanceDate: '2021-04-12T23:20:50.52Z',
       proof: { proofPurpose: '', type: '', jws: '', created: '', verificationMethod: '' },
-    });
-
-    subjectIsIssuerEvaluationHandler.handle(pdSchema, [vc]);
+    };
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]);
+    subjectIsIssuerEvaluationHandler.handle(pdSchema, wvcs);
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       evaluator: 'SubjectIsIssuerEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
