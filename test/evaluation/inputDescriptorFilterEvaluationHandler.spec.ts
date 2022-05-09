@@ -14,7 +14,7 @@ const message: HandlerCheckResult = {
   verifiable_credential_path: `$[0]`,
   evaluator: `FilterEvaluation`,
   status: Status.INFO,
-  payload: { result: { path: ['$', 'vc', 'issuer'], value: 'did:example:123' }, valid: true },
+  payload: { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: true },
   message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
 };
 
@@ -173,7 +173,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
       ['status']: Status.ERROR,
       ['message']: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION,
     };
-    message0.payload = { result: { path: ['$', 'vc', 'issuer'], value: 'did:example:123' }, valid: false };
+    message0.payload = { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: false };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
     message1.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false };
     const message2 = { ...message0, ['verifiable_credential_path']: '$[2]' };

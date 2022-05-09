@@ -8,6 +8,14 @@ export interface ICredentialSubject {
   [x: string]: unknown;
 }
 
+export type ICredentialContextType = ICredentialContext | string;
+
+export interface ICredentialContext {
+  name?: string;
+  did?: string;
+  [x: string]: unknown;
+}
+
 export type ICredentialSchemaType = ICredentialSchema | string;
 
 export interface ICredentialSchema {
@@ -72,7 +80,7 @@ export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDef
 export type IVerifiableCredential = InternalCredential | IHasProof;
 
 export interface IPresentation {
-  '@context': string[];
+  '@context': ICredentialContextType | ICredentialContextType[];
   type: string[];
   verifiableCredential: IVerifiableCredential[];
   presentation_submission?: PresentationSubmission;

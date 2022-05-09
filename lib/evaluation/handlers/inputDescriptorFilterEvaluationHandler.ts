@@ -32,7 +32,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       fields.forEach((field) => {
         let inputField = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(wvc.decoded, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
         }
         if (!inputField.length) {
           const payload = { valid: false };

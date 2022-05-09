@@ -31,6 +31,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private static HASHLINK_QUERY_URL_REGEX =
     /https*?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(hl=[a-zA-Z0-9]+)/g;
 
+  //TODO: handle context objects
+  //TODO: handle hashlinks
   public handle(d: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     // This filter is removed in V2
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
@@ -90,7 +92,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private static buildVcContextAndSchemaUris(internalCredential: InternalCredential) {
     const uris: string[] = [];
     if (Array.isArray(internalCredential['@context'])) {
-      internalCredential['@context'].forEach((value) => uris.push(value));
+      internalCredential['@context'].forEach((value) => uris.push(value as string));
     } else {
       uris.push(<string>internalCredential['@context']);
     }

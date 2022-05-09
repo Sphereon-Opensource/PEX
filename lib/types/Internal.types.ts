@@ -7,7 +7,16 @@ import {
   SubmissionRequirement,
 } from '@sphereon/pex-models';
 
-import { ICredentialSchemaType, ICredentialStatus, ICredentialSubject, IIssuer, PEVersion } from './SSI.types';
+import {
+  ICredentialContextType,
+  ICredentialSchemaType,
+  ICredentialStatus,
+  ICredentialSubject,
+  IIssuer,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  PEVersion,
+} from './SSI.types';
 
 export interface IInternalPresentationDefinition {
   format?: Format;
@@ -85,11 +94,11 @@ export interface WrappedVerifiableCredential {
   /**
    * Original VC that we've received
    */
-  original: unknown;
+  original: string | JwtWrappedVerifiableCredential | IVerifiableCredential;
   /**
    * In case of JWT credential it will be the decoded version. In other cases it will be the same as original one
    */
-  decoded: unknown;
+  decoded: JwtWrappedVerifiableCredential | IVerifiableCredential;
   /**
    * Type of this credential. Supported types are json-ld and jwt
    */
@@ -101,8 +110,8 @@ export interface WrappedVerifiableCredential {
 }
 
 export interface WrappedVerifiablePresentation {
-  original: unknown;
-  decoded: unknown;
+  original: string | JwtWrappedVerifiablePresentation | IVerifiablePresentation;
+  decoded: JwtWrappedVerifiablePresentation | IVerifiablePresentation;
   type: VerifiableDataExchangeType;
   vcs: WrappedVerifiableCredential[];
 }
@@ -124,7 +133,7 @@ export interface InternalCredential {
   credentialSubject: ICredentialSubject;
   // If jti is present, the value MUST be used to set the value of the id property of the new JSON object.
   id: string;
-  '@context': string[] | string;
+  '@context': ICredentialContextType[] | ICredentialContextType;
   credentialStatus?: ICredentialStatus;
   credentialSchema?: undefined | ICredentialSchemaType | ICredentialSchemaType[];
   description?: string;
@@ -132,4 +141,22 @@ export interface InternalCredential {
   type: string[];
 
   [x: string]: unknown;
+}
+
+export interface JwtWrappedVerifiableCredential {
+  vc: InternalCredential;
+  exp: string;
+  iss: string;
+  nbf: string;
+  sub: string;
+  jti: string;
+}
+
+export interface JwtWrappedVerifiablePresentation {
+  vp: IVerifiablePresentation;
+  exp: string;
+  iss: string;
+  nbf: string;
+  sub: string;
+  jti: string;
 }
