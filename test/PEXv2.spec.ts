@@ -2,7 +2,16 @@ import fs from 'fs';
 
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiablePresentation, PEXv2, ProofType, Status, Validated, ValidationEngine } from '../lib';
+import {
+  IVerifiablePresentation,
+  PEX,
+  PEXv2,
+  ProofType,
+  SelectResults,
+  Status,
+  Validated,
+  ValidationEngine,
+} from '../lib';
 import { PresentationDefinitionV2VB } from '../lib/validation';
 
 import {
@@ -11,6 +20,7 @@ import {
   getProofOptionsMock,
   getSingatureOptionsMock,
 } from './test_data/PresentationSignUtilMock';
+import { JwtVcs } from './test_data/jwtVcs';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -438,5 +448,113 @@ describe('evaluate', () => {
     );
     expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
     expect(result.errors?.length).toEqual(0);
+  });
+
+  it('should pass with jwt travel badge', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857-aec0-4e9d-8392-0e2e01d20120',
+      input_descriptors: [
+        {
+          id: 'travel_badge_issuer',
+          name: 'issuer of travel badge',
+          purpose: 'We can only allow badges from these issuer',
+          constraints: {
+            fields: [
+              {
+                path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
+                filter: {
+                  type: 'string',
+                  _enum: ['did:web:vc.transmute.world'],
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 'travel_badge_expiration_date',
+          name: 'expiration date of travel badge',
+          purpose: "We can only allow badges that haven't expired",
+          constraints: {
+            fields: [
+              {
+                path: ['$.vc.expirationDate', '$.expirationDate'],
+                filter: {
+                  format: 'date',
+                  type: 'string',
+                  formatMinimum: '2020-11-4',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const selectResults: SelectResults = pex.selectFrom(pdSchema, [JwtVcs.getVCs()[4]]);
+    expect(selectResults.errors?.length).toEqual(0);
+    expect(selectResults.matches?.length).toEqual(2);
+    expect(selectResults.areRequiredCredentialsPresent).toEqual(Status.INFO);
+  });
+
+  it('should pass with jwt university degree', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857-aec0-4e9d-8392-0e2e01d20120',
+      input_descriptors: [
+        {
+          id: 'degree_issuer',
+          name: 'issuer of university degree',
+          purpose: 'We can only allow degrees from these issuer',
+          constraints: {
+            fields: [
+              {
+                path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
+                filter: {
+                  type: 'string',
+                  _enum: ['https://example.edu/issuers/565049'],
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 'degree_issuance_date',
+          name: 'issuance date of degree',
+          purpose: 'we can only allow degrees issued after a certain date',
+          constraints: {
+            fields: [
+              {
+                path: ['$.vc.issuanceDate', '$.issuanceDate'],
+                filter: {
+                  format: 'date',
+                  type: 'string',
+                  formatMinimum: '2009-01-1',
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 'degree_name',
+          name: 'name of degree',
+          purpose: 'we can only allow degrees with a certain name',
+          constraints: {
+            fields: [
+              {
+                path: ['$.vc.credentialSubject.degree.name', '$.credentialSubject.degree.name'],
+                filter: {
+                  type: 'string',
+                  _enum: ['Bachelor of Science and Arts'],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const selectResults: SelectResults = pex.selectFrom(pdSchema, [JwtVcs.getVCs()[0]]);
+    expect(selectResults.errors?.length).toEqual(0);
+    expect(selectResults.matches?.length).toEqual(3);
+    expect(selectResults.areRequiredCredentialsPresent).toEqual(Status.INFO);
   });
 });

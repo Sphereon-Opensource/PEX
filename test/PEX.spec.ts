@@ -475,7 +475,12 @@ describe('evaluate', () => {
     };
     const pex: PEX = new PEX();
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt');
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp as unknown as IPresentation);
-    console.log(JSON.stringify(evalResult, null, 2));
+    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
+    expect(evalResult.errors).toEqual([]);
+    expect(evalResult.value?.descriptor_map[0]).toEqual({
+      id: 'universityDegree_type',
+      format: 'ldp_vc',
+      path: '$.verifiableCredential[0]',
+    });
   });
 });

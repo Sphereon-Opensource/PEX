@@ -1,4 +1,10 @@
 import {
+  JwtWrappedVerifiableCredential,
+  JwtWrappedVerifiablePresentation,
+  WrappedVerifiableCredential,
+  WrappedVerifiablePresentation,
+} from './Internal.types';
+import {
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
@@ -16,18 +22,22 @@ import {
 } from './SSI.types';
 
 export {
-  IPresentation,
-  IVerifiablePresentation,
+  ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
-  IProof,
-  InputFieldType,
-  IIssuer,
-  ProofType,
   IHasProof,
+  IIssuer,
+  InputFieldType,
+  IPresentation,
   IPresentationDefinition,
-  ProofPurpose,
+  IProof,
   IVerifiableCredential,
-  ICredentialSchema,
+  IVerifiablePresentation,
+  JwtWrappedVerifiableCredential,
+  JwtWrappedVerifiablePresentation,
   PEVersion,
+  ProofPurpose,
+  ProofType,
+  WrappedVerifiableCredential,
+  WrappedVerifiablePresentation,
 };

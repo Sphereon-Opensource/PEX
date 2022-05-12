@@ -50,22 +50,34 @@ export class SSITypesBuilder {
     return pd;
   }
 
-  static mapExternalVerifiablePresentationToWrappedVP(presentationCopy: IPresentation): WrappedVerifiablePresentation {
-    const isjwtEncoded: boolean = ObjectUtils.isString(presentationCopy);
-    const type: VerifiableDataExchangeType = isjwtEncoded
+  static mapExternalVerifiablePresentationToWrappedVP(
+    presentation: IPresentation | JwtWrappedVerifiablePresentation | string
+  ): WrappedVerifiablePresentation {
+    const isJwtEncoded: boolean = ObjectUtils.isString(presentation);
+    const type: VerifiableDataExchangeType = isJwtEncoded
       ? VerifiableDataExchangeType.JWT_ENCODED
       : VerifiableDataExchangeType.JSONLD;
-    const vp = isjwtEncoded
-      ? this.decodeJwtVerifiablePresentation(presentationCopy as unknown as string)
-      : presentationCopy;
-
+    let vp = isJwtEncoded ? this.decodeJwtVerifiablePresentation(presentation as string) : presentation;
+    vp = this.isJwtDecodedPresentation(vp)
+      ? this.createInternalPresentationFromJwtDecoded(vp as JwtWrappedVerifiablePresentation)
+      : vp;
+    const vcs: WrappedVerifiableCredential[] = this.mapExternalVerifiableCredentialsToWrappedVcs(
+      (vp as IPresentation).verifiableCredential
+    );
     return {
       type: type,
-      original: presentationCopy as IVerifiablePresentation,
-      decoded: isjwtEncoded
-        ? (jwt_decode(presentationCopy as unknown as string) as JwtWrappedVerifiablePresentation)
-        : (presentationCopy as IVerifiablePresentation),
-      vcs: this.mapExternalVerifiableCredentialsToWrappedVcs(vp.verifiableCredential),
+      original: presentation as IVerifiablePresentation,
+      decoded: isJwtEncoded
+        ? (jwt_decode(presentation as string) as JwtWrappedVerifiablePresentation)
+        : (presentation as IVerifiablePresentation),
+      internalPresentation: {
+        '@context': (<IVerifiablePresentation>vp)['@context'],
+        type: (<IVerifiablePresentation>vp).type,
+        holder: (<IVerifiablePresentation>vp).holder,
+        presentation_submission: (<IVerifiablePresentation>vp).presentation_submission,
+        verifiableCredential: vcs,
+      },
+      vcs: vcs,
     };
   }
 
@@ -81,7 +93,7 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiableCredentialsToWrappedVcs(
-    verifiableCredentials: IVerifiableCredential[]
+    verifiableCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[]
   ): WrappedVerifiableCredential[] {
     const wrappedVcs: WrappedVerifiableCredential[] = [];
     for (let i = 0; i < verifiableCredentials.length; i++) {
@@ -91,12 +103,10 @@ export class SSITypesBuilder {
   }
 
   private static mapExternalVerifiableCredentialToWrappedVc(
-    verifiableCredential: IVerifiableCredential
+    verifiableCredential: IVerifiableCredential | JwtWrappedVerifiableCredential | string
   ): WrappedVerifiableCredential {
     if (ObjectUtils.isString(verifiableCredential)) {
-      const externalCredentialJwt: JwtWrappedVerifiableCredential = jwt_decode(
-        verifiableCredential as unknown as string
-      );
+      const externalCredentialJwt: JwtWrappedVerifiableCredential = jwt_decode(<string>verifiableCredential);
       this.createInternalCredentialFromJwtDecoded(externalCredentialJwt);
       return {
         original: verifiableCredential,
@@ -104,10 +114,10 @@ export class SSITypesBuilder {
         type: VerifiableDataExchangeType.JWT_ENCODED,
         internalCredential: this.createInternalCredentialFromJwtDecoded(externalCredentialJwt),
       };
-    } else if (this.isJwtDecoded(verifiableCredential)) {
+    } else if (this.isJwtDecodedCredential(verifiableCredential)) {
       return {
         original: verifiableCredential,
-        decoded: verifiableCredential,
+        decoded: verifiableCredential as JwtWrappedVerifiableCredential,
         type: VerifiableDataExchangeType.JWT_DECODED,
         internalCredential: this.createInternalCredentialFromJwtDecoded(
           verifiableCredential as unknown as JwtWrappedVerifiableCredential
@@ -116,7 +126,7 @@ export class SSITypesBuilder {
     } else {
       return {
         original: verifiableCredential,
-        decoded: verifiableCredential,
+        decoded: verifiableCredential as IVerifiableCredential,
         type: VerifiableDataExchangeType.JSONLD,
         internalCredential: verifiableCredential as InternalCredential,
       };
@@ -200,10 +210,38 @@ export class SSITypesBuilder {
     return internalCredential;
   }
 
-  private static isJwtDecoded(verifiableCredential: IVerifiableCredential) {
+  private static isJwtDecodedCredential(
+    verifiableCredential: IVerifiableCredential | JwtWrappedVerifiableCredential | string
+  ) {
     return (
-      verifiableCredential['vc' as keyof IVerifiableCredential] &&
-      verifiableCredential['iss' as keyof IVerifiableCredential]
+      (<JwtWrappedVerifiableCredential>verifiableCredential)['vc'] &&
+      (<JwtWrappedVerifiableCredential>verifiableCredential)['iss']
     );
+  }
+
+  private static isJwtDecodedPresentation(
+    verifiablePresentation: IPresentation | JwtWrappedVerifiablePresentation | string
+  ) {
+    return (
+      (<JwtWrappedVerifiablePresentation>verifiablePresentation)['vp'] &&
+      (<JwtWrappedVerifiablePresentation>verifiablePresentation)['iss']
+    );
+  }
+
+  private static createInternalPresentationFromJwtDecoded(jwtVP: JwtWrappedVerifiablePresentation): IPresentation {
+    const presentation: IPresentation = {
+      ...(jwtVP.vp as IPresentation),
+    };
+
+    if (jwtVP.iss) {
+      const holder = presentation.holder;
+      if (holder) {
+        if (holder !== jwtVP.iss) {
+          throw new Error(`Inconsistent holders between JWT claim (${jwtVP.iss}) and VC value (${holder})`);
+        }
+      }
+      presentation.holder = jwtVP.iss;
+    }
+    return presentation;
   }
 }

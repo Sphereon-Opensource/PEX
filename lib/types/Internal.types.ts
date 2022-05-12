@@ -4,6 +4,7 @@ import {
   InputDescriptorV2,
   PresentationDefinitionV1,
   PresentationDefinitionV2,
+  PresentationSubmission,
   SubmissionRequirement,
 } from '@sphereon/pex-models';
 
@@ -113,6 +114,7 @@ export interface WrappedVerifiablePresentation {
   original: string | JwtWrappedVerifiablePresentation | IVerifiablePresentation;
   decoded: JwtWrappedVerifiablePresentation | IVerifiablePresentation;
   type: VerifiableDataExchangeType;
+  internalPresentation: InternalPresentation;
   vcs: WrappedVerifiableCredential[];
 }
 
@@ -120,6 +122,14 @@ export enum VerifiableDataExchangeType {
   JSONLD,
   JWT_ENCODED,
   JWT_DECODED,
+}
+
+export interface InternalPresentation {
+  '@context': ICredentialContextType | ICredentialContextType[];
+  type: string[];
+  verifiableCredential: WrappedVerifiableCredential[];
+  presentation_submission?: PresentationSubmission;
+  holder?: string;
 }
 
 export interface InternalCredential {

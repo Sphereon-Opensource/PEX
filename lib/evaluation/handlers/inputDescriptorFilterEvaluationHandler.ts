@@ -91,11 +91,19 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+    if (field.filter?.format && field.filter.format === 'date') {
+      this.transformDateFormat(result);
+    }
     const ajv = new Ajv();
     addFormats(ajv);
     if (field.filter) {
       return ajv.validate(field.filter, result.value);
     }
     return true;
+  }
+
+  private transformDateFormat(result: { path: string[]; value: unknown }) {
+    const date: Date = new Date(result.value as string);
+    result.value = date.toISOString().substring(0, date.toISOString().indexOf('T'));
   }
 }

@@ -29,7 +29,7 @@ describe('selectFrom tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
+      areRequiredCredentialsPresent: Status.ERROR,
       errors: [
         {
           tag: 'UriEvaluation',
@@ -225,8 +225,8 @@ describe('selectFrom tests', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(result.matches?.length).toBe(3);
-    expect(result.areRequiredCredentialsPresent).toBe('info');
+    expect(result.matches?.length).toBe(0);
+    expect(result.areRequiredCredentialsPresent).toBe(Status.ERROR);
   });
 
   it('Evaluate submission requirements min 2 from group B', () => {
@@ -244,104 +244,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from: ['B'],
@@ -410,105 +313,8 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[2],
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
-      areRequiredCredentialsPresent: Status.WARN,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [],
       matches: [
         {
           count: 1,
@@ -622,104 +428,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from: ['B'],
@@ -789,104 +498,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from_nested: [
@@ -999,104 +611,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from_nested: [
@@ -1210,104 +725,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from_nested: [
@@ -1421,104 +839,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from: ['B'],
@@ -1921,103 +1242,99 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[2],
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
+      areRequiredCredentialsPresent: Status.ERROR,
       errors: [
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
         },
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
         },
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]',
         },
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]',
         },
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]',
         },
         {
           tag: 'UriEvaluation',
           status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]',
         },
         {
           tag: 'FilterEvaluation',
           status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]',
         },
         {
           tag: 'FilterEvaluation',
           status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]',
         },
         {
           tag: 'FilterEvaluation',
           status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
         },
         {
           tag: 'FilterEvaluation',
           status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
+            'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
+            'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
+            'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
+            'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
+            'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]',
         },
         {
           tag: 'MarkForSubmissionEvaluation',
           status: 'error',
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
+            'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]',
         },
       ],
       matches: [
@@ -2080,6 +1397,7 @@ describe('selectFrom tests', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![11]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    pd.submission_requirements![0].min = 1;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
@@ -2088,104 +1406,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      errors: [],
       matches: [
         {
           from_nested: [
@@ -2204,7 +1425,7 @@ describe('selectFrom tests', () => {
             },
           ],
           vc_path: [],
-          min: 3,
+          min: 1,
           name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
         },
@@ -2299,105 +1520,8 @@ describe('selectFrom tests', () => {
     ]);
     const result = evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(result).toEqual({
-      areRequiredCredentialsPresent: Status.WARN,
-      errors: [
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[1]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[2]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-      ],
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [],
       matches: [
         {
           from_nested: [

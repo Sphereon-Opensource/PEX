@@ -1,5 +1,5 @@
 import { Checked, Status } from '../../ConstraintUtils';
-import { IVerifiableCredential } from '../../types/SSI.types';
+import { IVerifiableCredential } from '../../types';
 
 import { SubmissionRequirementMatch } from './submissionRequirementMatch';
 
