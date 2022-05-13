@@ -1,6 +1,6 @@
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 
-import { IVerifiableCredential, PEX, ProofType, Status } from '../../lib';
+import {EvaluationResults, IPresentation, IVerifiableCredential, PEX, ProofType, Status} from '../../lib';
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
 
@@ -141,6 +141,62 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
   };
 }
 
+function getPresentationDefinition_3(): PresentationDefinitionV2 {
+  return {
+    id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    input_descriptors: [
+      {
+        id: 'identity_input',
+        name: 'Subject identity input',
+        purpose: 'Subject should be identifiable',
+        constraints: {
+          fields: [
+            {
+              path: ['$.credentialSubject.did'],
+              filter: {
+                type: 'string',
+                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: 'name_input',
+        name: 'Subject name input',
+        purpose: 'Subject should have name',
+        constraints: {
+          fields: [
+            {
+              path: ['$.credentialSubject.profile.name'],
+              filter: {
+                type: 'string',
+                _const: 'John',
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: 'role_input',
+        name: 'Admin role input',
+        purpose: 'Subject should have admin role',
+        constraints: {
+          fields: [
+            {
+              path: ['$.credentialSubject.role'],
+              filter: {
+                type: 'string',
+                _const: 'admin',
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
 function getPresentationDefinition_4(): PresentationDefinitionV2 {
   return {
     id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
@@ -149,6 +205,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
         name: 'Identity requirement',
         rule: 'pick',
         from: 'A',
+        min: 2
       },
     ],
     input_descriptors: [
@@ -207,13 +264,22 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
   };
 }
 
-function getPresentationDefinition_3(): PresentationDefinitionV2 {
+function getPresentationDefinition_5(): PresentationDefinitionV2 {
   return {
     id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    submission_requirements: [
+      {
+        name: 'Identity requirement',
+        rule: 'pick',
+        from: 'A',
+        count: 3
+      },
+    ],
     input_descriptors: [
       {
         id: 'identity_input',
         name: 'Subject identity input',
+        group: ['A'],
         purpose: 'Subject should be identifiable',
         constraints: {
           fields: [
@@ -230,6 +296,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
       {
         id: 'name_input',
         name: 'Subject name input',
+        group: ['A'],
         purpose: 'Subject should have name',
         constraints: {
           fields: [
@@ -246,6 +313,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
       {
         id: 'role_input',
         name: 'Admin role input',
+        group: ['A'],
         purpose: 'Subject should have admin role',
         constraints: {
           fields: [
@@ -333,13 +401,37 @@ describe('evaluate JGiter tests', () => {
     const vcs = getVerifiableCredentials();
 
     const selectFrom = pex.selectFrom(pdSchema, vcs);
-    expect(selectFrom.errors).toEqual([]);
+    expect(selectFrom.errors?.length).toEqual(0);
     expect(selectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(selectFrom.verifiableCredential?.length).toEqual(2);
     expect(selectFrom.matches![0]?.from).toEqual(['A']);
     expect(selectFrom.matches![0]?.vc_path).toEqual(['$.verifiableCredential[0]']);
     expect(selectFrom.matches![1]?.from).toEqual(['B']);
     expect(selectFrom.matches![1]?.vc_path).toEqual(['$.verifiableCredential[1]']);
+    const presentation : IPresentation = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
+    expect(presentation.presentation_submission).toEqual({
+      id: "Nj31QtD0wxJV4jddJ1FjT",
+      definition_id: "286bc1e0-f1bd-488a-a873-8d71be3c690e",
+      descriptor_map: [
+        {
+          id: "identity_input",
+          format: "ldp_vc",
+          path: "$.verifiableCredential[0]"
+        },
+        {
+          id: "name_input",
+          format: "ldp_vc",
+          path: "$.verifiableCredential[0]"
+        },
+        {
+          id: "role_input",
+          format: "ldp_vc",
+          path: "$.verifiableCredential[1]"
+        }
+      ]
+    })
+    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, presentation);
+    expect(evalResult.errors?.length).toEqual(0);
   });
 
   it('Evaluate case with with single submission requirements (A all)', () => {
@@ -351,16 +443,46 @@ describe('evaluate JGiter tests', () => {
     expect(selectResult.areRequiredCredentialsPresent).toEqual(Status.ERROR);
   });
 
-  it('Evaluate case with with single submission requirements (A pick)', () => {
+  it('Evaluate case with with single submission requirements (A pick min 2)', () => {
     const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_4();
     const vcs = getVerifiableCredentials();
     const selectResult = pex.selectFrom(pdSchema, vcs);
     const resultEvaluation = pex.evaluateCredentials(
       pdSchema,
-      selectResult.verifiableCredential as IVerifiableCredential[]
+      [
+        selectResult.verifiableCredential![0],
+        selectResult.verifiableCredential![1]
+      ]
     );
     expect(resultEvaluation.errors?.length).toEqual(0);
+    const presentation: IPresentation = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
+    expect(presentation.presentation_submission).toBe(
+      {
+        id: "aTe8SxGFiLK7IVC2PIutc",
+        definition_id: "286bc1e0-f1bd-488a-a873-8d71be3c690e",
+        descriptor_map: [
+          {
+            id: "identity_input",
+            format: "ldp_vc",
+            path: "$.verifiableCredential[0]"
+          },
+          {
+            id: "name_input",
+            format: "ldp_vc",
+            path: "$.verifiableCredential[0]"
+          }
+        ]
+      }
+    );
+  });
+
+  it('Evaluate case with with single submission requirements (A pick count 3)', () => {
+    const pex: PEX = new PEX();
+    const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_5();
+    const vcs = getVerifiableCredentials();
+    const selectResult = pex.selectFrom(pdSchema, vcs);
+    expect(selectResult.areRequiredCredentialsPresent).toBe(Status.ERROR);
   });
 
   it('Evaluate case with with no submission requirements', () => {
