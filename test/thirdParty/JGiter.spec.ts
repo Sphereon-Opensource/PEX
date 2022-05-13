@@ -412,27 +412,23 @@ describe('evaluate JGiter tests', () => {
       pdSchema,
       selectFrom.verifiableCredential as IVerifiableCredential[]
     );
-    expect(presentation.presentation_submission).toEqual({
-      id: 'Nj31QtD0wxJV4jddJ1FjT',
-      definition_id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
-      descriptor_map: [
-        {
-          id: 'identity_input',
-          format: 'ldp_vc',
-          path: '$.verifiableCredential[0]',
-        },
-        {
-          id: 'name_input',
-          format: 'ldp_vc',
-          path: '$.verifiableCredential[0]',
-        },
-        {
-          id: 'role_input',
-          format: 'ldp_vc',
-          path: '$.verifiableCredential[1]',
-        },
-      ],
-    });
+    expect(presentation.presentation_submission?.descriptor_map).toEqual([
+      {
+        id: 'identity_input',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
+      {
+        id: 'name_input',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
+      {
+        id: 'role_input',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[1]',
+      },
+    ]);
     const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, presentation);
     expect(evalResult.errors?.length).toEqual(0);
   });
@@ -457,22 +453,18 @@ describe('evaluate JGiter tests', () => {
     ]);
     expect(resultEvaluation.errors?.length).toEqual(0);
     const presentation: IPresentation = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
-    expect(presentation.presentation_submission).toBe({
-      id: 'aTe8SxGFiLK7IVC2PIutc',
-      definition_id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
-      descriptor_map: [
-        {
-          id: 'identity_input',
-          format: 'ldp_vc',
-          path: '$.verifiableCredential[0]',
-        },
-        {
-          id: 'name_input',
-          format: 'ldp_vc',
-          path: '$.verifiableCredential[0]',
-        },
-      ],
-    });
+    expect(presentation.presentation_submission?.descriptor_map).toEqual([
+      {
+        id: 'identity_input',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
+      {
+        id: 'name_input',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
+    ]);
   });
 
   it('Evaluate case with with single submission requirements (A pick count 3)', () => {
