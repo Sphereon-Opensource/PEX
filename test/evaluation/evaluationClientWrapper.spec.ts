@@ -1,8 +1,8 @@
 import fs from 'fs';
 
-import {Optionality, PresentationDefinitionV2, PresentationSubmission, Rules} from '@sphereon/pex-models';
+import { Optionality, PresentationDefinitionV2, PresentationSubmission, Rules } from '@sphereon/pex-models';
 
-import {IVerifiableCredential, IVerifiablePresentation, Status} from '../../lib';
+import { IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
 import {
   InternalCredential,
@@ -16,7 +16,6 @@ import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
 function getFile(path: string) {
   return fs.readFileSync(path, 'utf-8');
 }
-
 
 function getFileAsJson(path: string) {
   return JSON.parse(getFile(path));
@@ -540,12 +539,16 @@ describe('evaluate', () => {
     const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, wvcs);
-    expect(ps.descriptor_map.map(d=>d.path)).toEqual(['$.verifiableCredential[0]','$.verifiableCredential[0]','$.verifiableCredential[1]'])
+    expect(ps.descriptor_map.map((d) => d.path)).toEqual([
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[1]',
+    ]);
   });
 
   it('should pass with correct submissionFrom result', function () {
     const clientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const vcjwt = getFile("test/dif_pe_examples/vc/nameCredential-vc.jwt")
+    const vcjwt = getFile('test/dif_pe_examples/vc/nameCredential-vc.jwt');
     const pdSchema: PresentationDefinitionV2 = {
       id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
       submission_requirements: [
@@ -637,13 +640,23 @@ describe('evaluate', () => {
     const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
-    const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(resultSelectFrom.verifiableCredential as IVerifiableCredential[]));
-    expect(ps.descriptor_map.map(d=>d.path)).toEqual(['$.verifiableCredential[0]','$.verifiableCredential[0]','$.verifiableCredential[0]','$.verifiableCredential[0]'])
+    const ps: PresentationSubmission = clientWrapper.submissionFrom(
+      internalPD,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
+        resultSelectFrom.verifiableCredential as IVerifiableCredential[]
+      )
+    );
+    expect(ps.descriptor_map.map((d) => d.path)).toEqual([
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+    ]);
   });
 
   it('should pass with correct submissionFrom result with rule all', function () {
     const clientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const vcjwt = getFile("test/dif_pe_examples/vc/nameCredential-vc.jwt")
+    const vcjwt = getFile('test/dif_pe_examples/vc/nameCredential-vc.jwt');
     const pdSchema: PresentationDefinitionV2 = {
       id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
       submission_requirements: [
@@ -662,7 +675,7 @@ describe('evaluate', () => {
               rule: 'all',
               from: 'B',
             },
-          ]
+          ],
         },
       ],
       input_descriptors: [
@@ -742,9 +755,16 @@ describe('evaluate', () => {
     const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
-    const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(resultSelectFrom.verifiableCredential as IVerifiableCredential[]));
-    expect(ps.descriptor_map.map(d=>d.path)).toEqual(['$.verifiableCredential[0]','$.verifiableCredential[0]','$.verifiableCredential[0]'])
+    const ps: PresentationSubmission = clientWrapper.submissionFrom(
+      internalPD,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
+        resultSelectFrom.verifiableCredential as IVerifiableCredential[]
+      )
+    );
+    expect(ps.descriptor_map.map((d) => d.path)).toEqual([
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+      '$.verifiableCredential[0]',
+    ]);
   });
-
-
 });
