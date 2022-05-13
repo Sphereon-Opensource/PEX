@@ -61,7 +61,7 @@ export class EvaluationClientWrapper {
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
           jp.nodes(
-            this._client.wrappedVcs.map((wrapped) => wrapped.decoded),
+            this._client.wrappedVcs.map((wrapped) => wrapped.original),
             e
           )[0].value
       );
