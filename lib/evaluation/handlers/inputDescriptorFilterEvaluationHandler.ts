@@ -104,6 +104,16 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
 
   private transformDateFormat(result: { path: string[]; value: unknown }) {
     const date: Date = new Date(result.value as string);
+    let month = date.getUTCMonth() + 1 + '';
+    if (month.length === 1) {
+      month = '0' + month;
+    }
+    let day = date.getUTCDate() + '';
+    if (day.length === 1) {
+      day = '0' + day;
+    }
+    result.value = date.getUTCFullYear() + '-' + month + '-' + day;
+
     result.value = date.toISOString().substring(0, date.toISOString().indexOf('T'));
   }
 }
