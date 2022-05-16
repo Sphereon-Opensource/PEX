@@ -1,9 +1,9 @@
-import { InternalVerifiableCredential, InternalVerifiableCredentialJsonLD } from '../../../lib/types/Internal.types';
+import { IVerifiableCredential } from '../../../lib';
 
 export class Wallet {
-  getWallet(): { holder: string; verifiableCredentials: InternalVerifiableCredential[] } {
+  getWallet(): { holder: string; verifiableCredentials: IVerifiableCredential[] } {
     // We can't force our users to give us a complete VerifiableCredentialJsonLd/VerifiableCredentialJwt so we can get it like this
-    const vc0: InternalVerifiableCredential = {
+    const vc0: IVerifiableCredential = {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',
         'https://w3c-ccg.github.io/vc-examples/covid-19/v2/v2.jsonld',
@@ -42,8 +42,8 @@ export class Wallet {
         proofPurpose: 'assertionMethod',
         jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..xnB7m8M6TcAFmz2efqb74IyJECUTAMpCkJAudfmVkLC3CPmCrMznvlD2E7WCCkzF9nnrZlJw0VpHdXJpjEU-AQ',
       },
-    } as unknown as InternalVerifiableCredentialJsonLD;
-    const vc1: InternalVerifiableCredential = {
+    };
+    const vc1: IVerifiableCredential = {
       '@context': [
         'https://www.w3.org/2018/credentials/v1',
         'https://w3id.org/security/suites/ed25519-2020/v1',
@@ -80,8 +80,8 @@ export class Wallet {
         //it was missing in the original vc
         jws: '',
       },
-    } as unknown as InternalVerifiableCredentialJsonLD;
-    const vc2: InternalVerifiableCredential = {
+    };
+    const vc2: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'],
       issuer: 'did:web:vc.transmute.world',
       issuanceDate: '2020-03-16T22:37:26.544Z',
@@ -101,7 +101,7 @@ export class Wallet {
         proofPurpose: 'assertionMethod',
         jws: 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..YtqjEYnFENT7fNW-COD0HAACxeuQxPKAmp4nIl8jYAu__6IH2FpSxv81w-l5PvE1og50tS9tH8WyXMlXyo45CA',
       },
-    } as unknown as InternalVerifiableCredentialJsonLD;
+    };
     return {
       holder: 'did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd',
       verifiableCredentials: [vc0, vc1, vc2],

@@ -3,7 +3,7 @@ import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { ICredentialSubject } from '../../types';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -38,9 +38,9 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     return 'IsHolderEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     this.findIsHolderFieldIdsToInputDescriptorsSets(pd);
-    this.findAllCredentialSubjects(vcs);
+    this.findAllCredentialSubjects(wrappedVcs);
     this.confirmAllFieldSetHasSameSubject(
       this.fieldIdzInputDescriptorsSameSubjectRequired,
       Status.INFO,
@@ -102,10 +102,10 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     return error;
   }
 
-  private findAllCredentialSubjects(vcs: InternalVerifiableCredential[]) {
+  private findAllCredentialSubjects(wrappedVcs: WrappedVerifiableCredential[]) {
     //TODO handle nested path
     const credentialSubject: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
-      vcs,
+      wrappedVcs.map((wvc) => wvc.internalCredential),
       '$..credentialSubject'
     );
     credentialSubject.forEach((cs) => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));

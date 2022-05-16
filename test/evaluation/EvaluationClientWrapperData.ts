@@ -1,7 +1,6 @@
 import { PresentationSubmission, Rules } from '@sphereon/pex-models';
 
-import { HandlerCheckResult, SelectResults, Status } from '../../lib';
-import { InternalVerifiableCredential, InternalVerifiableCredentialJsonLD } from '../../lib/types/Internal.types';
+import { HandlerCheckResult, IVerifiableCredential, SelectResults, Status } from '../../lib';
 import PEMessages from '../../lib/types/Messages';
 
 export class EvaluationClientWrapperData {
@@ -136,7 +135,7 @@ export class EvaluationClientWrapperData {
       }),
       warnings: [
         {
-          message: PEMessages.LIMIT_DISCLOSURE_APPLIED + ': $.input_descriptors[0]: $[0]',
+          message: PEMessages.LIMIT_DISCLOSURE_APPLIED + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'warn',
           tag: 'LimitDisclosureEvaluation',
         },
@@ -148,13 +147,14 @@ export class EvaluationClientWrapperData {
     return {
       errors: [
         {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $[0]',
+          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[0]',
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
@@ -186,7 +186,7 @@ export class EvaluationClientWrapperData {
             verificationMethod: '',
             jws: '',
           },
-        } as unknown as InternalVerifiableCredentialJsonLD,
+        } as IVerifiableCredential,
       ],
       vcIndexes: [],
       matches: [
@@ -199,7 +199,7 @@ export class EvaluationClientWrapperData {
     };
   }
 
-  public getVerifiableCredential(): InternalVerifiableCredential[] {
+  public getVerifiableCredential(): IVerifiableCredential[] {
     return [
       {
         id: 'CredentialID2021110100',
@@ -221,7 +221,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as InternalVerifiableCredentialJsonLD,
+      } as IVerifiableCredential,
       {
         id: 'CredentialID2021110405',
         credentialStatus: {
@@ -242,9 +242,9 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as InternalVerifiableCredentialJsonLD,
+      } as IVerifiableCredential,
       {
-        id: 'CredentialID2021110100',
+        id: 'CredentialID2021110406',
         credentialStatus: {
           id: '',
           type: '',
@@ -263,7 +263,7 @@ export class EvaluationClientWrapperData {
           verificationMethod: '',
           jws: '',
         },
-      } as unknown as InternalVerifiableCredentialJsonLD,
+      } as IVerifiableCredential,
     ];
   }
 
@@ -282,30 +282,35 @@ export class EvaluationClientWrapperData {
           tag: 'UriEvaluation',
         },
         {
-          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[1]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $[2]',
+          message:
+            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[0]',
+            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message:
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[2]',
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            ': $.input_descriptors[0]: $.verifiableCredential[2]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $[1]',
+            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },

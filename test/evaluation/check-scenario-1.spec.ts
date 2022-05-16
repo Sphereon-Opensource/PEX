@@ -1,7 +1,6 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
 
-import { IPresentation, PEX } from '../../lib';
-import { InternalVerifiableCredential } from '../../lib/types/Internal.types';
+import { IPresentation, IVerifiableCredential, PEX } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
@@ -17,17 +16,17 @@ describe('1st scenario', () => {
    */
   it('should return ok get the right presentationSubmission', function () {
     const pd: PdV1 = getPresentationDefinition();
-    const pejs: PEX = new PEX();
+    const pex: PEX = new PEX();
     /**
      * optional, first we want to make sure that the presentationDefinition object that we got is correct
      */
-    const result = pejs.validateDefinition(pd);
+    const result = pex.validateDefinition(pd);
     expect(result).toEqual([{ tag: 'root', status: 'info', message: 'ok' }]);
     const wallet: Wallet = new Wallet();
     /**
      * we get the verifiableCredentials from our wallet
      */
-    const holderWallet: { holder: string; verifiableCredentials: InternalVerifiableCredential[] } = wallet.getWallet();
+    const holderWallet: { holder: string; verifiableCredentials: IVerifiableCredential[] } = wallet.getWallet();
     expect(holderWallet.holder).toEqual('did:key:z6MkjRagNiMu91DduvCvgEsqLZDVzrJzFrwahc4tXLt9DoHd');
     /**
      * evaluation result will be:
@@ -93,7 +92,7 @@ describe('1st scenario', () => {
       }
     }
      */
-    const evaluationResult = pejs.evaluatePresentation(
+    const evaluationResult = pex.evaluatePresentation(
       pd,
       {
         '@context': [],
@@ -196,7 +195,7 @@ describe('1st scenario', () => {
       "warnings": []
     }
      */
-    const selectFromResult = pejs.selectFrom(
+    const selectFromResult = pex.selectFrom(
       pd,
       holderWallet.verifiableCredentials,
       [holderWallet.holder],
@@ -231,7 +230,7 @@ describe('1st scenario', () => {
 
      which is wrong in the case of our example, because the index of our verifiableCredential is no longer #2, but it's "1"
      */
-    const presentation: IPresentation = pejs.presentationFrom(
+    const presentation: IPresentation = pex.presentationFrom(
       pd,
       [holderWallet.verifiableCredentials[2]],
       'did:didMethod:2021112400'
@@ -258,7 +257,7 @@ describe('1st scenario', () => {
      */
     expect(() => {
       new PEX().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], 'did:didMethod: 2021112401');
-    }).toThrowError('You need to call evaluate() before pejs.presentationFrom()');
+    }).toThrowError('You need to call evaluate() before pex.presentationFrom()');
   });
 });
 

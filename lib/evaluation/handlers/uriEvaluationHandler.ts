@@ -3,11 +3,11 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { ICredentialSchema, PEVersion } from '../../types';
+import { ICredential, ICredentialSchema, PEVersion } from '../../types';
 import {
   IInternalPresentationDefinition,
   InternalPresentationDefinitionV1,
-  InternalVerifiableCredential,
+  WrappedVerifiableCredential,
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { EvaluationClient } from '../evaluationClient';
@@ -30,13 +30,15 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private static HASHLINK_QUERY_URL_REGEX =
     /https*?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(hl=[a-zA-Z0-9]+)/g;
 
-  public handle(d: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  //TODO: handle context objects
+  //TODO: handle hashlinks
+  public handle(d: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     // This filter is removed in V2
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
-      vcs.forEach((vc: InternalVerifiableCredential, j: number) => {
-        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(vc);
-        this.evaluateUris(vc, vcUris, uris, i, j, d.getVersion());
+      wrappedVcs.forEach((wvc: WrappedVerifiableCredential, j: number) => {
+        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.internalCredential);
+        this.evaluateUris(wvc, vcUris, uris, i, j, d.getVersion());
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
@@ -57,7 +59,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private evaluateUris(
-    vc: InternalVerifiableCredential,
+    wvc: WrappedVerifiableCredential,
     verifiableCredentialUris: string[],
     inputDescriptorsUris: string[],
     idIdx: number,
@@ -80,29 +82,29 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       hasAnyMatch = true;
     }
     if (hasAnyMatch) {
-      this.getResults().push(this.createSuccessResultObject(vc, inputDescriptorsUris, idIdx, vcIdx));
+      this.getResults().push(this.createSuccessResultObject(wvc, inputDescriptorsUris, idIdx, vcIdx));
     } else {
-      this.getResults().push(this.createErrorResultObject(vc, inputDescriptorsUris, idIdx, vcIdx));
+      this.getResults().push(this.createErrorResultObject(wvc, inputDescriptorsUris, idIdx, vcIdx));
     }
   }
 
-  private static buildVcContextAndSchemaUris(vc: InternalVerifiableCredential) {
+  private static buildVcContextAndSchemaUris(credential: ICredential) {
     const uris: string[] = [];
-    if (Array.isArray(vc.getContext())) {
-      uris.push(...vc.getContext());
+    if (Array.isArray(credential['@context'])) {
+      credential['@context'].forEach((value) => uris.push(value as string));
     } else {
-      uris.push(<string>vc.getContext());
+      uris.push(<string>credential['@context']);
     }
-    if (Array.isArray(vc.getCredentialSchema()) && (vc.getCredentialSchema() as ICredentialSchema[]).length > 0) {
-      (vc.getCredentialSchema() as ICredentialSchema[]).forEach((element) => uris.push(element.id));
-    } else if (vc.getCredentialSchema()) {
-      uris.push((vc.getCredentialSchema() as ICredentialSchema).id);
+    if (Array.isArray(credential.credentialSchema) && (credential.credentialSchema as ICredentialSchema[]).length > 0) {
+      (credential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
+    } else if (credential.credentialSchema) {
+      uris.push((credential.credentialSchema as ICredentialSchema).id);
     }
     return uris;
   }
 
   private createSuccessResultObject(
-    vc: InternalVerifiableCredential,
+    wvc: WrappedVerifiableCredential,
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -111,15 +113,15 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.INFO;
     result.message = PEMessages.URI_EVALUATION_PASSED;
     result.payload = {
-      vcContext: vc.getContext(),
-      vcCredentialSchema: vc.getCredentialSchema(),
+      vcContext: wvc.internalCredential['@context'],
+      vcCredentialSchema: wvc.internalCredential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;
   }
 
   private createErrorResultObject(
-    vc: InternalVerifiableCredential,
+    wvc: WrappedVerifiableCredential,
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
@@ -128,8 +130,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.ERROR;
     result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
-      vcContext: vc.getContext(),
-      vcCredentialSchema: vc.getCredentialSchema(),
+      vcContext: wvc.internalCredential['@context'],
+      vcCredentialSchema: wvc.internalCredential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;

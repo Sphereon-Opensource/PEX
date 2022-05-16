@@ -1,9 +1,8 @@
-import { InternalVerifiableCredential, InternalVerifiableCredentialJsonLD } from '../../../lib/types/Internal.types';
+import { IVerifiableCredential } from '../../../lib';
 
 export class SameSubjectVerifiableCredential {
-  public getVerifiableCredential(): InternalVerifiableCredential[] {
-    let vc0: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc0 = Object.assign(vc0, {
+  public getVerifiableCredential(): IVerifiableCredential[] {
+    const vc0: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -25,9 +24,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc1: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc1 = Object.assign(vc1, {
+    };
+    const vc1: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -49,9 +47,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc2: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc2 = Object.assign(vc2, {
+    };
+    const vc2: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -73,9 +70,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc3: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc3 = Object.assign(vc3, {
+    };
+    const vc3: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -97,9 +93,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc4: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc4 = Object.assign(vc4, {
+    };
+    const vc4: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -121,9 +116,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc5: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc5 = Object.assign(vc5, {
+    };
+    const vc5: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -145,9 +139,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc6: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc6 = Object.assign(vc6, {
+    };
+    const vc6: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -169,9 +162,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc7: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc7 = Object.assign(vc7, {
+    };
+    const vc7: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -193,9 +185,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc8: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc8 = Object.assign(vc8, {
+    };
+    const vc8: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -217,9 +208,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
-    let vc9: InternalVerifiableCredentialJsonLD = new InternalVerifiableCredentialJsonLD();
-    vc9 = Object.assign(vc9, {
+    };
+    const vc9: IVerifiableCredential = {
       '@context': ['https://www.w3.org/2018/credentials/v1'],
       credentialSchema: [
         {
@@ -241,7 +231,8 @@ export class SameSubjectVerifiableCredential {
         jws: '',
         created: '',
       },
-    });
+    };
+    7;
     return [vc0, vc1, vc2, vc3, vc4, vc5, vc6, vc7, vc8, vc9];
   }
 }

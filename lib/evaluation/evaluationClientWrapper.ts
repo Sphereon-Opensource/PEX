@@ -1,10 +1,16 @@
-import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
+import {
+  Descriptor,
+  InputDescriptorV1,
+  InputDescriptorV2,
+  PresentationSubmission,
+  Rules,
+  SubmissionRequirement,
+} from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { IVerifiableCredential } from '../types';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../types/Internal.types';
-import { SSITypesBuilder } from '../types/SSITypesBuilder';
+import { IPresentationDefinition, IVerifiableCredential } from '../types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
 import { JsonPathUtils } from '../utils';
 
 import { SelectResults, SubmissionRequirementMatch } from './core';
@@ -25,13 +31,18 @@ export class EvaluationClientWrapper {
 
   public selectFrom(
     presentationDefinition: IInternalPresentationDefinition,
-    verifiableCredentials: InternalVerifiableCredential[],
+    wrappedVerifiableCredentials: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, verifiableCredentials, holderDids, limitDisclosureSignatureSuites);
+    this._client.evaluate(
+      presentationDefinition,
+      wrappedVerifiableCredentials,
+      holderDids,
+      limitDisclosureSignatureSuites
+    );
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -47,14 +58,18 @@ export class EvaluationClientWrapper {
         marked
       );
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: InternalVerifiableCredential[] = matches.map(
-        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      const credentials: IVerifiableCredential[] = matches.map(
+        (e) =>
+          jp.nodes(
+            this._client.wrappedVcs.map((wrapped) => wrapped.original),
+            e
+          )[0].value
       );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
+        verifiableCredential: credentials,
         warnings,
       };
     } else {
@@ -63,35 +78,59 @@ export class EvaluationClientWrapper {
       );
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
       const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: InternalVerifiableCredential[] = matches.map(
-        (e) => jp.nodes(this._client.verifiableCredential, e)[0].value
+      const credentials: IVerifiableCredential[] = matches.map(
+        (e) =>
+          jp.nodes(
+            this._client.wrappedVcs.map((wrapped) => wrapped.original),
+            e
+          )[0].value
       );
       selectResults = {
         errors: errors,
         matches: [...matchSubmissionRequirements],
         areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: SSITypesBuilder.mapInternalVerifiableCredentialsToExternal(credentials),
+        verifiableCredential: credentials,
         warnings,
       };
     }
 
-    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, verifiableCredentials);
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
-    this.remapMatches(selectResults, verifiableCredentials);
+    this.remapMatches(
+      wrappedVerifiableCredentials.map((wrapped) => wrapped.original as IVerifiableCredential),
+      selectResults.matches,
+      selectResults?.verifiableCredential
+    );
     selectResults.matches?.forEach((m) => {
       this.updateSubmissionRequirementMatchPathToAlias(m, 'verifiableCredential');
     });
+    if (selectResults.areRequiredCredentialsPresent === Status.INFO) {
+      selectResults.errors = [];
+    }
     return selectResults;
   }
 
-  private remapMatches(selectResults: SelectResults, verifiableCredentials: InternalVerifiableCredential[]) {
-    selectResults.matches?.forEach((srm) => {
-      srm.vc_path.forEach((match, index, matches) => {
-        const vc = jp.query(verifiableCredentials, match)[0];
-        const newIndex = selectResults.verifiableCredential?.findIndex((svc) => svc.id === vc.id);
-        matches[index] = `$[${newIndex}]`;
-      });
-      srm.name;
+  private remapMatches(
+    verifiableCredentials: IVerifiableCredential[],
+    submissionRequirementMatches?: SubmissionRequirementMatch[],
+    vcsToSend?: IVerifiableCredential[]
+  ) {
+    submissionRequirementMatches?.forEach((srm) => {
+      if (srm.from_nested) {
+        this.remapMatches(verifiableCredentials, srm.from_nested, vcsToSend);
+      } else {
+        srm.vc_path.forEach((match, index, matches) => {
+          const vc = jp.query(verifiableCredentials, match)[0];
+          const newIndex = vcsToSend?.findIndex((svc) => JSON.stringify(svc) === JSON.stringify(vc));
+          if (newIndex === -1) {
+            throw new Error(
+              `The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`
+            );
+          }
+          matches[index] = `$[${newIndex}]`;
+        });
+        srm.name;
+      }
     });
   }
 
@@ -140,16 +179,22 @@ export class EvaluationClientWrapper {
     pd: IInternalPresentationDefinition
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
-    const partitionedResults: Map<string, string[]> = this.partitionCheckResults(marked);
-    for (const [idPath, sameIdVCs] of partitionedResults.entries()) {
-      const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
-      if (idRes.length) {
-        const submissionRequirementMatch: SubmissionRequirementMatch = {
-          name: idRes[0].value.name || idRes[0].value.id,
-          rule: Rules.All,
-          vc_path: sameIdVCs,
-        };
-        submissionRequirementMatches.push(submissionRequirementMatch);
+    const partitionedResults: Map<string, string[]> = this.createVcToIdMap(marked);
+    for (const [vcPath, sameVcIds] of partitionedResults.entries()) {
+      if (
+        sameVcIds.length &&
+        sameVcIds.length === (pd as unknown as IPresentationDefinition).input_descriptors.length
+      ) {
+        for (const idPath of sameVcIds) {
+          const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
+          if (idRes.length) {
+            submissionRequirementMatches.push({
+              name: idRes[0].value.name || idRes[0].value.id,
+              rule: Rules.All,
+              vc_path: [vcPath],
+            });
+          }
+        }
       }
     }
     return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
@@ -178,12 +223,14 @@ export class EvaluationClientWrapper {
 
   public evaluate(
     pd: IInternalPresentationDefinition,
-    vcs: InternalVerifiableCredential[],
+    wvcs: WrappedVerifiableCredential[],
     holderDids?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    this._client.evaluate(pd, vcs, holderDids, limitDisclosureSignatureSuites);
-    const result: EvaluationResults = { verifiableCredential: [...vcs] };
+    this._client.evaluate(pd, wvcs, holderDids, limitDisclosureSignatureSuites);
+    const result: EvaluationResults = {
+      verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential),
+    };
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
     if (this._client.presentationSubmission?.descriptor_map.length) {
@@ -198,7 +245,10 @@ export class EvaluationClientWrapper {
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
-    result.verifiableCredential = this._client.verifiableCredential;
+    result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
+    if (result.value) {
+      this.filterEvaluationErrors(result, pd as unknown as IPresentationDefinition);
+    }
     return result;
   }
 
@@ -206,20 +256,21 @@ export class EvaluationClientWrapper {
     return this._client.results
       .filter((result) => result.status === status)
       .map((x) => {
+        const vcPath = x.verifiable_credential_path.substring(1);
         return {
           tag: x.evaluator,
           status: x.status,
-          message: `${x.message}: ${x.input_descriptor_path}: ${x.verifiable_credential_path}`,
+          message: `${x.message}: ${x.input_descriptor_path}: $.verifiableCredential${vcPath}`,
         };
       });
   }
 
   public submissionFrom(
     pd: IInternalPresentationDefinition,
-    vcs: InternalVerifiableCredential[]
+    vcs: WrappedVerifiableCredential[]
   ): PresentationSubmission {
     if (!this._client.results.length) {
-      throw Error('You need to call evaluate() before pejs.presentationFrom()');
+      throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
 
     if (pd.submission_requirements) {
@@ -277,12 +328,12 @@ export class EvaluationClientWrapper {
 
   private matchUserSelectedVcs(
     marked: HandlerCheckResult[],
-    vcs: InternalVerifiableCredential[]
+    vcs: WrappedVerifiableCredential[]
   ): [HandlerCheckResult[], [string, string][]] {
-    const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc)]);
-    const allCredentials: [number, string][] = this._client.verifiableCredential.map((vc, index) => [
+    const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc.original)]);
+    const allCredentials: [number, string][] = this._client.wrappedVcs.map((vc, index) => [
       index,
-      JSON.stringify(vc),
+      JSON.stringify(vc.original),
     ]);
     const updatedIndexes: [string, string][] = [];
     userSelected.forEach((us, i) => {
@@ -375,34 +426,6 @@ export class EvaluationClientWrapper {
     }
   }
 
-  private partitionCheckResults(marked: HandlerCheckResult[]): Map<string, string[]> {
-    const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
-
-    const partitionedBasedOnID: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
-    for (let i = 0; i < marked.length; i++) {
-      const currentIdPath: string = marked[i].input_descriptor_path;
-      if (partitionedBasedOnID.has(currentIdPath)) {
-        const partBasedOnID = partitionedBasedOnID.get(currentIdPath);
-        if (partBasedOnID) {
-          partBasedOnID.push(marked[i]);
-        }
-      } else {
-        partitionedBasedOnID.set(currentIdPath, [marked[i]]);
-      }
-    }
-
-    for (const [idPath, sameIdCheckResults] of partitionedBasedOnID.entries()) {
-      const vcPaths: string[] = [];
-      for (let i = 0; i < sameIdCheckResults.length; i++) {
-        if (vcPaths.indexOf(sameIdCheckResults[i].verifiable_credential_path) === -1) {
-          vcPaths.push(sameIdCheckResults[i].verifiable_credential_path);
-        }
-      }
-      partitionedResults.set(idPath, vcPaths);
-    }
-    return partitionedResults;
-  }
-
   private removeDuplicateSubmissionRequirementMatches(matches: SubmissionRequirementMatch[]) {
     return matches.filter((match, index) => {
       const _match = JSON.stringify(match);
@@ -417,44 +440,94 @@ export class EvaluationClientWrapper {
 
   public fillSelectableCredentialsToVerifiableCredentialsMapping(
     selectResults: SelectResults,
-    verifiableCredentials: InternalVerifiableCredential[]
+    wrappedVcs: WrappedVerifiableCredential[]
   ) {
     if (selectResults) {
       selectResults.verifiableCredential?.forEach((selectableCredential: IVerifiableCredential) => {
-        const foundIndex: number = verifiableCredentials.findIndex(
-          (verifiableCredential) => selectableCredential.id === verifiableCredential.id
+        const foundIndex: number = wrappedVcs.findIndex(
+          (wrappedVc) => JSON.stringify(selectableCredential) === JSON.stringify(wrappedVc.original)
         );
+        if (foundIndex === -1) {
+          throw new Error('index is not right');
+        }
         selectResults.vcIndexes?.push(foundIndex);
       });
     }
   }
 
   public determineAreRequiredCredentialsPresent(
-    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined
+    matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined,
+    parentMsr?: SubmissionRequirementMatch
   ): Status {
     let status = Status.INFO;
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
       return Status.ERROR;
     }
-    for (const m of matchSubmissionRequirements) {
-      if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+    if (!parentMsr) {
+      const childStatuses = [];
+      for (const m of matchSubmissionRequirements) {
+        childStatuses.push(this.determineSubmissionRequirementStatus(m));
+      }
+      if (childStatuses.filter((status) => status === Status.ERROR).length) {
         return Status.ERROR;
-      } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+      } else if (childStatuses.filter((status) => status === Status.WARN).length) {
+        return Status.WARN;
+      } else {
+        return Status.INFO;
+      }
+    } else {
+      const childStatuses = [];
+      for (const m of matchSubmissionRequirements) {
+        childStatuses.push(this.determineSubmissionRequirementStatus(m));
+      }
+      if (parentMsr.rule === Rules.All && childStatuses.filter((status) => status === Status.ERROR).length) {
         return Status.ERROR;
-      } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+      }
+      const nonErrStatCount = childStatuses.filter((status) => status !== Status.ERROR).length;
+      if (parentMsr.count && parentMsr.count < nonErrStatCount) {
+        return Status.ERROR;
+      } else if (parentMsr.count && parentMsr.count > nonErrStatCount) {
         status = Status.WARN;
-      } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
+      } else if (parentMsr.min && parentMsr.min > nonErrStatCount) {
         return Status.ERROR;
-      } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+      } else if (parentMsr.max && parentMsr.max < nonErrStatCount) {
         status = Status.WARN;
-      } else if (m.from_nested) {
-        status = this.determineAreRequiredCredentialsPresent(m.from_nested);
-        if (status === Status.ERROR) {
-          return status;
-        }
       }
     }
     return status;
+  }
+
+  private determineSubmissionRequirementStatus(m: SubmissionRequirementMatch): Status {
+    let innerStatus = Status.INFO;
+    if (m.from && m.from_nested) {
+      throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.');
+    }
+    if (!m.from && !m.from_nested && m.vc_path.length !== 1) {
+      innerStatus = Status.ERROR;
+    }
+    if (m.from) {
+      if (m.rule === Rules.All && m.vc_path.length !== 1) {
+        innerStatus = Status.ERROR;
+      }
+      if (m.rule === Rules.Pick) {
+        if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+          innerStatus = Status.ERROR;
+        } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+          innerStatus = Status.ERROR;
+        } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+          innerStatus = Status.WARN;
+        } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
+          innerStatus = Status.ERROR;
+        } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+          innerStatus = Status.WARN;
+        } else if (m.rule === Rules.All && m.vc_path.length > 1) {
+          innerStatus = Status.ERROR;
+        }
+      }
+    } else if (m.from_nested) {
+      innerStatus = this.determineAreRequiredCredentialsPresent(m.from_nested, m);
+    }
+    return innerStatus;
   }
 
   private updateSubmissionRequirementMatchPathToAlias(
@@ -489,6 +562,89 @@ export class EvaluationClientWrapper {
     descriptor.path = descriptor.path.replace('$', '$.' + alias);
     if (descriptor.path_nested) {
       this.replacePathWithAlias(descriptor.path_nested, alias);
+    }
+  }
+
+  private createVcToIdMap(marked: HandlerCheckResult[]): Map<string, string[]> {
+    const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
+
+    const partitionedBasedOnVc: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
+    for (let i = 0; i < marked.length; i++) {
+      const currentVcPath: string = marked[i].verifiable_credential_path;
+      if (partitionedBasedOnVc.has(currentVcPath)) {
+        const partBasedOnVc = partitionedBasedOnVc.get(currentVcPath);
+        if (partBasedOnVc) {
+          partBasedOnVc.push(marked[i]);
+        }
+      } else {
+        partitionedBasedOnVc.set(currentVcPath, [marked[i]]);
+      }
+    }
+
+    for (const [idPath, sameVcCheckResults] of partitionedBasedOnVc.entries()) {
+      const idPaths: string[] = [];
+      for (let i = 0; i < sameVcCheckResults.length; i++) {
+        if (idPaths.indexOf(sameVcCheckResults[i].input_descriptor_path) === -1) {
+          idPaths.push(sameVcCheckResults[i].input_descriptor_path);
+        }
+      }
+      partitionedResults.set(idPath, idPaths);
+    }
+    return partitionedResults;
+  }
+
+  private filterEvaluationErrors(result: EvaluationResults, pd: IPresentationDefinition) {
+    const errors: HandlerCheckResult[] = this._client.results.filter((hcr) => hcr.status === Status.ERROR);
+    let relatedErrorFound = false;
+    if (result.value && result.errors) {
+      const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] =
+        EvaluationClientWrapper.findInputDescriptorIdAndVcListFromLogs(errors, pd);
+      for (const errorIdAndVcPath of errorsIdAndVcList) {
+        for (const desc of result.value.descriptor_map) {
+          if (desc.id === errorIdAndVcPath.id) {
+            if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
+              relatedErrorFound = true;
+            }
+            if (!desc.path && desc.path_nested) {
+              this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc, relatedErrorFound);
+            }
+          }
+        }
+      }
+    }
+    if (!relatedErrorFound) {
+      result.errors = [];
+    }
+  }
+
+  private static findInputDescriptorIdAndVcListFromLogs(
+    errors: HandlerCheckResult[],
+    pd: IPresentationDefinition
+  ): [{ id: string; verifiable_credential_path: string }] {
+    const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] = [] as unknown as [
+      { id: string; verifiable_credential_path: string }
+    ];
+    for (const hcr of errors) {
+      const idRes = JsonPathUtils.extractInputField(pd, [hcr.input_descriptor_path]);
+      if (idRes.length) {
+        const id: InputDescriptorV1 | InputDescriptorV2 = idRes[0].value;
+        const vcPath = hcr.verifiable_credential_path.replace('$', '$.verifiableCredential');
+        errorsIdAndVcList.push({ id: id.id, verifiable_credential_path: vcPath });
+      }
+    }
+    return errorsIdAndVcList;
+  }
+
+  private checkLogsVcInputDescriptorRelationRecursive(
+    errorIdAndVcPath: { id: string; verifiable_credential_path: string },
+    desc: Descriptor,
+    isRelated: boolean
+  ) {
+    if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
+      isRelated = true;
+    }
+    if (!desc.path && desc.path_nested) {
+      this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc.path_nested, isRelated);
     }
   }
 }

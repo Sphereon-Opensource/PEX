@@ -1,4 +1,4 @@
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 
 export interface EvaluationHandler {
@@ -7,5 +7,5 @@ export interface EvaluationHandler {
   getNext(): EvaluationHandler | undefined;
   hasNext(): boolean;
   getName(): string;
-  handle(pd: IInternalPresentationDefinition, p: InternalVerifiableCredential[]): void;
+  handle(pd: IInternalPresentationDefinition, p: WrappedVerifiableCredential[]): void;
 }

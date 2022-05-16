@@ -349,7 +349,7 @@ export interface PresentationSignCallBackParams {
   /**
    * The selected credentials to include in the eventual VP as determined by PEX and/or user
    */
-  selectedCredentials: IVerifiableCredential[];
+  selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[];
 
   /**
    * The presentation object created from the definition and verifiable credentials.
@@ -498,7 +498,7 @@ interface EvaluationResults {
   value?: PresentationSubmission;
   warnings?: string[];
   errors?: Error[];
-  verifiableCredential: IVerifiableCredential[];
+  verifiableCredential: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[];
 }
 ```
 
@@ -522,11 +522,11 @@ You, or rather the user, typically has to do a final selection.
 
 #### selectFrom Parameters
 
-| name                     | type                      | description                                                                                                                                                  |
-| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `presentationDefinition` | `PresentationDefinition`  | the presentation definition that initiated the request from the verifier                                                                                     |
-| `credentials`            | `IVerifiableCredential[]` | the array of verifiable credentials to select from                                                                                                           |
-| `holderDids`             | `string[]`                | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
+| name                     | type                                                                    | description                                                                                                                                                  |
+| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `presentationDefinition` | `PresentationDefinition`                                                | the presentation definition that initiated the request from the verifier                                                                                     |
+| `credentials`            | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials to select from                                                                                                           |
+| `holderDids`             | `string[]`                                                              | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
 
 #### Return value
 
@@ -554,7 +554,7 @@ interface SelectResults {
   /**
    * All matched/selectable credentials
    */
-  verifiableCredential?: IVerifiableCredential[];
+  verifiableCredential?: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[];
   /**
    * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
    */
@@ -594,19 +594,19 @@ maps the submitted credentials to the requested inputs in the `presentationDefin
 
 #### presentationFromV1 Parameters
 
-| name                     | type                       | description                                                                                                                                                  |
-| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `presentationDefinition` | `PresentationDefinitionV1` | the v1 presentation definition that initiated the request from the verifier                                                                                  |
-| `selectedCredentials`    | `IVerifiableCredential[]`  | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
-| `holderDid`              | `string`                   | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| name                     | type                                                                    | description                                                                                                                                                  |
+| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `presentationDefinition` | `PresentationDefinitionV1`                                              | the v1 presentation definition that initiated the request from the verifier                                                                                  |
+| `selectedCredentials`    | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
+| `holderDid`              | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### presentationFromV2 Parameters
 
-| name                     | type                       | description                                                                                                                                                  |
-| ------------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `presentationDefinition` | `PresentationDefinitionV2` | the v2 presentation definition that initiated the request from the verifier                                                                                  |
-| `selectedCredentials`    | `IVerifiableCredential[]`  | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
-| `holderDid`              | `string`                   | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| name                     | type                                                                    | description                                                                                                                                                  |
+| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `presentationDefinition` | `PresentationDefinitionV2`                                              | the v2 presentation definition that initiated the request from the verifier                                                                                  |
+| `selectedCredentials`    | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
+| `holderDid`              | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### Return value
 
@@ -759,17 +759,17 @@ There are several other utility scripts that help with development.
 
 # Glossary
 
-| Term                    | Definition                                                                                                                                                                                                                                                                 |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                             |
-| Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build Verifiable Presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. |
-| Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                      |
-| Holder                  | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a Presentation Definition.                                                   |
-| Holder's Did            | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet                                                             |
-| Verifier                | Verifiers are entities that define what proofs they require from a Holder (via a Presentation Definition) in order to proceed with an interaction.                                                                                                                         |
-| Issuer                  | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder.                                                                                   |
-| Presentation            | Data derived from one or more verifiable credentials, issued by one or more issuers                                                                                                                                                                                        |
-| Verifiable Presentation | Is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification.                                                                                                                           |
+| Term                    | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build Verifiable Presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. PEX accepts Verifiable credential in 3 forms: 1. JSON_LD which is know in our system as IVerifiableCredential, 2. JWT-Wrapped VC which is known in our system as JwtWrappedVerifiableCredential or string which is a valid Verifiable credential jwt |
+| Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Holder                  | Holders are entities that have one or more verifiable credentials in their possession. Holders are also the entities that submit proofs to Verifiers to satisfy the requirements described in a Presentation Definition.                                                                                                                                                                                                                                                                                                        |
+| Holder's Did            | Unique ID URI string and PKI metadata document format for describing the cryptographic keys and other fundamental PKI values linked to a unique, user-controlled, self-sovereign identifier in holder's wallet                                                                                                                                                                                                                                                                                                                  |
+| Verifier                | Verifiers are entities that define what proofs they require from a Holder (via a Presentation Definition) in order to proceed with an interaction.                                                                                                                                                                                                                                                                                                                                                                              |
+| Issuer                  | A role an entity can perform by asserting claims about one or more subjects, creating a verifiable credential from these claims, and transmitting the verifiable credential to a holder.                                                                                                                                                                                                                                                                                                                                        |
+| Presentation            | Data derived from one or more verifiable credentials, issued by one or more issuers                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Verifiable Presentation | Is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification.                                                                                                                                                                                                                                                                                                                                                                                |
 
 ## Further work:
 

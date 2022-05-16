@@ -2,7 +2,7 @@ import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 import { HandlerCheckResult } from '../handlerCheckResult';
 
@@ -29,9 +29,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return 'SameSubjectEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const sameSubjectInDesc = this.mapSameSubjectFieldIdsToInputDescriptors(pd);
-    const handlerCheckResults = this.mapCredentialsToResultObjecs(vcs, sameSubjectInDesc);
+    const handlerCheckResults = this.mapCredentialsToResultObjecs(wrappedVcs, sameSubjectInDesc);
     const fieldIdOccurrencesCount = this.countSameSubjectOccurrences(sameSubjectInDesc, handlerCheckResults);
     this.generateErrorResults(fieldIdOccurrencesCount, handlerCheckResults);
     this.updatePresentationSubmission(pd);
@@ -96,10 +96,15 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapCredentialsToResultObjecs(
-    vcs: InternalVerifiableCredential[],
+    wrappedVcs: WrappedVerifiableCredential[],
     results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][]
   ): HandlerCheckResult[] {
-    const subjects = [...jp.nodes(vcs, '$..credentialSubject')];
+    const subjects = [
+      ...jp.nodes(
+        wrappedVcs.map((wvc) => wvc.internalCredential),
+        '$..credentialSubject'
+      ),
+    ];
     const handlerCheckResults: HandlerCheckResult[] = [];
     subjects.forEach((s) => {
       const result = results.find((id) => jp.query(s.value, `$..${id[0].value}`).length !== 0);

@@ -3,9 +3,16 @@ import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { IPresentation, IProof, IVerifiablePresentation } from './types';
-import { InternalVerifiableCredential } from './types/Internal.types';
-import { IVerifiableCredential } from './types/SSI.types';
+import {
+  IPresentation,
+  IProof,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  JwtWrappedVerifiableCredential,
+  JwtWrappedVerifiablePresentation,
+  WrappedVerifiableCredential,
+  WrappedVerifiablePresentation,
+} from './types';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
@@ -31,26 +38,29 @@ export class PEXv1 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV1,
-    presentation: IPresentation,
+    presentation: IPresentation | JwtWrappedVerifiablePresentation | string,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
-    const internalVCs: InternalVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(
-      presentationCopy.verifiableCredential
-    );
+    const wrappedPresentation: WrappedVerifiablePresentation =
+      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
+    const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentationCopy.verifiableCredential);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDIDs = presentation.holder ? [presentation.holder] : [];
+    const holderDIDs = wrappedPresentation.internalPresentation.holder
+      ? [wrappedPresentation.internalPresentation.holder]
+      : [];
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      internalVCs,
+      wrappedVerifiableCredentials,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
   }
 
   /***
-   * The evaluate compares what is expected from a verifiableCredentials with the presentationDefinition.
+   * To evaluate compares what is expected from a verifiableCredentials with the presentationDefinition.
    *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
@@ -62,15 +72,14 @@ export class PEXv1 {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV1,
-    verifiableCredentials: IVerifiableCredential[],
+    verifiableCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.evaluate(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -89,7 +98,7 @@ export class PEXv1 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV1,
-    verifiableCredentials: IVerifiableCredential[],
+    verifiableCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
@@ -97,7 +106,7 @@ export class PEXv1 {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(verifiableCredentialCopy),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy),
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -118,18 +127,14 @@ export class PEXv1 {
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV1,
-    selectedCredential: IVerifiableCredential[],
+    selectedCredential: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     holderDID?: string
   ): IPresentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential)
     );
-    return PEX.getPresentation(
-      presentationSubmission,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredential),
-      holderDID
-    );
+    return PEX.getPresentation(presentationSubmission, selectedCredential, holderDID);
   }
 
   /**
@@ -164,13 +169,13 @@ export class PEXv1 {
    * This method can be used to combine a v1 definition, selected Verifiable Credentials, together with
    * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
-   * Please note that PE-JS has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
+   * Please note that PEX has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
    * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
    * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
    *
    * @param presentationDefinition the Presentation Definition V1
-   * @param selectedCredentials the PE-JS and/or User selected/filtered credentials that will become part of the Verifiable Presentation
+   * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
    * @param options: Signing Params these are the signing params required to sign.
@@ -179,7 +184,7 @@ export class PEXv1 {
    */
   public verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV1,
-    selectedCredentials: IVerifiableCredential[],
+    selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
   ): IVerifiablePresentation {
@@ -198,18 +203,9 @@ export class PEXv1 {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(
-      presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
 
-    const presentation = this.presentationFrom(
-      presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToInternal(selectedCredentials),
-      holder
-    );
+    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,

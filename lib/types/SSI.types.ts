@@ -1,6 +1,27 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
-import { BaseCredential, IInternalPresentationDefinition, InternalVerifiableCredential } from './Internal.types';
+import { IInternalPresentationDefinition } from './Internal.types';
+
+export interface ICredential {
+  // If exp is present, the UNIX timestamp MUST be converted to an [XMLSCHEMA11-2] date-time, and MUST be used to set the value of the expirationDate property of credentialSubject of the new JSON object.
+  expirationDate?: string;
+  // If iss is present, the value MUST be used to set the issuer property of the new credential JSON object or the holder property of the new presentation JSON object.
+  issuer: string | IIssuer;
+  // If nbf is present, the UNIX timestamp MUST be converted to an [XMLSCHEMA11-2] date-time, and MUST be used to set the value of the issuanceDate property of the new JSON object.
+  issuanceDate: string;
+  // If sub is present, the value MUST be used to set the value of the id property of credentialSubject of the new credential JSON object.
+  credentialSubject: ICredentialSubject;
+  // If jti is present, the value MUST be used to set the value of the id property of the new JSON object.
+  id: string;
+  '@context': ICredentialContextType[] | ICredentialContextType;
+  credentialStatus?: ICredentialStatus;
+  credentialSchema?: undefined | ICredentialSchemaType | ICredentialSchemaType[];
+  description?: string;
+  name?: string;
+  type: string[];
+
+  [x: string]: unknown;
+}
 
 export interface ICredentialSubject {
   id?: string;
@@ -8,9 +29,19 @@ export interface ICredentialSubject {
   [x: string]: unknown;
 }
 
+export type ICredentialContextType = ICredentialContext | string;
+
+export interface ICredentialContext {
+  name?: string;
+  did?: string;
+  [x: string]: unknown;
+}
+
+export type ICredentialSchemaType = ICredentialSchema | string;
+
 export interface ICredentialSchema {
   id: string;
-  type: string;
+  type?: string;
 }
 
 export enum ProofType {
@@ -61,48 +92,16 @@ export interface IIssuer {
   [x: string]: unknown;
 }
 
-export interface IJwtCredential {
-  aud?: string;
-  exp?: string | number;
-  iss: string;
-  jti?: string;
-  nbf?: string | number;
-  sub?: string;
-  vc: BaseCredential;
-  [x: string]: unknown;
-}
-
-export interface IJsonLdCredential {
-  '@context': string[] | string;
-  credentialStatus?: ICredentialStatus;
-  credentialSubject: ICredentialSubject;
-  credentialSchema?: ICredentialSchema | ICredentialSchema[];
-  description?: string;
-  expirationDate?: string;
-  id: string;
-  issuanceDate: string;
-  issuer: string | IIssuer;
-  name?: string;
-  type: string[];
-  [x: string]: unknown;
-}
-
 export interface IHasProof {
   proof: IProof | IProof[];
 }
 
-export type ICredential = IJwtCredential | IJsonLdCredential;
-
 export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDefinitionV2;
 
-export type IJwtVerifiableCredential = IJwtCredential & IHasProof;
-
-export type IJsonLdVerifiableCredential = IJsonLdCredential & IHasProof;
-
-export type IVerifiableCredential = IJwtVerifiableCredential | IJsonLdVerifiableCredential;
+export type IVerifiableCredential = ICredential & IHasProof;
 
 export interface IPresentation {
-  '@context': string[];
+  '@context': ICredentialContextType | ICredentialContextType[];
   type: string[];
   verifiableCredential: IVerifiableCredential[];
   presentation_submission?: PresentationSubmission;
@@ -113,11 +112,12 @@ export type IVerifiablePresentation = IPresentation & IHasProof;
 
 export type InputFieldType =
   | IVerifiablePresentation
-  | InternalVerifiableCredential
-  | InternalVerifiableCredential[]
+  | IVerifiableCredential
+  | IVerifiableCredential[]
   | IInternalPresentationDefinition
   | PresentationDefinitionV1
-  | PresentationDefinitionV2;
+  | PresentationDefinitionV2
+  | unknown;
 
 export enum PEVersion {
   v1 = 'v1',

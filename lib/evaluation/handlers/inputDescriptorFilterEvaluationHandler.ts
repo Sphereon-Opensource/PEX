@@ -7,7 +7,7 @@ import { Status } from '../../ConstraintUtils';
 import {
   IInternalPresentationDefinition,
   InternalPresentationDefinitionV2,
-  InternalVerifiableCredential,
+  WrappedVerifiableCredential,
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
@@ -25,14 +25,14 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return 'FilterEvaluation';
   }
 
-  public handle(pd: IInternalPresentationDefinition, vcs: InternalVerifiableCredential[]): void {
+  public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
-    vcs.forEach((vc: InternalVerifiableCredential, vcIndex: number) => {
+    wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
         let inputField = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(vc, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
         }
         if (!inputField.length) {
           const payload = { valid: false };
@@ -91,11 +91,29 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+    if (field.filter?.format && field.filter.format === 'date') {
+      this.transformDateFormat(result);
+    }
     const ajv = new Ajv();
     addFormats(ajv);
     if (field.filter) {
       return ajv.validate(field.filter, result.value);
     }
     return true;
+  }
+
+  private transformDateFormat(result: { path: string[]; value: unknown }) {
+    const date: Date = new Date(result.value as string);
+    let month = date.getUTCMonth() + 1 + '';
+    if (month.length === 1) {
+      month = '0' + month;
+    }
+    let day = date.getUTCDate() + '';
+    if (day.length === 1) {
+      day = '0' + day;
+    }
+    result.value = date.getUTCFullYear() + '-' + month + '-' + day;
+
+    result.value = date.toISOString().substring(0, date.toISOString().indexOf('T'));
   }
 }
