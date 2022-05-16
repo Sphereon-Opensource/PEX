@@ -497,8 +497,101 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[2],
     ]);
     expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
-      errors: [],
+      areRequiredCredentialsPresent: Status.ERROR,
+      errors: [
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message:
+            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]',
+          status: 'error',
+          tag: 'UriEvaluation',
+        },
+        {
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+      ],
       matches: [
         {
           from_nested: [

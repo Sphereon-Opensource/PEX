@@ -464,70 +464,21 @@ export class EvaluationClientWrapper {
       return Status.ERROR;
     }
     if (!parentMsr) {
+      const childStatuses = [];
       for (const m of matchSubmissionRequirements) {
-        let innerStatus = Status.INFO;
-        if (m.from && m.from_nested) {
-          throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.');
-        }
-        if (!m.from && !m.from_nested && m.vc_path.length !== 1) {
-          innerStatus = Status.ERROR;
-        }
-        if (m.from) {
-          if (m.rule === Rules.All && m.vc_path.length !== 1) {
-            innerStatus = Status.ERROR;
-          }
-          if (m.rule === Rules.Pick) {
-            if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
-              innerStatus = Status.ERROR;
-            } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
-              innerStatus = Status.ERROR;
-            } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
-              innerStatus = Status.WARN;
-            } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
-              innerStatus = Status.ERROR;
-            } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
-              innerStatus = Status.WARN;
-            } else if (m.rule === Rules.All && m.vc_path.length > 1) {
-              innerStatus = Status.ERROR;
-            }
-          }
-        } else if (m.from_nested) {
-          this.determineAreRequiredCredentialsPresent(m.from_nested, m);
-        }
-        return innerStatus;
+        childStatuses.push(this.determineSubmissionRequirementStatus(m));
+      }
+      if (childStatuses.filter((status) => status === Status.ERROR).length) {
+        return Status.ERROR;
+      } else if (childStatuses.filter((status) => status === Status.WARN).length) {
+        return Status.WARN;
+      } else {
+        return Status.INFO;
       }
     } else {
       const childStatuses = [];
       for (const m of matchSubmissionRequirements) {
-        let innerStatus = Status.INFO;
-        if (m.from && m.from_nested) {
-          innerStatus = Status.ERROR;
-        } else if (!m.from && !m.from_nested) {
-          innerStatus = Status.ERROR;
-        }
-        if (m.from) {
-          if (m.rule === Rules.All && m.vc_path.length !== 1) {
-            innerStatus = Status.ERROR;
-          }
-          if (m.rule === Rules.Pick) {
-            if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
-              innerStatus = Status.ERROR;
-            } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
-              innerStatus = Status.ERROR;
-            } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
-              innerStatus = Status.WARN;
-            } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
-              innerStatus = Status.ERROR;
-            } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
-              innerStatus = Status.WARN;
-            } else if (m.rule === Rules.All && m.vc_path.length > 1) {
-              innerStatus = Status.ERROR;
-            }
-          }
-        } else if (m.from_nested) {
-          innerStatus = this.determineAreRequiredCredentialsPresent(m.from_nested, m);
-        }
-        childStatuses.push(innerStatus);
+        childStatuses.push(this.determineSubmissionRequirementStatus(m));
       }
       if (parentMsr.rule === Rules.All && childStatuses.filter((status) => status === Status.ERROR).length) {
         return Status.ERROR;
@@ -544,6 +495,39 @@ export class EvaluationClientWrapper {
       }
     }
     return status;
+  }
+
+  private determineSubmissionRequirementStatus(m: SubmissionRequirementMatch): Status {
+    let innerStatus = Status.INFO;
+    if (m.from && m.from_nested) {
+      throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.');
+    }
+    if (!m.from && !m.from_nested && m.vc_path.length !== 1) {
+      innerStatus = Status.ERROR;
+    }
+    if (m.from) {
+      if (m.rule === Rules.All && m.vc_path.length !== 1) {
+        innerStatus = Status.ERROR;
+      }
+      if (m.rule === Rules.Pick) {
+        if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+          innerStatus = Status.ERROR;
+        } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+          innerStatus = Status.ERROR;
+        } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+          innerStatus = Status.WARN;
+        } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
+          innerStatus = Status.ERROR;
+        } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+          innerStatus = Status.WARN;
+        } else if (m.rule === Rules.All && m.vc_path.length > 1) {
+          innerStatus = Status.ERROR;
+        }
+      }
+    } else if (m.from_nested) {
+      innerStatus = this.determineAreRequiredCredentialsPresent(m.from_nested, m);
+    }
+    return innerStatus;
   }
 
   private updateSubmissionRequirementMatchPathToAlias(
