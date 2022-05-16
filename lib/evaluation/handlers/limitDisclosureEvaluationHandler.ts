@@ -2,7 +2,7 @@ import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality }
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { ICredential, IVerifiablePresentation } from '../../types';
+import { ICredential, IVerifiableCredential } from '../../types';
 import {
   IInternalPresentationDefinition,
   InternalPresentationDefinitionV2,
@@ -43,7 +43,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     optionality: Optionality
   ): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
-    const proof = (wvc.decoded as IVerifiablePresentation).proof;
+    const proof = (wvc.decoded as IVerifiableCredential).proof;
     if (!proof || Array.isArray(proof) || !proof.type) {
       // todo: Support/inspect array based proofs
       return false;
