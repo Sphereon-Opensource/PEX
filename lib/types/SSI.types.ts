@@ -98,7 +98,7 @@ export interface IHasProof {
 
 export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDefinitionV2;
 
-export type IVerifiableCredential = ICredential | IHasProof;
+export type IVerifiableCredential = ICredential & IHasProof;
 
 export interface IPresentation {
   '@context': ICredentialContextType | ICredentialContextType[];
