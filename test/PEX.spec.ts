@@ -11,7 +11,7 @@ import {
   ProofType,
   Validated,
 } from '../lib';
-import { InternalCredential } from '../lib/types/Internal.types';
+import { ICredential } from '../lib/types';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 
 import {
@@ -338,14 +338,14 @@ describe('evaluate', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
     jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
-    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate = (+new Date(
+    (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate = (+new Date(
       (jwtVc['exp' as keyof IVerifiableCredential] as string) + 2
     )).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent expiration dates between JWT claim (${new Date(
         parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)
       ).toISOString()}) and VC value (${
-        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate
+        (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate
       })`
     );
   });
@@ -353,7 +353,7 @@ describe('evaluate', () => {
   it('should set issuer if iss is present in JWT vc', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
-    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer;
+    (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer;
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
     expect(vcs[0].internalCredential.issuer).toEqual(jwtVc['iss' as keyof IVerifiableCredential]);
   });
@@ -364,7 +364,7 @@ describe('evaluate', () => {
     jwtVc['iss' as keyof IVerifiableCredential] = 'did:test:456';
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent issuers between JWT claim (${jwtVc['iss' as keyof IVerifiableCredential]}) and VC value (${
-        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer
+        (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer
       })`
     );
   });
@@ -373,7 +373,7 @@ describe('evaluate', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
     jwtVc['nbf' as keyof IVerifiableCredential] = (+new Date()).toString();
-    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
+    (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
       parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)
     ).toISOString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
@@ -387,14 +387,12 @@ describe('evaluate', () => {
       .verifiableCredential[0];
     const nbf = new Date().valueOf();
     jwtVc['nbf' as keyof IVerifiableCredential] = nbf / 1000;
-    (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
-      +new Date() + 2
-    ).toISOString();
+    (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(+new Date() + 2).toISOString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent issuance dates between JWT claim (${new Date(nbf)
         .toISOString()
         .replace(/\.\d\d\dZ/, 'Z')}) and VC value (${
-        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate
+        (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate
       })`
     );
   });
@@ -402,7 +400,7 @@ describe('evaluate', () => {
   it('should set credentialSubject.id if sub is present in JWT vc', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
-    jwtVc['sub' as keyof IVerifiableCredential] = (<InternalCredential>(
+    jwtVc['sub' as keyof IVerifiableCredential] = (<ICredential>(
       jwtVc['vc' as keyof IVerifiableCredential]
     )).credentialSubject.id;
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
@@ -416,14 +414,14 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent credential subject ids between JWT claim (${
         jwtVc['sub' as keyof IVerifiableCredential]
-      }) and VC value (${(<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.id})`
+      }) and VC value (${(<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.id})`
     );
   });
 
   it('should set id if jti is present in JWT vc', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
-    jwtVc['jti' as keyof IVerifiableCredential] = (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).id;
+    jwtVc['jti' as keyof IVerifiableCredential] = (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).id;
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
     expect(wvcs[0].internalCredential.id).toEqual(jwtVc['jti' as keyof IVerifiableCredential]);
   });
@@ -434,7 +432,7 @@ describe('evaluate', () => {
     jwtVc['jti' as keyof IVerifiableCredential] = 'test';
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent credential ids between JWT claim (${jwtVc['jti' as keyof IVerifiableCredential]}) and VC value (${
-        (<InternalCredential>jwtVc['vc' as keyof IVerifiableCredential]).id
+        (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).id
       })`
     );
   });

@@ -3,8 +3,8 @@ import fs from 'fs';
 import { HandlerCheckResult, IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
+import { ICredential } from '../../lib/types';
 import {
-  InternalCredential,
   InternalPresentationDefinitionV1,
   VerifiableDataExchangeType,
   WrappedVerifiableCredential,
@@ -28,7 +28,7 @@ describe('evaluate', () => {
     const wvc: WrappedVerifiableCredential = {
       decoded: vpSimple.verifiableCredential[0],
       original: vpSimple.verifiableCredential[0],
-      internalCredential: vpSimple.verifiableCredential[0] as InternalCredential,
+      internalCredential: vpSimple.verifiableCredential[0] as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     evaluationHandler.handle(pd, [wvc]);
@@ -47,7 +47,7 @@ describe('evaluate', () => {
     const wvc: WrappedVerifiableCredential = {
       decoded: vc,
       original: vc,
-      internalCredential: vc as InternalCredential,
+      internalCredential: vc as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -85,7 +85,7 @@ describe('evaluate', () => {
     const wvc: WrappedVerifiableCredential = {
       decoded: vc,
       original: vc,
-      internalCredential: vc as InternalCredential,
+      internalCredential: vc as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     evaluationHandler.handle(pd, [wvc]);
@@ -104,21 +104,21 @@ describe('evaluate', () => {
     const wvc0: WrappedVerifiableCredential = {
       decoded: vc0,
       original: vc0,
-      internalCredential: vc0 as InternalCredential,
+      internalCredential: vc0 as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     const vc1: IVerifiableCredential = vpSimple.verifiableCredential[1];
     const wvc1: WrappedVerifiableCredential = {
       decoded: vc1,
       original: vc1,
-      internalCredential: vc1 as InternalCredential,
+      internalCredential: vc1 as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     const vc2: IVerifiableCredential = vpSimple.verifiableCredential[2];
     const wvc2: WrappedVerifiableCredential = {
       decoded: vc2,
       original: vc2,
-      internalCredential: vc2 as InternalCredential,
+      internalCredential: vc2 as ICredential,
       type: VerifiableDataExchangeType.JSONLD,
     };
     const evaluationClient: EvaluationClient = new EvaluationClient();

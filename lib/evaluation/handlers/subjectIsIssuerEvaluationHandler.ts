@@ -2,9 +2,9 @@ import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models'
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
+import { ICredential } from '../../types';
 import {
   IInternalPresentationDefinition,
-  InternalCredential,
   InternalPresentationDefinitionV2,
   WrappedVerifiableCredential,
 } from '../../types/Internal.types';
@@ -46,7 +46,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   ): void {
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
-        const vc: { path: PathComponent[]; value: InternalCredential }[] = JsonPathUtils.extractInputField(
+        const vc: { path: PathComponent[]; value: ICredential }[] = JsonPathUtils.extractInputField(
           wrappedVcs.map((wvc) => wvc.internalCredential),
           [currentDescriptor.path]
         );

@@ -5,6 +5,7 @@ import {
   WrappedVerifiablePresentation,
 } from './Internal.types';
 import {
+  ICredential,
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,
@@ -22,6 +23,7 @@ import {
 } from './SSI.types';
 
 export {
+  ICredential,
   ICredentialSchema,
   ICredentialStatus,
   ICredentialSubject,

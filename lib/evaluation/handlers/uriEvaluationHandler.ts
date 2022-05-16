@@ -3,10 +3,9 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { ICredentialSchema, PEVersion } from '../../types';
+import { ICredential, ICredentialSchema, PEVersion } from '../../types';
 import {
   IInternalPresentationDefinition,
-  InternalCredential,
   InternalPresentationDefinitionV1,
   WrappedVerifiableCredential,
 } from '../../types/Internal.types';
@@ -89,20 +88,17 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static buildVcContextAndSchemaUris(internalCredential: InternalCredential) {
+  private static buildVcContextAndSchemaUris(credential: ICredential) {
     const uris: string[] = [];
-    if (Array.isArray(internalCredential['@context'])) {
-      internalCredential['@context'].forEach((value) => uris.push(value as string));
+    if (Array.isArray(credential['@context'])) {
+      credential['@context'].forEach((value) => uris.push(value as string));
     } else {
-      uris.push(<string>internalCredential['@context']);
+      uris.push(<string>credential['@context']);
     }
-    if (
-      Array.isArray(internalCredential.credentialSchema) &&
-      (internalCredential.credentialSchema as ICredentialSchema[]).length > 0
-    ) {
-      (internalCredential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
-    } else if (internalCredential.credentialSchema) {
-      uris.push((internalCredential.credentialSchema as ICredentialSchema).id);
+    if (Array.isArray(credential.credentialSchema) && (credential.credentialSchema as ICredentialSchema[]).length > 0) {
+      (credential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
+    } else if (credential.credentialSchema) {
+      uris.push((credential.credentialSchema as ICredentialSchema).id);
     }
     return uris;
   }

@@ -4,11 +4,8 @@ import { Optionality, PresentationDefinitionV2, PresentationSubmission, Rules } 
 
 import { IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
-import {
-  InternalCredential,
-  InternalPresentationDefinitionV1,
-  WrappedVerifiableCredential,
-} from '../../lib/types/Internal.types';
+import { ICredential } from '../../lib/types';
+import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
@@ -290,7 +287,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
-    (vpSimple.verifiableCredential[0] as InternalCredential).issuer = 'did:foo:123';
+    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
       vpSimple.verifiableCredential[1],
@@ -333,7 +330,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
-    (vpSimple.verifiableCredential[0] as InternalCredential).issuer = 'did:foo:123';
+    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
       vpSimple.verifiableCredential[1],
@@ -363,7 +360,7 @@ describe('evaluate', () => {
     ) as IVerifiablePresentation;
     delete pdSchema!.submission_requirements;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    (vpSimple.verifiableCredential[0] as InternalCredential).issuer = 'did:foo:123';
+    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
       vpSimple.verifiableCredential[1],
@@ -407,7 +404,7 @@ describe('evaluate', () => {
     );
     const verifiableCredential = selectResults.verifiableCredential![0];
     expect(verifiableCredential['id' as keyof IVerifiableCredential]).toEqual(
-      (<InternalCredential>evaluationClientWrapperData.getVerifiableCredential()[1]).id
+      (<ICredential>evaluationClientWrapperData.getVerifiableCredential()[1]).id
     );
   });
 

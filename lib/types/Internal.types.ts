@@ -9,11 +9,8 @@ import {
 } from '@sphereon/pex-models';
 
 import {
+  ICredential,
   ICredentialContextType,
-  ICredentialSchemaType,
-  ICredentialStatus,
-  ICredentialSubject,
-  IIssuer,
   IVerifiableCredential,
   IVerifiablePresentation,
   PEVersion,
@@ -107,7 +104,7 @@ export interface WrappedVerifiableCredential {
   /**
    * created based on https://www.w3.org/TR/vc-data-model/#jwt-decoding
    */
-  internalCredential: InternalCredential;
+  internalCredential: ICredential;
 }
 
 export interface WrappedVerifiablePresentation {
@@ -132,29 +129,8 @@ export interface InternalPresentation {
   holder?: string;
 }
 
-export interface InternalCredential {
-  // If exp is present, the UNIX timestamp MUST be converted to an [XMLSCHEMA11-2] date-time, and MUST be used to set the value of the expirationDate property of credentialSubject of the new JSON object.
-  expirationDate?: string;
-  // If iss is present, the value MUST be used to set the issuer property of the new credential JSON object or the holder property of the new presentation JSON object.
-  issuer: string | IIssuer;
-  // If nbf is present, the UNIX timestamp MUST be converted to an [XMLSCHEMA11-2] date-time, and MUST be used to set the value of the issuanceDate property of the new JSON object.
-  issuanceDate: string;
-  // If sub is present, the value MUST be used to set the value of the id property of credentialSubject of the new credential JSON object.
-  credentialSubject: ICredentialSubject;
-  // If jti is present, the value MUST be used to set the value of the id property of the new JSON object.
-  id: string;
-  '@context': ICredentialContextType[] | ICredentialContextType;
-  credentialStatus?: ICredentialStatus;
-  credentialSchema?: undefined | ICredentialSchemaType | ICredentialSchemaType[];
-  description?: string;
-  name?: string;
-  type: string[];
-
-  [x: string]: unknown;
-}
-
 export interface JwtWrappedVerifiableCredential {
-  vc: InternalCredential;
+  vc: ICredential;
   exp: string;
   iss: string;
   nbf: string;

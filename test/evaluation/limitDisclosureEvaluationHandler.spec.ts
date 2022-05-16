@@ -2,11 +2,8 @@ import fs from 'fs';
 
 import { IProof, IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
-import {
-  InternalCredential,
-  InternalPresentationDefinitionV1,
-  WrappedVerifiableCredential,
-} from '../../lib/types/Internal.types';
+import { ICredential } from '../../lib/types';
+import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';
@@ -78,7 +75,7 @@ describe('evaluate', () => {
     const vc: IVerifiableCredential = vpSimple.verifiableCredential[0];
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    delete (vc as InternalCredential).credentialSubject['details'];
+    delete (vc as ICredential).credentialSubject['details'];
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);

@@ -5,7 +5,6 @@ import { JsonPathUtils } from '../utils';
 import { ObjectUtils } from '../utils/ObjectUtils';
 
 import {
-  InternalCredential,
   InternalPresentationDefinitionV1,
   InternalPresentationDefinitionV2,
   JwtWrappedVerifiableCredential,
@@ -14,7 +13,13 @@ import {
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
 } from './Internal.types';
-import { IPresentation, IPresentationDefinition, IVerifiableCredential, IVerifiablePresentation } from './SSI.types';
+import {
+  ICredential,
+  IPresentation,
+  IPresentationDefinition,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+} from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -128,16 +133,16 @@ export class SSITypesBuilder {
         original: verifiableCredential,
         decoded: verifiableCredential as IVerifiableCredential,
         type: VerifiableDataExchangeType.JSONLD,
-        internalCredential: verifiableCredential as InternalCredential,
+        internalCredential: verifiableCredential as ICredential,
       };
     }
   }
 
   private static createInternalCredentialFromJwtDecoded(
     externalCredentialJwt: JwtWrappedVerifiableCredential
-  ): InternalCredential {
-    const internalCredential: InternalCredential = {
-      ...(externalCredentialJwt.vc as InternalCredential),
+  ): ICredential {
+    const internalCredential: ICredential = {
+      ...(externalCredentialJwt.vc as ICredential),
     };
     if (externalCredentialJwt.exp) {
       const expDate = internalCredential.credentialSubject?.expirationDate;

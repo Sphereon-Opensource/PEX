@@ -4,11 +4,8 @@ import { Optionality } from '@sphereon/pex-models';
 
 import { IVerifiablePresentation, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
-import {
-  InternalCredential,
-  InternalPresentationDefinitionV1,
-  WrappedVerifiableCredential,
-} from '../../lib/types/Internal.types';
+import { ICredential } from '../../lib/types';
+import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
@@ -69,9 +66,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    (<InternalCredential>vpSimple.verifiableCredential[0])['@context'] = [
-      'https://www.w3.org/TR/vc-data-model/#types1',
-    ];
+    (<ICredential>vpSimple.verifiableCredential[0])['@context'] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
     ]);
@@ -101,9 +96,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    (<InternalCredential>vpSimple.verifiableCredential[0])[`@context`] = [
-      'https://www.w3.org/TR/vc-data-model/#types1',
-    ];
+    (<ICredential>vpSimple.verifiableCredential[0])[`@context`] = ['https://www.w3.org/TR/vc-data-model/#types1'];
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential[0],
     ]);

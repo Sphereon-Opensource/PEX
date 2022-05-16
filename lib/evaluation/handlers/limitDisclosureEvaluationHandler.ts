@@ -2,10 +2,9 @@ import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality }
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IVerifiablePresentation } from '../../types';
+import { ICredential, IVerifiablePresentation } from '../../types';
 import {
   IInternalPresentationDefinition,
-  InternalCredential,
   InternalPresentationDefinitionV2,
   WrappedVerifiableCredential,
 } from '../../types/Internal.types';
@@ -72,7 +71,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private enforceLimitDisclosure(
-    vc: InternalCredential,
+    vc: ICredential,
     fields: FieldV2[],
     idIdx: number,
     index: number,
@@ -90,12 +89,12 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createVcWithRequiredFields(
-    vc: InternalCredential,
+    vc: ICredential,
     fields: FieldV2[],
     idIdx: number,
     vcIdx: number
-  ): InternalCredential | undefined {
-    let credentialToSend: InternalCredential = {} as InternalCredential;
+  ): ICredential | undefined {
+    let credentialToSend: ICredential = {} as ICredential;
     credentialToSend = Object.assign(credentialToSend, vc);
     credentialToSend.credentialSubject = {};
 
@@ -115,9 +114,9 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
-    internalCredential: InternalCredential,
-    internalCredentialToSend: InternalCredential
-  ): InternalCredential {
+    internalCredential: ICredential,
+    internalCredentialToSend: ICredential
+  ): ICredential {
     let credentialSubject = { ...internalCredential.credentialSubject };
     requiredField.path.forEach((e) => {
       if (credentialSubject[e]) {
