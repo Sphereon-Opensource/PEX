@@ -123,7 +123,9 @@ export class EvaluationClientWrapper {
           const vc = jp.query(verifiableCredentials, match)[0];
           const newIndex = vcsToSend?.findIndex((svc) => JSON.stringify(svc) === JSON.stringify(vc));
           if (newIndex === -1) {
-            throw new Error(`The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`);
+            throw new Error(
+              `The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`
+            );
           }
           matches[index] = `$[${newIndex}]`;
         });
@@ -465,7 +467,7 @@ export class EvaluationClientWrapper {
       for (const m of matchSubmissionRequirements) {
         let innerStatus = Status.INFO;
         if (m.from && m.from_nested) {
-          throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.')
+          throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.');
         }
         if (!m.from && !m.from_nested && m.vc_path.length !== 1) {
           innerStatus = Status.ERROR;
