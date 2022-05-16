@@ -49,7 +49,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    if ('type' in <IVerifiableCredential>vpSimple.verifiableCredential[0].proof) {
+    if ('type' in (<IVerifiableCredential>vpSimple.verifiableCredential[0]).proof) {
       (<IProof>vpSimple.verifiableCredential[0].proof).type = 'limit disclosure unsupported';
     }
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]);
