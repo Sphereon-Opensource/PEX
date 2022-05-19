@@ -53,6 +53,12 @@ export function getErrorThrown(): IVerifiablePresentation {
   throw new Error('Could not sign because of missing fields');
 }
 
+export async function getAsyncCallbackWithoutProofType(
+  callbackParams: PresentationSignCallBackParams
+): Promise<IVerifiablePresentation> {
+  return mockCallback(callbackParams);
+}
+
 export function getProofOptionsMock(): ProofOptions {
   return {
     type: ProofType.EcdsaSecp256k1Signature2019,

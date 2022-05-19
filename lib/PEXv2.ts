@@ -179,12 +179,12 @@ export class PEXv2 {
    *
    * @return the signed and thus Verifiable Presentation.
    */
-  public verifiablePresentationFrom(
+  public async verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV2,
     selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
-  ): IVerifiablePresentation {
+  ): Promise<IVerifiablePresentation> {
     const { holder, signatureOptions, proofOptions } = options;
 
     function limitedDisclosureSuites() {
@@ -234,6 +234,6 @@ export class PEXv2 {
       evaluationResults,
     };
 
-    return signingCallBack(callBackParams);
+    return await signingCallBack(callBackParams);
   }
 }

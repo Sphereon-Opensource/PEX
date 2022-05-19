@@ -5,6 +5,7 @@ import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './eva
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import {
   IPresentation,
+  IPresentationDefinition,
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
@@ -12,7 +13,6 @@ import {
   JwtWrappedVerifiablePresentation,
   PEVersion,
 } from './types';
-import { IPresentationDefinition } from './types';
 import {
   IInternalPresentationDefinition,
   WrappedVerifiableCredential,
@@ -238,12 +238,15 @@ export class PEX {
    *
    * @return the signed and thus Verifiable Presentation.
    */
-  public verifiablePresentationFrom(
+  public async verifiablePresentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
+    signingCallBack:
+      | ((callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation)
+      | ((callBackParams: PresentationSignCallBackParams) => Promise<IVerifiablePresentation>),
     options: PresentationSignOptions
-  ): IVerifiablePresentation {
+  ): Promise<IVerifiablePresentation> {
+    console.log('verifiablePresentationFrom called');
     const { holder, signatureOptions, proofOptions } = options;
 
     function limitedDisclosureSuites() {
@@ -297,8 +300,7 @@ export class PEX {
       presentationSubmission: evaluationResults.value,
       evaluationResults,
     };
-
-    return signingCallBack(callBackParams);
+    return (await signingCallBack(callBackParams)) as IVerifiablePresentation;
   }
 
   public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): {

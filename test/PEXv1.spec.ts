@@ -114,11 +114,11 @@ describe('evaluate', () => {
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should return a signed presentation', () => {
+  it('should return a signed presentation', async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
-    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -134,7 +134,7 @@ describe('evaluate', () => {
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
-  it("should throw error if proofOptions doesn't have a type", () => {
+  it("should throw error if proofOptions doesn't have a type", async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pejs: PEXv1 = new PEXv1();
@@ -142,7 +142,7 @@ describe('evaluate', () => {
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    expect(() =>
+    await expect(
       pejs.verifiablePresentationFrom(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
@@ -153,19 +153,19 @@ describe('evaluate', () => {
           holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
         }
       )
-    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
-  it('should throw exception if signing encounters a problem', () => {
+  it('should throw exception if signing encounters a problem', async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
 
-    expect(() => {
+    await expect(
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
-      });
-    }).toThrow(Error);
+      })
+    ).rejects.toThrow(Error);
   });
 });
