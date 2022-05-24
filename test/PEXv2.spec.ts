@@ -274,13 +274,13 @@ describe('evaluate', () => {
   it("should throw error if proofOptions doesn't have a type", () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEXv2 = new PEXv2();
+    const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    expect(
-      pejs.verifiablePresentationFrom(
+    expect(() =>
+      pex.verifiablePresentationFrom(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,
@@ -290,7 +290,7 @@ describe('evaluate', () => {
           holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
         }
       )
-    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
   it('Evaluate selectFrom', () => {
@@ -310,13 +310,13 @@ describe('evaluate', () => {
   it("should throw error if proofOptions doesn't have a type with v2 pd", async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV2/vc_expiration(corrected).json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEXv2 = new PEXv2();
+    const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     await expect(
-      pejs.verifiablePresentationFrom(
+      pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,

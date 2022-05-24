@@ -118,7 +118,7 @@ describe('evaluate', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -137,13 +137,13 @@ describe('evaluate', () => {
   it("should throw error if proofOptions doesn't have a type", async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEXv1 = new PEXv1();
+    const pex: PEXv1 = new PEXv1();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     await expect(
-      pejs.verifiablePresentationFrom(
+      pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,
@@ -162,10 +162,15 @@ describe('evaluate', () => {
     const pex: PEXv1 = new PEXv1();
 
     await expect(
-      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-      })
+      pex.verifiablePresentationFromAsync(
+        pdSchema.presentation_definition,
+        vpSimple.verifiableCredential,
+        getErrorThrown,
+        {
+          proofOptions: getProofOptionsMock(),
+          signatureOptions: getSingatureOptionsMock(),
+        }
+      )
     ).rejects.toThrow(Error);
   });
 });

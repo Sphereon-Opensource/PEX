@@ -249,7 +249,7 @@ describe('evaluate', () => {
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
-  it("should throw error if proofOptions doesn't have a type", async () => {
+  it("should throw error if proofOptions doesn't have a type", () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
@@ -257,7 +257,7 @@ describe('evaluate', () => {
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    await expect(
+    expect(() =>
       pex.verifiablePresentationFrom(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
@@ -268,20 +268,20 @@ describe('evaluate', () => {
           holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
         }
       )
-    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
-  it('should throw exception if signing encounters a problem', async () => {
+  it('should throw exception if signing encounters a problem', () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
 
-    await expect(
+    expect(() => {
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
-      })
-    ).rejects.toThrow(Error);
+      });
+    }).toThrow(Error);
   });
 
   it('should return v1 when calling version discovery', function () {
@@ -509,7 +509,7 @@ describe('evaluate', () => {
     const wvp: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(jwtEncodedVp);
     const pex: PEX = new PEX();
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFromAsync(
       pdSchema,
       [wvp.vcs[0].original],
       getAsyncCallbackWithoutProofType,

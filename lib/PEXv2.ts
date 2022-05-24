@@ -179,7 +179,7 @@ export class PEXv2 {
    *
    * @return the signed and thus Verifiable Presentation.
    */
-  public async verifiablePresentationFrom(
+  public async verifiablePresentationFromAsync(
     presentationDefinition: PresentationDefinitionV2,
     selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
@@ -235,5 +235,82 @@ export class PEXv2 {
     };
 
     return await signingCallBack(callBackParams);
+  }
+
+  /**
+   * This method can be used to combine a definition, selected Verifiable Credentials, together with
+   * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
+   *
+   * Please note that PEX has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
+   * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
+   * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
+   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
+   *
+   * @deprecated This method in current form will not be supported in our next release. This will be changed to an "async" function.
+   *
+   * @param presentationDefinition the Presentation Definition V2
+   * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
+   * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
+   *        signing. One example of signing is available in the project named. pe-selective-disclosure.
+   * @param options: Signing Params these are the signing params required to sign.
+   *
+   * @return the signed and thus Verifiable Presentation.
+   */
+  public verifiablePresentationFrom(
+    presentationDefinition: PresentationDefinitionV2,
+    selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
+    options: PresentationSignOptions
+  ): IVerifiablePresentation {
+    const { holder, signatureOptions, proofOptions } = options;
+
+    function limitedDisclosureSuites() {
+      let limitDisclosureSignatureSuites: string[] = [];
+      if (proofOptions?.typeSupportsSelectiveDisclosure) {
+        if (!proofOptions?.type) {
+          throw Error('Please provide a proof type if you enable selective disclosure');
+        }
+        limitDisclosureSignatureSuites = [proofOptions.type];
+      }
+      return limitDisclosureSignatureSuites;
+    }
+
+    const holderDIDs: string[] = holder ? [holder] : [];
+    const limitDisclosureSignatureSuites = limitedDisclosureSuites();
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+
+    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
+    const evaluationResults = this.evaluatePresentation(
+      presentationDefinition,
+      presentation,
+      limitDisclosureSignatureSuites
+    );
+    if (!evaluationResults.value) {
+      throw new Error('Could not get evaluation results from presentation');
+    }
+
+    const proof: Partial<IProof> = {
+      type: proofOptions?.type,
+      verificationMethod: signatureOptions?.verificationMethod,
+      created: proofOptions?.created ? proofOptions.created : new Date().toISOString(),
+      proofPurpose: proofOptions?.proofPurpose,
+      proofValue: signatureOptions?.proofValue,
+      jws: signatureOptions?.jws,
+      challenge: proofOptions?.challenge,
+      nonce: proofOptions?.nonce,
+      domain: proofOptions?.domain,
+    };
+
+    const callBackParams: PresentationSignCallBackParams = {
+      options,
+      presentation,
+      presentationDefinition,
+      selectedCredentials,
+      proof,
+      presentationSubmission: evaluationResults.value,
+      evaluationResults,
+    };
+
+    return signingCallBack(callBackParams);
   }
 }
