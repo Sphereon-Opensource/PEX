@@ -250,12 +250,12 @@ describe('evaluate', () => {
   });
 
   //Credential does not contain the field
-  it('should return a signed presentation with PdV2', () => {
+  it('should return a signed presentation with PdV2', async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -274,13 +274,13 @@ describe('evaluate', () => {
   it("should throw error if proofOptions doesn't have a type", () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEXv2 = new PEXv2();
+    const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     expect(() =>
-      pejs.verifiablePresentationFrom(
+      pex.verifiablePresentationFrom(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,
@@ -307,16 +307,16 @@ describe('evaluate', () => {
     expect(result!.areRequiredCredentialsPresent).toBe('info');
   });
 
-  it("should throw error if proofOptions doesn't have a type", () => {
+  it("should throw error if proofOptions doesn't have a type with v2 pd", async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV2/vc_expiration(corrected).json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
-    const pejs: PEXv2 = new PEXv2();
+    const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    expect(() =>
-      pejs.verifiablePresentationFrom(
+    await expect(
+      pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
         assertedMockCallbackWithoutProofType,
@@ -326,7 +326,7 @@ describe('evaluate', () => {
           holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
         }
       )
-    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
   it('should return ok if presentation definition with _const is valid', () => {

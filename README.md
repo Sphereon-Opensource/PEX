@@ -213,12 +213,14 @@ How did we solve this? We have created a callback mechanism, allowing you to cre
 input allowing you to use your library of choice to create the signature. The callback needs to accept
 a `PresentationSignCallBackParams` object.
 
+**NOTE:**
 The method `verifiablePresentationFrom` accepts the presentation definition and selected Verifiable Credentials as the
 first two arguments, just like the `presentationFrom` method. Next it accepts the callback function as argument and
 a `PresentationSignOptions` object as last argument. The sign callback params, allow you to control the signature
-process. You will have access in the callback to these params as well.
+process. You will have access in the callback to these params as well. This method is deprecated and will be replaced with the async version.
+You can use the `async` version of this method which is called `verifiablePresentationFromAsync`
 
-Before calling your callback function a few things happen. First of all, just like the `presentationFrom` method, it
+Before calling your callback function a few things happen. First, just like the `presentationFrom` method, it
 will evaluate whether the supplied credentials conform to the supplied presentation definition. Then it creates a
 presentation, just like `presentationFrom`. This presentation is provided for your convenience and can be used in your
 callback for simple use cases. In more elaborate cases, like for instance with more complex signature suites and/or
@@ -233,7 +235,7 @@ jws, based upon your options.
 
 #### Presentation Sign Options
 
-The options accepted by the `verifiablePresentationFrom` are:
+The options accepted by the `verifiablePresentationFromAsync` are:
 
 ```typescript
 interface PresentationSignOptions {
@@ -404,7 +406,7 @@ const params: PresentationSignOptions = {
   },
 };
 
-const vp = pex.verifiablePresentationFrom(
+const vp = await pex.verifiablePresentationFromAsync(
   presentationDefinition,
   selectedCredentials,
   simpleSignedProofCallback,

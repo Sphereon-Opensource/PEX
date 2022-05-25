@@ -11,12 +11,13 @@ import {
   ProofType,
   Validated,
 } from '../lib';
-import { ICredential } from '../lib/types';
+import { ICredential, WrappedVerifiablePresentation } from '../lib/types';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 
 import {
   assertedMockCallback,
   assertedMockCallbackWithoutProofType,
+  getAsyncCallbackWithoutProofType,
   getErrorThrown,
   getProofOptionsMock,
   getSingatureOptionsMock,
@@ -207,11 +208,11 @@ describe('evaluate', () => {
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should return a signed presentation', () => {
+  it('should return a signed presentation', async () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
-    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -227,12 +228,12 @@ describe('evaluate', () => {
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
-  it('should return a signed presentation with PdV2', () => {
+  it('should return a signed presentation with PdV2', async () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential,
       assertedMockCallback,
@@ -480,5 +481,50 @@ describe('evaluate', () => {
       format: 'ldp_vc',
       path: '$.verifiableCredential[0]',
     });
+  });
+
+  it('should resolve callback promise', async () => {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857-aec0-4e9d-8392-0e2e01d20120',
+      input_descriptors: [
+        {
+          id: 'universityDegree_type',
+          name: 'Type of university degree',
+          purpose: 'We can only support certain type of university degrees',
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.degree.type'],
+                filter: {
+                  type: 'string',
+                  _enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt');
+    const wvp: WrappedVerifiablePresentation =
+      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(jwtEncodedVp);
+    const pex: PEX = new PEX();
+    const vp: IVerifiablePresentation = await pex.verifiablePresentationFromAsync(
+      pdSchema,
+      [wvp.vcs[0].original],
+      getAsyncCallbackWithoutProofType,
+      {
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
+      }
+    );
+    expect(vp.verifiableCredential.length).toEqual(1);
+    expect(vp.presentation_submission?.descriptor_map).toEqual([
+      {
+        format: 'ldp_vc',
+        id: 'universityDegree_type',
+        path: '$.verifiableCredential[0]',
+      },
+    ]);
   });
 });
