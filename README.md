@@ -213,6 +213,7 @@ How did we solve this? We have created a callback mechanism, allowing you to cre
 input allowing you to use your library of choice to create the signature. The callback needs to accept
 a `PresentationSignCallBackParams` object.
 
+**NOTE:**
 The method `verifiablePresentationFrom` accepts the presentation definition and selected Verifiable Credentials as the
 first two arguments, just like the `presentationFrom` method. Next it accepts the callback function as argument and
 a `PresentationSignOptions` object as last argument. The sign callback params, allow you to control the signature
