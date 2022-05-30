@@ -1,5 +1,19 @@
 # Release Notes
 
+## v1.0.3 - 2022-05-30
+Added support for jwt vc/vp, added support for async callbacks, fixed some issues with generating PresentationSubmission
+
+- Added:
+  - support for jwt vc
+  - support for jwt vp
+  - support for async callback when creating verifiable presentation
+- changed:
+  - verifiablePresentationFrom is deprecated
+- fixed:
+  - handling of submission_requirement object
+  - creation of presentation_submission
+  - handling of unwrapped jwt verifiable credentials
+
 ## v1.0.2 - 2022-01-14
 Added String.matchAll shim for React-Native compatibility. Will be removed later and updated with another solution, to keep the deps to a minumum
 
