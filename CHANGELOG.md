@@ -1,15 +1,15 @@
 # Release Notes
 
-## v1.0.3 - 2022-05-30
+## v1.1.0 - 2022-05-30
 Added support for jwt vc/vp, added support for async callbacks, fixed some issues with generating PresentationSubmission
 
 - Added:
   - support for jwt vc
   - support for jwt vp
-  - support for async callback when creating verifiable presentation
-- changed:
+  - support for async callback when creating verifiable presentation (verifiablePresentationFromAsync)
+- Changed:
   - verifiablePresentationFrom is deprecated
-- fixed:
+- Fixed:
   - handling of submission_requirement object
   - creation of presentation_submission
   - handling of unwrapped jwt verifiable credentials
