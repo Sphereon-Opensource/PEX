@@ -1,9 +1,4 @@
-import {
-  Descriptor,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pex-models';
+import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
