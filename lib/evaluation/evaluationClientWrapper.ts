@@ -1,7 +1,5 @@
 import {
   Descriptor,
-  // InputDescriptorV1,
-  // InputDescriptorV2,
   PresentationSubmission,
   Rules,
   SubmissionRequirement,
@@ -589,63 +587,4 @@ export class EvaluationClientWrapper {
     }
     return partitionedResults;
   }
-  /*
-  private filterEvaluationErrors(result: EvaluationResults, pd: IPresentationDefinition) {
-    const errors: HandlerCheckResult[] = this._client.results.filter((hcr) => hcr.status === Status.ERROR);
-    let relatedErrorFound = false;
-    // If we don't generate any element in descripto_map, we return all the errors
-    if (result.value && (!result.value.descriptor_map || result.value.descriptor_map.length === 0)) {
-      return;
-    }
-    if (result.value && result.errors) {
-      const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] =
-        EvaluationClientWrapper.findInputDescriptorIdAndVcListFromLogs(errors, pd);
-      for (const errorIdAndVcPath of errorsIdAndVcList) {
-        for (const desc of result.value.descriptor_map) {
-          if (desc.id === errorIdAndVcPath.id) {
-            if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
-              relatedErrorFound = true;
-            }
-            if (!desc.path && desc.path_nested) {
-              this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc, relatedErrorFound);
-            }
-          }
-        }
-      }
-    }
-    if (!relatedErrorFound) {
-      result.errors = [];
-    }
-  }*/
-
-  /*private static findInputDescriptorIdAndVcListFromLogs(
-    errors: HandlerCheckResult[],
-    pd: IPresentationDefinition
-  ): [{ id: string; verifiable_credential_path: string }] {
-    const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] = [] as unknown as [
-      { id: string; verifiable_credential_path: string }
-    ];
-    for (const hcr of errors) {
-      const idRes = JsonPathUtils.extractInputField(pd, [hcr.input_descriptor_path]);
-      if (idRes.length) {
-        const id: InputDescriptorV1 | InputDescriptorV2 = idRes[0].value;
-        const vcPath = hcr.verifiable_credential_path.replace('$', '$.verifiableCredential');
-        errorsIdAndVcList.push({ id: id.id, verifiable_credential_path: vcPath });
-      }
-    }
-    return errorsIdAndVcList;
-  }*/
-
-  /*private checkLogsVcInputDescriptorRelationRecursive(
-    errorIdAndVcPath: { id: string; verifiable_credential_path: string },
-    desc: Descriptor,
-    isRelated: boolean
-  ) {
-    if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
-      isRelated = true;
-    }
-    if (!desc.path && desc.path_nested) {
-      this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc.path_nested, isRelated);
-    }
-  }*/
 }
