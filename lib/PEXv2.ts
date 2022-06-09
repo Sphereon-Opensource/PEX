@@ -1,5 +1,6 @@
 import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 
+import { Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
@@ -51,12 +52,21 @@ export class PEXv2 {
     const holderDIDs = wrappedPresentation.internalPresentation.holder
       ? [wrappedPresentation.internalPresentation.holder]
       : [];
-    return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      wrappedVcs,
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVcs, holderDIDs, limitDisclosureSignatureSuites);
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wrappedPresentation.vcs,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+        result.errors = [];
+      }
+    }
+    return result;
   }
 
   /***
@@ -77,12 +87,22 @@ export class PEXv2 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials),
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+    const result = this._evaluationClientWrapper.evaluate(pd, wvcs, holderDIDs, limitDisclosureSignatureSuites);
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wvcs,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+        result.errors = [];
+      }
+    }
+    return result;
   }
 
   /**

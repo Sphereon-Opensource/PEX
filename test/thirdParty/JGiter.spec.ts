@@ -331,6 +331,67 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
   };
 }
 
+function getPresentationDefinition_6(): PresentationDefinitionV2 {
+  return {
+    id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    input_descriptors: [
+      {
+        id: 'some_id',
+        name: 'Required credential',
+        constraints: {
+          fields: [
+            {
+              path: ['$.credentialSubject.role'],
+              filter: {
+                type: 'string',
+                _const: 'admin',
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+function getPresentationDefinition_7(): PresentationDefinitionV2 {
+  return {
+    id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    input_descriptors: [
+      {
+        id: 'some_id',
+        name: 'Required credential role',
+        constraints: {
+          fields: [
+            {
+              path: ['$.credentialSubject.role'],
+              filter: {
+                type: 'string',
+                _const: 'admin',
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: 'some_other_id',
+        name: 'Required credential issuer',
+        constraints: {
+          fields: [
+            {
+              path: ['$.issuer'],
+              filter: {
+                type: 'string',
+                _const: 'did:example:123456789af312312i',
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
 function getVerifiableCredentials(): IVerifiableCredential[] {
   return [
     {
@@ -385,6 +446,41 @@ function getVerifiableCredentials(): IVerifiableCredential[] {
       },
     },
   ];
+}
+
+function getPresentation(): IPresentation {
+  return {
+    '@context': ['https://www.w3.org/2018/credentials/v1'],
+    type: ['VerifiablePresentation'],
+    verifiableCredential: [
+      {
+        '@context': [
+          'https://www.w3.org/2018/credentials/v1',
+          {
+            AdminRole: 'ew:AdminRole',
+            ew: 'https://energyweb.org/ld-context-2022#',
+            role: 'ew:role',
+          },
+        ],
+        id: 'urn:uuid:7f94d397-3e70-4a43-945e-1a13069e636f',
+        type: ['VerifiableCredential', 'AdminRole'],
+        credentialSubject: {
+          id: 'did:example:1234567894ad31s12',
+          role: 'user',
+        },
+        issuer: 'did:example:123456789af312312i',
+        issuanceDate: '2022-03-18T08:57:32.477Z',
+        proof: {
+          type: 'Ed25519Signature2018',
+          proofPurpose: 'assertionMethod',
+          verificationMethod:
+            'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+          created: '2021-11-16T14:52:19.514Z',
+          jws: 'eyJhbGciOiJFZERTQSIsImtpZCI6InpXTUU5MTNqZFlySUx1WUQtb3QtakRibXpxejM0SHFsQ1VaNkNNZEpueW8iLCJjcml0IjpbImI2NCJdLCJiNjQiOmZhbHNlfQ..b8N7pmZHjWN_QnEdJBXrubP-HOcnkQjkXSUHth6drx3UjEaQpNfGW2lICDWL6qaAcXxcMQX-_GH-8XxtHTdxDQ',
+        },
+      },
+    ],
+  };
 }
 
 describe('evaluate JGiter tests', () => {
@@ -483,5 +579,22 @@ describe('evaluate JGiter tests', () => {
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.ERROR);
     expect(resultSelectFrom.matches).toEqual([]);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(0);
+  });
+
+  it('should have 2 errors in the evaluation result', function () {
+    const pex: PEX = new PEX();
+    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_6(), getPresentation());
+    expect(evaluatePresentationResult.errors?.length).toEqual(2);
+  });
+
+  it('should have 2 errors in the evaluation result with passing ID', function () {
+    const pex: PEX = new PEX();
+    const sd: EvaluationResults = pex.evaluateCredentials(
+      getPresentationDefinition_7(),
+      getPresentation().verifiableCredential
+    );
+    expect(sd.errors?.length).toEqual(2);
+    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_7(), getPresentation());
+    expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 });

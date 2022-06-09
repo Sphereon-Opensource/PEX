@@ -1,7 +1,7 @@
 import {
   Descriptor,
-  InputDescriptorV1,
-  InputDescriptorV2,
+  // InputDescriptorV1,
+  // InputDescriptorV2,
   PresentationSubmission,
   Rules,
   SubmissionRequirement,
@@ -246,9 +246,6 @@ export class EvaluationClientWrapper {
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
     result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
-    if (result.value) {
-      this.filterEvaluationErrors(result, pd as unknown as IPresentationDefinition);
-    }
     return result;
   }
 
@@ -592,10 +589,14 @@ export class EvaluationClientWrapper {
     }
     return partitionedResults;
   }
-
+  /*
   private filterEvaluationErrors(result: EvaluationResults, pd: IPresentationDefinition) {
     const errors: HandlerCheckResult[] = this._client.results.filter((hcr) => hcr.status === Status.ERROR);
     let relatedErrorFound = false;
+    // If we don't generate any element in descripto_map, we return all the errors
+    if (result.value && (!result.value.descriptor_map || result.value.descriptor_map.length === 0)) {
+      return;
+    }
     if (result.value && result.errors) {
       const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] =
         EvaluationClientWrapper.findInputDescriptorIdAndVcListFromLogs(errors, pd);
@@ -615,9 +616,9 @@ export class EvaluationClientWrapper {
     if (!relatedErrorFound) {
       result.errors = [];
     }
-  }
+  }*/
 
-  private static findInputDescriptorIdAndVcListFromLogs(
+  /*private static findInputDescriptorIdAndVcListFromLogs(
     errors: HandlerCheckResult[],
     pd: IPresentationDefinition
   ): [{ id: string; verifiable_credential_path: string }] {
@@ -633,9 +634,9 @@ export class EvaluationClientWrapper {
       }
     }
     return errorsIdAndVcList;
-  }
+  }*/
 
-  private checkLogsVcInputDescriptorRelationRecursive(
+  /*private checkLogsVcInputDescriptorRelationRecursive(
     errorIdAndVcPath: { id: string; verifiable_credential_path: string },
     desc: Descriptor,
     isRelated: boolean
@@ -646,5 +647,5 @@ export class EvaluationClientWrapper {
     if (!desc.path && desc.path_nested) {
       this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc.path_nested, isRelated);
     }
-  }
+  }*/
 }

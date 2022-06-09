@@ -1,5 +1,6 @@
 import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
 
+import { Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
@@ -51,12 +52,26 @@ export class PEXv1 {
     const holderDIDs = wrappedPresentation.internalPresentation.holder
       ? [wrappedPresentation.internalPresentation.holder]
       : [];
-    return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
+    const result = this._evaluationClientWrapper.evaluate(
+      pd,
       wrappedVerifiableCredentials,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wrappedVerifiableCredentials,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+        result.errors = [];
+      }
+    }
+    return result;
   }
 
   /***
@@ -77,12 +92,29 @@ export class PEXv1 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.evaluate(
-      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials),
+    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
+    const wrappedVerifiableCredentials =
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+
+    const result = this._evaluationClientWrapper.evaluate(
+      pd,
+      wrappedVerifiableCredentials,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wrappedVerifiableCredentials,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+        result.errors = [];
+      }
+    }
+    return result;
   }
 
   /**
