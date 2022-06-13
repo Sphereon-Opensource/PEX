@@ -11,8 +11,8 @@ import {
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
+import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
-import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 

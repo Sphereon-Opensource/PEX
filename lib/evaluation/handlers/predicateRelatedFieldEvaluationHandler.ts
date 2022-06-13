@@ -3,8 +3,8 @@ import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@s
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
+import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
-import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 

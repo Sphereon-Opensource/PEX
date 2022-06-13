@@ -6,10 +6,8 @@ import { IPresentationDefinition, IVerifiableCredential } from '../types';
 import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
 import { JsonPathUtils } from '../utils';
 
-import { SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
-import { EvaluationResults } from './evaluationResults';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -222,6 +220,7 @@ export class EvaluationClientWrapper {
   ): EvaluationResults {
     this._client.evaluate(pd, wvcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {
+      areRequiredCredentialsPresent: Status.INFO,
       verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential),
     };
     result.warnings = this.formatNotInfo(Status.WARN);
@@ -239,6 +238,7 @@ export class EvaluationClientWrapper {
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
     result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
+    result.areRequiredCredentialsPresent = result.value?.descriptor_map?.length ? Status.INFO : Status.ERROR;
     return result;
   }
 
