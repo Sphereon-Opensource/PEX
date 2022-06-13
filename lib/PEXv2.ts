@@ -58,13 +58,13 @@ export class PEXv2 {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
         pd,
-        wrappedPresentation.vcs,
+        wrappedVcs,
         holderDIDs,
         limitDisclosureSignatureSuites
       );
-      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
-        result.errors = [];
-      }
+      result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
+    } else {
+      result.areRequiredCredentialsPresent = Status.ERROR;
     }
     return result;
   }

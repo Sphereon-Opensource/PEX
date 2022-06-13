@@ -547,7 +547,8 @@ describe('evaluate JGiter tests', () => {
       selectResult.verifiableCredential![0],
       selectResult.verifiableCredential![1],
     ]);
-    expect(resultEvaluation.errors?.length).toEqual(0);
+    expect(resultEvaluation.errors?.length).toEqual(6);
+    expect(resultEvaluation.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const presentation: IPresentation = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {

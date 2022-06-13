@@ -125,9 +125,9 @@ export class PEX {
         holderDIDs,
         limitDisclosureSignatureSuites
       );
-      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
-        result.errors = [];
-      }
+      result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
+    } else {
+      result.areRequiredCredentialsPresent = Status.ERROR;
     }
     return result;
   }
