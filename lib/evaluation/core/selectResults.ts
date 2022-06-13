@@ -7,7 +7,7 @@ export interface SelectResults {
   errors?: Checked[];
   matches?: SubmissionRequirementMatch[];
   /**
-   * This is the parameter that pejs library user should look into to determine what to do next
+   * This is the parameter that pex library user should look into to determine what to do next
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required.
