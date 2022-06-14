@@ -1,4 +1,4 @@
-import { Status } from '../ConstraintUtils';
+import { Status } from '../../ConstraintUtils';
 
 export interface HandlerCheckResult {
   input_descriptor_path: string;

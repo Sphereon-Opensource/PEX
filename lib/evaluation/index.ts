@@ -1,7 +1,7 @@
 import { SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationResults } from './core/evaluationResults';
+import { HandlerCheckResult } from './core/handlerCheckResult';
 import { EvaluationClient } from './evaluationClient';
-import { EvaluationResults } from './evaluationResults';
-import { HandlerCheckResult } from './handlerCheckResult';
 import { EvaluationHandler } from './handlers';
 export { EvaluationClient };
 export { SubmissionRequirementMatch, SelectResults };

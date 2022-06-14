@@ -1,11 +1,4 @@
-import {
-  Descriptor,
-  InputDescriptorV1,
-  InputDescriptorV2,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pex-models';
+import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
@@ -13,10 +6,8 @@ import { IPresentationDefinition, IVerifiableCredential } from '../types';
 import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
 import { JsonPathUtils } from '../utils';
 
-import { SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
-import { EvaluationResults } from './evaluationResults';
-import { HandlerCheckResult } from './handlerCheckResult';
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -229,6 +220,7 @@ export class EvaluationClientWrapper {
   ): EvaluationResults {
     this._client.evaluate(pd, wvcs, holderDids, limitDisclosureSignatureSuites);
     const result: EvaluationResults = {
+      areRequiredCredentialsPresent: Status.INFO,
       verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential),
     };
     result.warnings = this.formatNotInfo(Status.WARN);
@@ -246,9 +238,7 @@ export class EvaluationClientWrapper {
     }
     this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
     result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
-    if (result.value) {
-      this.filterEvaluationErrors(result, pd as unknown as IPresentationDefinition);
-    }
+    result.areRequiredCredentialsPresent = result.value?.descriptor_map?.length ? Status.INFO : Status.ERROR;
     return result;
   }
 
@@ -591,60 +581,5 @@ export class EvaluationClientWrapper {
       partitionedResults.set(idPath, idPaths);
     }
     return partitionedResults;
-  }
-
-  private filterEvaluationErrors(result: EvaluationResults, pd: IPresentationDefinition) {
-    const errors: HandlerCheckResult[] = this._client.results.filter((hcr) => hcr.status === Status.ERROR);
-    let relatedErrorFound = false;
-    if (result.value && result.errors) {
-      const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] =
-        EvaluationClientWrapper.findInputDescriptorIdAndVcListFromLogs(errors, pd);
-      for (const errorIdAndVcPath of errorsIdAndVcList) {
-        for (const desc of result.value.descriptor_map) {
-          if (desc.id === errorIdAndVcPath.id) {
-            if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
-              relatedErrorFound = true;
-            }
-            if (!desc.path && desc.path_nested) {
-              this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc, relatedErrorFound);
-            }
-          }
-        }
-      }
-    }
-    if (!relatedErrorFound) {
-      result.errors = [];
-    }
-  }
-
-  private static findInputDescriptorIdAndVcListFromLogs(
-    errors: HandlerCheckResult[],
-    pd: IPresentationDefinition
-  ): [{ id: string; verifiable_credential_path: string }] {
-    const errorsIdAndVcList: [{ id: string; verifiable_credential_path: string }] = [] as unknown as [
-      { id: string; verifiable_credential_path: string }
-    ];
-    for (const hcr of errors) {
-      const idRes = JsonPathUtils.extractInputField(pd, [hcr.input_descriptor_path]);
-      if (idRes.length) {
-        const id: InputDescriptorV1 | InputDescriptorV2 = idRes[0].value;
-        const vcPath = hcr.verifiable_credential_path.replace('$', '$.verifiableCredential');
-        errorsIdAndVcList.push({ id: id.id, verifiable_credential_path: vcPath });
-      }
-    }
-    return errorsIdAndVcList;
-  }
-
-  private checkLogsVcInputDescriptorRelationRecursive(
-    errorIdAndVcPath: { id: string; verifiable_credential_path: string },
-    desc: Descriptor,
-    isRelated: boolean
-  ) {
-    if (desc.path && desc.path === errorIdAndVcPath.verifiable_credential_path) {
-      isRelated = true;
-    }
-    if (!desc.path && desc.path_nested) {
-      this.checkLogsVcInputDescriptorRelationRecursive(errorIdAndVcPath, desc.path_nested, isRelated);
-    }
   }
 }
