@@ -1,6 +1,6 @@
 # Release Notes
 
-## v1.1.1 - 2022-06-30
+## v1.1.2 - 2022-06-30
 Bugfix release
 
 - Added:
@@ -8,6 +8,8 @@ Bugfix release
 - Fixed:
   - Some errors would be filtered out by mistake
 
+## v1.1.1
+Internal release because of forgotten merges
 
 ## v1.1.0 - 2022-05-30
 Added support for jwt vc/vp, added support for async callbacks, fixed some issues with generating PresentationSubmission
