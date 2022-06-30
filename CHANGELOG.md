@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.1.1 - 2022-06-30
+Bugfix release
+
+- Added:
+  - Add status object to evaluationResult which informs whether VCs would satisfy the Definition or not 
+- Fixed:
+  - Some errors would be filtered out by mistake
+
+
 ## v1.1.0 - 2022-05-30
 Added support for jwt vc/vp, added support for async callbacks, fixed some issues with generating PresentationSubmission
 
