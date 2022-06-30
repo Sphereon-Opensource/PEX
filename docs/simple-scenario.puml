@@ -19,7 +19,7 @@ participant "PEX-Lib Wallet" as PE order 4 #YELLOW
 V -> W: PresentationDefinition
 W -> A: Notification
 A -> W: Accepts PresentationDefinition
-W -> PE: evaluate(presentationDefinition, allAvailableCredentials[])
+W -> PE: evaluateCredentials(presentationDefinition, allAvailableCredentials[])
 PE -> W: evaluation results
 W -> A: from the credentials in your wallet, \na combination is acceptable
 loop
@@ -45,7 +45,7 @@ PE -> W: returns a Verifiable Presentation object
 end
 W -> V: VerifiablePresentation containing Presentation Submission
 
-V -> PEXV: evaluate(verifiablePresentation)
+V -> PEXV: evaluatePresentation(verifiablePresentation)
 PEXV -> V: evaluation result
 V -> W: Pass/Fail response
 W -> A: Pass/Fail notification

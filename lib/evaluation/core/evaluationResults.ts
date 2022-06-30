@@ -1,11 +1,9 @@
+import { PresentationSubmission } from '@sphereon/pex-models';
+
 import { Checked, Status } from '../../ConstraintUtils';
 import { IVerifiableCredential } from '../../types';
 
-import { SubmissionRequirementMatch } from './submissionRequirementMatch';
-
-export interface SelectResults {
-  errors?: Checked[];
-  matches?: SubmissionRequirementMatch[];
+export interface EvaluationResults {
   /**
    * This is the parameter that pex library user should look into to determine what to do next
    * Status can have three values:
@@ -16,12 +14,12 @@ export interface SelectResults {
    */
   areRequiredCredentialsPresent: Status;
   /**
-   * All matched/selectable credentials
+   * List of the errors lines generated during the evaluation process.
+   *  In case of evaluateCredentials gets populated with all the errors generated in the process
+   *  In case of evaluatePresentation gets populated with errors only if areRequiredCredentialsPresent is set to Status Error
    */
-  verifiableCredential?: IVerifiableCredential[];
-  /**
-   * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
-   */
-  vcIndexes?: number[];
+  errors?: Checked[];
+  value?: PresentationSubmission;
+  verifiableCredential: IVerifiableCredential[];
   warnings?: Checked[];
 }

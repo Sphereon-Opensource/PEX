@@ -10,8 +10,8 @@ import {
   WrappedVerifiableCredential,
 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
+import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
-import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 

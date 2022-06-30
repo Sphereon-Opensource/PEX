@@ -5,7 +5,7 @@ import { ProofType } from '../types';
 import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
 import PEMessages from '../types/Messages';
 
-import { HandlerCheckResult } from './handlerCheckResult';
+import { HandlerCheckResult } from './core';
 import {
   EvaluationHandler,
   InputDescriptorFilterEvaluationHandler,

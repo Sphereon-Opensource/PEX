@@ -4,8 +4,8 @@ import jp, { PathComponent } from 'jsonpath';
 import { Status } from '../../ConstraintUtils';
 import { ICredentialSubject } from '../../types';
 import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
+import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
-import { HandlerCheckResult } from '../handlerCheckResult';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 

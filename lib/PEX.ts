@@ -1,6 +1,7 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import Ajv from 'ajv';
 
+import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import {
@@ -67,12 +68,25 @@ export class PEX {
     const holderDIDs = wrappedPresentation.internalPresentation.holder
       ? [wrappedPresentation.internalPresentation.holder]
       : [];
-    return this._evaluationClientWrapper.evaluate(
+    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(
       pd,
       wrappedVerifiablePresentation.vcs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wrappedVerifiablePresentation.vcs,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+        result.errors = [];
+      }
+    }
+    return result;
   }
 
   /***
@@ -97,12 +111,25 @@ export class PEX {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd: IInternalPresentationDefinition =
       this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
-    return this._evaluationClientWrapper.evaluate(
+    const result = this._evaluationClientWrapper.evaluate(
       pd,
       wrappedVerifiableCredentials,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
+    if (result.value && result.value.descriptor_map.length) {
+      const selectFromClientWrapper = new EvaluationClientWrapper();
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
+        pd,
+        wrappedVerifiableCredentials,
+        holderDIDs,
+        limitDisclosureSignatureSuites
+      );
+      result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
+    } else {
+      result.areRequiredCredentialsPresent = Status.ERROR;
+    }
+    return result;
   }
 
   /**
