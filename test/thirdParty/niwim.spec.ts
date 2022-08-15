@@ -1,6 +1,6 @@
-import { PresentationDefinitionV1 } from '@sphereon/pex-models';
+import {FilterV1, PresentationDefinitionV1} from '@sphereon/pex-models';
 
-import { IVerifiableCredential, PEX, Status } from '../../lib';
+import {IVerifiableCredential, PEX, PEXv1, Status} from '../../lib';
 
 function getVerifiableCredentials(): IVerifiableCredential[] {
   return [
@@ -168,6 +168,66 @@ function getPresentationDefinition_modified3(): PresentationDefinitionV1 {
     ],
   };
 }
+// path: ["$.type.[*]"],
+function getPresentationDefinition_modified4(): PresentationDefinitionV1 {
+  return {
+    id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    input_descriptors: [
+      {
+        id: 'A specific type of VC',
+        name: 'A specific type of VC',
+        purpose: 'We want a VC of this type',
+        schema: [
+          {
+            uri: 'https://www.w3.org/2018/credentials/v1',
+          },
+          {
+            uri: 'https://www.w3.org/2018/credentials/examples/v1',
+          },
+        ],
+        constraints: {
+          fields: [
+            {
+              path: ['$.type'],
+              filter: {
+                type: 'array',
+                pattern: 'AlumniCredential',
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
+
+function getPresentationDefinition_modified5(): PresentationDefinitionV1 {
+  return {
+    id: '286bc1e0-f1bd-488a-a873-8d71be3c690e',
+    input_descriptors: [
+      {
+        id: 'A specific type of VC',
+        name: 'A specific type of VC',
+        purpose: 'We want a VC of this type',
+        schema: [
+          {
+            uri: 'https://www.w3.org/2018/credentials/v1',
+          },
+          {
+            uri: 'https://www.w3.org/2018/credentials/examples/v1',
+          },
+        ],
+        constraints: {
+          fields: [
+            {
+              path: ['$.type'],
+            },
+          ],
+        },
+      },
+    ],
+  };
+}
 
 describe('evaluate niwim tests', () => {
   it('Evaluate case must return error', () => {
@@ -200,5 +260,27 @@ describe('evaluate niwim tests', () => {
     const vcs = getVerifiableCredentials();
 
     expect(() => pex.evaluateCredentials(pdSchema, vcs)).toThrowError();
+  });
+
+  it('Evaluate case must return success4', () => {
+    const pex: PEX = new PEX();
+    const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_modified4();
+    const vcs = getVerifiableCredentials();
+    const selectResult = pex.evaluateCredentials(pdSchema, vcs);
+    expect(selectResult.areRequiredCredentialsPresent).toBe(Status.INFO);
+  });
+
+  it('Evaluate case must return success5', () => {
+    const pex: PEXv1 = new PEXv1();
+    const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_modified5();
+    pdSchema.input_descriptors[0].constraints!.fields![0]!.filter = {
+      "type": "array",
+        "contains": {
+        "_enum": ["AlumniCredential"]
+      }
+    } as unknown as FilterV1;
+    const vcs = getVerifiableCredentials();
+    const selectResult = pex.evaluateCredentials(pdSchema, vcs);
+    expect(selectResult.areRequiredCredentialsPresent).toBe(Status.INFO);
   });
 });
