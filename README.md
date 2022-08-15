@@ -778,6 +778,8 @@ There are several other utility scripts that help with development.
 This implementation fully supports V1 and V2 of the Presentation Exchange specification with the following exception:
 
 - Support for hashlink verification in the schema part of the V1 specification is not fully incorporated as it depends on missing external library support. We generate a warning about the missing verification if we encounter them.
+- Support for complete [json-schema](http://json-schema.org/draft-07/schema#) in `pex-models`
+  - which means if you're relying on our version-discovery feature (with calling general `PEX`) and sending `presentation_definition` object with unsupported fields, you'll get an exception. However if you call specific version of PEX (PEXv1 or PEXv2) it will work.
 
 ## Breaking change: class and package renamed as of v0.6.0!
 
