@@ -1,5 +1,12 @@
 # Release Notes
 
+## v1.1.3 - 2022-08-15
+Bugfix release
+
+- Fixed:
+  - Json-path fix for when an array needs to be searched in a field filter. See README for how to search in an array, as not all JSON schema methods are supported in current verion.
+
+
 ## v1.1.2 - 2022-06-30
 Bugfix release
 
