@@ -169,7 +169,7 @@ function getPresentationDefinition_modified3(): PresentationDefinitionV1 {
   };
 }
 
-describe('evaluate JGiter tests', () => {
+describe('evaluate niwim tests', () => {
   it('Evaluate case must return error', () => {
     const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_original();
