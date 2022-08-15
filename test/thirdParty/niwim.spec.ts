@@ -1,6 +1,6 @@
-import {FilterV1, PresentationDefinitionV1} from '@sphereon/pex-models';
+import { FilterV1, PresentationDefinitionV1 } from '@sphereon/pex-models';
 
-import {IVerifiableCredential, PEX, PEXv1, Status} from '../../lib';
+import { IVerifiableCredential, PEX, PEXv1, Status } from '../../lib';
 
 function getVerifiableCredentials(): IVerifiableCredential[] {
   return [
@@ -274,10 +274,10 @@ describe('evaluate niwim tests', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_modified5();
     pdSchema.input_descriptors[0].constraints!.fields![0]!.filter = {
-      "type": "array",
-        "contains": {
-        "_enum": ["AlumniCredential"]
-      }
+      type: 'array',
+      contains: {
+        _enum: ['AlumniCredential'],
+      },
     } as unknown as FilterV1;
     const vcs = getVerifiableCredentials();
     const selectResult = pex.evaluateCredentials(pdSchema, vcs);
