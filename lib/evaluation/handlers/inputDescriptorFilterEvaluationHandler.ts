@@ -34,17 +34,24 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         if (field.value.path) {
           inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
         }
-        if (!inputField.length) {
-          const payload = { valid: false };
-          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
-        } else if (!this.evaluateFilter(inputField[0], field.value)) {
-          const payload = { result: { ...inputField[0] }, valid: false };
-          this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
-        } else {
-          const payload = { result: { ...inputField[0] }, valid: true };
-          this.getResults().push({
-            ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
-          });
+        let resultFound = false;
+        for (const inputFieldKey of inputField) {
+          if (this.evaluateFilter(inputFieldKey, field.value)) {
+            resultFound = true;
+            const payload = { result: { ...inputField[0] }, valid: true };
+            this.getResults().push({
+              ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
+            });
+          }
+        }
+        if (!resultFound) {
+          if (!inputField.length) {
+            const payload = { valid: false };
+            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
+          } else {
+            const payload = { result: { ...inputField[0] }, valid: false };
+            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
+          }
         }
       });
     });
@@ -69,7 +76,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   private createResponse(
     field: { path: PathComponent[]; value: FieldV1 | FieldV2 },
     vcIndex: number,
-    payload: { result?: { path: PathComponent[]; value: unknown }; valid: boolean },
+    payload: unknown,
     message: string
   ): void {
     this.getResults().push({
