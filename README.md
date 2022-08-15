@@ -78,7 +78,7 @@ The core functionality of the DIF Presentation Exchange can be outlined as follo
 
 
 ### Verifier: Create a Presentation Definition object:
-Presentation Definitions are objects that articulate what proofs a Verifier requires. These help the Verifier to decide how or whether to interact with a Holder. Presentation Definitions are composed of inputs, which describe the forms and details of the proofs they require, and optional sets of selection rules, to allow Holders flexibility in cases where different types of proofs may satisfy an input requirement.
+[Presentation Definitions](https://identity.foundation/presentation-exchange/#presentation-definition) are objects that articulate what proofs a Verifier requires. These help the Verifier to decide how or whether to interact with a Holder. Presentation Definitions are composed of inputs, which describe the forms and details of the proofs they require, and optional sets of selection rules, to allow Holders flexibility in cases where different types of proofs may satisfy an input requirement.
 PEX library supports two versions of `presentation_definition` object. The details of it can be found in `@spehereon/pex-models` below you can find some tips about querying via a presentation_definition object:
 - Using the `constraint` field:
   - You can use the constraint field for creating your query:
