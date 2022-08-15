@@ -76,6 +76,77 @@ The core functionality of the DIF Presentation Exchange can be outlined as follo
   - [Verifiable Presentation creation](#holder-verifiable-presentation-with-callback)
   - [Utilities](#utilities)
 
+
+### Verifier: Create a Presentation Definition object:
+Presentation Definitions are objects that articulate what proofs a Verifier requires. These help the Verifier to decide how or whether to interact with a Holder. Presentation Definitions are composed of inputs, which describe the forms and details of the proofs they require, and optional sets of selection rules, to allow Holders flexibility in cases where different types of proofs may satisfy an input requirement.
+PEX library supports two versions of `presentation_definition` object. The details of it can be found in `@spehereon/pex-models` below you can find some tips about querying via a presentation_definition object:
+- Using the `constraint` field:
+  - You can use the constraint field for creating your query:
+```js
+constraints: {
+  fields: [
+    {
+       path: ['$.credentialSubject.role'],
+       filter: {
+         type: 'string',
+         _const: 'admin',
+       },
+    },
+  ]
+}
+```
+- for special cases, like querying fields that start with `@` you can use the following syntax:
+  - You can use the following syntax, PEX will change it to correct query itself:
+```js
+path: ['$.@context', '$.vc.@context']
+```
+For querying the arrays, right now we don't support the [json-schema](http://json-schema.org/draft-07/schema#) fully, but we do support the following syntax:
+
+- using `[*]` like:
+```json
+{
+    fields: [
+      {
+        path: ['$.type.[*]'],
+        filter: {
+          type: 'string',
+          pattern: 'AlumniCredential'
+        }
+      }
+    ]
+}
+```
+
+- using `.*` like:
+```json
+{
+  fields: [
+    {
+      path: ['$.type.*'],
+      filter: {
+        type: 'string',
+        pattern: 'AlumniCredential',
+      },
+    },
+  ],
+}
+```
+- using `type: array` and `contains` keyword. PEX currently doesn't support this syntax fully, but if you don't rely on our `versionDiscovery` functionality and call the specific version of PEX (PEXv1 or PEXv2) yourself, you can use this syntax as well.
+```json
+{
+  "fields": [
+    {
+      "path": [ "$.type" ],
+      "filter": {
+        "type": "array",
+        "contains": {
+          "enum": ["https://example.com/type"]
+        }
+      }
+    }
+  ]
+}
+```
 ### Verifier: Input Evaluation
 
 Input evaluation is the primary mechanism by which a verifier determines whether a Verifiable Presentation and Presentation Submission from a holder
