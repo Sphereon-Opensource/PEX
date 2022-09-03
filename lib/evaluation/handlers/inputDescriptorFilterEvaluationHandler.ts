@@ -1,14 +1,11 @@
 import { FieldV1, FieldV2 } from '@sphereon/pex-models';
+import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import {
-  IInternalPresentationDefinition,
-  InternalPresentationDefinitionV2,
-  WrappedVerifiableCredential,
-} from '../../types/Internal.types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';

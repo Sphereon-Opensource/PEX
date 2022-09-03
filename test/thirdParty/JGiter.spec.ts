@@ -1,8 +1,9 @@
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
+import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
-import { EvaluationResults, IPresentation, IVerifiableCredential, PEX, ProofType, Status } from '../../lib';
+import { EvaluationResults, PEX, Status } from '../../lib';
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 function getPresentationDefinition_1(): PresentationDefinitionV2 {
   return {

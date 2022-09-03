@@ -1,6 +1,7 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
+import { IPresentation, IVerifiableCredential } from '@sphereon/ssi-types';
 
-import { IPresentation, IVerifiableCredential, PEX } from '../../lib';
+import { PEX } from '../../lib';
 
 import { Wallet } from './core/Wallet';
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];

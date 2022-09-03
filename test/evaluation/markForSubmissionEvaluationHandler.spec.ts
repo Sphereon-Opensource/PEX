@@ -1,6 +1,7 @@
 import fs from 'fs';
 
-import { IVerifiableCredential, IVerifiablePresentation } from '../../lib';
+import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
+
 import { HandlerCheckResult } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { MarkForSubmissionEvaluationHandler } from '../../lib/evaluation/handlers';

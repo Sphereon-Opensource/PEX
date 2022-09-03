@@ -1,17 +1,16 @@
 import fs from 'fs';
 
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-
 import {
-  EvaluationResults,
+  ICredential,
   IPresentation,
+  IProofType,
   IVerifiableCredential,
   IVerifiablePresentation,
-  PEX,
-  ProofType,
-  Validated,
-} from '../lib';
-import { ICredential, WrappedVerifiablePresentation } from '../lib/types';
+  WrappedVerifiablePresentation,
+} from '@sphereon/ssi-types';
+
+import { EvaluationResults, PEX, Validated } from '../lib';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
 
 import {
@@ -31,7 +30,7 @@ function getFileAsJson(path: string) {
   return JSON.parse(getFile(path));
 }
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   return {

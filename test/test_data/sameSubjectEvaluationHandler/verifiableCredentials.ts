@@ -1,4 +1,4 @@
-import { IVerifiableCredential } from '../../../lib';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 export class SameSubjectVerifiableCredential {
   public getVerifiableCredential(): IVerifiableCredential[] {

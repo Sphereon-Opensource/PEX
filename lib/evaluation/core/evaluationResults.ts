@@ -1,7 +1,7 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../../ConstraintUtils';
-import { IVerifiableCredential } from '../../types';
 
 export interface EvaluationResults {
   /**

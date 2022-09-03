@@ -4,17 +4,10 @@ import {
   InputDescriptorV2,
   PresentationDefinitionV1,
   PresentationDefinitionV2,
-  PresentationSubmission,
   SubmissionRequirement,
 } from '@sphereon/pex-models';
 
-import {
-  ICredential,
-  ICredentialContextType,
-  IVerifiableCredential,
-  IVerifiablePresentation,
-  PEVersion,
-} from './SSI.types';
+import { PEVersion } from './SSI.types';
 
 export interface IInternalPresentationDefinition {
   format?: Format;
@@ -86,63 +79,4 @@ export class InternalPresentationDefinitionV2 implements PresentationDefinitionV
   getVersion(): PEVersion {
     return PEVersion.v2;
   }
-}
-
-export interface WrappedVerifiableCredential {
-  /**
-   * Original VC that we've received
-   */
-  original: string | JwtWrappedVerifiableCredential | IVerifiableCredential;
-  /**
-   * In case of JWT credential it will be the decoded version. In other cases it will be the same as original one
-   */
-  decoded: JwtWrappedVerifiableCredential | IVerifiableCredential;
-  /**
-   * Type of this credential. Supported types are json-ld and jwt
-   */
-  type: VerifiableDataExchangeType;
-  /**
-   * created based on https://www.w3.org/TR/vc-data-model/#jwt-decoding
-   */
-  internalCredential: ICredential;
-}
-
-export interface WrappedVerifiablePresentation {
-  original: string | JwtWrappedVerifiablePresentation | IVerifiablePresentation;
-  decoded: JwtWrappedVerifiablePresentation | IVerifiablePresentation;
-  type: VerifiableDataExchangeType;
-  internalPresentation: InternalPresentation;
-  vcs: WrappedVerifiableCredential[];
-}
-
-export enum VerifiableDataExchangeType {
-  JSONLD,
-  JWT_ENCODED,
-  JWT_DECODED,
-}
-
-export interface InternalPresentation {
-  '@context': ICredentialContextType | ICredentialContextType[];
-  type: string[];
-  verifiableCredential: WrappedVerifiableCredential[];
-  presentation_submission?: PresentationSubmission;
-  holder?: string;
-}
-
-export interface JwtWrappedVerifiableCredential {
-  vc: ICredential;
-  exp: string;
-  iss: string;
-  nbf: string;
-  sub: string;
-  jti: string;
-}
-
-export interface JwtWrappedVerifiablePresentation {
-  vp: IVerifiablePresentation;
-  exp: string;
-  iss: string;
-  nbf: string;
-  sub: string;
-  jti: string;
 }

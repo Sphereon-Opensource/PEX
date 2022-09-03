@@ -1,25 +1,20 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import Ajv from 'ajv';
-
-import { Status } from './ConstraintUtils';
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import {
   IPresentation,
-  IPresentationDefinition,
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
   JwtWrappedVerifiableCredential,
   JwtWrappedVerifiablePresentation,
-  PEVersion,
-} from './types';
-import {
-  IInternalPresentationDefinition,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
-} from './types/Internal.types';
-import { SSITypesBuilder } from './types/SSITypesBuilder';
+} from '@sphereon/ssi-types';
+import Ajv from 'ajv';
+
+import { Status } from './ConstraintUtils';
+import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
+import { IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
 import { JsonPathUtils } from './utils';
 import {
   PresentationDefinitionV1VB,

@@ -1,9 +1,16 @@
 import fs from 'fs';
 
-import { IProof, IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
+import {
+  ICredential,
+  IProof,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
+
+import { Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
-import { ICredential } from '../../lib/types';
-import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 import { LimitDisclosureEvaluationResults } from '../test_data/limitDisclosureEvaluation/limitDisclosureEvaluationResults';

@@ -1,5 +1,6 @@
+import { IVerifiableCredential } from '@sphereon/ssi-types';
+
 import { Checked, Status } from '../../ConstraintUtils';
-import { IVerifiableCredential } from '../../types';
 
 import { SubmissionRequirementMatch } from './submissionRequirementMatch';
 

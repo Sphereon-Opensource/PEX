@@ -1,6 +1,7 @@
 import { PresentationSubmission, Rules } from '@sphereon/pex-models';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
 
-import { HandlerCheckResult, IVerifiableCredential, SelectResults, Status } from '../../lib';
+import { HandlerCheckResult, SelectResults, Status } from '../../lib';
 import PEMessages from '../../lib/types/Messages';
 
 export class EvaluationClientWrapperData {

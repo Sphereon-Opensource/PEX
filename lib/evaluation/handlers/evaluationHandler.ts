@@ -1,4 +1,6 @@
-import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
+import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
+
+import { IInternalPresentationDefinition } from '../../types/Internal.types';
 import { EvaluationClient } from '../evaluationClient';
 
 export interface EvaluationHandler {

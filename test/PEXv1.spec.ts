@@ -1,8 +1,9 @@
 import fs from 'fs';
 
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
+import { IPresentation, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { IPresentation, IVerifiablePresentation, PEXv1, ProofType, Validated } from '../lib';
+import { PEXv1, Validated } from '../lib';
 
 import {
   assertedMockCallback,
@@ -16,7 +17,7 @@ function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
 }
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate', () => {
   it('testing constructor', function () {

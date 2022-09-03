@@ -1,45 +1,4 @@
-import {
-  JwtWrappedVerifiableCredential,
-  JwtWrappedVerifiablePresentation,
-  WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
-} from './Internal.types';
-import {
-  ICredential,
-  ICredentialSchema,
-  ICredentialStatus,
-  ICredentialSubject,
-  IHasProof,
-  IIssuer,
-  InputFieldType,
-  IPresentation,
-  IPresentationDefinition,
-  IProof,
-  IVerifiableCredential,
-  IVerifiablePresentation,
-  PEVersion,
-  ProofPurpose,
-  ProofType,
-} from './SSI.types';
-
-export {
-  ICredential,
-  ICredentialSchema,
-  ICredentialStatus,
-  ICredentialSubject,
-  IHasProof,
-  IIssuer,
-  InputFieldType,
-  IPresentation,
-  IPresentationDefinition,
-  IProof,
-  IVerifiableCredential,
-  IVerifiablePresentation,
-  JwtWrappedVerifiableCredential,
-  JwtWrappedVerifiablePresentation,
-  PEVersion,
-  ProofPurpose,
-  ProofType,
-  WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
-};
+export * from './Messages';
+export * from './internal.types';
+export * from './SSI.types';
+export * from './SSITypesBuilder';

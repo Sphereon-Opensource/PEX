@@ -1,14 +1,17 @@
 import fs from 'fs';
 
-import { HandlerCheckResult, IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
-import { EvaluationClient } from '../../lib/evaluation';
-import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
-import { ICredential } from '../../lib/types';
 import {
-  InternalPresentationDefinitionV1,
+  ICredential,
+  IVerifiableCredential,
+  IVerifiablePresentation,
   VerifiableDataExchangeType,
   WrappedVerifiableCredential,
-} from '../../lib/types/Internal.types';
+} from '@sphereon/ssi-types';
+
+import { HandlerCheckResult, Status } from '../../lib';
+import { EvaluationClient } from '../../lib/evaluation';
+import { UriEvaluationHandler } from '../../lib/evaluation/handlers';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 

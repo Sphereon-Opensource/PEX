@@ -1,25 +1,22 @@
 import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
-import jwt_decode from 'jwt-decode';
-
-import { JsonPathUtils } from '../utils';
-import { ObjectUtils } from '../utils/ObjectUtils';
-
 import {
-  InternalPresentationDefinitionV1,
-  InternalPresentationDefinitionV2,
+  ICredential,
+  IPresentation,
+  IVerifiableCredential,
+  IVerifiablePresentation,
   JwtWrappedVerifiableCredential,
   JwtWrappedVerifiablePresentation,
   VerifiableDataExchangeType,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
-} from './Internal.types';
-import {
-  ICredential,
-  IPresentation,
-  IPresentationDefinition,
-  IVerifiableCredential,
-  IVerifiablePresentation,
-} from './SSI.types';
+} from '@sphereon/ssi-types';
+import jwt_decode from 'jwt-decode';
+
+import { JsonPathUtils } from '../utils';
+import { ObjectUtils } from '../utils/ObjectUtils';
+
+import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from './Internal.types';
+import { IPresentationDefinition } from './SSI.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {

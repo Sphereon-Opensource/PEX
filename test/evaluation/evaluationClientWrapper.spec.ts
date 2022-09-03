@@ -1,12 +1,17 @@
 import fs from 'fs';
 
 import { Optionality, PresentationDefinitionV2, PresentationSubmission, Rules } from '@sphereon/pex-models';
+import {
+  ICredential,
+  IVerifiableCredential,
+  IVerifiablePresentation,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 
-import { IVerifiableCredential, IVerifiablePresentation, Status } from '../../lib';
+import { Status } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
-import { ICredential } from '../../lib/types';
-import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
-import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
+import { InternalPresentationDefinitionV1 } from '../../lib/types';
+import { SSITypesBuilder } from '../../lib/types';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
 

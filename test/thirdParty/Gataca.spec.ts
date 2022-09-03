@@ -1,11 +1,11 @@
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
+import { IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
-import { PEX, PEXv1, ProofType, Status } from '../../lib';
-import { IVerifiableCredential } from '../../lib';
+import { PEX, PEXv1, Status } from '../../lib';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
 import { GatacaSelectedCredentials } from '../test_data/gataca/gatacaSelectedCredentials';
 
-const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [ProofType.BbsBlsSignatureProof2020];
+const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate gataca tests', () => {
   it('should return v1 in version discovery', function () {

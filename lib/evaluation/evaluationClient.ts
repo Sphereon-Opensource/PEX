@@ -1,8 +1,8 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
+import { IProofType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../ConstraintUtils';
-import { ProofType } from '../types';
-import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../types/Internal.types';
+import { IInternalPresentationDefinition } from '../types/Internal.types';
 import PEMessages from '../types/Messages';
 
 import { HandlerCheckResult } from './core';
@@ -18,7 +18,7 @@ import {
   UriEvaluationHandler,
 } from './handlers';
 
-const DEFAULT_LIMIT_DISCLOSURE_TYPES = [ProofType.BbsBlsSignatureProof2020];
+const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020];
 
 export class EvaluationClient {
   constructor() {

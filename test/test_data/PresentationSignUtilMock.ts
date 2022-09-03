@@ -1,12 +1,6 @@
-import {
-  IProof,
-  IVerifiablePresentation,
-  KeyEncoding,
-  PresentationSignCallBackParams,
-  ProofOptions,
-  SignatureOptions,
-} from '../../lib';
-import { ProofPurpose, ProofType } from '../../lib/types/SSI.types';
+import { IProof, IProofPurpose, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
+
+import { KeyEncoding, PresentationSignCallBackParams, ProofOptions, SignatureOptions } from '../../lib';
 
 export function mockCallback(opts: PresentationSignCallBackParams): IVerifiablePresentation {
   return {
@@ -61,8 +55,8 @@ export async function getAsyncCallbackWithoutProofType(
 
 export function getProofOptionsMock(): ProofOptions {
   return {
-    type: ProofType.EcdsaSecp256k1Signature2019,
-    proofPurpose: ProofPurpose.authentication,
+    type: IProofType.EcdsaSecp256k1Signature2019,
+    proofPurpose: IProofPurpose.authentication,
   };
 }
 

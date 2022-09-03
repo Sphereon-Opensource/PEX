@@ -1,14 +1,11 @@
 import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
+import { ICredential, ICredentialSchema, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { ICredential, ICredentialSchema, PEVersion } from '../../types';
-import {
-  IInternalPresentationDefinition,
-  InternalPresentationDefinitionV1,
-  WrappedVerifiableCredential,
-} from '../../types/Internal.types';
+import { PEVersion } from '../../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV1 } from '../../types/Internal.types';
 import PEMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';

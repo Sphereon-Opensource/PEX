@@ -1,8 +1,8 @@
 import fs from 'fs';
 
 import { PresentationSubmission } from '@sphereon/pex-models';
+import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { IVerifiableCredential, IVerifiablePresentation } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/handlers';
 import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';

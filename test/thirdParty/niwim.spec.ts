@@ -1,6 +1,7 @@
 import { FilterV1, PresentationDefinitionV1 } from '@sphereon/pex-models';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
 
-import { IVerifiableCredential, PEX, PEXv1, Status } from '../../lib';
+import { PEX, PEXv1, Status } from '../../lib';
 
 function getVerifiableCredentials(): IVerifiableCredential[] {
   return [

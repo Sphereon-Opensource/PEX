@@ -1,8 +1,9 @@
 import { HolderSubject, Optionality } from '@sphereon/pex-models';
+import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, WrappedVerifiableCredential } from '../../types/Internal.types';
+import { IInternalPresentationDefinition } from '../../types/Internal.types';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 

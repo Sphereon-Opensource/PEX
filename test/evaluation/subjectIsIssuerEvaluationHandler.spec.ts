@@ -1,9 +1,10 @@
 import fs from 'fs';
 
-import { IVerifiableCredential } from '../../lib';
+import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
-import { InternalPresentationDefinitionV1, WrappedVerifiableCredential } from '../../lib/types/Internal.types';
+import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
 import PEMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 

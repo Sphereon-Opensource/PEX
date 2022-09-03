@@ -1,4 +1,4 @@
-import { IVerifiableCredential } from '../../../lib/types/SSI.types';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 export class GatacaSelectedCredentials {
   static getVerifiableCredentials(): IVerifiableCredential[] {

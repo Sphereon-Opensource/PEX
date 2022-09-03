@@ -1,9 +1,4 @@
 import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-
-import { Status } from './ConstraintUtils';
-import { PEX } from './PEX';
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import {
   IPresentation,
   IProof,
@@ -13,7 +8,12 @@ import {
   JwtWrappedVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
-} from './types';
+} from '@sphereon/ssi-types';
+
+import { Status } from './ConstraintUtils';
+import { PEX } from './PEX';
+import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
 import { SSITypesBuilder } from './types/SSITypesBuilder';
 import { PresentationDefinitionV2VB, Validated, ValidationEngine } from './validation';
 
