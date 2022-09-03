@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "1.1.4-unstable.0",
+  "version": "1.1.4-unstable.1",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -32,7 +32,7 @@
     "test:cov": "jest --ci --coverage && codecov"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "dependencies": {
     "@sphereon/ssi-types": "^0.8.1-next.2",
