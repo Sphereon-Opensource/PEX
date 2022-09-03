@@ -1,4 +1,4 @@
-import { IVerifiableCredential, IVerifiablePresentation } from '../../../lib';
+import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
 export class SrRules {
   public getVerifiablePresentation(): Partial<IVerifiablePresentation> {
