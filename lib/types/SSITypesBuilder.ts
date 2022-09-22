@@ -56,9 +56,7 @@ export class SSITypesBuilder {
     presentation: IPresentation | JwtDecodedVerifiablePresentation | string
   ): WrappedVerifiablePresentation {
     const isJwtEncoded: boolean = ObjectUtils.isString(presentation);
-    const type: OriginalType = isJwtEncoded
-      ? OriginalType.JWT_ENCODED
-      : OriginalType.JSONLD;
+    const type: OriginalType = isJwtEncoded ? OriginalType.JWT_ENCODED : OriginalType.JSONLD;
     let vp = isJwtEncoded ? this.decodeJwtVerifiablePresentation(presentation as string) : presentation;
     vp = this.isJwtDecodedPresentation(vp)
       ? this.createInternalPresentationFromJwtDecoded(vp as JwtDecodedVerifiablePresentation)
@@ -116,7 +114,7 @@ export class SSITypesBuilder {
         decoded: jwt_decode(verifiableCredential as unknown as string),
         type: OriginalType.JWT_ENCODED,
         credential: this.createInternalCredentialFromJwtDecoded(externalCredentialJwt),
-        format: 'jwt_vc'
+        format: 'jwt_vc',
       };
     } else if (this.isJwtDecodedCredential(verifiableCredential)) {
       return {
@@ -126,7 +124,7 @@ export class SSITypesBuilder {
         credential: this.createInternalCredentialFromJwtDecoded(
           verifiableCredential as unknown as JwtDecodedVerifiableCredential
         ),
-        format: 'jwt_vc'
+        format: 'jwt_vc',
       };
     } else {
       return {
@@ -134,7 +132,7 @@ export class SSITypesBuilder {
         decoded: verifiableCredential as IVerifiableCredential,
         type: OriginalType.JSONLD,
         credential: verifiableCredential as ICredential,
-        format: 'ldp_vc'
+        format: 'ldp_vc',
       };
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "1.1.4-unstable.1",
+  "version": "1.1.4-unstable.2",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -35,7 +35,7 @@
     "node": ">=14"
   },
   "dependencies": {
-    "@sphereon/ssi-types": "C:\\Git\\Sphereon-Opensource\\pex\\sphereon-ssi-types-v0.8.4.tgz",
+    "@sphereon/ssi-types": "0.8.1-next.20",
     "@sphereon/pex-models": "^1.1.0",
     "ajv": "^8.11.0",
     "ajv-formats": "^2.1.1",

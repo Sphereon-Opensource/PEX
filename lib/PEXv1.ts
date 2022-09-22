@@ -4,9 +4,9 @@ import {
   IProof,
   IVerifiablePresentation,
   JwtDecodedVerifiablePresentation,
+  OriginalVerifiableCredential,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
-  OriginalVerifiableCredential
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
@@ -48,9 +48,7 @@ export class PEXv1 {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentationCopy.verifiableCredential);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDIDs = wrappedPresentation.presentation.holder
-      ? [wrappedPresentation.presentation.holder]
-      : [];
+    const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const result = this._evaluationClientWrapper.evaluate(
       pd,

@@ -4,10 +4,10 @@ import {
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
+  JwtDecodedVerifiablePresentation,
+  OriginalVerifiableCredential,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
-  OriginalVerifiableCredential,
-  JwtDecodedVerifiablePresentation
 } from '@sphereon/ssi-types';
 import Ajv from 'ajv';
 
@@ -60,9 +60,7 @@ export class PEX {
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
-    const holderDIDs = wrappedPresentation.presentation.holder
-      ? [wrappedPresentation.presentation.holder]
-      : [];
+    const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const result: EvaluationResults = this._evaluationClientWrapper.evaluate(
       pd,
       wrappedVerifiablePresentation.vcs,

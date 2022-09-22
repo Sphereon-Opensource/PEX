@@ -33,7 +33,7 @@ describe('evaluate', () => {
       original: vpSimple.verifiableCredential[0],
       credential: vpSimple.verifiableCredential[0] as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     evaluationHandler.handle(pd, [wvc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
@@ -53,7 +53,7 @@ describe('evaluate', () => {
       original: vc,
       credential: vc as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
@@ -92,7 +92,7 @@ describe('evaluate', () => {
       original: vc,
       credential: vc as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     evaluationHandler.handle(pd, [wvc]);
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
@@ -112,7 +112,7 @@ describe('evaluate', () => {
       original: vc0,
       credential: vc0 as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     const vc1: IVerifiableCredential = <IVerifiableCredential>vpSimple.verifiableCredential[1];
     const wvc1: WrappedVerifiableCredential = {
@@ -120,7 +120,7 @@ describe('evaluate', () => {
       original: vc1,
       credential: vc1 as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     const vc2: IVerifiableCredential = <IVerifiableCredential>vpSimple.verifiableCredential[2];
     const wvc2: WrappedVerifiableCredential = {
@@ -128,7 +128,7 @@ describe('evaluate', () => {
       original: vc2,
       credential: vc2 as ICredential,
       type: OriginalType.JSONLD,
-      format: 'ldp_vc'
+      format: 'ldp_vc',
     };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
