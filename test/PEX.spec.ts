@@ -318,7 +318,7 @@ describe('evaluate', () => {
       .verifiableCredential[0];
     jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].internalCredential.credentialSubject.expirationDate).toEqual(
+    expect(vcs[0].credential.credentialSubject.expirationDate).toEqual(
       new Date(parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)).toISOString()
     );
   });
@@ -329,7 +329,7 @@ describe('evaluate', () => {
 
     jwtVc['exp' as keyof IVerifiableCredential] = new Date().valueOf();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].internalCredential.credentialSubject.expirationDate).toEqual(
+    expect(vcs[0].credential.credentialSubject.expirationDate).toEqual(
       new Date(jwtVc['exp' as keyof IVerifiableCredential] as string).toISOString()
     );
   });
@@ -355,7 +355,7 @@ describe('evaluate', () => {
       .verifiableCredential[0];
     (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer;
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].internalCredential.issuer).toEqual(jwtVc['iss' as keyof IVerifiableCredential]);
+    expect(vcs[0].credential.issuer).toEqual(jwtVc['iss' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if issuer and iss are different in JWT vc', () => {
@@ -377,7 +377,7 @@ describe('evaluate', () => {
       parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)
     ).toISOString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].internalCredential.issuanceDate).toEqual(
+    expect(vcs[0].credential.issuanceDate).toEqual(
       new Date(parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)).toISOString()
     );
   });
@@ -404,7 +404,7 @@ describe('evaluate', () => {
       jwtVc['vc' as keyof IVerifiableCredential]
     )).credentialSubject.id;
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(wvcs[0].internalCredential.credentialSubject.id).toEqual(jwtVc['sub' as keyof IVerifiableCredential]);
+    expect(wvcs[0].credential.credentialSubject.id).toEqual(jwtVc['sub' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if credentialSubject.id and sub are different in JWT vc', () => {
@@ -423,7 +423,7 @@ describe('evaluate', () => {
       .verifiableCredential[0];
     jwtVc['jti' as keyof IVerifiableCredential] = (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).id;
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(wvcs[0].internalCredential.id).toEqual(jwtVc['jti' as keyof IVerifiableCredential]);
+    expect(wvcs[0].credential.id).toEqual(jwtVc['jti' as keyof IVerifiableCredential]);
   });
 
   it('should throw an error if id and jti are different in JWT vc', () => {

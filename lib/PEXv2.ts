@@ -2,12 +2,11 @@ import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-
 import {
   IPresentation,
   IProof,
-  IVerifiableCredential,
   IVerifiablePresentation,
-  JwtWrappedVerifiableCredential,
-  JwtWrappedVerifiablePresentation,
+  JwtDecodedVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
+  OriginalVerifiableCredential
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
@@ -39,7 +38,7 @@ export class PEXv2 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV2,
-    presentation: IPresentation | JwtWrappedVerifiablePresentation | string,
+    presentation: IPresentation | JwtDecodedVerifiablePresentation | string,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
@@ -49,8 +48,8 @@ export class PEXv2 {
       presentationCopy.verifiableCredential
     );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    const holderDIDs = wrappedPresentation.internalPresentation.holder
-      ? [wrappedPresentation.internalPresentation.holder]
+    const holderDIDs = wrappedPresentation.presentation.holder
+      ? [wrappedPresentation.presentation.holder]
       : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
     const result = this._evaluationClientWrapper.evaluate(pd, wrappedVcs, holderDIDs, limitDisclosureSignatureSuites);
@@ -82,7 +81,7 @@ export class PEXv2 {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    verifiableCredentials: OriginalVerifiableCredential[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
@@ -118,7 +117,7 @@ export class PEXv2 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    verifiableCredentials: OriginalVerifiableCredential[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
@@ -144,7 +143,7 @@ export class PEXv2 {
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredential: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    selectedCredential: OriginalVerifiableCredential[],
     holderDID?: string
   ): IPresentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
@@ -201,7 +200,7 @@ export class PEXv2 {
    */
   public async verifiablePresentationFromAsync(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
   ): Promise<IVerifiablePresentation> {
@@ -278,7 +277,7 @@ export class PEXv2 {
    */
   public verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: (IVerifiableCredential | JwtWrappedVerifiableCredential | string)[],
+    selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
   ): IVerifiablePresentation {

@@ -43,7 +43,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
         const vc: { path: PathComponent[]; value: ICredential }[] = JsonPathUtils.extractInputField(
-          wrappedVcs.map((wvc) => wvc.internalCredential),
+          wrappedVcs.map((wvc) => wvc.credential),
           [currentDescriptor.path]
         );
         if (vc[0]?.value.issuer === vc[0]?.value.credentialSubject.id) {

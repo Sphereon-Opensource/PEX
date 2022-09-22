@@ -911,10 +911,11 @@
   resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-1.1.0.tgz#716898344fd07400bbffaa0c34a1f7ecdda14166"
   integrity sha512-kMslWspdqwuXGBFxOPXTAK8HlIHycBR/locYHMlYmyvdnau6bp40JXk2zviBRVOPfe8N3Dv2p5IPAjMk3pT77A==
 
-"@sphereon/ssi-types@^0.8.1-next.6":
-  version "0.8.1-unstable.5"
-  resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.8.1-unstable.5.tgz#0c9b83f5ee3caeb013a471939d420e8b67f3bdfd"
-  integrity sha512-QpCdvVDGxQlPJL8GL1OoD1oc0t2AqUCZpko/q1YizlGZ2yKeo9l4Xfgg6mIZpQM0mL08WJejkM8kBXFrNWJTew==
+"@sphereon/ssi-types@file:sphereon-ssi-types-v0.8.4.tgz":
+  version "0.8.4"
+  resolved "file:sphereon-ssi-types-v0.8.4.tgz#227b0874dc3abf7ac56447d6c33cf8ab0db380ef"
+  dependencies:
+    jwt-decode "^3.1.2"
 
 "@tokenizer/token@^0.3.0":
   version "0.3.0"

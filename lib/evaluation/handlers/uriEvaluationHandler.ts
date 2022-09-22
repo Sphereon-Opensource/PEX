@@ -34,7 +34,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
       wrappedVcs.forEach((wvc: WrappedVerifiableCredential, j: number) => {
-        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.internalCredential);
+        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential);
         this.evaluateUris(wvc, vcUris, uris, i, j, d.getVersion());
       });
     });
@@ -110,8 +110,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.INFO;
     result.message = PEMessages.URI_EVALUATION_PASSED;
     result.payload = {
-      vcContext: wvc.internalCredential['@context'],
-      vcCredentialSchema: wvc.internalCredential.credentialSchema,
+      vcContext: wvc.credential['@context'],
+      vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;
@@ -127,8 +127,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.status = Status.ERROR;
     result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
-      vcContext: wvc.internalCredential['@context'],
-      vcCredentialSchema: wvc.internalCredential.credentialSchema,
+      vcContext: wvc.credential['@context'],
+      vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;

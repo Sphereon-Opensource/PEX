@@ -102,7 +102,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   ): HandlerCheckResult[] {
     const subjects = [
       ...jp.nodes(
-        wrappedVcs.map((wvc) => wvc.internalCredential),
+        wrappedVcs.map((wvc) => wvc.credential),
         '$..credentialSubject'
       ),
     ];

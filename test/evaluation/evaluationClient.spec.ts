@@ -131,7 +131,7 @@ describe('evaluate', () => {
     ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
   });
 
   it('should return info if limit_disclosure does not delete the etc field', function () {
@@ -146,7 +146,7 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toEqual('etc');
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toEqual('etc');
   });
 
   it('should return warn if limit_disclosure deletes the etc field', function () {
@@ -161,7 +161,7 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the birthPlace field", function () {
@@ -176,7 +176,7 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['birthPlace']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['birthPlace']).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the etc field", function () {
@@ -190,6 +190,6 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
   });
 });

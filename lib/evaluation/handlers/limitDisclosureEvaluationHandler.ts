@@ -61,7 +61,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const optionality = constraints.limit_disclosure;
     wrappedVcs.forEach((wvc, index) => {
       if (optionality && this.isLimitDisclosureSupported(wvc, index, idIdx, optionality)) {
-        this.enforceLimitDisclosure(wvc.internalCredential, fields, idIdx, index, wrappedVcs, optionality);
+        this.enforceLimitDisclosure(wvc.credential, fields, idIdx, index, wrappedVcs, optionality);
       }
     });
   }
@@ -79,7 +79,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
      * remain untouched and the verifiable credential won't be submitted.
      */
     if (internalCredentialToSend) {
-      wrappedVcs[index].internalCredential = internalCredentialToSend;
+      wrappedVcs[index].credential = internalCredentialToSend;
       this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
     }
   }

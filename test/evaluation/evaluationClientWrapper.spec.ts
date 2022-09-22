@@ -58,7 +58,7 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0];
+    const vc: IVerifiableCredential = <IVerifiableCredential>vpSimple.verifiableCredential[0];
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]),
@@ -158,7 +158,7 @@ describe('evaluate', () => {
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -179,7 +179,7 @@ describe('evaluate', () => {
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toEqual('etc');
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toEqual('etc');
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -200,7 +200,7 @@ describe('evaluate', () => {
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getWarn().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings).toEqual(evaluationClientWrapperData.getWarn().warnings);
@@ -221,7 +221,7 @@ describe('evaluate', () => {
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['birthPlace']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['birthPlace']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -244,7 +244,7 @@ describe('evaluate', () => {
       evaluationClientWrapperData.getHolderDID(),
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(evaluationClient.wrappedVcs[0].credential.credentialSubject['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);

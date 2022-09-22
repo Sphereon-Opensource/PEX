@@ -105,7 +105,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private findAllCredentialSubjects(wrappedVcs: WrappedVerifiableCredential[]) {
     //TODO handle nested path
     const credentialSubject: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
-      wrappedVcs.map((wvc) => wvc.internalCredential),
+      wrappedVcs.map((wvc) => wvc.credential),
       '$..credentialSubject'
     );
     credentialSubject.forEach((cs) => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));
