@@ -1,10 +1,10 @@
 import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
-import { ICredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { ICredential, ICredentialSubject, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
@@ -43,10 +43,11 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
         const vc: { path: PathComponent[]; value: ICredential }[] = JsonPathUtils.extractInputField(
-          wrappedVcs.map((wvc) => wvc.internalCredential),
+          wrappedVcs.map((wvc) => wvc.credential),
           [currentDescriptor.path]
         );
-        if (vc[0]?.value.issuer === vc[0]?.value.credentialSubject.id) {
+        //TODO: ESSIFI-186
+        if (vc[0]?.value.issuer === (vc[0]?.value.credentialSubject as ICredentialSubject).id) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {
           this.getResults().push(this.generateErrorResult(idIdx, currentDescriptor.path));
@@ -60,7 +61,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: PEMessages.SUBJECT_IS_NOT_ISSUER,
+      message: PexMessages.SUBJECT_IS_NOT_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }
@@ -70,7 +71,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       input_descriptor_path: `$.input_descriptors[${idIdx}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: message ?? PEMessages.SUBJECT_IS_ISSUER,
+      message: message ?? PexMessages.SUBJECT_IS_ISSUER,
       verifiable_credential_path: vcPath,
     };
   }

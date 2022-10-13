@@ -596,7 +596,7 @@ describe('evaluate JGiter tests', () => {
       getPresentation().verifiableCredential
     );
     expect(sd.errors?.length).toEqual(2);
-    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_7(), getPresentation());
+    const evaluatePresentationResult = new PEX().evaluatePresentation(getPresentationDefinition_7(), getPresentation());
     expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 });

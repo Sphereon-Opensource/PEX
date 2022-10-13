@@ -3,7 +3,7 @@ import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import PexMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -49,7 +49,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
         evaluator: this.getName(),
         status: Status.INFO,
         payload: { group },
-        message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+        message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       });
     });
   }
@@ -61,7 +61,7 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
       this.getResults().push({
         ...error,
         evaluator: this.getName(),
-        message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
         payload: payload,
       });
     });

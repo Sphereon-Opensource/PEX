@@ -63,9 +63,9 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
-      'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
-    );
+    expect(
+      (presentationFromResult.verifiableCredential[0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]
+    ).toEqual('cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw');
   });
 
   it('Gataca example just pick.pick', function () {
@@ -138,8 +138,8 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
-      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
-    );
+    expect(
+      (presentationFromResult.verifiableCredential[0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]
+    ).toEqual('cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk');
   });
 });

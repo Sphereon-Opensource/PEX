@@ -1,13 +1,18 @@
 import fs from 'fs';
 
 import { Optionality } from '@sphereon/pex-models';
-import { ICredential, IVerifiablePresentation, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import {
+  AdditionalClaims,
+  ICredential,
+  ICredentialSubject,
+  IVerifiablePresentation,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 
 import { Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
-import PEMessages from '../../lib/types/Messages';
-import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
+import { InternalPresentationDefinitionV1, SSITypesBuilder } from '../../lib/types';
+import PexMessages from '../../lib/types/Messages';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -35,7 +40,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+      message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcContext: ['https://www.w3.org/2018/credentials/v1'],
@@ -76,7 +81,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+      message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.w3.org/TR/vc-data-model/#types1'],
@@ -131,7 +136,9 @@ describe('evaluate', () => {
     ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']
+    ).toBeUndefined();
   });
 
   it('should return info if limit_disclosure does not delete the etc field', function () {
@@ -146,7 +153,9 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toEqual('etc');
+    expect(
+      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']
+    ).toEqual('etc');
   });
 
   it('should return warn if limit_disclosure deletes the etc field', function () {
@@ -161,7 +170,9 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']
+    ).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the birthPlace field", function () {
@@ -176,7 +187,11 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['birthPlace']).toBeUndefined();
+    expect(
+      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)[
+        'birthPlace'
+      ]
+    ).toBeUndefined();
   });
 
   it("should return ok if vc[0] doesn't have the etc field", function () {
@@ -190,6 +205,8 @@ describe('evaluate', () => {
       vpSimple.verifiableCredential[0],
     ]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect(
+      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']
+    ).toBeUndefined();
   });
 });

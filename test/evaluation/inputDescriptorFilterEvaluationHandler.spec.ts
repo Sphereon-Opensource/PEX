@@ -7,7 +7,7 @@ import { HandlerCheckResult, Status } from '../../lib';
 import { EvaluationClient, EvaluationHandler } from '../../lib/evaluation';
 import { InputDescriptorFilterEvaluationHandler } from '../../lib/evaluation/handlers';
 import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
-import PEMessages from '../../lib/types/Messages';
+import PexMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 const message: HandlerCheckResult = {
@@ -16,7 +16,7 @@ const message: HandlerCheckResult = {
   evaluator: `FilterEvaluation`,
   status: Status.INFO,
   payload: { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: true },
-  message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+  message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
 };
 
 function getFile(path: string): InternalPresentationDefinitionV1 | IVerifiablePresentation | IVerifiableCredential {
@@ -138,7 +138,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message0 = {
       ...message,
       ['status']: Status.ERROR,
-      ['message']: PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY,
+      ['message']: PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY,
     };
     message0.payload = { valid: false };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
@@ -172,7 +172,7 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message0 = {
       ...message,
       ['status']: Status.ERROR,
-      ['message']: PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION,
+      ['message']: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION,
     };
     message0.payload = { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: false };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };

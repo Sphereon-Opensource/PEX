@@ -1,4 +1,4 @@
-enum PEMessages {
+enum PexMessages {
   INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY = 'Input candidate does not contain property',
   INPUT_CANDIDATE_FAILED_FILTER_EVALUATION = 'Input candidate failed filter evaluation',
   INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION = 'The input candidate is eligible for submission',
@@ -14,4 +14,4 @@ enum PEMessages {
   VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT = 'mandatory field not present in the verifiableCredential',
 }
 
-export default PEMessages;
+export default PexMessages;

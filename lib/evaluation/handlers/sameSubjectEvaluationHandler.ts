@@ -3,7 +3,7 @@ import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../../types/Internal.types';
+import { IInternalPresentationDefinition } from '../../types';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -102,7 +102,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   ): HandlerCheckResult[] {
     const subjects = [
       ...jp.nodes(
-        wrappedVcs.map((wvc) => wvc.internalCredential),
+        wrappedVcs.map((wvc) => wvc.credential),
         '$..credentialSubject'
       ),
     ];

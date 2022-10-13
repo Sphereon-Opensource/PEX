@@ -6,7 +6,7 @@ import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
@@ -29,7 +29,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       fields.forEach((field) => {
         let inputField = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.credential, field.value.path);
         }
         let resultFound = false;
         for (const inputFieldKey of inputField) {
@@ -44,10 +44,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         if (!resultFound) {
           if (!inputField.length) {
             const payload = { valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
           } else {
             const payload = { result: { ...inputField[0] }, valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
           }
         }
       });
@@ -89,7 +89,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: `$[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload,
     };
   }
