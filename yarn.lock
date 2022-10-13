@@ -911,7 +911,7 @@
   resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-1.1.0.tgz#716898344fd07400bbffaa0c34a1f7ecdda14166"
   integrity sha512-kMslWspdqwuXGBFxOPXTAK8HlIHycBR/locYHMlYmyvdnau6bp40JXk2zviBRVOPfe8N3Dv2p5IPAjMk3pT77A==
 
-"@sphereon/ssi-types@^0.8.1-next.20":
+"@sphereon/ssi-types@^0.8.1-next.31":
   version "0.8.1-unstable.30"
   resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.8.1-unstable.30.tgz#7cd33d13a1170bfec345c3354b8e113efa30c836"
   integrity sha512-AtDaUa1AO4AmVf55nnssDINOKLr2BDnyOQKSGe8GkE7vAAvTJJX4d/CJAx5o7HEqyofJ2A+jAqnNkY5avokChg==
