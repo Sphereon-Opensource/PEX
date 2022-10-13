@@ -272,8 +272,10 @@ export class EvaluationClientWrapper {
       const groupCount = new Map<string, number>();
       //TODO instanceof fails in some cases, need to check how to fix it
       if (Object.keys(pd).includes('input_descriptors')) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (pd as any).input_descriptors.forEach((e: any) => {
           if (e.group) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             e.group.forEach((key: any) => {
               if (groupCount.has(key)) {
                 groupCount.set(key, (groupCount.get(key) as number) + 1);

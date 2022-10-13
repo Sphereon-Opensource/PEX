@@ -48,7 +48,9 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static extractInputField(obj: InputFieldType, paths: string[]): any[] {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any[] = [];
     if (paths) {
       for (const path of paths) {
@@ -79,6 +81,7 @@ export class JsonPathUtils {
     pd: IPresentationDefinition,
     newPropertyName: string
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {
@@ -100,6 +103,7 @@ export class JsonPathUtils {
   }
 
   private static modifyPathsWithSpecialCharacter(pathDetails: (string | number)[], pd: IPresentationDefinition) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {

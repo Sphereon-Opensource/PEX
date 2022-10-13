@@ -1,4 +1,4 @@
-import { ObjectUtils } from '../../utils/ObjectUtils';
+import { ObjectUtils } from '../../utils';
 import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';

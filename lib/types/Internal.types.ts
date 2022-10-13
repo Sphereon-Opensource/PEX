@@ -6,8 +6,7 @@ import {
   PresentationDefinitionV2,
   SubmissionRequirement,
 } from '@sphereon/pex-models';
-
-import { PEVersion } from './SSI.types';
+import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
 export interface IInternalPresentationDefinition {
   format?: Format;
@@ -51,6 +50,7 @@ export class InternalPresentationDefinitionV1 implements PresentationDefinitionV
 
 export class InternalPresentationDefinitionV2 implements PresentationDefinitionV2, IInternalPresentationDefinition {
   format?: Format;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   frame?: any;
   id: string;
   input_descriptors: Array<InputDescriptorV2>;
@@ -62,6 +62,7 @@ export class InternalPresentationDefinitionV2 implements PresentationDefinitionV
     id: string,
     input_descriptors: Array<InputDescriptorV2>,
     format?: Format,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     frame?: any,
     name?: string,
     purpose?: string,
@@ -79,4 +80,20 @@ export class InternalPresentationDefinitionV2 implements PresentationDefinitionV
   getVersion(): PEVersion {
     return PEVersion.v2;
   }
+}
+
+export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDefinitionV2;
+
+export type InputFieldType =
+  | IVerifiablePresentation
+  | IVerifiableCredential
+  | IVerifiableCredential[]
+  | IInternalPresentationDefinition
+  | PresentationDefinitionV1
+  | PresentationDefinitionV2
+  | unknown;
+
+export enum PEVersion {
+  v1 = 'v1',
+  v2 = 'v2',
 }

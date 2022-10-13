@@ -18,11 +18,13 @@ import {
 } from '@sphereon/ssi-types';
 import jwt_decode from 'jwt-decode';
 
-import { JsonPathUtils } from '../utils';
-import { ObjectUtils } from '../utils/ObjectUtils';
+import { JsonPathUtils, ObjectUtils } from '../utils';
 
-import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from './Internal.types';
-import { IPresentationDefinition } from './SSI.types';
+import {
+  InternalPresentationDefinitionV1,
+  InternalPresentationDefinitionV2,
+  IPresentationDefinition,
+} from './Internal.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
