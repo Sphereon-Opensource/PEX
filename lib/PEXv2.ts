@@ -1,11 +1,9 @@
 import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
-  CompactJWT,
   IPresentation,
   IProof,
-  IVerifiableCredential,
   IVerifiablePresentation,
-  JwtDecodedVerifiableCredential,
+  OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
@@ -82,7 +80,7 @@ export class PEXv2 {
    */
   public evaluateCredentials(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: (IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT)[],
+    verifiableCredentials: OriginalVerifiableCredential[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
@@ -118,7 +116,7 @@ export class PEXv2 {
    */
   public selectFrom(
     presentationDefinition: PresentationDefinitionV2,
-    verifiableCredentials: (IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT)[],
+    verifiableCredentials: OriginalVerifiableCredential[],
     holderDIDs?: string[],
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
@@ -144,7 +142,7 @@ export class PEXv2 {
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredential: (IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT)[],
+    selectedCredential: OriginalVerifiableCredential[],
     holderDID?: string
   ): IPresentation {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
@@ -201,7 +199,7 @@ export class PEXv2 {
    */
   public async verifiablePresentationFromAsync(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: (IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT)[],
+    selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
   ): Promise<IVerifiablePresentation> {
@@ -278,7 +276,7 @@ export class PEXv2 {
    */
   public verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: (IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT)[],
+    selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
     options: PresentationSignOptions
   ): IVerifiablePresentation {
