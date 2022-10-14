@@ -1,22 +1,30 @@
 import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
 import {
+  AdditionalClaims,
+  CompactJWT,
   ICredential,
+  ICredentialSubject,
   IPresentation,
   IVerifiableCredential,
   IVerifiablePresentation,
   JwtDecodedVerifiableCredential,
   JwtDecodedVerifiablePresentation,
   OriginalType,
+  OriginalVerifiableCredential,
+  OriginalVerifiablePresentation,
+  PresentationFormat,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 import jwt_decode from 'jwt-decode';
 
-import { JsonPathUtils } from '../utils';
-import { ObjectUtils } from '../utils/ObjectUtils';
+import { JsonPathUtils, ObjectUtils } from '../utils';
 
-import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from './Internal.types';
-import { IPresentationDefinition } from './SSI.types';
+import {
+  InternalPresentationDefinitionV1,
+  InternalPresentationDefinitionV2,
+  IPresentationDefinition,
+} from './Internal.types';
 
 export class SSITypesBuilder {
   public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
@@ -53,22 +61,29 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiablePresentationToWrappedVP(
-    presentation: IPresentation | JwtDecodedVerifiablePresentation | string
+    presentation: OriginalVerifiablePresentation | IPresentation
   ): WrappedVerifiablePresentation {
     const isJwtEncoded: boolean = ObjectUtils.isString(presentation);
-    const type: OriginalType = isJwtEncoded ? OriginalType.JWT_ENCODED : OriginalType.JSONLD;
-    let vp = isJwtEncoded ? this.decodeJwtVerifiablePresentation(presentation as string) : presentation;
-    vp = this.isJwtDecodedPresentation(vp)
+    const type: OriginalType = isJwtEncoded
+      ? OriginalType.JWT_ENCODED
+      : this.isJwtDecodedPresentation(presentation)
+      ? OriginalType.JWT_DECODED
+      : OriginalType.JSONLD;
+    let vp = isJwtEncoded ? this.decodeJwtVerifiablePresentation(presentation as CompactJWT) : presentation;
+    vp = this.isJwtDecodedPresentation(vp as OriginalVerifiablePresentation)
       ? this.createInternalPresentationFromJwtDecoded(vp as JwtDecodedVerifiablePresentation)
       : vp;
     const vcs: WrappedVerifiableCredential[] = this.mapExternalVerifiableCredentialsToWrappedVcs(
       (vp as IPresentation).verifiableCredential
     );
+    const format: PresentationFormat =
+      type === OriginalType.JWT_ENCODED || type === OriginalType.JWT_DECODED ? 'jwt_vp' : 'ldp_vp';
     return {
+      format: format,
       type: type,
-      original: presentation as IVerifiablePresentation,
+      original: presentation as OriginalVerifiablePresentation,
       decoded: isJwtEncoded
-        ? (jwt_decode(presentation as string) as JwtDecodedVerifiablePresentation)
+        ? (jwt_decode(presentation as CompactJWT) as JwtDecodedVerifiablePresentation)
         : (presentation as IVerifiablePresentation),
       presentation: {
         '@context': (<IVerifiablePresentation>vp)['@context'],
@@ -77,7 +92,6 @@ export class SSITypesBuilder {
         presentation_submission: (<IVerifiablePresentation>vp).presentation_submission,
         verifiableCredential: vcs,
       },
-      format: isJwtEncoded ? 'jwt_vp' : 'ldp_vp',
       vcs: vcs,
     };
   }
@@ -94,7 +108,7 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiableCredentialsToWrappedVcs(
-    verifiableCredentials: (IVerifiableCredential | JwtDecodedVerifiableCredential | string)[]
+    verifiableCredentials: OriginalVerifiableCredential[]
   ): WrappedVerifiableCredential[] {
     const wrappedVcs: WrappedVerifiableCredential[] = [];
     for (let i = 0; i < verifiableCredentials.length; i++) {
@@ -104,35 +118,35 @@ export class SSITypesBuilder {
   }
 
   private static mapExternalVerifiableCredentialToWrappedVc(
-    verifiableCredential: IVerifiableCredential | JwtDecodedVerifiableCredential | string
+    verifiableCredential: OriginalVerifiableCredential
   ): WrappedVerifiableCredential {
     if (ObjectUtils.isString(verifiableCredential)) {
-      const externalCredentialJwt: JwtDecodedVerifiableCredential = jwt_decode(<string>verifiableCredential);
+      const externalCredentialJwt: JwtDecodedVerifiableCredential = jwt_decode(<CompactJWT>verifiableCredential);
       this.createInternalCredentialFromJwtDecoded(externalCredentialJwt);
       return {
+        format: 'jwt_vc',
         original: verifiableCredential,
         decoded: jwt_decode(verifiableCredential as unknown as string),
         type: OriginalType.JWT_ENCODED,
         credential: this.createInternalCredentialFromJwtDecoded(externalCredentialJwt),
-        format: 'jwt_vc',
       };
     } else if (this.isJwtDecodedCredential(verifiableCredential)) {
       return {
+        format: 'jwt_vc',
         original: verifiableCredential,
         decoded: verifiableCredential as JwtDecodedVerifiableCredential,
         type: OriginalType.JWT_DECODED,
         credential: this.createInternalCredentialFromJwtDecoded(
           verifiableCredential as unknown as JwtDecodedVerifiableCredential
         ),
-        format: 'jwt_vc',
       };
     } else {
       return {
+        format: 'ldp_vc',
         original: verifiableCredential,
         decoded: verifiableCredential as IVerifiableCredential,
         type: OriginalType.JSONLD,
         credential: verifiableCredential as ICredential,
-        format: 'ldp_vc',
       };
     }
   }
@@ -144,7 +158,8 @@ export class SSITypesBuilder {
       ...(externalCredentialJwt.vc as ICredential),
     };
     if (externalCredentialJwt.exp) {
-      const expDate = internalCredential.credentialSubject?.expirationDate;
+      //TODO ESSIFI-186
+      const expDate = (internalCredential.credentialSubject as ICredentialSubject & AdditionalClaims)?.expirationDate;
       const jwtExp = parseInt(externalCredentialJwt.exp.toString());
       // fix seconds to millisecs for the date
       const expAsDateStr =
@@ -154,7 +169,8 @@ export class SSITypesBuilder {
       if (expDate && expDate !== expAsDateStr) {
         throw new Error(`Inconsistent expiration dates between JWT claim (${expAsDateStr}) and VC value (${expDate})`);
       }
-      internalCredential.credentialSubject.expirationDate = expAsDateStr;
+      //TODO ESSIFI-186
+      (internalCredential.credentialSubject as ICredentialSubject & AdditionalClaims).expirationDate = expAsDateStr;
     }
 
     if (externalCredentialJwt.nbf) {
@@ -194,13 +210,15 @@ export class SSITypesBuilder {
     }
 
     if (externalCredentialJwt.sub) {
-      const csId = internalCredential.credentialSubject?.id;
+      //TODO ESSIFI-186
+      const csId = (internalCredential.credentialSubject as ICredentialSubject)?.id;
       if (csId && csId !== externalCredentialJwt.sub) {
         throw new Error(
           `Inconsistent credential subject ids between JWT claim (${externalCredentialJwt.sub}) and VC value (${csId})`
         );
       }
-      internalCredential.credentialSubject.id = externalCredentialJwt.sub;
+      //TODO ESSIFI-186
+      (internalCredential.credentialSubject as ICredentialSubject).id = externalCredentialJwt.sub;
     }
     if (externalCredentialJwt.jti) {
       const id = internalCredential.id;
@@ -214,18 +232,14 @@ export class SSITypesBuilder {
     return internalCredential;
   }
 
-  private static isJwtDecodedCredential(
-    verifiableCredential: IVerifiableCredential | JwtDecodedVerifiableCredential | string
-  ) {
+  private static isJwtDecodedCredential(verifiableCredential: OriginalVerifiableCredential) {
     return (
       (<JwtDecodedVerifiableCredential>verifiableCredential)['vc'] &&
       (<JwtDecodedVerifiableCredential>verifiableCredential)['iss']
     );
   }
 
-  private static isJwtDecodedPresentation(
-    verifiablePresentation: IPresentation | JwtDecodedVerifiablePresentation | string
-  ) {
+  private static isJwtDecodedPresentation(verifiablePresentation: OriginalVerifiablePresentation | IPresentation) {
     return (
       (<JwtDecodedVerifiablePresentation>verifiablePresentation)['vp'] &&
       (<JwtDecodedVerifiablePresentation>verifiablePresentation)['iss']

@@ -3,7 +3,7 @@ import { IProofType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../ConstraintUtils';
 import { IInternalPresentationDefinition } from '../types/Internal.types';
-import PEMessages from '../types/Messages';
+import PexMessages from '../types/Messages';
 
 import { HandlerCheckResult } from './core';
 import {
@@ -32,7 +32,7 @@ export class EvaluationClient {
   private failed_catched = {
     tag: 'root',
     status: Status.ERROR,
-    message: PEMessages.UNKNOWN_EXCEPTION as string,
+    message: PexMessages.UNKNOWN_EXCEPTION as string,
     stacktrace: '',
   };
 

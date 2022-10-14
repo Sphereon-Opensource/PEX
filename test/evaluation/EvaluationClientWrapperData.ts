@@ -2,7 +2,7 @@ import { PresentationSubmission, Rules } from '@sphereon/pex-models';
 import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { HandlerCheckResult, SelectResults, Status } from '../../lib';
-import PEMessages from '../../lib/types/Messages';
+import PexMessages from '../../lib/types/Messages';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {
@@ -15,7 +15,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+      message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcContext: ['https://www.w3.org/2018/credentials/v1'],
@@ -30,7 +30,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'MarkForSubmissionEvaluation',
       status: 'error',
-      message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
@@ -46,7 +46,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'UriEvaluation',
       status: 'error',
-      message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+      message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.w3.org/TR/vc-data-model/#types1'],
@@ -61,7 +61,7 @@ export class EvaluationClientWrapperData {
       verifiable_credential_path: '$[0]',
       evaluator: 'MarkForSubmissionEvaluation',
       status: 'error',
-      message: PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
@@ -136,7 +136,7 @@ export class EvaluationClientWrapperData {
       }),
       warnings: [
         {
-          message: PEMessages.LIMIT_DISCLOSURE_APPLIED + ': $.input_descriptors[0]: $.verifiableCredential[0]',
+          message: PexMessages.LIMIT_DISCLOSURE_APPLIED + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'warn',
           tag: 'LimitDisclosureEvaluation',
         },
@@ -148,13 +148,13 @@ export class EvaluationClientWrapperData {
     return {
       errors: [
         {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[0]',
+          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
             ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
@@ -273,44 +273,46 @@ export class EvaluationClientWrapperData {
       areRequiredCredentialsPresent: Status.INFO,
       errors: [
         {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+          message: PexMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
-          message: PEMessages.URI_EVALUATION_DIDNT_PASS,
+          message: PexMessages.URI_EVALUATION_DIDNT_PASS,
           status: 'error',
           tag: 'UriEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+            PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION +
+            ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+            PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION +
+            ': $.input_descriptors[0]: $.verifiableCredential[2]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
             ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
             ': $.input_descriptors[0]: $.verifiableCredential[2]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
           message:
-            PEMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
+            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
             ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',

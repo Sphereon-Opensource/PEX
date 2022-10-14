@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-import jp from 'jsonpath';
+import jp, { PathComponent } from 'jsonpath';
 
 import { InputFieldType, IPresentationDefinition } from '../types';
 
@@ -48,8 +48,8 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  public static extractInputField(obj: InputFieldType, paths: string[]): any[] {
-    let result: any[] = [];
+  public static extractInputField(obj: InputFieldType, paths: string[]): { value: unknown; path: PathComponent[] }[] {
+    let result: { value: unknown; path: PathComponent[] }[] = [];
     if (paths) {
       for (const path of paths) {
         result = jp.nodes(obj, path);
@@ -79,6 +79,7 @@ export class JsonPathUtils {
     pd: IPresentationDefinition,
     newPropertyName: string
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {
@@ -100,6 +101,7 @@ export class JsonPathUtils {
   }
 
   private static modifyPathsWithSpecialCharacter(pathDetails: (string | number)[], pd: IPresentationDefinition) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {

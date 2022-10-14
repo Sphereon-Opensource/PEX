@@ -3,9 +3,8 @@ import {
   IPresentation,
   IProof,
   IVerifiablePresentation,
-  JwtDecodedVerifiablePresentation,
   OriginalVerifiableCredential,
-  WrappedVerifiableCredential,
+  OriginalVerifiablePresentation,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
@@ -13,7 +12,7 @@ import { Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { SSITypesBuilder } from './types';
 import { PresentationDefinitionV2VB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -38,24 +37,26 @@ export class PEXv2 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV2,
-    presentation: IPresentation | JwtDecodedVerifiablePresentation | string,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const presentationCopy: OriginalVerifiablePresentation | IPresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    const wrappedVcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentationCopy.verifiableCredential
-    );
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVcs, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(
+      pd,
+      wrappedPresentation.vcs,
+      holderDIDs,
+      limitDisclosureSignatureSuites
+    );
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
         pd,
-        wrappedVcs,
+        wrappedPresentation.vcs,
         holderDIDs,
         limitDisclosureSignatureSuites
       );

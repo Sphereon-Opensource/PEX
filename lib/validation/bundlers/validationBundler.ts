@@ -10,6 +10,7 @@ export abstract class ValidationBundler<T> {
     this.myTag = myTag;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public abstract getValidations(t: T | T[]): Validation<any>[];
 
   protected getTag() {

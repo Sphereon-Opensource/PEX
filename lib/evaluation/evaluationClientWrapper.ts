@@ -1,4 +1,11 @@
-import { Descriptor, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
+import {
+  Descriptor,
+  InputDescriptorV1,
+  InputDescriptorV2,
+  PresentationSubmission,
+  Rules,
+  SubmissionRequirement,
+} from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
 
@@ -180,7 +187,9 @@ export class EvaluationClientWrapper {
           const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
           if (idRes.length) {
             submissionRequirementMatches.push({
-              name: idRes[0].value.name || idRes[0].value.id,
+              name:
+                (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name ||
+                (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
               rule: Rules.All,
               vc_path: [vcPath],
             });
@@ -272,17 +281,19 @@ export class EvaluationClientWrapper {
       const groupCount = new Map<string, number>();
       //TODO instanceof fails in some cases, need to check how to fix it
       if (Object.keys(pd).includes('input_descriptors')) {
-        (pd as any).input_descriptors.forEach((e: any) => {
-          if (e.group) {
-            e.group.forEach((key: any) => {
-              if (groupCount.has(key)) {
-                groupCount.set(key, (groupCount.get(key) as number) + 1);
-              } else {
-                groupCount.set(key, 1);
-              }
-            });
+        (pd as unknown as IPresentationDefinition).input_descriptors.forEach(
+          (e: InputDescriptorV1 | InputDescriptorV2) => {
+            if (e.group) {
+              e.group.forEach((key: string) => {
+                if (groupCount.has(key)) {
+                  groupCount.set(key, (groupCount.get(key) as number) + 1);
+                } else {
+                  groupCount.set(key, 1);
+                }
+              });
+            }
           }
-        });
+        );
       }
       const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
         pd.submission_requirements,

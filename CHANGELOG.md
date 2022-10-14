@@ -1,4 +1,10 @@
 # Release Notes
+## v2.0.0-unstable.1 - 2022-10-14
+Using @sphereon/ssi-types
+- removed
+  - definitions of ssi-types (lib/types/SSI.types.ts)
+- Changed:
+  - method signatures to types from @sphereon/ssi-types
 
 ## v1.1.3 - 2022-08-15
 Bugfix release

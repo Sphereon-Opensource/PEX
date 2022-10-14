@@ -1,10 +1,16 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
-import { ICredential, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import {
+  AdditionalClaims,
+  ICredential,
+  ICredentialSubject,
+  IVerifiableCredential,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -113,10 +119,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     internalCredential: ICredential,
     internalCredentialToSend: ICredential
   ): ICredential {
-    let credentialSubject = { ...internalCredential.credentialSubject };
+    //TODO: ESSIFI-186
+    let credentialSubject: ICredentialSubject & AdditionalClaims = { ...internalCredential.credentialSubject };
     requiredField.path.forEach((e) => {
-      if (credentialSubject[e]) {
-        credentialSubject = { [e]: credentialSubject[e] } as { [x: string]: unknown };
+      if (credentialSubject[e as keyof ICredentialSubject]) {
+        credentialSubject = { [e]: credentialSubject[e as keyof ICredentialSubject] } as { [x: string]: unknown };
       }
     });
     internalCredentialToSend.credentialSubject = {
@@ -132,7 +139,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
       status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
-      message: PEMessages.LIMIT_DISCLOSURE_APPLIED,
+      message: PexMessages.LIMIT_DISCLOSURE_APPLIED,
       payload: undefined,
     });
   }
@@ -143,7 +150,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: PEMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
+      message: PexMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
       payload: path,
     });
   }
@@ -154,7 +161,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: PEMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
+      message: PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
     });
   }
 }

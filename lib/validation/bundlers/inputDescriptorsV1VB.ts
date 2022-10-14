@@ -1,6 +1,6 @@
 import { ConstraintsV1, FieldV1, HolderSubject, InputDescriptorV1, Schema } from '@sphereon/pex-models';
 
-import { ObjectValidationUtils } from '../../utils/ObjectValidationUtils';
+import { ObjectValidationUtils } from '../../utils';
 import { Validation, ValidationPredicate } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';

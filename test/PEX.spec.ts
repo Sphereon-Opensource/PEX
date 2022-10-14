@@ -3,12 +3,15 @@ import fs from 'fs';
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import {
   ICredential,
+  ICredentialSubject,
   IPresentation,
   IProofType,
   IVerifiableCredential,
   IVerifiablePresentation,
+  W3CVerifiablePresentation,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
+import { AdditionalClaims } from '@sphereon/ssi-types/src/types/vc';
 
 import { EvaluationResults, PEX, Validated } from '../lib';
 import { SSITypesBuilder } from '../lib/types/SSITypesBuilder';
@@ -318,7 +321,7 @@ describe('evaluate', () => {
       .verifiableCredential[0];
     jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].credential.credentialSubject.expirationDate).toEqual(
+    expect((vcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims).expirationDate).toEqual(
       new Date(parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)).toISOString()
     );
   });
@@ -329,7 +332,7 @@ describe('evaluate', () => {
 
     jwtVc['exp' as keyof IVerifiableCredential] = new Date().valueOf();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(vcs[0].credential.credentialSubject.expirationDate).toEqual(
+    expect((vcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims).expirationDate).toEqual(
       new Date(jwtVc['exp' as keyof IVerifiableCredential] as string).toISOString()
     );
   });
@@ -338,14 +341,18 @@ describe('evaluate', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
     jwtVc['exp' as keyof IVerifiableCredential] = (+new Date()).toString();
-    (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate = (+new Date(
-      (jwtVc['exp' as keyof IVerifiableCredential] as string) + 2
-    )).toString();
+    (
+      (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject as ICredentialSubject &
+        AdditionalClaims
+    ).expirationDate = (+new Date((jwtVc['exp' as keyof IVerifiableCredential] as string) + 2)).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent expiration dates between JWT claim (${new Date(
         parseInt(jwtVc['exp' as keyof IVerifiableCredential] as string)
       ).toISOString()}) and VC value (${
-        (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.expirationDate
+        (
+          (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject as ICredentialSubject &
+            AdditionalClaims
+        ).expirationDate
       })`
     );
   });
@@ -400,11 +407,13 @@ describe('evaluate', () => {
   it('should set credentialSubject.id if sub is present in JWT vc', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json')
       .verifiableCredential[0];
-    jwtVc['sub' as keyof IVerifiableCredential] = (<ICredential>(
-      jwtVc['vc' as keyof IVerifiableCredential]
-    )).credentialSubject.id;
+    jwtVc['sub' as keyof IVerifiableCredential] = (
+      (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject as ICredentialSubject
+    ).id;
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
-    expect(wvcs[0].credential.credentialSubject.id).toEqual(jwtVc['sub' as keyof IVerifiableCredential]);
+    expect((wvcs[0].credential.credentialSubject as ICredentialSubject).id).toEqual(
+      jwtVc['sub' as keyof IVerifiableCredential]
+    );
   });
 
   it('should throw an error if credentialSubject.id and sub are different in JWT vc', () => {
@@ -414,7 +423,9 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent credential subject ids between JWT claim (${
         jwtVc['sub' as keyof IVerifiableCredential]
-      }) and VC value (${(<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject.id})`
+      }) and VC value (${
+        ((<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject as ICredentialSubject).id
+      })`
     );
   });
 
@@ -508,7 +519,7 @@ describe('evaluate', () => {
     const wvp: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(jwtEncodedVp);
     const pex: PEX = new PEX();
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFromAsync(
+    const vp: W3CVerifiablePresentation = (await pex.verifiablePresentationFromAsync(
       pdSchema,
       [wvp.vcs[0].original],
       getAsyncCallbackWithoutProofType,
@@ -516,7 +527,7 @@ describe('evaluate', () => {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
       }
-    );
+    )) as IVerifiablePresentation;
     expect(vp.verifiableCredential.length).toEqual(1);
     expect(vp.presentation_submission?.descriptor_map).toEqual([
       {

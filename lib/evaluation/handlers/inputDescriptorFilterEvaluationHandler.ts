@@ -5,8 +5,8 @@ import addFormats from 'ajv-formats';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
@@ -27,7 +27,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
-        let inputField = [];
+        let inputField: { path: PathComponent[]; value: unknown }[] = [];
         if (field.value.path) {
           inputField = JsonPathUtils.extractInputField(wvc.credential, field.value.path);
         }
@@ -44,10 +44,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         if (!resultFound) {
           if (!inputField.length) {
             const payload = { valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
           } else {
             const payload = { result: { ...inputField[0] }, valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
           }
         }
       });
@@ -89,12 +89,12 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: `$[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload,
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+  private evaluateFilter(result: { path: PathComponent[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
@@ -106,7 +106,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return true;
   }
 
-  private transformDateFormat(result: { path: string[]; value: unknown }) {
+  private transformDateFormat(result: { path: PathComponent[]; value: unknown }) {
     const date: Date = new Date(result.value as string);
     let month = date.getUTCMonth() + 1 + '';
     if (month.length === 1) {

@@ -3,9 +3,8 @@ import {
   IPresentation,
   IProof,
   IVerifiablePresentation,
-  JwtDecodedVerifiablePresentation,
   OriginalVerifiableCredential,
-  WrappedVerifiableCredential,
+  OriginalVerifiablePresentation,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
@@ -13,7 +12,7 @@ import { Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { SSITypesBuilder } from './types/SSITypesBuilder';
+import { SSITypesBuilder } from './types';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -38,21 +37,19 @@ export class PEXv1 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV1,
-    presentation: IPresentation | JwtDecodedVerifiablePresentation | string,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentationCopy.verifiableCredential);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const result = this._evaluationClientWrapper.evaluate(
       pd,
-      wrappedVerifiableCredentials,
+      wrappedPresentation.vcs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -60,7 +57,7 @@ export class PEXv1 {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
         pd,
-        wrappedVerifiableCredentials,
+        wrappedPresentation.vcs,
         holderDIDs,
         limitDisclosureSignatureSuites
       );

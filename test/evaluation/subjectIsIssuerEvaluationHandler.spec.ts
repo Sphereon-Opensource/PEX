@@ -5,7 +5,7 @@ import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ss
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsIssuerEvaluationHandler } from '../../lib/evaluation/handlers';
 import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
-import PEMessages from '../../lib/types/Messages';
+import PexMessages from '../../lib/types/Messages';
 import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {
@@ -56,7 +56,7 @@ describe('evaluate', () => {
       verifiable_credential_path: '$[0]',
       evaluator: 'SubjectIsIssuerEvaluation',
       status: 'info',
-      message: PEMessages.SUBJECT_IS_ISSUER,
+      message: PexMessages.SUBJECT_IS_ISSUER,
     });
   });
 
@@ -101,7 +101,7 @@ describe('evaluate', () => {
     expect(subjectIsIssuerEvaluationHandler.getResults()[0]).toEqual({
       evaluator: 'SubjectIsIssuerEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: PEMessages.SUBJECT_IS_NOT_ISSUER,
+      message: PexMessages.SUBJECT_IS_NOT_ISSUER,
       status: 'error',
       verifiable_credential_path: '$[0]',
     });

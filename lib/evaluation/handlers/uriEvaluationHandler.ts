@@ -5,8 +5,8 @@ import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
 import { PEVersion } from '../../types';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV1 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV1 } from '../../types';
+import PexMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -108,7 +108,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   ) {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
-    result.message = PEMessages.URI_EVALUATION_PASSED;
+    result.message = PexMessages.URI_EVALUATION_PASSED;
     result.payload = {
       vcContext: wvc.credential['@context'],
       vcCredentialSchema: wvc.credential.credentialSchema,
@@ -125,7 +125,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   ) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
-    result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
+    result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
       vcContext: wvc.credential['@context'],
       vcCredentialSchema: wvc.credential.credentialSchema,
@@ -137,8 +137,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private createWarnResultObject(idIdx: number, vcIdx: number) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.WARN;
-    result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
-    result.payload = PEMessages.INPUT_DESCRIPTOR_CONTEXT_CONTAINS_HASHLINK_VERIFICATION_NOT_SUPPORTED;
+    result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
+    result.payload = PexMessages.INPUT_DESCRIPTOR_CONTEXT_CONTAINS_HASHLINK_VERIFICATION_NOT_SUPPORTED;
     return result;
   }
 

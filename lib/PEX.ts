@@ -4,8 +4,9 @@ import {
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
-  JwtDecodedVerifiablePresentation,
   OriginalVerifiableCredential,
+  OriginalVerifiablePresentation,
+  W3CVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
@@ -48,22 +49,19 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentation: IPresentation | JwtDecodedVerifiablePresentation | string,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const pd: IInternalPresentationDefinition =
       this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
-    const presentationCopy: IPresentation = JSON.parse(JSON.stringify(presentation));
+    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    const wrappedVerifiablePresentation: WrappedVerifiablePresentation =
-      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const result: EvaluationResults = this._evaluationClientWrapper.evaluate(
       pd,
-      wrappedVerifiablePresentation.vcs,
+      wrappedPresentation.vcs,
       holderDIDs,
       limitDisclosureSignatureSuites
     );
@@ -71,7 +69,7 @@ export class PEX {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
         pd,
-        wrappedVerifiablePresentation.vcs,
+        wrappedPresentation.vcs,
         holderDIDs,
         limitDisclosureSignatureSuites
       );
@@ -261,9 +259,9 @@ export class PEX {
   public async verifiablePresentationFromAsync(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<IVerifiablePresentation>,
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation>,
     options: PresentationSignOptions
-  ): Promise<IVerifiablePresentation> {
+  ): Promise<W3CVerifiablePresentation> {
     const { holder, signatureOptions, proofOptions } = options;
 
     function limitedDisclosureSuites() {
