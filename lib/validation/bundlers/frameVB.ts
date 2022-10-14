@@ -19,9 +19,6 @@ export class FrameVB extends ValidationBundler<unknown> {
 
   private getMyValidations(frame: unknown): Validation<unknown>[] {
     return [
-      //(ps: PresentationSubmission) =>
-      //           PresentationSubmissionVB.descriptorMapMustBePresent(ps?.descriptor_map),
-      //(f as Frame) => FrameVB.
       {
         tag: this.getMyTag(),
         target: frame,

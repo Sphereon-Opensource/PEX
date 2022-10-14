@@ -5,7 +5,7 @@ import addFormats from 'ajv-formats';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
 import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
@@ -27,7 +27,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
       fields.forEach((field) => {
-        let inputField = [];
+        let inputField: { path: PathComponent[]; value: unknown }[] = [];
         if (field.value.path) {
           inputField = JsonPathUtils.extractInputField(wvc.credential, field.value.path);
         }
@@ -94,7 +94,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+  private evaluateFilter(result: { path: PathComponent[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
@@ -106,7 +106,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return true;
   }
 
-  private transformDateFormat(result: { path: string[]; value: unknown }) {
+  private transformDateFormat(result: { path: PathComponent[]; value: unknown }) {
     const date: Date = new Date(result.value as string);
     let month = date.getUTCMonth() + 1 + '';
     if (month.length === 1) {

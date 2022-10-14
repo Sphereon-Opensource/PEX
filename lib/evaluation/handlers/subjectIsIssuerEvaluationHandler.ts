@@ -45,7 +45,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
         const vc: { path: PathComponent[]; value: ICredential }[] = JsonPathUtils.extractInputField(
           wrappedVcs.map((wvc) => wvc.credential),
           [currentDescriptor.path]
-        );
+        ) as { path: PathComponent[]; value: ICredential }[];
         //TODO: ESSIFI-186
         if (vc[0]?.value.issuer === (vc[0]?.value.credentialSubject as ICredentialSubject).id) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));

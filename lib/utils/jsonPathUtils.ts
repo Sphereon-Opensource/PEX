@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-import jp from 'jsonpath';
+import jp, { PathComponent } from 'jsonpath';
 
 import { InputFieldType, IPresentationDefinition } from '../types';
 
@@ -48,10 +48,8 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static extractInputField(obj: InputFieldType, paths: string[]): any[] {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let result: any[] = [];
+  public static extractInputField(obj: InputFieldType, paths: string[]): { value: unknown; path: PathComponent[] }[] {
+    let result: { value: unknown; path: PathComponent[] }[] = [];
     if (paths) {
       for (const path of paths) {
         result = jp.nodes(obj, path);
