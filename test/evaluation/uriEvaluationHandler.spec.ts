@@ -63,7 +63,7 @@ describe('evaluate', () => {
         '$[0]',
         'UriEvaluation',
         Status.ERROR,
-        PEMessages.URI_EVALUATION_DIDNT_PASS,
+        PexMessages.URI_EVALUATION_DIDNT_PASS,
         {
           inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
           vcContext: ['https://www.test.org/mock'],
