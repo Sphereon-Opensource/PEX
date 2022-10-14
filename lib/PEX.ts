@@ -4,7 +4,6 @@ import {
   IProof,
   IVerifiableCredential,
   IVerifiablePresentation,
-  JwtDecodedVerifiablePresentation,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   W3CVerifiablePresentation,
@@ -285,7 +284,11 @@ export class PEX {
       limitDisclosureSignatureSuites
     );
 
-    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
+    const presentation = this.presentationFrom(
+      presentationDefinition,
+      evaluationResult.verifiableCredential,
+      holder
+    ) as IVerifiablePresentation;
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,
@@ -366,7 +369,11 @@ export class PEX {
       limitDisclosureSignatureSuites
     );
 
-    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
+    const presentation = this.presentationFrom(
+      presentationDefinition,
+      evaluationResult.verifiableCredential,
+      holder
+    ) as IVerifiablePresentation;
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,

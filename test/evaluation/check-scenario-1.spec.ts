@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1 as PdV1 } from '@sphereon/pex-models';
-import { IPresentation, IVerifiableCredential } from '@sphereon/ssi-types';
+import { IPresentation, IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { PEX } from '../../lib';
 
@@ -100,7 +100,7 @@ describe('1st scenario', () => {
         holder: holderWallet.holder,
         type: [],
         verifiableCredential: holderWallet.verifiableCredentials,
-      },
+      } as unknown as IVerifiablePresentation,
       LIMIT_DISCLOSURE_SIGNATURE_SUITES
     );
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');

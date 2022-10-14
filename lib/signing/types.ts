@@ -1,11 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import {
-  IPresentation,
-  IProof,
-  IProofPurpose,
-  IProofType,
-  OriginalVerifiableCredential,
-} from '@sphereon/ssi-types';
+import { IPresentation, IProof, IProofPurpose, IProofType, OriginalVerifiableCredential } from '@sphereon/ssi-types';
 
 import { EvaluationResults } from '../evaluation';
 
