@@ -77,7 +77,7 @@ export class SSITypesBuilder {
       (vp as IPresentation).verifiableCredential
     );
     const format: PresentationFormat =
-      type === OriginalType.JWT_ENCODED || type === OriginalType.JWT_DECODED ? 'jwt' : 'ldp';
+      type === OriginalType.JWT_ENCODED || type === OriginalType.JWT_DECODED ? 'jwt_vp' : 'ldp_vp';
     return {
       format: format,
       type: type,
