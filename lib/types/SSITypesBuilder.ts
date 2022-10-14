@@ -118,7 +118,7 @@ export class SSITypesBuilder {
   }
 
   private static mapExternalVerifiableCredentialToWrappedVc(
-    verifiableCredential: IVerifiableCredential | JwtDecodedVerifiableCredential | CompactJWT
+    verifiableCredential: OriginalVerifiableCredential
   ): WrappedVerifiableCredential {
     if (ObjectUtils.isString(verifiableCredential)) {
       const externalCredentialJwt: JwtDecodedVerifiableCredential = jwt_decode(<CompactJWT>verifiableCredential);
