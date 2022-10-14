@@ -37,7 +37,7 @@ export class PEXv1 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV1,
-    presentation: OriginalVerifiablePresentation,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
@@ -234,7 +234,7 @@ export class PEXv1 {
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
-      presentation as IVerifiablePresentation,
+      presentation,
       limitDisclosureSignatureSuites
     );
     if (!evaluationResults.value) {
@@ -311,7 +311,7 @@ export class PEXv1 {
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
-      presentation as IVerifiablePresentation,
+      presentation,
       limitDisclosureSignatureSuites
     );
     if (!evaluationResults.value) {

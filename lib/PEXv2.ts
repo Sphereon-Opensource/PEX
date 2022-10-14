@@ -37,10 +37,10 @@ export class PEXv2 {
    */
   public evaluatePresentation(
     presentationDefinition: PresentationDefinitionV2,
-    presentation: OriginalVerifiablePresentation,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
-    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
+    const presentationCopy: OriginalVerifiablePresentation | IPresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation =
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -223,7 +223,7 @@ export class PEXv2 {
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
-      presentation as IVerifiablePresentation,
+      presentation,
       limitDisclosureSignatureSuites
     );
     if (!evaluationResults.value) {
@@ -300,7 +300,7 @@ export class PEXv2 {
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
-      presentation as IVerifiablePresentation,
+      presentation,
       limitDisclosureSignatureSuites
     );
     if (!evaluationResults.value) {

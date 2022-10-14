@@ -49,7 +49,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentation: OriginalVerifiablePresentation,
+    presentation: OriginalVerifiablePresentation | IPresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const pd: IInternalPresentationDefinition =
@@ -284,11 +284,7 @@ export class PEX {
       limitDisclosureSignatureSuites
     );
 
-    const presentation = this.presentationFrom(
-      presentationDefinition,
-      evaluationResult.verifiableCredential,
-      holder
-    ) as IVerifiablePresentation;
+    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,
@@ -369,11 +365,7 @@ export class PEX {
       limitDisclosureSignatureSuites
     );
 
-    const presentation = this.presentationFrom(
-      presentationDefinition,
-      evaluationResult.verifiableCredential,
-      holder
-    ) as IVerifiablePresentation;
+    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
     const evaluationResults = this.evaluatePresentation(
       presentationDefinition,
       presentation,

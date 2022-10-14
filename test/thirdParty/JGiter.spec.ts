@@ -1,5 +1,5 @@
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
-import { IPresentation, IProofType, IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
+import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { EvaluationResults, PEX, Status } from '../../lib';
 
@@ -449,7 +449,7 @@ function getVerifiableCredentials(): IVerifiableCredential[] {
   ];
 }
 
-function getPresentation(): IVerifiablePresentation {
+function getPresentation(): IPresentation {
   return {
     '@context': ['https://www.w3.org/2018/credentials/v1'],
     type: ['VerifiablePresentation'],
@@ -481,7 +481,7 @@ function getPresentation(): IVerifiablePresentation {
         },
       },
     ],
-  } as unknown as IVerifiablePresentation;
+  };
 }
 
 describe('evaluate JGiter tests', () => {
@@ -526,7 +526,7 @@ describe('evaluate JGiter tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, presentation as IVerifiablePresentation);
+    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, presentation);
     expect(evalResult.errors?.length).toEqual(0);
   });
 

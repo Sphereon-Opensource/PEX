@@ -61,7 +61,7 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiablePresentationToWrappedVP(
-    presentation: OriginalVerifiablePresentation
+    presentation: OriginalVerifiablePresentation | IPresentation
   ): WrappedVerifiablePresentation {
     const isJwtEncoded: boolean = ObjectUtils.isString(presentation);
     const type: OriginalType = isJwtEncoded
@@ -81,9 +81,9 @@ export class SSITypesBuilder {
     return {
       format: format,
       type: type,
-      original: presentation,
+      original: presentation as OriginalVerifiablePresentation,
       decoded: isJwtEncoded
-        ? (jwt_decode(presentation as string) as JwtDecodedVerifiablePresentation)
+        ? (jwt_decode(presentation as CompactJWT) as JwtDecodedVerifiablePresentation)
         : (presentation as IVerifiablePresentation),
       presentation: {
         '@context': (<IVerifiablePresentation>vp)['@context'],
@@ -124,7 +124,7 @@ export class SSITypesBuilder {
       const externalCredentialJwt: JwtDecodedVerifiableCredential = jwt_decode(<CompactJWT>verifiableCredential);
       this.createInternalCredentialFromJwtDecoded(externalCredentialJwt);
       return {
-        format: 'jwt',
+        format: 'jwt_vc',
         original: verifiableCredential,
         decoded: jwt_decode(verifiableCredential as unknown as string),
         type: OriginalType.JWT_ENCODED,
@@ -132,7 +132,7 @@ export class SSITypesBuilder {
       };
     } else if (this.isJwtDecodedCredential(verifiableCredential)) {
       return {
-        format: 'jwt',
+        format: 'jwt_vc',
         original: verifiableCredential,
         decoded: verifiableCredential as JwtDecodedVerifiableCredential,
         type: OriginalType.JWT_DECODED,
@@ -142,7 +142,7 @@ export class SSITypesBuilder {
       };
     } else {
       return {
-        format: 'ldp',
+        format: 'ldp_vc',
         original: verifiableCredential,
         decoded: verifiableCredential as IVerifiableCredential,
         type: OriginalType.JSONLD,
@@ -239,7 +239,7 @@ export class SSITypesBuilder {
     );
   }
 
-  private static isJwtDecodedPresentation(verifiablePresentation: OriginalVerifiablePresentation) {
+  private static isJwtDecodedPresentation(verifiablePresentation: OriginalVerifiablePresentation | IPresentation) {
     return (
       (<JwtDecodedVerifiablePresentation>verifiablePresentation)['vp'] &&
       (<JwtDecodedVerifiablePresentation>verifiablePresentation)['iss']
