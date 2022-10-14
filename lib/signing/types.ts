@@ -1,6 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
-  CompactJWT,
   IPresentation,
   IProof,
   IProofPurpose,

@@ -90,7 +90,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0] as IVerifiableCredential;
+    const vc: IVerifiableCredential = <IVerifiableCredential>vpSimple.verifiableCredential[0] as IVerifiableCredential;
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     delete ((vc as ICredential).credentialSubject as ICredentialSubject & AdditionalClaims)['details'];
