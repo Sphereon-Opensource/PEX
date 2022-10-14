@@ -50,7 +50,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentation: IPresentation | JwtDecodedVerifiablePresentation | string,
+    presentation: OriginalVerifiablePresentation,
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const pd: IInternalPresentationDefinition =
