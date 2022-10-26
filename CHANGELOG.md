@@ -1,5 +1,12 @@
 # Release Notes
 
+## v1.1.4 - 2022-10-26
+Update dependencies
+
+- Updates:
+  - Update dependencies
+
+
 ## v1.1.3 - 2022-08-15
 Bugfix release
 
