@@ -1,11 +1,11 @@
 import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
-import { ICredential, ICredentialSubject, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { ICredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
 import PexMessages from '../../types/Messages';
-import { JsonPathUtils } from '../../utils';
+import { getIssuerString, getSubjectIdsAsString, JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -47,7 +47,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
           [currentDescriptor.path]
         ) as { path: PathComponent[]; value: ICredential }[];
         //TODO: ESSIFI-186
-        if (vc[0]?.value.issuer === (vc[0]?.value.credentialSubject as ICredentialSubject).id) {
+        if (getSubjectIdsAsString(vc[0]?.value).indexOf(getIssuerString(vc[0]?.value)) !== -1) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {
           this.getResults().push(this.generateErrorResult(idIdx, currentDescriptor.path));
