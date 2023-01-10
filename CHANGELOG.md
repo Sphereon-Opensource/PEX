@@ -6,6 +6,19 @@ Using @sphereon/ssi-types
 - Changed:
   - method signatures to types from @sphereon/ssi-types
 
+## v1.1.5 - 2023-01-10
+Relax V1 schema URI handling
+- Updates:
+  - Relax V1 schema URI handling. Previously we required the URI to be an actual URI, but in the wild the URI is also used as a regular string. We now support that as well. In case we detect a http based URI we will perform some additional checks.
+
+
+## v1.1.4 - 2022-10-26
+Update dependencies
+
+- Updates:
+  - Update dependencies
+
+
 ## v1.1.3 - 2022-08-15
 Bugfix release
 
