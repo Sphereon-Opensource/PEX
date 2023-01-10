@@ -47,7 +47,7 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
           [currentDescriptor.path]
         ) as { path: PathComponent[]; value: ICredential }[];
         //TODO: ESSIFI-186
-        if (getSubjectIdsAsString(vc[0]?.value).indexOf(getIssuerString(vc[0]?.value)) !== -1) {
+        if (vc[0] && vc[0].value && getSubjectIdsAsString(vc[0].value).indexOf(getIssuerString(vc[0].value)) !== -1) {
           this.getResults().push(this.generateSuccessResult(idIdx, currentDescriptor.path));
         } else {
           this.getResults().push(this.generateErrorResult(idIdx, currentDescriptor.path));
