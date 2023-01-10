@@ -133,10 +133,17 @@ export class InputDescriptorsV1VB extends ValidationBundler<InputDescriptorV1[]>
   }
 
   isAValidURI(uri: string) {
-    try {
-      new URL(uri);
-    } catch (err) {
-      return ObjectValidationUtils.isValidDIDURI(uri);
+    if (!uri) {
+      return false;
+    } else if (!ObjectValidationUtils.nonEmptyString(uri)) {
+      return false;
+    }
+    if (uri.startsWith('http://') || uri.startsWith('https://')) {
+      try {
+        new URL(uri);
+      } catch (err) {
+        return ObjectValidationUtils.isValidDIDURI(uri);
+      }
     }
     return true;
   }
