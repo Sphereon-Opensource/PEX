@@ -571,6 +571,11 @@ export class PresentationDefinitionSchema {
                 },
                 purpose: { type: 'string' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
+                intent_to_retain: { type: 'boolean' },
+                evidence: {
+                  type: 'string',
+                  enum: ['required', 'preferred'],
+                },
               },
               required: ['path'],
               additionalProperties: false,
@@ -585,6 +590,11 @@ export class PresentationDefinitionSchema {
                 purpose: { type: 'string' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
                 predicate: {
+                  type: 'string',
+                  enum: ['required', 'preferred'],
+                },
+                intent_to_retain: { type: 'boolean' },
+                evidence: {
                   type: 'string',
                   enum: ['required', 'preferred'],
                 },
