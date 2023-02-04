@@ -27,7 +27,6 @@ export class EvaluationClientWrapper {
     limitDisclosureSignatureSuites?: string[]
   ): SelectResults {
     let selectResults: SelectResults;
-
     this._client.evaluate(
       presentationDefinition,
       wrappedVerifiableCredentials,
@@ -43,11 +42,13 @@ export class EvaluationClientWrapper {
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const marked = Array.from(new Set(info));
+
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
         presentationDefinition,
         presentationDefinition.submission_requirements,
         marked
       );
+
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
@@ -84,7 +85,6 @@ export class EvaluationClientWrapper {
         warnings,
       };
     }
-
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     this.remapMatches(
@@ -284,6 +284,7 @@ export class EvaluationClientWrapper {
           }
         });
       }
+
       const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
         pd.submission_requirements,
         updatedMarked,
@@ -354,30 +355,44 @@ export class EvaluationClientWrapper {
   ): [number, HandlerCheckResult[]] {
     let total = 0;
     const result: HandlerCheckResult[] = [];
+
     for (const sr of submissionRequirement) {
       if (sr.from) {
+        const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
         if (sr.rule === Rules.All) {
-          const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
           if (count !== groupCount.get(sr.from)) {
-            throw Error(`Not all input descriptors are members of group ${sr.from}`);
+            if(level === 0) throw Error(`Not all input descriptors are members of group ${sr.from}`);
+            continue;
           }
           total++;
           result.push(...matched);
         } else if (sr.rule === Rules.Pick) {
-          const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
           try {
             this.handleCount(sr, count, level);
             total++;
+            result.push(...matched);
           } catch (error) {
             if (level === 0) throw error;
           }
-          result.push(...matched);
         }
       } else if (sr.from_nested) {
         const [count, matched] = this.evaluateRequirements(sr.from_nested, marked, groupCount, ++level);
-        total += count;
-        result.push(...matched);
-        this.handleCount(sr, count, level);
+        if(sr.rule === Rules.All) {
+          if (count !== sr.from_nested.length) {
+            if(level === 0) throw Error(`Not all input descriptors are matched.`);
+            continue;
+          }
+          total++;
+          result.push(...matched);
+        } else if (sr.rule === Rules.Pick) {
+          try {
+            this.handleCount(sr, count, level);
+            total++;
+            result.push(...matched);
+          } catch (error) {
+            if (level === 0) throw error;
+          }
+        }
       }
     }
     return [total, result];
