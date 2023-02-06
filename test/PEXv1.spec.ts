@@ -7,8 +7,8 @@ import { PEXv1, Validated } from '../lib';
 
 import {
   assertedMockCallback,
-  assertedMockCallbackWithoutProofType,
-  getErrorThrown,
+  getAsyncCallbackWithoutProofType,
+  getAsyncErrorThrown,
   getProofOptionsMock,
   getSingatureOptionsMock,
 } from './test_data/PresentationSignUtilMock';
@@ -147,7 +147,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
-        assertedMockCallbackWithoutProofType,
+        getAsyncCallbackWithoutProofType,
         {
           proofOptions,
           signatureOptions: getSingatureOptionsMock(),
@@ -166,7 +166,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
-        getErrorThrown,
+        getAsyncErrorThrown,
         {
           proofOptions: getProofOptionsMock(),
           signatureOptions: getSingatureOptionsMock(),

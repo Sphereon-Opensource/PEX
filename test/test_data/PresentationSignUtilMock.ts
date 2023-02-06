@@ -47,6 +47,10 @@ export function getErrorThrown(): IVerifiablePresentation {
   throw new Error('Could not sign because of missing fields');
 }
 
+export async function getAsyncErrorThrown(): Promise<IVerifiablePresentation> {
+  throw new Error('Could not sign because of missing fields');
+}
+
 export async function getAsyncCallbackWithoutProofType(
   callbackParams: PresentationSignCallBackParams
 ): Promise<IVerifiablePresentation> {

@@ -9,6 +9,7 @@ import { PresentationDefinitionV2VB } from '../lib/validation';
 import {
   assertedMockCallback,
   assertedMockCallbackWithoutProofType,
+  getAsyncCallbackWithoutProofType,
   getProofOptionsMock,
   getSingatureOptionsMock,
 } from './test_data/PresentationSignUtilMock';
@@ -311,7 +312,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFromAsync(
         pdSchema.presentation_definition,
         vpSimple.verifiableCredential,
-        assertedMockCallbackWithoutProofType,
+        getAsyncCallbackWithoutProofType,
         {
           proofOptions,
           signatureOptions: getSingatureOptionsMock(),
