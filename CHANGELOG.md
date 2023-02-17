@@ -16,7 +16,7 @@ Add async callback for signing
 
 ## v1.1.5 - 2023-01-10
 Relax V1 schema URI handling
-- 
+
 - Updates:
   - Relax V1 schema URI handling. Previously we required the URI to be an actual URI, but in the wild the URI is also used as a regular string. We now support that as well. In case we detect a http based URI we will perform some additional checks.
 
