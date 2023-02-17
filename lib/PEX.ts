@@ -259,7 +259,9 @@ export class PEX {
   public async verifiablePresentationFromAsync(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation>,
+    signingCallBack: (
+      callBackParams: PresentationSignCallBackParams
+    ) => Promise<W3CVerifiablePresentation> | IVerifiablePresentation,
     options: PresentationSignOptions
   ): Promise<W3CVerifiablePresentation> {
     const { holder, signatureOptions, proofOptions } = options;
