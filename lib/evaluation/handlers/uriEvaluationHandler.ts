@@ -4,8 +4,7 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { PEVersion } from '../../types';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV1 } from '../../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV1, PEVersion } from '../../types';
 import PexMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
@@ -34,7 +33,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
       const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
       wrappedVcs.forEach((wvc: WrappedVerifiableCredential, j: number) => {
-        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential);
+        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential, d.getVersion());
         this.evaluateUris(wvc, vcUris, uris, i, j, d.getVersion());
       });
     });
@@ -85,7 +84,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static buildVcContextAndSchemaUris(credential: ICredential) {
+  private static buildVcContextAndSchemaUris(credential: ICredential, version: PEVersion) {
     const uris: string[] = [];
     if (Array.isArray(credential['@context'])) {
       credential['@context'].forEach((value) => uris.push(value as string));
@@ -96,6 +95,14 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       (credential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
     } else if (credential.credentialSchema) {
       uris.push((credential.credentialSchema as ICredentialSchema).id);
+    }
+    if (version === PEVersion.v1) {
+      // JWT VC Profile and MS Entry Verified ID do use the schema from V1 to match against types in the VC
+      Array.isArray(credential.type)
+        ? credential.type.forEach((type) => uris.push(type))
+        : credential.type
+        ? uris.push(credential.type)
+        : undefined;
     }
     return uris;
   }
