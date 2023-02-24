@@ -27,7 +27,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
 
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true, verbose: true });
+    this.ajv = new Ajv({ allowUnionTypes: true, verbose: false, strict: false });
   }
 
   public getValidations(
