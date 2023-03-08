@@ -3,13 +3,7 @@ import { PEX } from './PEX';
 import { PEXv1 } from './PEXv1';
 import { PEXv2 } from './PEXv2';
 import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './evaluation';
-import {
-  KeyEncoding,
-  PresentationSignCallBackParams,
-  PresentationSignOptions,
-  ProofOptions,
-  SignatureOptions,
-} from './signing';
+import { KeyEncoding, PresentationSignCallBackParams, PresentationSignOptions, ProofOptions, SignatureOptions } from './signing';
 import { InputFieldType, IPresentationDefinition, PEVersion } from './types';
 import { Validated, Validation, ValidationEngine, ValidationPredicate, Validator } from './validation';
 

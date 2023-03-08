@@ -3,12 +3,7 @@ import fs from 'fs';
 import { InputDescriptorV2, PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
 
 import { Checked, Status } from '../../../lib';
-import {
-  PresentationDefinitionV1VB,
-  PresentationDefinitionV2VB,
-  ValidationBundler,
-  ValidationEngine,
-} from '../../../lib/validation';
+import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, ValidationBundler, ValidationEngine } from '../../../lib/validation';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -131,9 +126,7 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationDefinitionV1> = new PresentationDefinitionV1VB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
-    expect(result).toEqual([
-      new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string'),
-    ]);
+    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string')]);
   });
 
   it('should return error for empty name v2', () => {
@@ -143,9 +136,7 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationDefinitionV2> = new PresentationDefinitionV2VB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
-    expect(result).toEqual([
-      new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string'),
-    ]);
+    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'name should be a non-empty string')]);
   });
 
   it('should not return error for missing purpose v1', () => {
@@ -175,9 +166,7 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationDefinitionV1> = new PresentationDefinitionV1VB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
-    expect(result).toEqual([
-      new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string'),
-    ]);
+    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string')]);
   });
 
   it('should return error for empty purpose v2', () => {
@@ -188,9 +177,7 @@ describe('validate', () => {
     const vb: ValidationBundler<PresentationDefinitionV2> = new PresentationDefinitionV2VB('root');
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
-    expect(result).toEqual([
-      new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string'),
-    ]);
+    expect(result).toEqual([new Checked('root.presentation_definition', Status.ERROR, 'purpose should be a non-empty string')]);
   });
 
   it('should not return error for missing format v1', () => {
@@ -241,11 +228,7 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
-      new Checked(
-        'root.presentation_definition',
-        Status.ERROR,
-        'presentation_definition should be as per json schema.'
-      ),
+      new Checked('root.presentation_definition', Status.ERROR, 'presentation_definition should be as per json schema.'),
       new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty'),
     ]);
   });
@@ -258,11 +241,7 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
-      new Checked(
-        'root.presentation_definition',
-        Status.ERROR,
-        'presentation_definition should be as per json schema.'
-      ),
+      new Checked('root.presentation_definition', Status.ERROR, 'presentation_definition should be as per json schema.'),
       new Checked('root.presentation_definition', Status.ERROR, 'formats values should not empty'),
     ]);
   });
@@ -275,11 +254,7 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
-      new Checked(
-        'root.presentation_definition',
-        Status.ERROR,
-        'formats should only have known identifiers for alg or proof_type'
-      ),
+      new Checked('root.presentation_definition', Status.ERROR, 'formats should only have known identifiers for alg or proof_type'),
     ]);
   });
 
@@ -291,18 +266,12 @@ describe('validate', () => {
 
     const result = new ValidationEngine().validate([{ bundler: vb, target: basicPD }]);
     expect(result).toEqual([
-      new Checked(
-        'root.presentation_definition',
-        Status.ERROR,
-        'formats should only have known identifiers for alg or proof_type'
-      ),
+      new Checked('root.presentation_definition', Status.ERROR, 'formats should only have known identifiers for alg or proof_type'),
     ]);
   });
 
   it('should report error for duplicate id', () => {
-    const basicPD: PresentationDefinitionV1 = getFile(
-      './test/resources/pd_require_is_holder.json'
-    ).presentation_definition;
+    const basicPD: PresentationDefinitionV1 = getFile('./test/resources/pd_require_is_holder.json').presentation_definition;
     const vb: ValidationBundler<PresentationDefinitionV1> = new PresentationDefinitionV1VB('root');
     const ve = new ValidationEngine();
     basicPD.input_descriptors[0].constraints!.fields![0]!.id = 'uuid2021-05-04 00';
@@ -313,8 +282,6 @@ describe('validate', () => {
     basicPD.input_descriptors[1].schema = [{ uri: 'https://www.w3.org/2018/credentials/v1' }];
     basicPD.input_descriptors = [basicPD.input_descriptors[0], basicPD.input_descriptors[1]];
     const result = ve.validate([{ bundler: vb, target: basicPD }]);
-    expect(result).toEqual([
-      new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique'),
-    ]);
+    expect(result).toEqual([new Checked('presentation_definition.input_descriptor', Status.ERROR, 'fields id must be unique')]);
   });
 });

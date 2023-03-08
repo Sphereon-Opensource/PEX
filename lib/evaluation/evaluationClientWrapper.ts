@@ -1,11 +1,4 @@
-import {
-  Descriptor,
-  InputDescriptorV1,
-  InputDescriptorV2,
-  PresentationSubmission,
-  Rules,
-  SubmissionRequirement,
-} from '@sphereon/pex-models';
+import { Descriptor, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
 
@@ -35,19 +28,13 @@ export class EvaluationClientWrapper {
   ): SelectResults {
     let selectResults: SelectResults;
 
-    this._client.evaluate(
-      presentationDefinition,
-      wrappedVerifiableCredentials,
-      holderDids,
-      limitDisclosureSignatureSuites
-    );
+    this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, holderDids, limitDisclosureSignatureSuites);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
-        (result) =>
-          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const marked = Array.from(new Set(info));
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
@@ -172,24 +159,16 @@ export class EvaluationClientWrapper {
     return submissionRequirementMatches;
   }
 
-  private matchWithoutSubmissionRequirements(
-    marked: HandlerCheckResult[],
-    pd: IInternalPresentationDefinition
-  ): SubmissionRequirementMatch[] {
+  private matchWithoutSubmissionRequirements(marked: HandlerCheckResult[], pd: IInternalPresentationDefinition): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     const partitionedResults: Map<string, string[]> = this.createVcToIdMap(marked);
     for (const [vcPath, sameVcIds] of partitionedResults.entries()) {
-      if (
-        sameVcIds.length &&
-        sameVcIds.length === (pd as unknown as IPresentationDefinition).input_descriptors.length
-      ) {
+      if (sameVcIds.length && sameVcIds.length === (pd as unknown as IPresentationDefinition).input_descriptors.length) {
         for (const idPath of sameVcIds) {
           const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
           if (idRes.length) {
             submissionRequirementMatches.push({
-              name:
-                (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name ||
-                (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
+              name: (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name || (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
               rule: Rules.All,
               vc_path: [vcPath],
             });
@@ -238,9 +217,7 @@ export class EvaluationClientWrapper {
       const len = this._client.presentationSubmission?.descriptor_map.length;
       for (let i = 0; i < len; i++) {
         this._client.presentationSubmission.descriptor_map[i] &&
-          this._client.presentationSubmission.descriptor_map.push(
-            this._client.presentationSubmission.descriptor_map[i]
-          );
+          this._client.presentationSubmission.descriptor_map.push(this._client.presentationSubmission.descriptor_map[i]);
       }
       this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
@@ -264,43 +241,32 @@ export class EvaluationClientWrapper {
       });
   }
 
-  public submissionFrom(
-    pd: IInternalPresentationDefinition,
-    vcs: WrappedVerifiableCredential[]
-  ): PresentationSubmission {
+  public submissionFrom(pd: IInternalPresentationDefinition, vcs: WrappedVerifiableCredential[]): PresentationSubmission {
     if (!this._client.results.length) {
       throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
 
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
-        (result) =>
-          result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
       const groupCount = new Map<string, number>();
       //TODO instanceof fails in some cases, need to check how to fix it
       if (Object.keys(pd).includes('input_descriptors')) {
-        (pd as unknown as IPresentationDefinition).input_descriptors.forEach(
-          (e: InputDescriptorV1 | InputDescriptorV2) => {
-            if (e.group) {
-              e.group.forEach((key: string) => {
-                if (groupCount.has(key)) {
-                  groupCount.set(key, (groupCount.get(key) as number) + 1);
-                } else {
-                  groupCount.set(key, 1);
-                }
-              });
-            }
+        (pd as unknown as IPresentationDefinition).input_descriptors.forEach((e: InputDescriptorV1 | InputDescriptorV2) => {
+          if (e.group) {
+            e.group.forEach((key: string) => {
+              if (groupCount.has(key)) {
+                groupCount.set(key, (groupCount.get(key) as number) + 1);
+              } else {
+                groupCount.set(key, 1);
+              }
+            });
           }
-        );
+        });
       }
-      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(
-        pd.submission_requirements,
-        updatedMarked,
-        groupCount,
-        0
-      );
+      const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(pd.submission_requirements, updatedMarked, groupCount, 0);
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
       this.updatePresentationSubmission(finalIdx);
       this.updatePresentationSubmissionPathToAlias('verifiableCredential');
@@ -327,15 +293,9 @@ export class EvaluationClientWrapper {
       });
   }
 
-  private matchUserSelectedVcs(
-    marked: HandlerCheckResult[],
-    vcs: WrappedVerifiableCredential[]
-  ): [HandlerCheckResult[], [string, string][]] {
+  private matchUserSelectedVcs(marked: HandlerCheckResult[], vcs: WrappedVerifiableCredential[]): [HandlerCheckResult[], [string, string][]] {
     const userSelected: [number, string][] = vcs.map((vc, index) => [index, JSON.stringify(vc.original)]);
-    const allCredentials: [number, string][] = this._client.wrappedVcs.map((vc, index) => [
-      index,
-      JSON.stringify(vc.original),
-    ]);
+    const allCredentials: [number, string][] = this._client.wrappedVcs.map((vc, index) => [index, JSON.stringify(vc.original)]);
     const updatedIndexes: [string, string][] = [];
     userSelected.forEach((us, i) => {
       allCredentials.forEach((ac, j) => {
@@ -394,10 +354,7 @@ export class EvaluationClientWrapper {
     return [total, result];
   }
 
-  private countMatchingInputDescriptors(
-    submissionRequirement: SubmissionRequirement,
-    marked: HandlerCheckResult[]
-  ): [number, HandlerCheckResult[]] {
+  private countMatchingInputDescriptors(submissionRequirement: SubmissionRequirement, marked: HandlerCheckResult[]): [number, HandlerCheckResult[]] {
     let count = 0;
     const matched: HandlerCheckResult[] = [];
     for (const m of marked) {
@@ -439,15 +396,10 @@ export class EvaluationClientWrapper {
     });
   }
 
-  public fillSelectableCredentialsToVerifiableCredentialsMapping(
-    selectResults: SelectResults,
-    wrappedVcs: WrappedVerifiableCredential[]
-  ) {
+  public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, wrappedVcs: WrappedVerifiableCredential[]) {
     if (selectResults) {
       selectResults.verifiableCredential?.forEach((selectableCredential: IVerifiableCredential) => {
-        const foundIndex: number = wrappedVcs.findIndex(
-          (wrappedVc) => JSON.stringify(selectableCredential) === JSON.stringify(wrappedVc.original)
-        );
+        const foundIndex: number = wrappedVcs.findIndex((wrappedVc) => JSON.stringify(selectableCredential) === JSON.stringify(wrappedVc.original));
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
@@ -531,10 +483,7 @@ export class EvaluationClientWrapper {
     return innerStatus;
   }
 
-  private updateSubmissionRequirementMatchPathToAlias(
-    submissionRequirementMatch: SubmissionRequirementMatch,
-    alias: string
-  ) {
+  private updateSubmissionRequirementMatchPathToAlias(submissionRequirementMatch: SubmissionRequirementMatch, alias: string) {
     const vc_path: string[] = [];
     submissionRequirementMatch.vc_path.forEach((m) => {
       vc_path.push(m.replace('$', '$.' + alias));

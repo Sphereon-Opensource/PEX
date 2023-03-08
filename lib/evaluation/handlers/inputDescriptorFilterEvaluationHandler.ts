@@ -70,12 +70,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     });
   }
 
-  private createResponse(
-    field: { path: PathComponent[]; value: FieldV1 | FieldV2 },
-    vcIndex: number,
-    payload: unknown,
-    message: string
-  ): void {
+  private createResponse(field: { path: PathComponent[]; value: FieldV1 | FieldV2 }, vcIndex: number, payload: unknown, message: string): void {
     this.getResults().push({
       ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
       ['status']: Status.ERROR,

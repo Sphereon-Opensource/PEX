@@ -37,9 +37,7 @@ export function assertedMockCallback(callBackParams: PresentationSignCallBackPar
   return vp;
 }
 
-export function assertedMockCallbackWithoutProofType(
-  callBackParams: PresentationSignCallBackParams
-): IVerifiablePresentation {
+export function assertedMockCallbackWithoutProofType(callBackParams: PresentationSignCallBackParams): IVerifiablePresentation {
   const vp = mockCallback(callBackParams);
   return vp;
 }
@@ -51,9 +49,7 @@ export async function getAsyncErrorThrown(): Promise<IVerifiablePresentation> {
   throw new Error('Could not sign because of missing fields');
 }
 
-export async function getAsyncCallbackWithoutProofType(
-  callbackParams: PresentationSignCallBackParams
-): Promise<IVerifiablePresentation> {
+export async function getAsyncCallbackWithoutProofType(callbackParams: PresentationSignCallBackParams): Promise<IVerifiablePresentation> {
   return mockCallback(callbackParams);
 }
 

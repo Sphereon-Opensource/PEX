@@ -23,8 +23,7 @@ function getPresentationDefinitionV1(): PresentationDefinitionV1 {
           fields: [
             {
               path: ['$.issuer', '$.vc.issuer', '$.iss'],
-              purpose:
-                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
                 _const: 'did:example:123|did:example:456',
@@ -41,9 +40,7 @@ describe('should test jsonPathUtils function', () => {
   it('should return ok if changePropertyNameRecursively works correctly', () => {
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinitionV1();
     JsonPathUtils.changePropertyNameRecursively(pdSchema, '_const', 'const');
-    expect(pdSchema.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV1]).toEqual(
-      'did:example:123|did:example:456'
-    );
+    expect(pdSchema.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV1]).toEqual('did:example:123|did:example:456');
   });
 
   it('should return ok if presentation definition @ in path escapes first and not second', () => {
@@ -59,9 +56,7 @@ describe('should test jsonPathUtils function', () => {
       },
     ];
     const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual([
-      "$['@book'].accessModeSufficient[(@.length-1)]",
-    ]);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@book'].accessModeSufficient[(@.length-1)]"]);
   });
 
   it('should return ok if presentation definition @ in path escapes properly', () => {
@@ -125,8 +120,6 @@ describe('should test jsonPathUtils function', () => {
       },
     ];
     const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(
-      pd.input_descriptors[0].constraints!.fields[0].path
-    );
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(pd.input_descriptors[0].constraints!.fields[0].path);
   });
 });

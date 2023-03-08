@@ -98,20 +98,10 @@ export class GatacaPresentationDefinition {
       purpose: 'Bank Fake Demo',
       format: {
         ldp: {
-          proof_type: [
-            'JsonWebSignature2020',
-            'Ed25519Signature2018',
-            'EcdsaSecp256k1Signature2019',
-            'RsaSignature2018',
-          ],
+          proof_type: ['JsonWebSignature2020', 'Ed25519Signature2018', 'EcdsaSecp256k1Signature2019', 'RsaSignature2018'],
         },
         ldp_vp: {
-          proof_type: [
-            'JsonWebSignature2020',
-            'Ed25519Signature2018',
-            'EcdsaSecp256k1Signature2019',
-            'RsaSignature2018',
-          ],
+          proof_type: ['JsonWebSignature2020', 'Ed25519Signature2018', 'EcdsaSecp256k1Signature2019', 'RsaSignature2018'],
         },
       },
       submission_requirements: [

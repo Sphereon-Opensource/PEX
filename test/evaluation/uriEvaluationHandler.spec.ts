@@ -1,12 +1,6 @@
 import fs from 'fs';
 
-import {
-  ICredential,
-  IVerifiableCredential,
-  IVerifiablePresentation,
-  OriginalType,
-  WrappedVerifiableCredential,
-} from '@sphereon/ssi-types';
+import { IVerifiableCredential, IVerifiablePresentation, OriginalType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { HandlerCheckResult, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
@@ -19,7 +13,7 @@ function getFile(path: string) {
 }
 
 describe('evaluate', () => {
-  it('should return ok if uris match in vpSimple.verifiableCredential[0].credentialSchema[0].id', () => {
+  it('should return ok if uris match in vpSimple.verifiableCredential![0].credentialSchema[0].id', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
@@ -28,10 +22,10 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     const wvc: WrappedVerifiableCredential = {
-      credential: vpSimple.verifiableCredential[0] as ICredential,
-      decoded: vpSimple.verifiableCredential[0] as IVerifiableCredential,
+      credential: vpSimple.verifiableCredential![0] as IVerifiableCredential,
+      decoded: vpSimple.verifiableCredential![0] as IVerifiableCredential,
       format: 'ldp',
-      original: vpSimple.verifiableCredential[0],
+      original: vpSimple.verifiableCredential![0],
       type: OriginalType.JSONLD,
     };
     evaluationHandler.handle(pd, [wvc]);
@@ -45,10 +39,10 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0] as IVerifiableCredential;
+    const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     vc['@context' as keyof IVerifiableCredential] = ['https://www.test.org/mock'];
     const wvc: WrappedVerifiableCredential = {
-      credential: vc as ICredential,
+      credential: vc as IVerifiableCredential,
       decoded: vc,
       format: 'ldp',
       original: vc,
@@ -58,22 +52,15 @@ describe('evaluate', () => {
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     evaluationHandler.handle(pd, [wvc]);
     expect(evaluationHandler.getResults()[0]).toEqual(
-      new HandlerCheckResult(
-        '$.input_descriptors[0]',
-        '$[0]',
-        'UriEvaluation',
-        Status.ERROR,
-        PexMessages.URI_EVALUATION_DIDNT_PASS,
-        {
-          inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
-          vcContext: ['https://www.test.org/mock'],
-          vcCredentialSchema: [
-            {
-              id: 'https://www.w3.org/TR/vc-data-model/#types',
-            },
-          ],
-        }
-      )
+      new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'UriEvaluation', Status.ERROR, PexMessages.URI_EVALUATION_DIDNT_PASS, {
+        inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
+        vcContext: ['https://www.test.org/mock'],
+        vcCredentialSchema: [
+          {
+            id: 'https://www.w3.org/TR/vc-data-model/#types',
+          },
+        ],
+      })
     );
   });
 
@@ -83,11 +70,11 @@ describe('evaluate', () => {
     ).presentation_definition;
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0] as IVerifiableCredential;
+    const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
     const wvc: WrappedVerifiableCredential = {
-      credential: vc as ICredential,
+      credential: vc as IVerifiableCredential,
       decoded: vc,
       format: 'ldp',
       original: vc,
@@ -105,25 +92,25 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const vc0: IVerifiableCredential = vpSimple.verifiableCredential[0] as IVerifiableCredential;
+    const vc0: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     const wvc0: WrappedVerifiableCredential = {
-      credential: vc0 as ICredential,
+      credential: vc0 as IVerifiableCredential,
       decoded: vc0,
       format: 'ldp',
       original: vc0,
       type: OriginalType.JSONLD,
     };
-    const vc1: IVerifiableCredential = vpSimple.verifiableCredential[1] as IVerifiableCredential;
+    const vc1: IVerifiableCredential = vpSimple.verifiableCredential![1] as IVerifiableCredential;
     const wvc1: WrappedVerifiableCredential = {
-      credential: vc1 as ICredential,
+      credential: vc1 as IVerifiableCredential,
       decoded: vc1,
       format: 'ldp',
       original: vc1,
       type: OriginalType.JSONLD,
     };
-    const vc2: IVerifiableCredential = vpSimple.verifiableCredential[2] as IVerifiableCredential;
+    const vc2: IVerifiableCredential = vpSimple.verifiableCredential![2] as IVerifiableCredential;
     const wvc2: WrappedVerifiableCredential = {
-      credential: vc2 as ICredential,
+      credential: vc2 as IVerifiableCredential,
       decoded: vc2,
       format: 'ldp',
       original: vc2,
@@ -149,9 +136,9 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
@@ -169,9 +156,9 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);

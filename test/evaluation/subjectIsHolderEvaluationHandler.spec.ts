@@ -29,17 +29,13 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     const results = getFile('./test/resources/isHolderEvaluationResults.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler: SubjectIsHolderEvaluationHandler = new SubjectIsHolderEvaluationHandler(evaluationClient);
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_subject_is_holder.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_subject_is_holder.json') as IVerifiablePresentation;
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.dids = [HOLDER_DID];
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationHandler.client.results).toEqual(results);
   });

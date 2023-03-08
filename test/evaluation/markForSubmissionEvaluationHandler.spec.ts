@@ -15,8 +15,7 @@ const results: HandlerCheckResult[] = [
     verifiable_credential_path: '$[0]',
     evaluator: 'UriEvaluation',
     status: 'info',
-    message:
-      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+    message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
   },
   {
     input_descriptor_path: '$.input_descriptors[0]',
@@ -42,8 +41,7 @@ const results_with_error: HandlerCheckResult[] = [
     verifiable_credential_path: '$[0]',
     evaluator: 'UriEvaluation',
     status: 'info',
-    message:
-      'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
+    message: 'presentation_definition URI for the schema of the candidate input is equal to one of the input_descriptors object uri values.',
   },
   {
     input_descriptor_path: '$.input_descriptors[0]',
@@ -76,9 +74,7 @@ function getFile(path: string): InternalPresentationDefinitionV1 | IVerifiablePr
 
 describe('markForSubmissionEvaluationHandler tests', () => {
   it(`Mark input candidates for presentation submission`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -88,7 +84,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
@@ -102,9 +98,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   });
 
   it(`Mark input candidates for presentation submission with errors`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -114,7 +108,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({

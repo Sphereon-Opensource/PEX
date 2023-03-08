@@ -32,9 +32,7 @@ function getFile(path: string): InternalPresentationDefinitionV1 | IVerifiablePr
 
 describe('inputDescriptorFilterEvaluationHandler tests', () => {
   it(`input descriptor's constraint property missing`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -50,22 +48,18 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { result: [], valid: true };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields property missing`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -81,22 +75,18 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { result: [], valid: true };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.length is equal to 0`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -112,22 +102,18 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { result: [], valid: true };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.path does not match`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -146,22 +132,18 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message0, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { valid: false };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraints.fields.filter does not match`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -180,22 +162,18 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message0, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message0, message1, message2]);
   });
 
   it(`input descriptor's constraint.fields.filter match`, () => {
-    const presentation: IVerifiablePresentation = getFile(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
       './test/resources/pd_input_descriptor_filter.json'
     ) as InternalPresentationDefinitionV1;
@@ -208,14 +186,12 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     const message2 = { ...message, ['verifiable_credential_path']: '$[2]' };
     message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: true };
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      presentation.verifiableCredential
-    );
+    evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
     const evaluationHandler: EvaluationHandler = new InputDescriptorFilterEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
     );
     expect(evaluationClient.results).toEqual([message, message1, message2]);
   });

@@ -153,9 +153,7 @@ export class EvaluationClientWrapperData {
           tag: 'UriEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[0]',
+          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
@@ -283,37 +281,27 @@ export class EvaluationClientWrapperData {
           tag: 'UriEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
+          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
+          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
           status: 'error',
           tag: 'FilterEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[0]',
+          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[0]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[2]',
+          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },
         {
-          message:
-            PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION +
-            ': $.input_descriptors[0]: $.verifiableCredential[1]',
+          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
           status: 'error',
           tag: 'MarkForSubmissionEvaluation',
         },

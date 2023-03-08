@@ -31,10 +31,7 @@ export class GatacaSelectedCredentials {
       {
         id: 'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv',
         type: ['VerifiableCredential', 'transcriptOfRecordsCredential'],
-        '@context': [
-          'https://www.w3.org/2018/credentials/v1',
-          'https://s3.eu-west-1.amazonaws.com/gataca.io/contexts/v1.json',
-        ],
+        '@context': ['https://www.w3.org/2018/credentials/v1', 'https://s3.eu-west-1.amazonaws.com/gataca.io/contexts/v1.json'],
         issuer: 'did:gatc:2wihrrZCM5XWpFkkPLUABXSKP7pniNJ1',
         issuanceDate: '2021-12-03T12:39:04.000Z',
         credentialSubject: {
@@ -137,10 +134,7 @@ export class GatacaSelectedCredentials {
       {
         id: 'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv',
         type: ['VerifiableCredential', 'transcriptOfRecordsCredential'],
-        '@context': [
-          'https://www.w3.org/2018/credentials/v1',
-          'https://s3.eu-west-1.amazonaws.com/gataca.io/contexts/v1.json',
-        ],
+        '@context': ['https://www.w3.org/2018/credentials/v1', 'https://s3.eu-west-1.amazonaws.com/gataca.io/contexts/v1.json'],
         issuer: 'did:gatc:2wihrrZCM5XWpFkkPLUABXSKP7pniNJ1',
         issuanceDate: '2021-12-03T12:39:04.000Z',
         credentialSubject: {

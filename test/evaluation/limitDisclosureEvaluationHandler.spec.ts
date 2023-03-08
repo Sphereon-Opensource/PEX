@@ -34,11 +34,9 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]);
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]);
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']
-    ).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
   });
 
   it("should return ok if verifiable Credential doesn't have the birthPlace field", () => {
@@ -46,16 +44,12 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]);
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)[
-        'birthPlace'
-      ]
-    ).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
   });
 
   it('should report an error if limit disclosure is not supported', () => {
@@ -63,19 +57,15 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    if ('type' in (<IVerifiableCredential>vpSimple.verifiableCredential[0]).proof) {
-      (<IProof>(vpSimple.verifiableCredential[0] as IVerifiableCredential).proof).type = 'limit disclosure unsupported';
+    if ('type' in (<IVerifiableCredential>vpSimple.verifiableCredential![0]).proof) {
+      (<IProof>(vpSimple.verifiableCredential![0] as IVerifiableCredential).proof).type = 'limit disclosure unsupported';
     }
-    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]);
+    const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]);
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)[
-        'birthPlace'
-      ]
-    ).toEqual('Maarssen');
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toEqual('Maarssen');
     expect(evaluationClient.results[7]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
@@ -90,18 +80,14 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
-    const vc: IVerifiableCredential = (<IVerifiableCredential>(
-      vpSimple.verifiableCredential[0]
-    )) as IVerifiableCredential;
+    const vc: IVerifiableCredential = (<IVerifiableCredential>vpSimple.verifiableCredential![0]) as IVerifiableCredential;
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     delete ((vc as ICredential).credentialSubject as ICredentialSubject & AdditionalClaims)['details'];
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      (evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']
-    ).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']).toBeUndefined();
     expect(evaluationClient.results[6]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
@@ -117,13 +103,12 @@ describe('evaluate', () => {
     const verifiableCredentials: IVerifiableCredential[] = new VcMultiCredentials().getVerifiableCredentials();
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const wvcs: WrappedVerifiableCredential[] =
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)
-    ).toEqual(new LimitDisclosureEvaluationResults().getMultiCredentialResultsAllInfo());
+    expect(evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)).toEqual(
+      new LimitDisclosureEvaluationResults().getMultiCredentialResultsAllInfo()
+    );
   });
 
   //FIXME If atomic credential and not supports limit disclosure, but passes same subject the credential should not be valid for submission
@@ -131,8 +116,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = new PdMultiCredentials().getPresentationDefinition();
     const verifiableCredentials: IVerifiableCredential[] = new VcMultiCredentials().getVerifiableCredentials();
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    const wvcs: WrappedVerifiableCredential[] =
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     verifiableCredentials[3].proof = {
       type: 'EcdsaSecp256k1VerificationKey2019',
@@ -143,9 +127,9 @@ describe('evaluate', () => {
     };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(
-      evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)
-    ).toEqual(new LimitDisclosureEvaluationResults().getMultiCredentialResultsThreeInfos());
+    expect(evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)).toEqual(
+      new LimitDisclosureEvaluationResults().getMultiCredentialResultsThreeInfos()
+    );
     expect(
       evaluationClient.results.filter(
         (ld) =>

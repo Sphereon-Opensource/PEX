@@ -1,11 +1,5 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
-import {
-  AdditionalClaims,
-  ICredential,
-  ICredentialSubject,
-  IVerifiableCredential,
-  WrappedVerifiableCredential,
-} from '@sphereon/ssi-types';
+import { AdditionalClaims, ICredential, ICredentialSubject, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
@@ -30,20 +24,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (
         inDesc.constraints?.fields &&
-        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
-          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+        (inDesc.constraints?.limit_disclosure === Optionality.Required || inDesc.constraints?.limit_disclosure === Optionality.Preferred)
       ) {
         this.evaluateLimitDisclosure(wrappedVcs, inDesc.constraints, index);
       }
     });
   }
 
-  private isLimitDisclosureSupported(
-    wvc: WrappedVerifiableCredential,
-    vcIdx: number,
-    idIdx: number,
-    optionality: Optionality
-  ): boolean {
+  private isLimitDisclosureSupported(wvc: WrappedVerifiableCredential, vcIdx: number, idIdx: number, optionality: Optionality): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     const proof = (wvc.decoded as IVerifiableCredential).proof;
     if (!proof || Array.isArray(proof) || !proof.type) {
@@ -58,11 +46,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return true;
   }
 
-  private evaluateLimitDisclosure(
-    wrappedVcs: WrappedVerifiableCredential[],
-    constraints: ConstraintsV1 | ConstraintsV2,
-    idIdx: number
-  ): void {
+  private evaluateLimitDisclosure(wrappedVcs: WrappedVerifiableCredential[], constraints: ConstraintsV1 | ConstraintsV2, idIdx: number): void {
     const fields = constraints?.fields as FieldV2[];
     const optionality = constraints.limit_disclosure;
     wrappedVcs.forEach((wvc, index) => {
@@ -73,7 +57,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private enforceLimitDisclosure(
-    vc: ICredential,
+    vc: IVerifiableCredential,
     fields: FieldV2[],
     idIdx: number,
     index: number,
@@ -90,13 +74,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     }
   }
 
-  private createVcWithRequiredFields(
-    vc: ICredential,
-    fields: FieldV2[],
-    idIdx: number,
-    vcIdx: number
-  ): ICredential | undefined {
-    let credentialToSend: ICredential = {} as ICredential;
+  private createVcWithRequiredFields(vc: IVerifiableCredential, fields: FieldV2[], idIdx: number, vcIdx: number): IVerifiableCredential | undefined {
+    let credentialToSend: IVerifiableCredential = {} as IVerifiableCredential;
     credentialToSend = Object.assign(credentialToSend, vc);
     credentialToSend.credentialSubject = {};
 
@@ -117,8 +96,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
     internalCredential: ICredential,
-    internalCredentialToSend: ICredential
-  ): ICredential {
+    internalCredentialToSend: IVerifiableCredential
+  ): IVerifiableCredential {
     //TODO: ESSIFI-186
     let credentialSubject: ICredentialSubject & AdditionalClaims = { ...internalCredential.credentialSubject };
     requiredField.path.forEach((e) => {

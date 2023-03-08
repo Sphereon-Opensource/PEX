@@ -44,12 +44,7 @@ describe('evaluate gataca tests', () => {
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     presentationDefinition.submission_requirements = [presentationDefinition.submission_requirements![0]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const selectFromResult = pex.selectFrom(
-      presentationDefinition,
-      vcs,
-      ['FAsYneKJhWBP2n5E21ZzdY'],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
@@ -63,9 +58,9 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect(
-      (presentationFromResult.verifiableCredential[0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]
-    ).toEqual('cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw');
+    expect((presentationFromResult.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+      'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
+    );
   });
 
   it('Gataca example just pick.pick', function () {
@@ -75,9 +70,7 @@ describe('evaluate gataca tests', () => {
     pdSchema.submission_requirements = [pdSchema.submission_requirements![1]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
     const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual(
-      'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv'
-    );
+    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual('urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv');
   });
 
   it('should return v1 in version discovery second example', function () {
@@ -114,12 +107,7 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const presentationDefinition: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
-    const selectFromResult = pex.selectFrom(
-      presentationDefinition,
-      vcs,
-      ['FAsYneKJhWBP2n5E21ZzdY'],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
@@ -138,8 +126,8 @@ describe('evaluate gataca tests', () => {
       },
     ]);
     expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect(
-      (presentationFromResult.verifiableCredential[0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]
-    ).toEqual('cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk');
+    expect((presentationFromResult.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
+    );
   });
 });

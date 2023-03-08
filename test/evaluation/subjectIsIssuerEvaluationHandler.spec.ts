@@ -17,9 +17,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(
-      evaluationClient
-    );
+    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     subjectIsIssuerEvaluationHandler.presentationSubmission = {
       id: '3cpLWMyiAT1qQXTaJNWOG',
       definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
@@ -64,9 +62,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(
-      evaluationClient
-    );
+    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     subjectIsIssuerEvaluationHandler.presentationSubmission = {
       id: '3cpLWMyiAT1qQXTaJNWOG',
       definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
@@ -119,9 +115,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(
-      evaluationClient
-    );
+    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     subjectIsIssuerEvaluationHandler.presentationSubmission = {
       id: '3cpLWMyiAT1qQXTaJNWOG',
       definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
@@ -175,9 +169,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
-    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(
-      evaluationClient
-    );
+    const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
     subjectIsIssuerEvaluationHandler.presentationSubmission = {
       id: '3cpLWMyiAT1qQXTaJNWOG',
       definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',

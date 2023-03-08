@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "2.0.0-unstable.10",
+  "version": "2.0.0-unstable.11",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -35,7 +35,7 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@sphereon/ssi-types": "0.8.1-next.194",
+    "@sphereon/ssi-types": "0.8.1-unstable.269",
     "@sphereon/pex-models": "^1.2.2",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
@@ -74,6 +74,6 @@
   ],
   "prettier": {
     "singleQuote": true,
-    "printWidth": 120
+    "printWidth": 150
   }
 }

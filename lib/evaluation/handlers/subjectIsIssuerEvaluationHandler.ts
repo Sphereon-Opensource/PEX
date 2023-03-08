@@ -27,19 +27,13 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       if (constraints?.subject_is_issuer === Optionality.Required) {
         this.checkSubjectIsIssuer(inputDescriptor.id, wrappedVcs, index);
       } else {
-        this.getResults().push(
-          ...wrappedVcs.map((_, vcIndex) => this.generateSuccessResult(index, `$[${vcIndex}]`, 'not applicable'))
-        );
+        this.getResults().push(...wrappedVcs.map((_, vcIndex) => this.generateSuccessResult(index, `$[${vcIndex}]`, 'not applicable')));
       }
     });
     this.updatePresentationSubmission(pd);
   }
 
-  private checkSubjectIsIssuer(
-    inputDescriptorId: string,
-    wrappedVcs: WrappedVerifiableCredential[],
-    idIdx: number
-  ): void {
+  private checkSubjectIsIssuer(inputDescriptorId: string, wrappedVcs: WrappedVerifiableCredential[], idIdx: number): void {
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
         const vc: { path: PathComponent[]; value: ICredential }[] = JsonPathUtils.extractInputField(

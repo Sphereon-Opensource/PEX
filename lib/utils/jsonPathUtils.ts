@@ -66,19 +66,13 @@ export class JsonPathUtils {
     currentPropertyName: string,
     newPropertyName: string
   ) {
-    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, [
-      '$..' + currentPropertyName,
-    ]);
+    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..' + currentPropertyName]);
     for (const existingPath of existingPaths) {
       this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
     }
   }
 
-  private static copyResultPathToDestinationDefinition(
-    pathDetails: (string | number)[],
-    pd: IPresentationDefinition,
-    newPropertyName: string
-  ) {
+  private static copyResultPathToDestinationDefinition(pathDetails: (string | number)[], pd: IPresentationDefinition, newPropertyName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
@@ -134,21 +128,14 @@ export class JsonPathUtils {
         path = path.charAt(0) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
         indexChanged = true;
         this.modifyPathRecursive(matches, path);
-      } else if (
-        atIdx &&
-        atIdx > 1 &&
-        path.substring(atIdx - 2, atIdx) !== "['" &&
-        path.substring(atIdx - 2, atIdx) !== '["'
-      ) {
+      } else if (atIdx && atIdx > 1 && path.substring(atIdx - 2, atIdx) !== "['" && path.substring(atIdx - 2, atIdx) !== '["') {
         if (path.substring(atIdx - 2, atIdx) === '..') {
-          path =
-            path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          path = path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
           const matches = this.matchAll(path, this.REGEX_PATH);
           this.modifyPathRecursive(matches, path);
         } else if (path.charAt(atIdx - 1) === '.') {
-          path =
-            path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          path = path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
           this.modifyPathRecursive(matches, path);
         }

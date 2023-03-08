@@ -13,10 +13,8 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
   private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
   private readonly filterMustBeValidJsonSchemaMsg = 'field object "filter" property must be valid json schema';
-  private readonly filterIsMustInPresenceOfPredicateMsg =
-    'field object must have a "filter" property if "predicate" is present';
-  private readonly filterIsNotValidJsonSchemaDescriptorMsg =
-    'could not parse "filter" object as a valid json schema descriptor.';
+  private readonly filterIsMustInPresenceOfPredicateMsg = 'field object must have a "filter" property if "predicate" is present';
+  private readonly filterIsNotValidJsonSchemaDescriptorMsg = 'could not parse "filter" object as a valid json schema descriptor.';
   private readonly purposeShouldBeANonEmptyStringMsg = 'purpose should be a non empty string';
   private readonly shouldBeKnownOptionMsg = 'Unknown predicate property';
 
@@ -77,8 +75,7 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
   }
 
   private mustHaveValidJsonPaths(): ValidationPredicate<FieldV1 | FieldV2> {
-    return (fieldObj: FieldV1 | FieldV2): boolean =>
-      fieldObj.path != null && fieldObj.path.length > 0 && this._validateJsonPaths(fieldObj.path);
+    return (fieldObj: FieldV1 | FieldV2): boolean => fieldObj.path != null && fieldObj.path.length > 0 && this._validateJsonPaths(fieldObj.path);
   }
 
   private _validateJsonPaths(jsonPath: string[]): boolean {

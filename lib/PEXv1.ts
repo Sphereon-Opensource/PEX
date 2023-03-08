@@ -41,18 +41,12 @@ export class PEXv1 {
     limitDisclosureSignatureSuites?: string[]
   ): EvaluationResults {
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
-    const wrappedPresentation: WrappedVerifiablePresentation =
-      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
+    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(
-      pd,
-      wrappedPresentation.vcs,
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
@@ -87,15 +81,9 @@ export class PEXv1 {
   ): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
-    const wrappedVerifiableCredentials =
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+    const wrappedVerifiableCredentials = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
 
-    const result = this._evaluationClientWrapper.evaluate(
-      pd,
-      wrappedVerifiableCredentials,
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
@@ -211,9 +199,7 @@ export class PEXv1 {
   public async verifiablePresentationFromAsync(
     presentationDefinition: PresentationDefinitionV1,
     selectedCredentials: OriginalVerifiableCredential[],
-    signingCallBack: (
-      callBackParams: PresentationSignCallBackParams
-    ) => Promise<IVerifiablePresentation> | IVerifiablePresentation,
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<IVerifiablePresentation> | IVerifiablePresentation,
     options: PresentationSignOptions
   ): Promise<IVerifiablePresentation> {
     const { holder, signatureOptions, proofOptions } = options;
@@ -234,11 +220,7 @@ export class PEXv1 {
     this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
 
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
-    const evaluationResults = this.evaluatePresentation(
-      presentationDefinition,
-      presentation,
-      limitDisclosureSignatureSuites
-    );
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, limitDisclosureSignatureSuites);
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
     }
@@ -311,11 +293,7 @@ export class PEXv1 {
     this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
 
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, holder);
-    const evaluationResults = this.evaluatePresentation(
-      presentationDefinition,
-      presentation,
-      limitDisclosureSignatureSuites
-    );
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, limitDisclosureSignatureSuites);
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
     }

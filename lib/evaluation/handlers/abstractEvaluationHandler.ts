@@ -77,9 +77,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   public removeDuplicate(results: HandlerCheckResult[]) {
     return results.reduce((arr: HandlerCheckResult[], cur: HandlerCheckResult) => {
       const result = arr.find(
-        (i) =>
-          i.input_descriptor_path === cur.input_descriptor_path &&
-          i.verifiable_credential_path === cur.verifiable_credential_path
+        (i) => i.input_descriptor_path === cur.input_descriptor_path && i.verifiable_credential_path === cur.verifiable_credential_path
       );
       if (!result) {
         return arr.concat([cur]);

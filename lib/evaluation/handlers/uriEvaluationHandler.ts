@@ -98,21 +98,12 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
     if (version === PEVersion.v1) {
       // JWT VC Profile and MS Entry Verified ID do use the schema from V1 to match against types in the VC
-      Array.isArray(credential.type)
-        ? credential.type.forEach((type) => uris.push(type))
-        : credential.type
-        ? uris.push(credential.type)
-        : undefined;
+      Array.isArray(credential.type) ? credential.type.forEach((type) => uris.push(type)) : credential.type ? uris.push(credential.type) : undefined;
     }
     return uris;
   }
 
-  private createSuccessResultObject(
-    wvc: WrappedVerifiableCredential,
-    inputDescriptorsUris: string[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private createSuccessResultObject(wvc: WrappedVerifiableCredential, inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
     result.message = PexMessages.URI_EVALUATION_PASSED;
@@ -124,12 +115,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return result;
   }
 
-  private createErrorResultObject(
-    wvc: WrappedVerifiableCredential,
-    inputDescriptorsUris: string[],
-    idIdx: number,
-    vcIdx: number
-  ) {
+  private createErrorResultObject(wvc: WrappedVerifiableCredential, inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
     result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;

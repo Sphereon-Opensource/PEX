@@ -41,16 +41,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     this.findIsHolderFieldIdsToInputDescriptorsSets(pd);
     this.findAllCredentialSubjects(wrappedVcs);
-    this.confirmAllFieldSetHasSameSubject(
-      this.fieldIdzInputDescriptorsSameSubjectRequired,
-      Status.INFO,
-      Optionality.Required
-    );
-    this.confirmAllFieldSetHasSameSubject(
-      this.fieldIdzInputDescriptorsSameSubjectPreferred,
-      Status.WARN,
-      Optionality.Preferred
-    );
+    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectRequired, Status.INFO, Optionality.Required);
+    this.confirmAllFieldSetHasSameSubject(this.fieldIdzInputDescriptorsSameSubjectPreferred, Status.WARN, Optionality.Preferred);
     this.updatePresentationSubmission(pd);
   }
 
@@ -63,22 +55,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     const fields: string[] = this.fieldIds?.map((n) => n.value) as string[];
     const error: [string, string[]][] = [];
 
-    error.push(
-      ...this.evaluateFields(
-        this.fieldIdzInputDescriptorsSameSubjectPreferred,
-        this.isHolder,
-        fields,
-        Optionality.Preferred
-      )
-    );
-    error.push(
-      ...this.evaluateFields(
-        this.fieldIdzInputDescriptorsSameSubjectRequired,
-        this.isHolder,
-        fields,
-        Optionality.Required
-      )
-    );
+    error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectPreferred, this.isHolder, fields, Optionality.Preferred));
+    error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectRequired, this.isHolder, fields, Optionality.Required));
 
     error.forEach((q) => this.getResults().push(this.createResult(q[1], q[0], ['', {}], Status.ERROR)));
   }
@@ -111,11 +89,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     credentialSubject.forEach((cs) => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));
   }
 
-  private confirmAllFieldSetHasSameSubject(
-    fieldIdzInputDescriptorsGroups: Map<string, string[]>,
-    status: Status,
-    directive: Optionality
-  ) {
+  private confirmAllFieldSetHasSameSubject(fieldIdzInputDescriptorsGroups: Map<string, string[]>, status: Status, directive: Optionality) {
     const subjectsMatchingFields = Array.from(fieldIdzInputDescriptorsGroups).flatMap((k) =>
       Array.from(this.credentialsSubjects).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
     );
@@ -124,9 +98,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
     const fields = Array.from(subjectsMatchingFields).flatMap((s) => Object.keys(s[1]).filter((w) => w !== 'id'));
 
-    const allFieldsMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap((v) =>
-      v.every((e) => fields.includes(e))
-    )[0];
+    const allFieldsMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap((v) => v.every((e) => fields.includes(e)))[0];
 
     subjectsMatchingFields.forEach((subject) => {
       const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;

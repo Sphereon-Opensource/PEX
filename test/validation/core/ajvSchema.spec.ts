@@ -313,8 +313,7 @@ describe('testing schemas with ajv', () => {
       presentation_definition: {
         id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         name: 'Conference Entry Requirements',
-        purpose:
-          'We can only allow people associated with Washington State business representatives into conference areas',
+        purpose: 'We can only allow people associated with Washington State business representatives into conference areas',
         format: {
           jwt: {
             alg: ['ES384'],
@@ -326,12 +325,7 @@ describe('testing schemas with ajv', () => {
             alg: ['ES384'],
           },
           ldp_vc: {
-            proof_type: [
-              'JsonWebSignature2020',
-              'Ed25519Signature2018',
-              'EcdsaSecp256k1Signature2019',
-              'RsaSignature2018',
-            ],
+            proof_type: ['JsonWebSignature2020', 'Ed25519Signature2018', 'EcdsaSecp256k1Signature2019', 'RsaSignature2018'],
           },
           ldp_vp: {
             proof_type: ['Ed25519Signature2018'],
@@ -344,16 +338,14 @@ describe('testing schemas with ajv', () => {
           {
             id: 'wa_driver_license',
             name: 'Washington State Business License',
-            purpose:
-              'We can only allow licensed Washington State business representatives into the WA Business Conference',
+            purpose: 'We can only allow licensed Washington State business representatives into the WA Business Conference',
             schema: [{ uri: 'https://myschema.org' }],
             constraints: {
               limit_disclosure: 'required',
               fields: [
                 {
                   path: ['$.issuer', '$.vc.issuer', '$.iss'],
-                  purpose:
-                    'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+                  purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
                   filter: {
                     type: 'string',
                     pattern: 'did:example:123|did:example:456',
