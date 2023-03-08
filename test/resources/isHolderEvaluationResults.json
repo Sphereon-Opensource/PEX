@@ -33,7 +33,8 @@
       },
       "fieldIdSet": [
         "accounts"
-      ]
+      ],
+      "format": "jwt_vc"
     },
     "status": "info",
     "verifiable_credential_path": "$[0]"
@@ -49,7 +50,8 @@
       },
       "fieldIdSet": [
         "active"
-      ]
+      ],
+      "format": "ldp_vc"
     },
     "status": "error",
     "verifiable_credential_path": "$[1]"
@@ -74,7 +76,8 @@
       },
       "fieldIdSet": [
         "accounts"
-      ]
+      ],
+      "format": "jwt_vc"
     },
     "status": "warn",
     "verifiable_credential_path": "$[0]"

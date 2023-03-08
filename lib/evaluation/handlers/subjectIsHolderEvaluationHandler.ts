@@ -15,7 +15,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
   private readonly fieldIds: { path: PathComponent[]; value: string }[];
   private readonly isHolder: { path: PathComponent[]; value: HolderSubject }[];
 
-  private credentialsSubjects: Map<string, ICredentialSubject>;
+  private credentialsSubjectsByPath: Map<string, ICredentialSubject>;
+  private credentialsByPath: Map<string, WrappedVerifiableCredential>;
 
   private messages: Map<Status, string>;
 
@@ -26,7 +27,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     this.fieldIdzInputDescriptorsSameSubjectPreferred = new Map<string, string[]>();
     this.isHolder = [];
     this.fieldIds = [];
-    this.credentialsSubjects = new Map<string, ICredentialSubject>();
+    this.credentialsSubjectsByPath = new Map<string, ICredentialSubject>();
+    this.credentialsByPath = new Map<string, WrappedVerifiableCredential>();
 
     this.messages = new Map<Status, string>();
     this.messages.set(Status.INFO, 'The field ids requiring the subject to be the holder');
@@ -58,7 +60,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectPreferred, this.isHolder, fields, Optionality.Preferred));
     error.push(...this.evaluateFields(this.fieldIdzInputDescriptorsSameSubjectRequired, this.isHolder, fields, Optionality.Required));
 
-    error.forEach((q) => this.getResults().push(this.createResult(q[1], q[0], ['', {}], Status.ERROR)));
+    error.forEach((q) => this.getResults().push(this.createResult(q[1], q[0], ['', {}], Status.ERROR, undefined)));
   }
 
   private evaluateFields(
@@ -82,33 +84,39 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private findAllCredentialSubjects(wrappedVcs: WrappedVerifiableCredential[]) {
     //TODO handle nested path
-    const credentialSubject: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
+    const credentialSubjects: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
       wrappedVcs.map((wvc) => wvc.credential),
       '$..credentialSubject'
     );
-    credentialSubject.forEach((cs) => this.credentialsSubjects.set(jp.stringify(cs.path.slice(0, 2)), cs.value));
+    for (let idx = 0; idx < credentialSubjects.length; idx++) {
+      const cs = credentialSubjects[idx];
+      const path = jp.stringify(cs.path.slice(0, 2));
+      this.credentialsSubjectsByPath.set(path, cs.value);
+      this.credentialsByPath.set(path, wrappedVcs[idx]);
+    }
   }
 
-  private confirmAllFieldSetHasSameSubject(fieldIdzInputDescriptorsGroups: Map<string, string[]>, status: Status, directive: Optionality) {
-    const subjectsMatchingFields = Array.from(fieldIdzInputDescriptorsGroups).flatMap((k) =>
-      Array.from(this.credentialsSubjects).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
+  private confirmAllFieldSetHasSameSubject(fieldIdsInputDescriptorsGroups: Map<string, string[]>, status: Status, directive: Optionality) {
+    const subjectsMatchingFields = Array.from(fieldIdsInputDescriptorsGroups).flatMap((k) =>
+      Array.from(this.credentialsSubjectsByPath).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
     );
 
-    const credentialsToInputDescriptors = this.mapCredentialsToInputDescriptors(directive);
+    const credentialPathsToInputDescriptors = this.mapCredentialPathsToInputDescriptors(directive);
 
     const fields = Array.from(subjectsMatchingFields).flatMap((s) => Object.keys(s[1]).filter((w) => w !== 'id'));
 
-    const allFieldsMatched: boolean = Array.from(fieldIdzInputDescriptorsGroups.values()).flatMap((v) => v.every((e) => fields.includes(e)))[0];
+    const allFieldsMatched: boolean = Array.from(fieldIdsInputDescriptorsGroups.values()).flatMap((v) => v.every((e) => fields.includes(e)))[0];
 
     subjectsMatchingFields.forEach((subject) => {
-      const inDescPath: string = credentialsToInputDescriptors.get(subject[0]) as string;
+      const inDescPath: string = credentialPathsToInputDescriptors.get(subject[0]) as string;
       if (allFieldsMatched && subject[1].id && this.client.dids.includes(subject[1].id)) {
         this.getResults().push(
           this.createResult(
             Object.keys(subject[1]).filter((k) => k !== 'id'),
             inDescPath,
             subject,
-            status
+            status,
+            this.credentialsByPath.get(subject[0])
           )
         );
       } else {
@@ -117,18 +125,19 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
             Object.keys(subject[1]).filter((k) => k !== 'id'),
             inDescPath,
             subject,
-            Status.ERROR
+            Status.ERROR,
+            this.credentialsByPath.get(subject[0])
           )
         );
       }
     });
   }
 
-  private mapCredentialsToInputDescriptors(directive: Optionality): Map<string, string> {
+  private mapCredentialPathsToInputDescriptors(directive: Optionality): Map<string, string> {
     const credentialsToInputDescriptors: Map<string, string> = new Map<string, string>();
     this.fieldIds?.forEach((id: { path: PathComponent[]; value: string }) => {
       const inDescPath = jp.stringify(id.path.slice(0, 3));
-      this.credentialsSubjects.forEach((cs: ICredentialSubject, credentialPath: string) => {
+      this.credentialsSubjectsByPath.forEach((cs: ICredentialSubject, credentialPath: string) => {
         const hs = this.isHolder.find((e) => jp.stringify(e.path.slice(0, 3)) === inDescPath);
         if (Object.keys(cs).includes(id.value) && hs?.value.directive === directive) {
           credentialsToInputDescriptors.set(credentialPath, inDescPath);
@@ -143,6 +152,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     inputDescriptorPath: string,
     credentialSub: [string, ICredentialSubject],
     myStatus: Status,
+    wvc?: WrappedVerifiableCredential,
     message?: string
   ): HandlerCheckResult {
     return {
@@ -150,7 +160,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: credentialSub[0],
       evaluator: this.getName(),
       status: myStatus,
-      payload: { fieldIdSet, credentialSubject: credentialSub[1] },
+      payload: { fieldIdSet, credentialSubject: credentialSub[1], ...(wvc ? { format: wvc.format } : {}) },
       message: message ?? this.messages.get(myStatus),
     };
   }

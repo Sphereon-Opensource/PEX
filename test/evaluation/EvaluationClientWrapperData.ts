@@ -17,6 +17,7 @@ export class EvaluationClientWrapperData {
       status: 'error',
       message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcContext: ['https://www.w3.org/2018/credentials/v1'],
         vcCredentialSchema: [{ id: 'https://www.w3.org/TR/vc-data-model/#types' }],
@@ -33,6 +34,7 @@ export class EvaluationClientWrapperData {
       message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcContext: ['https://www.w3.org/2018/credentials/v1'],
         vcCredentialSchema: [{ id: 'https://www.w3.org/TR/vc-data-model/#types' }],
@@ -48,6 +50,7 @@ export class EvaluationClientWrapperData {
       status: 'error',
       message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcCredentialSchema: [{ id: 'https://www.w3.org/TR/vc-data-model/#types' }],
@@ -64,6 +67,7 @@ export class EvaluationClientWrapperData {
       message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: {
         evaluator: 'UriEvaluation',
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcCredentialSchema: [{ id: 'https://www.w3.org/TR/vc-data-model/#types' }],
@@ -78,7 +82,7 @@ export class EvaluationClientWrapperData {
       descriptor_map: [
         {
           id: 'Educational transcripts',
-          format: 'ldp_vc',
+          format: 'jwt_vc', // This is actually a decoded JWT VC it seems
           path: '$.verifiableCredential[0]',
         },
       ],

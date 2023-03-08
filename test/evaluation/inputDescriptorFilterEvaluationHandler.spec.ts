@@ -15,7 +15,7 @@ const message: HandlerCheckResult = {
   verifiable_credential_path: `$[0]`,
   evaluator: `FilterEvaluation`,
   status: Status.INFO,
-  payload: { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: true },
+  payload: { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: true, format: 'jwt_vc' },
   message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
 };
 
@@ -42,11 +42,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     );
     const message0 = { ...message };
     message0.input_descriptor_path = '$.input_descriptors[0]';
-    message0.payload = { result: [], valid: true };
+    message0.payload = { result: [], valid: true, format: 'jwt_vc' };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { result: [], valid: true };
+    message1.payload = { result: [], valid: true, format: 'ldp_vc' };
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { result: [], valid: true };
+    message2.payload = { result: [], valid: true, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
@@ -69,11 +69,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     );
     const message0 = { ...message };
     message0.input_descriptor_path = '$.input_descriptors[0]';
-    message0.payload = { result: [], valid: true };
+    message0.payload = { result: [], valid: true, format: 'jwt_vc' };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { result: [], valid: true };
+    message1.payload = { result: [], valid: true, format: 'ldp_vc' };
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { result: [], valid: true };
+    message2.payload = { result: [], valid: true, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
@@ -96,11 +96,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
     );
     const message0 = { ...message };
     message0.input_descriptor_path = '$.input_descriptors[0]';
-    message0.payload = { result: [], valid: true };
+    message0.payload = { result: [], valid: true, format: 'jwt_vc' };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { result: [], valid: true };
+    message1.payload = { result: [], valid: true, format: 'ldp_vc' };
     const message2 = { ...message1, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { result: [], valid: true };
+    message2.payload = { result: [], valid: true, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
@@ -126,11 +126,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
       ['status']: Status.ERROR,
       ['message']: PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY,
     };
-    message0.payload = { valid: false };
+    message0.payload = { valid: false, format: 'jwt_vc' };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { valid: false };
+    message1.payload = { valid: false, format: 'ldp_vc' };
     const message2 = { ...message0, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { valid: false };
+    message2.payload = { valid: false, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
@@ -156,11 +156,11 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
       ['status']: Status.ERROR,
       ['message']: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION,
     };
-    message0.payload = { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: false };
+    message0.payload = { result: { path: ['$', 'issuer'], value: 'did:example:123' }, valid: false, format: 'jwt_vc' };
     const message1 = { ...message0, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false };
+    message1.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false, format: 'ldp_vc' };
     const message2 = { ...message0, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false };
+    message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: false, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;
@@ -182,9 +182,9 @@ describe('inputDescriptorFilterEvaluationHandler tests', () => {
       (d, i, dm) => (dm[i].path = d.path.replace(/\$\.verifiableCredential\[(\d+)/g, '$[$1]'))
     );
     const message1 = { ...message, ['verifiable_credential_path']: '$[1]' };
-    message1.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: true };
+    message1.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: true, format: 'ldp_vc' };
     const message2 = { ...message, ['verifiable_credential_path']: '$[2]' };
-    message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: true };
+    message2.payload = { result: { path: ['$', 'issuer'], value: 'did:foo:123' }, valid: true, format: 'ldp_vc' };
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!);
     evaluationClient.presentationSubmission = presentation.presentation_submission as PresentationSubmission;

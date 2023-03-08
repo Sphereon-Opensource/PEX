@@ -34,6 +34,7 @@ describe('evaluate', () => {
       status: 'error',
       message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcContext: ['https://www.w3.org/2018/credentials/v1'],
         vcCredentialSchema: [{ id: 'https://www.w3.org/TR/vc-data-model/#types' }],
@@ -71,6 +72,7 @@ describe('evaluate', () => {
       status: 'error',
       message: PexMessages.URI_EVALUATION_DIDNT_PASS,
       payload: {
+        format: 'ldp_vc',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.w3.org/TR/vc-data-model/#types1'],
         vcCredentialSchema: [

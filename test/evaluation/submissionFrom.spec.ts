@@ -36,7 +36,7 @@ describe('Submission requirements tests', () => {
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
@@ -92,7 +92,7 @@ describe('Submission requirements tests', () => {
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
         ],
       })
@@ -230,7 +230,7 @@ describe('Submission requirements tests', () => {
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
@@ -258,7 +258,7 @@ describe('Submission requirements tests', () => {
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
@@ -286,7 +286,7 @@ describe('Submission requirements tests', () => {
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],

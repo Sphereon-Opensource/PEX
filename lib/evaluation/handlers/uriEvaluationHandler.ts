@@ -28,28 +28,32 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
   //TODO: handle context objects
   //TODO: handle hashlinks
-  public handle(d: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
+  public handle(definition: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     // This filter is removed in V2
-    (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
-      const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
-      wrappedVcs.forEach((wvc: WrappedVerifiableCredential, j: number) => {
-        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential, d.getVersion());
-        this.evaluateUris(wvc, vcUris, uris, i, j, d.getVersion());
+    (<InternalPresentationDefinitionV1>definition).input_descriptors.forEach((inDesc: InputDescriptorV1, descriptorIdx: number) => {
+      const uris: string[] = definition.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
+      wrappedVcs.forEach((wvc: WrappedVerifiableCredential, wrappedVCIdx: number) => {
+        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential, definition.getVersion());
+        this.evaluateUris(wvc, vcUris, uris, descriptorIdx, wrappedVCIdx, definition.getVersion());
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
-      .filter((e) => e.status === Status.INFO)
-      .map((e) => {
-        const inputDescriptor: InputDescriptorV1 = jp.nodes(d, e.input_descriptor_path)[0].value;
+      .filter((result) => result.status === Status.INFO)
+      .map((result) => {
+        const inputDescriptor: InputDescriptorV1 = jp.nodes(definition, result.input_descriptor_path)[0].value;
         return {
           id: inputDescriptor.id,
-          format: 'ldp_vc',
-          path: e.verifiable_credential_path,
+          format: result.payload?.format,
+          path: result.verifiable_credential_path,
         };
       });
+    // The presentation submission is being created in this handler, then updated in subsequent handler.
+    // TODO: This approach needs to be refactored for a new Major version.
+    // Also there is no apparent need for the indirection and state in this class.
+    // Simply do the first loops and amend the presentation submission in every loop.
     this.presentationSubmission = {
       id: nanoid(),
-      definition_id: d.id,
+      definition_id: definition.id,
       descriptor_map: descriptorMap,
     };
   }
@@ -103,11 +107,17 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return uris;
   }
 
-  private createSuccessResultObject(wvc: WrappedVerifiableCredential, inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
+  private createSuccessResultObject(
+    wvc: WrappedVerifiableCredential,
+    inputDescriptorsUris: string[],
+    idIdx: number,
+    vcIdx: number
+  ): HandlerCheckResult {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
     result.message = PexMessages.URI_EVALUATION_PASSED;
     result.payload = {
+      format: wvc.format,
       vcContext: wvc.credential['@context'],
       vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,
@@ -115,11 +125,17 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     return result;
   }
 
-  private createErrorResultObject(wvc: WrappedVerifiableCredential, inputDescriptorsUris: string[], idIdx: number, vcIdx: number) {
+  private createErrorResultObject(
+    wvc: WrappedVerifiableCredential,
+    inputDescriptorsUris: string[],
+    idIdx: number,
+    vcIdx: number
+  ): HandlerCheckResult {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
     result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
+      format: wvc.format,
       vcContext: wvc.credential['@context'],
       vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,

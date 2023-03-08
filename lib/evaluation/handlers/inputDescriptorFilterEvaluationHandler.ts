@@ -25,7 +25,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
     wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
-      this.createNoFieldResults(pd, vcIndex);
+      this.createNoFieldResults(pd, vcIndex, wvc);
       fields.forEach((field) => {
         let inputField: { path: PathComponent[]; value: unknown }[] = [];
         if (field.value.path) {
@@ -35,7 +35,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         for (const inputFieldKey of inputField) {
           if (this.evaluateFilter(inputFieldKey, field.value)) {
             resultFound = true;
-            const payload = { result: { ...inputField[0] }, valid: true };
+            const payload = { result: { ...inputField[0] }, valid: true, format: wvc.format };
             this.getResults().push({
               ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
             });
@@ -43,10 +43,10 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
         if (!resultFound) {
           if (!inputField.length) {
-            const payload = { valid: false };
+            const payload = { valid: false, format: wvc.format };
             this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
           } else {
-            const payload = { result: { ...inputField[0] }, valid: false };
+            const payload = { result: { ...inputField[0] }, valid: false, format: wvc.format };
             this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
           }
         }
@@ -55,7 +55,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.updatePresentationSubmission(pd);
   }
 
-  private createNoFieldResults(pd: IInternalPresentationDefinition, vcIndex: number) {
+  private createNoFieldResults(pd: IInternalPresentationDefinition, vcIndex: number, credential: WrappedVerifiableCredential) {
     // PresentationDefinitionV2 is the common denominator
     const noFields = (pd as InternalPresentationDefinitionV2).input_descriptors
       .map((inDesc, index) => {
@@ -63,7 +63,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       })
       .filter((el) => el.inDesc.constraints?.fields === undefined || el.inDesc.constraints?.fields?.length === 0);
     noFields.forEach((noField) => {
-      const payload = { result: [], ['valid']: true };
+      const payload = { result: [], valid: true, format: credential.format };
       this.getResults().push({
         ...this.createResultObject(`$.input_descriptors[${noField.index}]`, vcIndex, payload),
       });
@@ -72,6 +72,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
 
   private createResponse(field: { path: PathComponent[]; value: FieldV1 | FieldV2 }, vcIndex: number, payload: unknown, message: string): void {
     this.getResults().push({
+      // TODO: why does this code assume a path to contain certain elements in the path?
       ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
       ['status']: Status.ERROR,
       ['message']: message,

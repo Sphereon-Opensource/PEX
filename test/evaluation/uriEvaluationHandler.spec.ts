@@ -53,6 +53,7 @@ describe('evaluate', () => {
     evaluationHandler.handle(pd, [wvc]);
     expect(evaluationHandler.getResults()[0]).toEqual(
       new HandlerCheckResult('$.input_descriptors[0]', '$[0]', 'UriEvaluation', Status.ERROR, PexMessages.URI_EVALUATION_DIDNT_PASS, {
+        format: 'ldp',
         inputDescriptorsUris: ['https://www.w3.org/2018/credentials/v1'],
         vcContext: ['https://www.test.org/mock'],
         vcCredentialSchema: [
