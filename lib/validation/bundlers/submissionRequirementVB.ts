@@ -98,7 +98,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   }
 
   isMinPositiveInt(sr: SubmissionRequirement): boolean {
-    return sr.rule !== 'pick' || sr.min == null || 0 < sr.min;
+    return sr.rule !== 'pick' || sr.min == null || 0 <= sr.min;
   }
 
   isMaxPositiveInt(sr: SubmissionRequirement): boolean {
