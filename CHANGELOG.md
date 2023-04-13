@@ -1,10 +1,18 @@
 # Release Notes
-## v2.0.0-unstable.1 - 2022-10-14
+## v2.0.0 - 2023-03-08
 Using @sphereon/ssi-types
-- removed
+- Added:
+  - Matching of schema strings against the type property in a VC for V1, as this is being used in the wiled
+  - Allow issuance object to be present in a definition as it is being used in the wild
+- Removed:
   - definitions of ssi-types (lib/types/SSI.types.ts)
 - Changed:
-  - method signatures to types from @sphereon/ssi-types
+  - method signatures to use types from @sphereon/ssi-types
+  - Credential Mapper from @sphereon/ssi-types to create internal uniform VPs/VCs
+  - Relax AJV errors
+- Fixed:
+  - Set the format based on detection of the format instead of hardcoding it in the descriptor 
+  - Match subject is issuer against all subjects of a VC if present (not common)
 
 ## v1.1.6 - 2023-02-17
 Add async callback for signing
