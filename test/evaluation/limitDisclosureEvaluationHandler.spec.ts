@@ -66,7 +66,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toEqual('Maarssen');
-    expect(evaluationClient.results[7]).toEqual({
+    expect(evaluationClient.results[8]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
       message: PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
@@ -88,7 +88,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']).toBeUndefined();
-    expect(evaluationClient.results[6]).toEqual({
+    expect(evaluationClient.results[7]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
       message: PexMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,

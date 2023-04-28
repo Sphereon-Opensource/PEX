@@ -9,5 +9,5 @@ export interface EvaluationHandler {
   getNext(): EvaluationHandler | undefined;
   hasNext(): boolean;
   getName(): string;
-  handle(pd: IInternalPresentationDefinition, p: WrappedVerifiableCredential[]): void;
+  handle(pd: IInternalPresentationDefinition, wvc: WrappedVerifiableCredential[]): void;
 }

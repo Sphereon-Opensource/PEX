@@ -85,7 +85,6 @@ export class PEX {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
-      restrictToFormats?: Format;
     }
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
@@ -120,6 +119,7 @@ export class PEX {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));

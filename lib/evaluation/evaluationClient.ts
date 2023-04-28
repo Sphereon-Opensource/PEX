@@ -1,4 +1,4 @@
-import { PresentationSubmission } from '@sphereon/pex-models';
+import { Format, PresentationSubmission } from '@sphereon/pex-models';
 import { IProofType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../ConstraintUtils';
@@ -17,6 +17,7 @@ import {
   SubjectIsIssuerEvaluationHandler,
   UriEvaluationHandler,
 } from './handlers';
+import { FormatRestrictionEvaluationHandler } from './handlers/formatRestrictionEvaluationHandler';
 
 const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -41,6 +42,7 @@ export class EvaluationClient {
   private _presentationSubmission: Partial<PresentationSubmission>;
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
+  private _restrictToFormats: Format | undefined;
 
   public evaluate(
     pd: IInternalPresentationDefinition,
@@ -48,11 +50,12 @@ export class EvaluationClient {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
-      // restrictToFormats?: Format;
+      restrictToFormats?: Format;
     }
   ): void {
     this._dids = opts?.holderDIDs || [];
     this._limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
+    this._restrictToFormats = opts?.restrictToFormats;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, wvcs);
     while (currentHandler?.hasNext()) {
@@ -103,10 +106,17 @@ export class EvaluationClient {
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
   }
 
+  get restrictToFormats(): Format | undefined {
+    return this._restrictToFormats;
+  }
+
+  set restrictToFormats(value: Format | undefined) {
+    this._restrictToFormats = value;
+  }
   private initEvaluationHandlers() {
     const uriEvaluation = new UriEvaluationHandler(this);
-
     uriEvaluation
+      .setNext(new FormatRestrictionEvaluationHandler(this))
       .setNext(new InputDescriptorFilterEvaluationHandler(this))
       .setNext(new PredicateRelatedFieldEvaluationHandler(this))
       .setNext(new LimitDisclosureEvaluationHandler(this))
