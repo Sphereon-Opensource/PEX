@@ -47,6 +47,7 @@ export class PEX {
     presentation: OriginalVerifiablePresentation | IPresentation,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): EvaluationResults {
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
@@ -85,6 +86,7 @@ export class PEX {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =

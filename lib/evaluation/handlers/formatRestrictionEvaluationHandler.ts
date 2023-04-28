@@ -20,7 +20,7 @@ export class FormatRestrictionEvaluationHandler extends AbstractEvaluationHandle
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     (pd as InternalPresentationDefinitionV1 | InternalPresentationDefinitionV2).input_descriptors.forEach((_inputDescriptor, index) => {
       wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
-        if (!this.client.restrictToFormats || wvc.format in Object.keys(this.client.restrictToFormats)) {
+        if (!this.client.restrictToFormats || Object.keys(this.client.restrictToFormats).includes(wvc.format)) {
           this.getResults().push(this.generateSuccessResult(index, `$[${vcIndex}]`, wvc, `${wvc.format} is allowed`));
         } else {
           this.getResults().push(this.generateErrorResult(index, `$[${vcIndex}]`, wvc));

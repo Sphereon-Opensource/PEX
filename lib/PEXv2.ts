@@ -1,4 +1,5 @@
 import { PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
+import { Format } from '@sphereon/pex-models/model/format';
 import {
   IPresentation,
   IProof,
@@ -40,6 +41,7 @@ export class PEXv2 {
     presentation: OriginalVerifiablePresentation | IPresentation,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): EvaluationResults {
     const presentationCopy: OriginalVerifiablePresentation | IVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
@@ -75,6 +77,7 @@ export class PEXv2 {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): EvaluationResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -108,6 +111,7 @@ export class PEXv2 {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): SelectResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
