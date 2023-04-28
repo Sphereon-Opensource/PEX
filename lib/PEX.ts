@@ -1,4 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
+import { Format } from '@sphereon/pex-models/model/format';
 import {
   IPresentation,
   IProof,
@@ -48,13 +49,15 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
     }
   ): EvaluationResults {
-    const limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
-    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
+    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, {
+      ...opts,
+      holderDIDs,
+    });
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
@@ -68,7 +71,7 @@ export class PEX {
   /***
    * The evaluate compares what is expected from a verifiableCredentials with the presentationDefinition.
    *
-   * @param presentationDefinition the v1 definition of what is expected in the presentation.
+   * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
    * @param opts - holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holder check.
    * @           - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
@@ -82,14 +85,14 @@ export class PEX {
     opts?: {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, opts);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedVerifiableCredentials, opts);

@@ -45,11 +45,14 @@ export class EvaluationClient {
   public evaluate(
     pd: IInternalPresentationDefinition,
     wvcs: WrappedVerifiableCredential[],
-    holderDids?: string[],
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+      // restrictToFormats?: Format;
+    }
   ): void {
-    this._dids = holderDids || [];
-    this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
+    this._dids = opts?.holderDIDs || [];
+    this._limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, wvcs);
     while (currentHandler?.hasNext()) {

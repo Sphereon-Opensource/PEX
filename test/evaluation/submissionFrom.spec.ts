@@ -27,7 +27,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -55,7 +55,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -83,7 +83,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -110,7 +110,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -137,7 +137,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toThrowError('Min: expected: 3 actual: 2 at level: 0');
@@ -154,7 +154,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toThrowError('Max: expected: 1 actual: 2 at level: 0');
@@ -171,7 +171,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toThrowError('Count: expected: 1 actual: 2 at level: 0');
@@ -188,7 +188,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toEqual(
@@ -221,7 +221,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -249,7 +249,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -277,7 +277,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
@@ -305,7 +305,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toThrowError('Min: expected: 3 actual: 2 at level: 1');
@@ -322,7 +322,7 @@ describe('Submission requirements tests', () => {
       vpSimple.verifiableCredential![1],
       vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(pd, wvcs, HOLDER_DID, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
       evaluationClientWrapper.submissionFrom(pdSchema, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
     ).toThrowError('Max: expected: 1 actual: 2 at level: 1');

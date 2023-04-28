@@ -42,14 +42,13 @@ export class PEXv1 {
       limitDisclosureSignatureSuites?: string[];
     }
   ): EvaluationResults {
-    const limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, { ...opts, holderDIDs });
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
@@ -79,12 +78,11 @@ export class PEXv1 {
       limitDisclosureSignatureSuites?: string[];
     }
   ): EvaluationResults {
-    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
     const wrappedVerifiableCredentials = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
 
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, opts);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedVerifiableCredentials, opts);
@@ -216,7 +214,10 @@ export class PEXv1 {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(presentationDefinition, selectedCredentials, { holderDIDs, limitDisclosureSignatureSuites });
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, {
+      holderDIDs,
+      limitDisclosureSignatureSuites,
+    });
 
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, { holderDID: holder });
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
@@ -289,7 +290,10 @@ export class PEXv1 {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(presentationDefinition, selectedCredentials, { holderDIDs, limitDisclosureSignatureSuites });
+    this.evaluateCredentials(presentationDefinition, selectedCredentials, {
+      holderDIDs,
+      limitDisclosureSignatureSuites,
+    });
 
     const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, { holderDID: holder });
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });

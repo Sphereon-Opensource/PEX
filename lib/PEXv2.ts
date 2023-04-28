@@ -42,13 +42,12 @@ export class PEXv2 {
       limitDisclosureSignatureSuites?: string[];
     }
   ): EvaluationResults {
-    const limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     const presentationCopy: OriginalVerifiablePresentation | IVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, { ...opts, holderDIDs });
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
@@ -78,11 +77,10 @@ export class PEXv2 {
       limitDisclosureSignatureSuites?: string[];
     }
   ): EvaluationResults {
-    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
-    const result = this._evaluationClientWrapper.evaluate(pd, wvcs, holderDIDs, limitDisclosureSignatureSuites);
+    const result = this._evaluationClientWrapper.evaluate(pd, wvcs, opts);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wvcs, opts);

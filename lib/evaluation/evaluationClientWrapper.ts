@@ -1,4 +1,5 @@
 import { Descriptor, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
+import { Format } from '@sphereon/pex-models/model/format';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
 
@@ -28,10 +29,9 @@ export class EvaluationClientWrapper {
       limitDisclosureSignatureSuites?: string[];
     }
   ): SelectResults {
-    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, opts);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 
@@ -206,10 +206,13 @@ export class EvaluationClientWrapper {
   public evaluate(
     pd: IInternalPresentationDefinition,
     wvcs: WrappedVerifiableCredential[],
-    holderDids?: string[],
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
+    }
   ): EvaluationResults {
-    this._client.evaluate(pd, wvcs, holderDids, limitDisclosureSignatureSuites);
+    this._client.evaluate(pd, wvcs, opts);
     const result: EvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
       verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential),
