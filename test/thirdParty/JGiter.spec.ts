@@ -568,7 +568,10 @@ describe('evaluate JGiter tests', () => {
     const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_3();
     const vcs = getVerifiableCredentials();
-    const resultSelectFrom = pex.selectFrom(pdSchema, vcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.ERROR);
     expect(resultSelectFrom.matches).toEqual([]);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(0);

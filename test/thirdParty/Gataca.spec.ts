@@ -19,7 +19,10 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(result.matches).toEqual([
       {
@@ -44,7 +47,10 @@ describe('evaluate gataca tests', () => {
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     presentationDefinition.submission_requirements = [presentationDefinition.submission_requirements![0]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
@@ -69,7 +75,10 @@ describe('evaluate gataca tests', () => {
     pdSchema.input_descriptors = [pdSchema.input_descriptors[1], pdSchema.input_descriptors[2]];
     pdSchema.submission_requirements = [pdSchema.submission_requirements![1]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual('urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv');
   });
 
@@ -84,7 +93,10 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(result.matches).toEqual([
       {
@@ -107,7 +119,10 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const presentationDefinition: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
-    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],

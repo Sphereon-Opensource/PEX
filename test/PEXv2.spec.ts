@@ -278,7 +278,10 @@ describe('evaluate', () => {
     const pex: PEXv2 = new PEXv2();
     const pdSchema: PresentationDefinitionV2 = getFile('./test/dif_pe_examples/pdV2/vc_expiration(corrected).json').presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
-    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, [vc], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result!.errors!.length).toEqual(0);
     expect(JSON.stringify(result!.matches)).toBe(
       JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }])
@@ -362,7 +365,10 @@ describe('evaluate', () => {
 
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
-    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
     expect(result.errors?.length).toEqual(0);
   });
@@ -383,7 +389,10 @@ describe('evaluate', () => {
 
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
-    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
     expect(result.errors?.length).toEqual(0);
   });
@@ -404,7 +413,10 @@ describe('evaluate', () => {
 
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
-    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pd, [vpSimple.verifiableCredential![0]], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
     expect(result.errors?.length).toEqual(0);
   });

@@ -82,6 +82,11 @@ export class InternalPresentationDefinitionV2 implements PresentationDefinitionV
   }
 }
 
+export interface DiscoveredVersion {
+  version?: PEVersion;
+  error?: string;
+}
+
 export type IPresentationDefinition = PresentationDefinitionV1 | PresentationDefinitionV2;
 
 export type InputFieldType =

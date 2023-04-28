@@ -106,7 +106,10 @@ describe('evaluate', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson('./test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json').presentation_definition;
     const vc = getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'https://www.example.com/schema' }];
-    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, [vc], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result!.errors!.length).toEqual(2);
     expect(result!.errors!.map((e) => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);
   });
@@ -118,7 +121,7 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pex: PEX = new PEX();
-    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -130,12 +133,10 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pex: PEX = new PEX();
-    const evaluationResults = pex.evaluateCredentials(
-      pdSchema,
-      vpSimple.verifiableCredential!,
-      [vpSimple.holder as string],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const evaluationResults = pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential!, {
+      holderDIDs: [vpSimple.holder as string],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -146,8 +147,11 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pex: PEX = new PEX();
-    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential!, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, HOLDER_DID);
+    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential!, {
+      holderDIDs: [HOLDER_DID],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',

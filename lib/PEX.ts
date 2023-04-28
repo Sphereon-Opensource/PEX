@@ -15,7 +15,7 @@ import Ajv from 'ajv';
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
-import { IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
+import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
 import { JsonPathUtils } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 import { PresentationDefinitionSchema } from './validation/core/presentationDefinitionSchema';
@@ -36,7 +36,7 @@ export class PEX {
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
    * @param presentation the presentation which has to be evaluated in comparison of the definition.
-   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
+   * @param opts - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
    * were not fulfilled by the presentation.
@@ -44,8 +44,11 @@ export class PEX {
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
     presentation: OriginalVerifiablePresentation | IPresentation,
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      limitDisclosureSignatureSuites?: string[];
+    }
   ): EvaluationResults {
+    const limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
@@ -54,12 +57,7 @@ export class PEX {
     const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, holderDIDs, limitDisclosureSignatureSuites);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
-        pd,
-        wrappedPresentation.vcs,
-        holderDIDs,
-        limitDisclosureSignatureSuites
-      );
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
       if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
         result.errors = [];
       }
@@ -72,8 +70,8 @@ export class PEX {
    *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
-   * @param holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holder check.
-   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
+   * @param opts - holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holder check.
+   * @           - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
    * were not fulfilled by the verifiable credentials.
@@ -81,9 +79,12 @@ export class PEX {
   public evaluateCredentials(
     presentationDefinition: IPresentationDefinition,
     verifiableCredentials: OriginalVerifiableCredential[],
-    holderDIDs?: string[],
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+    }
   ): EvaluationResults {
+    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -91,12 +92,7 @@ export class PEX {
     const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(
-        pd,
-        wrappedVerifiableCredentials,
-        holderDIDs,
-        limitDisclosureSignatureSuites
-      );
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedVerifiableCredentials, opts);
       result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
     } else {
       result.areRequiredCredentialsPresent = Status.ERROR;
@@ -110,26 +106,23 @@ export class PEX {
    *
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param holderDIDs the decentralized identifier(s) of the wallet holder. This is used to identify the credentials issued to the holder of wallet in certain scenario's.
-   * @param limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
+   * @param opts - holderDIDs the decentralized identifier(s) of the wallet holder. This is used to identify the credentials issued to the holder of wallet in certain scenario's.
+   *             - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
    */
   public selectFrom(
     presentationDefinition: IPresentationDefinition,
     verifiableCredentials: OriginalVerifiableCredential[],
-    holderDIDs?: string[],
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+    }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(
-      pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy),
-      holderDIDs,
-      limitDisclosureSignatureSuites
-    );
+    return this._evaluationClientWrapper.selectFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy), opts);
   }
 
   /**
@@ -139,29 +132,33 @@ export class PEX {
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
+   * @param opts - holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
    *
    * @return the presentation.
    */
   public presentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredential: OriginalVerifiableCredential[],
-    holderDID?: string
+    opts?: {
+      holderDID?: string;
+    }
   ): IPresentation {
     const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential)
     );
-    return PEX.getPresentation(presentationSubmission, selectedCredential, holderDID);
+    return PEX.getPresentation(presentationSubmission, selectedCredential, opts);
   }
 
   public static getPresentation(
     presentationSubmission: PresentationSubmission,
     selectedCredentials: OriginalVerifiableCredential[],
-    holderDID?: string
+    opts?: {
+      holderDID?: string;
+    }
   ): IPresentation {
-    const holder = holderDID;
+    const holder = opts?.holderDID;
     return {
       '@context': ['https://www.w3.org/2018/credentials/v1', 'https://identity.foundation/presentation-exchange/submission/v1'],
       type: [
@@ -177,12 +174,12 @@ export class PEX {
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *
-   * @param p: presentationDefinition of V1 or v2 to be validated.
+   * @param presentationDefinition: presentationDefinition of V1 or v2 to be validated.
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(p: IPresentationDefinition): Validated {
-    const result = this.definitionVersionDiscovery(p);
+  public validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
+    const result = this.definitionVersionDiscovery(presentationDefinition);
     if (result.error) {
       throw result.error;
     }
@@ -190,11 +187,11 @@ export class PEX {
     result.version === PEVersion.v1
       ? validators.push({
           bundler: new PresentationDefinitionV1VB('root'),
-          target: SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(p as PresentationDefinitionV1),
+          target: SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition as PresentationDefinitionV1),
         })
       : validators.push({
           bundler: new PresentationDefinitionV2VB('root'),
-          target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(p as PresentationDefinitionV2),
+          target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition as PresentationDefinitionV2),
         });
     return new ValidationEngine().validate(validators);
   }
@@ -217,18 +214,18 @@ export class PEX {
 
   /**
    * This method can be used to combine a definition, selected Verifiable Credentials, together with
-   * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
+   * signing opts and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
    * Please note that PEX has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
    * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
-   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
+   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature opts
    *
    * @param presentationDefinition the Presentation Definition V1 or V2
    * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
-   * @param options: Signing Params these are the signing params required to sign.
+   * @param opts: Signing Params these are the signing params required to sign.
    *
    * @return the signed and thus Verifiable Presentation.
    */
@@ -236,9 +233,9 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | IVerifiablePresentation,
-    options: PresentationSignOptions
+    opts: PresentationSignOptions
   ): Promise<W3CVerifiablePresentation> {
-    const { holder, signatureOptions, proofOptions } = options;
+    const { holder, signatureOptions, proofOptions } = opts;
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -253,10 +250,13 @@ export class PEX {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, {
+      holderDIDs,
+      limitDisclosureSignatureSuites,
+    });
 
-    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, limitDisclosureSignatureSuites);
+    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, { holderDID: holder });
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
     }
@@ -274,7 +274,7 @@ export class PEX {
     };
 
     const callBackParams: PresentationSignCallBackParams = {
-      options,
+      options: opts,
       presentation,
       presentationDefinition,
       selectedCredentials,
@@ -287,12 +287,12 @@ export class PEX {
 
   /**
    * This method can be used to combine a definition, selected Verifiable Credentials, together with
-   * signing options and a callback to sign a presentation, making it a Verifiable Presentation before sending.
+   * signing opts and a callback to sign a presentation, making it a Verifiable Presentation before sending.
    *
    * Please note that PEX has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
    * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
    * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
-   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature options
+   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature opts
    *
    * @deprecated This method in current form will not be supported in our next release. This will be changed to an "async" function.
    *
@@ -300,7 +300,7 @@ export class PEX {
    * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
-   * @param options: Signing Params these are the signing params required to sign.
+   * @param opts: Signing Params these are the signing params required to sign.
    *
    * @return the signed and thus Verifiable Presentation.
    */
@@ -308,9 +308,9 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => IVerifiablePresentation,
-    options: PresentationSignOptions
+    opts: PresentationSignOptions
   ): IVerifiablePresentation {
-    const { holder, signatureOptions, proofOptions } = options;
+    const { holder, signatureOptions, proofOptions } = opts;
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -325,10 +325,13 @@ export class PEX {
 
     const holderDIDs: string[] = holder ? [holder] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, holderDIDs, limitDisclosureSignatureSuites);
+    const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, {
+      holderDIDs,
+      limitDisclosureSignatureSuites,
+    });
 
-    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, holder);
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, limitDisclosureSignatureSuites);
+    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, { holderDID: holder });
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
     }
@@ -346,7 +349,7 @@ export class PEX {
     };
 
     const callBackParams: PresentationSignCallBackParams = {
-      options,
+      options: opts,
       presentation,
       presentationDefinition,
       selectedCredentials,
@@ -358,10 +361,7 @@ export class PEX {
     return signingCallBack(callBackParams);
   }
 
-  public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): {
-    version?: PEVersion;
-    error?: string;
-  } {
+  public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): DiscoveredVersion {
     const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
     JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
     JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
@@ -382,7 +382,7 @@ export class PEX {
 
   private determineAndCastToInternalPresentationDefinition(presentationDefinition: IPresentationDefinition): IInternalPresentationDefinition {
     const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
-    const versionResult: { version?: PEVersion; error?: string } = this.definitionVersionDiscovery(presentationDefinitionCopy);
+    const versionResult: DiscoveredVersion = this.definitionVersionDiscovery(presentationDefinitionCopy);
     if (versionResult.error) throw versionResult.error;
     if (versionResult.version == PEVersion.v1) {
       return SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinitionCopy as PresentationDefinitionV1);

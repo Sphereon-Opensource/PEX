@@ -23,12 +23,15 @@ export class EvaluationClientWrapper {
   public selectFrom(
     presentationDefinition: IInternalPresentationDefinition,
     wrappedVerifiableCredentials: WrappedVerifiableCredential[],
-    holderDids?: string[],
-    limitDisclosureSignatureSuites?: string[]
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+    }
   ): SelectResults {
+    const { holderDIDs, limitDisclosureSignatureSuites } = opts ?? {};
     let selectResults: SelectResults;
 
-    this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, holderDids, limitDisclosureSignatureSuites);
+    this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, holderDIDs, limitDisclosureSignatureSuites);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
     const errors: Checked[] = [...this.formatNotInfo(Status.ERROR)];
 

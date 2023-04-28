@@ -492,7 +492,10 @@ describe('evaluate', () => {
       },
     ];
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vcs);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, wvcs);
     expect(ps.descriptor_map.map((d) => d.path)).toEqual(['$.verifiableCredential[0]', '$.verifiableCredential[0]', '$.verifiableCredential[1]']);
@@ -589,7 +592,10 @@ describe('evaluate', () => {
     };
     const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(
@@ -702,7 +708,10 @@ describe('evaluate', () => {
     };
     const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(

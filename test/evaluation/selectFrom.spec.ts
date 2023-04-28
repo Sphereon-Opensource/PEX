@@ -28,7 +28,9 @@ describe('selectFrom tests', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
       errors: [
         {
@@ -206,7 +208,10 @@ describe('selectFrom tests', () => {
     ]);
     const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: dids,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.matches?.length).toBe(0);
     expect(result.areRequiredCredentialsPresent).toBe(Status.ERROR);
   });
@@ -222,7 +227,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -290,7 +297,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -402,7 +411,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -470,7 +481,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
       errors: [
         {
@@ -668,7 +681,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -780,7 +795,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -892,7 +909,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -960,7 +979,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1109,7 +1130,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.WARN,
       errors: [
         {
@@ -1258,7 +1281,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
       errors: [
         {
@@ -1413,7 +1438,9 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES)).toEqual({
+    expect(
+      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
+    ).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
       matches: [
@@ -1525,7 +1552,10 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    const result = evaluationClientWrapper.selectFrom(pd, wvcs, dids, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: dids,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
       errors: [],
@@ -1633,7 +1663,10 @@ describe('selectFrom tests', () => {
     const verifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([verifiableCredential]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pd, wvcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual("EU Driver's License");
     expect(result!.matches![0]).toEqual({
@@ -1650,7 +1683,10 @@ describe('selectFrom tests', () => {
     const verifiableCredential: IVerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as IVerifiableCredential;
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([verifiableCredential]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
-    const result = evaluationClientWrapper.selectFrom(pd, wvcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual("EU Driver's License");
   });
