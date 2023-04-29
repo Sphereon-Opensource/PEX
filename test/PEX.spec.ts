@@ -212,7 +212,7 @@ describe('evaluate', () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = (await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential!,
       assertedMockCallback,
@@ -221,7 +221,7 @@ describe('evaluate', () => {
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       }
-    );
+    )) as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -233,7 +233,7 @@ describe('evaluate', () => {
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = (await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential!,
       assertedMockCallback,
@@ -242,14 +242,14 @@ describe('evaluate', () => {
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       }
-    );
+    )) as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
-  it("should throw error if proofOptions doesn't have a type", () => {
+  it("should throw error if proofOptions doesn't have a type", async () => {
     const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
@@ -257,26 +257,27 @@ describe('evaluate', () => {
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    expect(() =>
+    await expect(() =>
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       })
-    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
-  it('should throw exception if signing encounters a problem', () => {
-    const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
+  it('should throw exception if signing encounters a problem', async () => {
+    const pdSchema = getFileAsJson('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
+    const vpSimple = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEX = new PEX();
 
-    expect(() => {
-      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getErrorThrown, {
+    await expect(async () => {
+      await pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
+        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       });
-    }).toThrow(Error);
+    }).rejects.toThrow();
   });
 
   it('should return v1 when calling version discovery', function () {
@@ -479,15 +480,10 @@ describe('evaluate', () => {
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt');
     const wvp: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(jwtEncodedVp);
     const pex: PEX = new PEX();
-    const vp: W3CVerifiablePresentation = (await pex.verifiablePresentationFromAsync(
-      pdSchema,
-      [wvp.vcs[0].original],
-      getAsyncCallbackWithoutProofType,
-      {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-      }
-    )) as IVerifiablePresentation;
+    const vp: W3CVerifiablePresentation = (await pex.verifiablePresentationFrom(pdSchema, [wvp.vcs[0].original], getAsyncCallbackWithoutProofType, {
+      proofOptions: getProofOptionsMock(),
+      signatureOptions: getSingatureOptionsMock(),
+    })) as IVerifiablePresentation;
     expect(vp.verifiableCredential?.length).toEqual(1);
     expect(vp.presentation_submission?.descriptor_map).toEqual([
       {

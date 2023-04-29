@@ -241,7 +241,7 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = await pex.verifiablePresentationFrom(
+    const vp: IVerifiablePresentation = (await pex.verifiablePresentationFrom(
       pdSchema.presentation_definition,
       vpSimple.verifiableCredential!,
       assertedMockCallback,
@@ -250,14 +250,14 @@ describe('evaluate', () => {
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       }
-    );
+    )) as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
     expect(proof.verificationMethod).toEqual('did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489#key');
   });
 
-  it("should throw error if proofOptions doesn't have a type", () => {
+  it("should throw error if proofOptions doesn't have a type", async () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
@@ -265,13 +265,13 @@ describe('evaluate', () => {
     const proofOptions = getProofOptionsMock();
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
-    expect(() =>
+    await expect(() =>
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       })
-    ).toThrowError('Please provide a proof type if you enable selective disclosure');
+    ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
   it('Evaluate selectFrom', () => {
@@ -298,7 +298,7 @@ describe('evaluate', () => {
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     await expect(
-      pex.verifiablePresentationFromAsync(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncCallbackWithoutProofType, {
+      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',

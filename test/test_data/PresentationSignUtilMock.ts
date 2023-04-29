@@ -1,8 +1,8 @@
-import { IProof, IProofPurpose, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
+import { IProof, IProofPurpose, IProofType, W3CVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { KeyEncoding, PresentationSignCallBackParams, ProofOptions, SignatureOptions } from '../../lib';
 
-export function mockCallback(opts: PresentationSignCallBackParams): IVerifiablePresentation {
+export function mockCallback(opts: PresentationSignCallBackParams): W3CVerifiablePresentation {
   return {
     ...opts.presentation,
     proof: {
@@ -13,7 +13,7 @@ export function mockCallback(opts: PresentationSignCallBackParams): IVerifiableP
   };
 }
 
-export function assertedMockCallback(callBackParams: PresentationSignCallBackParams): IVerifiablePresentation {
+export function assertedMockCallback(callBackParams: PresentationSignCallBackParams): W3CVerifiablePresentation {
   expect(callBackParams.proof).toBeDefined();
   expect(callBackParams.proof.proofValue).toBeUndefined();
   expect(callBackParams.proof.created).toBeDefined();
@@ -26,30 +26,32 @@ export function assertedMockCallback(callBackParams: PresentationSignCallBackPar
   const vp = mockCallback(callBackParams);
   expect(vp).toBeDefined();
 
-  const { proof } = vp;
-  expect(proof).toBeDefined();
-  if (Array.isArray(proof)) {
-    throw Error('Multiple proofs not mocked/supported');
-  }
+  if (typeof vp !== 'string') {
+    const { proof } = vp;
+    expect(proof).toBeDefined();
+    if (Array.isArray(proof)) {
+      throw Error('Multiple proofs not mocked/supported');
+    }
 
-  expect(proof.proofValue).toEqual('fake');
-  expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
+    expect(proof.proofValue).toEqual('fake');
+    expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
+  }
   return vp;
 }
 
-export function assertedMockCallbackWithoutProofType(callBackParams: PresentationSignCallBackParams): IVerifiablePresentation {
+export function assertedMockCallbackWithoutProofType(callBackParams: PresentationSignCallBackParams): W3CVerifiablePresentation {
   const vp = mockCallback(callBackParams);
   return vp;
 }
-export function getErrorThrown(): IVerifiablePresentation {
-  throw new Error('Could not sign because of missing fields');
+export async function getErrorThrown(): Promise<W3CVerifiablePresentation> {
+  throw Error('Could not sign because of missing fields');
 }
 
-export async function getAsyncErrorThrown(): Promise<IVerifiablePresentation> {
-  throw new Error('Could not sign because of missing fields');
+export async function getAsyncErrorThrown(): Promise<W3CVerifiablePresentation> {
+  throw Error('Could not sign because of missing fields');
 }
 
-export async function getAsyncCallbackWithoutProofType(callbackParams: PresentationSignCallBackParams): Promise<IVerifiablePresentation> {
+export async function getAsyncCallbackWithoutProofType(callbackParams: PresentationSignCallBackParams): Promise<W3CVerifiablePresentation> {
   return mockCallback(callbackParams);
 }
 
