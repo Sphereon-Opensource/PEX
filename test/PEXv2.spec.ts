@@ -215,23 +215,20 @@ describe('evaluate', () => {
 
   it('Evaluate presentationDefinition v2', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
-    const pex: PEXv2 = new PEXv2();
-    const result: Validated = pex.validateDefinition(pd);
+    const result: Validated = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate presentationDefinition v2 should fail for frame', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
     pd.frame = { '@id': 'this is not valid' };
-    const pex: PEXv2 = new PEXv2();
-    const result: Validated = pex.validateDefinition(pd);
+    const result: Validated = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'frame value is not valid', status: 'error', tag: 'presentation_definition.frame' }]);
   });
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const pex: PEXv2 = new PEXv2();
-    const result: Validated = pex.validateSubmission(vpSimple.presentation_submission);
+    const result: Validated = PEX.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
@@ -241,16 +238,12 @@ describe('evaluate', () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv2 = new PEXv2();
     delete pdSchema.presentation_definition.input_descriptors[0].schema;
-    const vp: IVerifiablePresentation = (await pex.verifiablePresentationFrom(
-      pdSchema.presentation_definition,
-      vpSimple.verifiableCredential!,
-      assertedMockCallback,
-      {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      }
-    )) as IVerifiablePresentation;
+    const vpr = await pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallback, {
+      proofOptions: getProofOptionsMock(),
+      signatureOptions: getSingatureOptionsMock(),
+      holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+    });
+    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -269,7 +262,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       })
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
@@ -301,14 +294,13 @@ describe('evaluate', () => {
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       })
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
   it('should return ok if presentation definition with _const is valid', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
-    const pex: PEXv2 = new PEXv2();
     pd.input_descriptors![0].constraints!.fields![0].filter = {
       type: 'string',
       _const: 'https://yourwatchful.gov/drivers-license-schema.json',
@@ -326,7 +318,7 @@ describe('evaluate', () => {
         tag: 'presentation_definition.input_descriptor[0].constraints.fields[0]',
       },
     ]);
-    const result2 = pex.validateDefinition(pd);
+    const result2 = PEX.validateDefinition(pd);
     expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_const' as keyof FilterV2]).toEqual(
       'https://yourwatchful.gov/drivers-license-schema.json'
@@ -335,16 +327,14 @@ describe('evaluate', () => {
 
   it('should return ok if presentation definition with enum is valid', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_2();
-    const pex: PEXv2 = new PEXv2();
-    const result = pex.validateDefinition(pd);
+    const result = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
   });
 
   it('should return ok if presentation definition with enum and const are valid', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
-    const pex: PEXv2 = new PEXv2();
-    const result = pex.validateDefinition(pd);
+    const result = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
   });

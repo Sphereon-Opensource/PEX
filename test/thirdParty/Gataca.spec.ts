@@ -9,9 +9,8 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate gataca tests', () => {
   it('should return v1 in version discovery', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v1');
   });
 
@@ -56,15 +55,15 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
         path: '$.verifiableCredential[0]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect((presentationFromResult.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(1);
+    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
     );
   });
@@ -83,9 +82,8 @@ describe('evaluate gataca tests', () => {
   });
 
   it('should return v1 in version discovery second example', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v1');
   });
 
@@ -128,7 +126,7 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
@@ -140,8 +138,8 @@ describe('evaluate gataca tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect((presentationFromResult.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(2);
+    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
     );
   });

@@ -3,30 +3,30 @@ import { Format } from '@sphereon/pex-models/model/format';
 import {
   IPresentation,
   IProof,
-  IVerifiableCredential,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
-import Ajv from 'ajv';
+import { W3CVerifiableCredential } from '@sphereon/ssi-types/src/types/vc';
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
+import { PresentationSignCallBackParams, VerifiablePresentationFromOpts } from './signing';
+import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation, VerifiablePresentationResult } from './signing/types';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
-import { JsonPathUtils } from './utils';
+import { definitionVersionDiscovery } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
-import { PresentationDefinitionSchema } from './validation/core/presentationDefinitionSchema';
 
 /**
  * This is the main interfacing class to be used by developers using the PEX library.
  */
 export class PEX {
-  private _evaluationClientWrapper: EvaluationClientWrapper;
+  protected _evaluationClientWrapper: EvaluationClientWrapper;
 
   constructor() {
+    // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it elsewhere. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
   }
 
@@ -49,7 +49,7 @@ export class PEX {
       restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
+    const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
 
@@ -73,7 +73,7 @@ export class PEX {
    *
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param verifiableCredentials the verifiable credentials which are candidates to fulfill requirements defined in the presentationDefinition param.
-   * @param opts - holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holder check.
+   * @param opts - holderDIDs the list of the DIDs that the wallet holders controls. Optional, but needed by some input requirements that do a holderDID check.
    * @           - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
@@ -90,8 +90,10 @@ export class PEX {
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+
+    // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it here. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
+    const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, opts);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
@@ -109,7 +111,7 @@ export class PEX {
    *
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param opts - holderDIDs the decentralized identifier(s) of the wallet holder. This is used to identify the credentials issued to the holder of wallet in certain scenario's.
+   * @param opts - holderDIDs the decentralized identifier(s) of the wallet holderDID. This is used to identify the credentials issued to the holderDID of wallet in certain scenario's.
    *             - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
@@ -124,9 +126,18 @@ export class PEX {
     }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
-    const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
+    const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
+    // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it here. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy), opts);
+  }
+
+  public presentationSubmissionFrom(
+    presentationDefinition: IPresentationDefinition,
+    selectedCredentials: OriginalVerifiableCredential[]
+  ): PresentationSubmission {
+    const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
+    return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials));
   }
 
   /**
@@ -134,44 +145,71 @@ export class PEX {
    * the verifier after signing it.
    *
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
-   * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
+   * @param selectedCredentials the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param opts - holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
+   * @param opts? - holderDID optional; the decentralized identity of the wallet holderDID. This is used to identify the holderDID of the presentation.
    *
    * @return the presentation.
    */
   public presentationFrom(
     presentationDefinition: IPresentationDefinition,
-    selectedCredential: OriginalVerifiableCredential[],
-    opts?: {
-      holderDID?: string;
-    }
-  ): IPresentation {
-    const pd: IInternalPresentationDefinition = this.determineAndCastToInternalPresentationDefinition(presentationDefinition);
-    const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
-      pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential)
-    );
-    return PEX.getPresentation(presentationSubmission, selectedCredential, opts);
+    selectedCredentials: OriginalVerifiableCredential[],
+    opts?: PresentationFromOpts
+  ): PresentationResult {
+    const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
+    const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials);
+    const presentation = PEX.constructPresentation(selectedCredentials, {
+      ...opts,
+      presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
+    });
+    return {
+      presentation,
+      presentationSubmissionLocation,
+      presentationSubmission,
+    };
   }
 
-  public static getPresentation(
-    presentationSubmission: PresentationSubmission,
-    selectedCredentials: OriginalVerifiableCredential[],
+  public static constructPresentation(
+    selectedCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
     opts?: {
+      presentationSubmission?: PresentationSubmission;
       holderDID?: string;
+      basePresentationPayload?: IPresentation;
     }
   ): IPresentation {
     const holder = opts?.holderDID;
+    const type = Array.isArray(opts?.basePresentationPayload?.type)
+      ? opts?.basePresentationPayload?.type || []
+      : opts?.basePresentationPayload?.type
+      ? [opts.basePresentationPayload.type]
+      : [];
+    const context = opts?.basePresentationPayload?.['@context']
+      ? Array.isArray(opts.basePresentationPayload['@context'])
+        ? opts.basePresentationPayload['@context']
+        : [opts.basePresentationPayload['@context']]
+      : [];
+    if (!context.includes('https://www.w3.org/2018/credentials/v1')) {
+      context.push('https://www.w3.org/2018/credentials/v1');
+    }
+
+    if (!type.includes('VerifiablePresentation')) {
+      type.push('VerifiablePresentation');
+    }
+    if (opts?.presentationSubmission) {
+      if (!type.includes('PresentationSubmission')) {
+        type.push('PresentationSubmission');
+      }
+      if (!context.includes('https://identity.foundation/presentation-exchange/submission/v1')) {
+        context.push('https://identity.foundation/presentation-exchange/submission/v1');
+      }
+    }
     return {
-      '@context': ['https://www.w3.org/2018/credentials/v1', 'https://identity.foundation/presentation-exchange/submission/v1'],
-      type: [
-        'VerifiablePresentation',
-        'PresentationSubmission', // This will be truly verifiable after the proof field is populated.
-      ],
+      ...opts?.basePresentationPayload,
+      '@context': context,
+      type,
       holder,
-      presentation_submission: presentationSubmission,
-      verifiableCredential: selectedCredentials as IVerifiableCredential[],
+      ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
+      verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[],
     };
   }
 
@@ -182,8 +220,8 @@ export class PEX {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
-    const result = this.definitionVersionDiscovery(presentationDefinition);
+  public static validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
+    const result = definitionVersionDiscovery(presentationDefinition);
     if (result.error) {
       throw result.error;
     }
@@ -191,11 +229,11 @@ export class PEX {
     result.version === PEVersion.v1
       ? validators.push({
           bundler: new PresentationDefinitionV1VB('root'),
-          target: SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition as PresentationDefinitionV1),
+          target: SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition as PresentationDefinitionV1),
         })
       : validators.push({
           bundler: new PresentationDefinitionV2VB('root'),
-          target: SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinition as PresentationDefinitionV2),
+          target: SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition as PresentationDefinitionV2),
         });
     return new ValidationEngine().validate(validators);
   }
@@ -207,7 +245,7 @@ export class PEX {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation submission
    */
-  public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
+  public static validateSubmission(presentationSubmission: PresentationSubmission): Validated {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationSubmissionVB('root'),
@@ -237,9 +275,11 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation,
-    opts: PresentationSignOptions
-  ): Promise<W3CVerifiablePresentation> {
-    const { holder, signatureOptions, proofOptions } = opts;
+    opts: VerifiablePresentationFromOpts
+  ): Promise<VerifiablePresentationResult> {
+    const { holderDID, signatureOptions, proofOptions } = opts;
+
+    const presentationSubmissionLocation = opts.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -252,17 +292,20 @@ export class PEX {
       return limitDisclosureSignatureSuites;
     }
 
-    const holderDIDs: string[] = holder ? [holder] : [];
+    const holderDIDs: string[] = holderDID ? [holderDID] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
     const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, {
       holderDIDs,
       limitDisclosureSignatureSuites,
     });
 
-    const presentation = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, { holderDID: holder });
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
+    const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, {
+      ...opts,
+      presentationSubmissionLocation,
+    });
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, { limitDisclosureSignatureSuites });
     if (!evaluationResults.value) {
-      throw new Error('Could not get evaluation results from presentation');
+      throw new Error('Could not get evaluation results from presentationResult');
     }
 
     const proof: Partial<IProof> = {
@@ -279,42 +322,23 @@ export class PEX {
 
     const callBackParams: PresentationSignCallBackParams = {
       options: opts,
-      presentation,
+      presentation: presentationResult.presentation,
       presentationDefinition,
       selectedCredentials,
       proof,
       presentationSubmission: evaluationResults.value,
       evaluationResults,
     };
-    return await signingCallBack(callBackParams);
+    const verifiablePresentation = await signingCallBack(callBackParams);
+
+    return {
+      verifiablePresentation,
+      presentationSubmissionLocation,
+      presentationSubmission: evaluationResults.value,
+    };
   }
 
-  public definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): DiscoveredVersion {
-    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
-    JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
-    const data = { presentation_definition: presentationDefinitionCopy };
-    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
-    const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
-    let result = validateV2(data);
-    if (result) {
-      return { version: PEVersion.v2 };
-    }
-    const validateV1 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV1());
-    result = validateV1(data);
-    if (result) {
-      return { version: PEVersion.v1 };
-    }
-    return { error: 'This is not a valid PresentationDefinition' };
-  }
-
-  private determineAndCastToInternalPresentationDefinition(presentationDefinition: IPresentationDefinition): IInternalPresentationDefinition {
-    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
-    const versionResult: DiscoveredVersion = this.definitionVersionDiscovery(presentationDefinitionCopy);
-    if (versionResult.error) throw versionResult.error;
-    if (versionResult.version == PEVersion.v1) {
-      return SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinitionCopy as PresentationDefinitionV1);
-    }
-    return SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(presentationDefinitionCopy as PresentationDefinitionV2);
+  public static definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): DiscoveredVersion {
+    return definitionVersionDiscovery(presentationDefinition);
   }
 }

@@ -220,7 +220,7 @@ const presentationDefinition = {
 // Finding out which version presentationDefinition is this:
 // The result is either 'v1', 'v2' or an error
 // You only have to do this if you want to apply some custom logic. The PEX class uses feature detection on the definition to determine whether it is v1 or v2 internally
-const result = pex.definitionVersionDiscovery(pdSchema);
+const result = PEX.definitionVersionDiscovery(pdSchema);
 
 // Example for loading credentials from your secure storage
 const credentials: IVerifiableCredential[] = await secureStore.getCredentials();
@@ -311,7 +311,7 @@ The options accepted by the `verifiablePresentationFromAsync` are:
 ```typescript
 interface PresentationSignOptions {
   /**
-   * The optional holder of the presentation
+   * The optional holderDID of the presentation
    */
   holder?: string;
 
@@ -523,8 +523,8 @@ const presentationDefinition = {
   ...
 };
 
-const result = pex.definitionVersionDiscovery(presentationDefinition);
-const { warnings: pdWarnings, errors: pdErrors } = pex.validateDefinition(presentationDefinition);
+const result = PEX.definitionVersionDiscovery(presentationDefinition);
+const { warnings: pdWarnings, errors: pdErrors } = PEX.validateDefinition(presentationDefinition);
 
 const presentationSubmission = {
   ...
@@ -620,7 +620,7 @@ interface SelectResults {
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required.
-   *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
+   *       To enhance credential holderDID's privacy it is recommended to select credentials which are absolutely required.
    *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object. Do not submit!
    */
   areRequiredCredentialsPresent: Status;

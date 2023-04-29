@@ -1,9 +1,9 @@
 import fs from 'fs';
 
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
-import { IPresentation, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
+import { IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { PEXv1, Validated } from '../lib';
+import { PEX, PEXv1, Validated } from '../lib';
 
 import {
   assertedMockCallback,
@@ -71,7 +71,8 @@ describe('evaluate', () => {
       holderDIDs: [HOLDER_DID],
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
+    const result = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
+    const presentation = result.presentation;
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -94,22 +95,19 @@ describe('evaluate', () => {
   it('Evaluate pdV1 schema of our sr_rules.json pdV1', () => {
     const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateDefinition(pdSchema);
+    const result: Validated = PEX.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateSubmission(vpSimple.presentation_submission);
+    const result: Validated = PEX.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate pdV1 schema of our pd_driver_license_name.json pdV1', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateDefinition(pdSchema.presentation_definition);
+    const result: Validated = PEX.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
@@ -117,16 +115,12 @@ describe('evaluate', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
-    const vp: IVerifiablePresentation = (await pex.verifiablePresentationFrom(
-      pdSchema.presentation_definition,
-      vpSimple.verifiableCredential!,
-      assertedMockCallback,
-      {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      }
-    )) as IVerifiablePresentation;
+    const vpr = await pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallback, {
+      proofOptions: getProofOptionsMock(),
+      signatureOptions: getSingatureOptionsMock(),
+      holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+    });
+    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -145,7 +139,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncCallbackWithoutProofType, {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+        holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       })
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });

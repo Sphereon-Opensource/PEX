@@ -17,7 +17,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const evaluationHandler = new UriEvaluationHandler(evaluationClient);
@@ -37,7 +37,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     vc['@context' as keyof IVerifiableCredential] = ['https://www.test.org/mock'];
@@ -69,7 +69,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
       './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -91,7 +91,7 @@ describe('evaluate', () => {
       './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
     ).presentation_definition;
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const vc0: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
     const wvc0: WrappedVerifiableCredential = {
@@ -134,7 +134,7 @@ describe('evaluate', () => {
     pdSchema.input_descriptors[0].schema.push({
       uri: 'hl:zm9YZpCjPLPJ4Epc:z3TSgXTuaHxY2tsArhUreJ4ixgw9NW7DYuQ9QTPQyLHy',
     });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential![0],
@@ -154,7 +154,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://example.com/hw.txt?hl=zm9YZpCjPLPJ4Epc' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential![0],

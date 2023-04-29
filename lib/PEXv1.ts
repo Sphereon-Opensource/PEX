@@ -1,29 +1,19 @@
 import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
 import { Format } from '@sphereon/pex-models/model/format';
-import {
-  IPresentation,
-  IProof,
-  OriginalVerifiableCredential,
-  OriginalVerifiablePresentation,
-  W3CVerifiablePresentation,
-  WrappedVerifiablePresentation,
-} from '@sphereon/ssi-types';
+import { IPresentation, OriginalVerifiableCredential, OriginalVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { Status } from './ConstraintUtils';
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, PresentationSignOptions } from './signing';
+import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation } from './signing/types';
 import { SSITypesBuilder } from './types';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 
 /**
  * This is the main interfacing class for using this library for v1 of presentation exchange
  */
-export class PEXv1 {
-  private _evaluationClientWrapper: EvaluationClientWrapper;
-
+export class PEXv1 extends PEX {
   constructor() {
-    this._evaluationClientWrapper = new EvaluationClientWrapper();
+    super();
   }
 
   /***
@@ -44,21 +34,8 @@ export class PEXv1 {
       restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
-    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    this._evaluationClientWrapper = new EvaluationClientWrapper();
-
-    const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, { ...opts, holderDIDs });
-    if (result.value && result.value.descriptor_map.length) {
-      const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
-      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
-        result.errors = [];
-      }
-    }
-    return result;
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition);
+    return super.evaluatePresentation(pd, presentation, opts);
   }
 
   /***
@@ -81,19 +58,8 @@ export class PEXv1 {
       restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    this._evaluationClientWrapper = new EvaluationClientWrapper();
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition);
-    const wrappedVerifiableCredentials = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
-
-    const result = this._evaluationClientWrapper.evaluate(pd, wrappedVerifiableCredentials, opts);
-    if (result.value && result.value.descriptor_map.length) {
-      const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedVerifiableCredentials, opts);
-      result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
-    } else {
-      result.areRequiredCredentialsPresent = Status.ERROR;
-    }
-    return result;
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition);
+    return super.evaluateCredentials(pd, verifiableCredentials, opts);
   }
 
   /**
@@ -102,7 +68,7 @@ export class PEXv1 {
    *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
    * @param verifiableCredentials verifiable credentials are the credentials from wallet provided to the library to find selectable credentials.
-   * @param opts - holderDIDs the decentralized identity of the wallet holder. This is used to identify the credentials issued to the holder of wallet.
+   * @param opts - holderDIDs the decentralized identity of the wallet holderDID. This is used to identify the credentials issued to the holderDID of wallet.
    *               limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the selectable credentials.
@@ -119,7 +85,7 @@ export class PEXv1 {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
-      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
+      SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition),
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy),
       opts
     );
@@ -132,24 +98,31 @@ export class PEXv1 {
    * IMPORTANT NOTE: this method creates a presentation object based on the SELECTED verifiable credentials. You can get the selected verifiable credentials using selectFrom method
    *
    * @param presentationDefinition the v1 definition of what is expected in the presentation.
-   * @param selectedCredential the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
+   * @param selectedCredentials the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param opts - holderDID optional; the decentralized identity of the wallet holder. This is used to identify the holder of the presentation.
+   * @param opts - holderDID optional; the decentralized identity of the wallet holderDID. This is used to identify the holderDID of the presentation.
    *
    * @return the presentation.
    */
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV1,
-    selectedCredential: OriginalVerifiableCredential[],
-    opts?: {
-      holderDID?: string;
-    }
-  ): IPresentation {
+    selectedCredentials: OriginalVerifiableCredential[],
+    opts?: PresentationFromOpts
+  ): PresentationResult {
+    const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
-      SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredential)
+      SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition),
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials)
     );
-    return PEX.getPresentation(presentationSubmission, selectedCredential, opts);
+    const presentation = PEX.constructPresentation(selectedCredentials, {
+      ...opts,
+      presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
+    });
+    return {
+      presentation,
+      presentationSubmissionLocation,
+      presentationSubmission,
+    };
   }
 
   /**
@@ -159,8 +132,8 @@ export class PEXv1 {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
-  public validateDefinition(presentationDefinitionV1: PresentationDefinitionV1): Validated {
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(presentationDefinitionV1);
+  public static validateDefinition(presentationDefinitionV1: PresentationDefinitionV1): Validated {
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinitionV1);
     return new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV1VB('root'),
@@ -176,8 +149,8 @@ export class PEXv1 {
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation submission
    */
-  public validateSubmission(presentationSubmission: PresentationSubmission): Validated {
-    return new PEX().validateSubmission(presentationSubmission);
+  public static validateSubmission(presentationSubmission: PresentationSubmission): Validated {
+    return PEX.validateSubmission(presentationSubmission);
   }
 
   /**
@@ -197,13 +170,13 @@ export class PEXv1 {
    *
    * @return the signed and thus Verifiable Presentation.
    */
-  public async verifiablePresentationFrom(
+  /* public async verifiablePresentationFrom(
     presentationDefinition: PresentationDefinitionV1,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation,
-    opts: PresentationSignOptions
+    opts: VerifiablePresentationFromOpts
   ): Promise<W3CVerifiablePresentation> {
-    const { holder, signatureOptions, proofOptions } = opts;
+    const { holderDID, signatureOptions, proofOptions } = opts;
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -216,14 +189,14 @@ export class PEXv1 {
       return limitDisclosureSignatureSuites;
     }
 
-    const holderDIDs: string[] = holder ? [holder] : [];
+    const holderDIDs: string[] = holderDID ? [holderDID] : [];
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
     this.evaluateCredentials(presentationDefinition, selectedCredentials, {
       holderDIDs,
       limitDisclosureSignatureSuites,
     });
 
-    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, { holderDID: holder });
+    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, { holderDID: holderDID });
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentation');
@@ -252,5 +225,5 @@ export class PEXv1 {
     };
 
     return await signingCallBack(callBackParams);
-  }
+  }*/
 }

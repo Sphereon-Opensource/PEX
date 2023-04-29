@@ -483,9 +483,8 @@ function getPresentation(): IPresentation {
 
 describe('evaluate JGiter tests', () => {
   it('should return v2 in version discovery', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_1();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v2');
   });
 
@@ -502,7 +501,8 @@ describe('evaluate JGiter tests', () => {
     expect(selectFrom.matches![0]?.vc_path).toEqual(['$.verifiableCredential[0]']);
     expect(selectFrom.matches![1]?.from).toEqual(['B']);
     expect(selectFrom.matches![1]?.vc_path).toEqual(['$.verifiableCredential[1]']);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
+    const presentationResult = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
+    const presentation = presentationResult.presentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',
@@ -541,8 +541,8 @@ describe('evaluate JGiter tests', () => {
     const resultEvaluation = pex.evaluateCredentials(pdSchema, [selectResult.verifiableCredential![0], selectResult.verifiableCredential![1]]);
     expect(resultEvaluation.errors?.length).toEqual(6);
     expect(resultEvaluation.areRequiredCredentialsPresent).toEqual(Status.INFO);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
-    expect(presentation.presentation_submission?.descriptor_map).toEqual([
+    const presentationResult = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
+    expect(presentationResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',
         format: 'ldp_vc',

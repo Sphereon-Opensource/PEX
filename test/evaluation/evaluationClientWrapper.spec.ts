@@ -36,7 +36,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -56,7 +56,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
@@ -75,7 +75,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     (<IVerifiableCredential>vpSimple.verifiableCredential![0])['@context' as keyof IVerifiableCredential] = [
       'https://www.w3.org/TR/vc-data-model/#types1',
@@ -97,7 +97,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     (<IVerifiableCredential>vpSimple.verifiableCredential![0])['@context' as keyof IVerifiableCredential] = [
       'https://www.w3.org/TR/vc-data-model/#types1',
@@ -121,7 +121,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -140,7 +140,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -161,7 +161,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -181,7 +181,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -201,7 +201,7 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
@@ -219,7 +219,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
@@ -240,7 +240,7 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential![0],
@@ -262,7 +262,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
@@ -299,7 +299,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
@@ -325,7 +325,7 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     delete pdSchema!.submission_requirements;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
       vpSimple.verifiableCredential![0],
@@ -440,7 +440,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const vcs = [
       {
         '@context': [
@@ -591,7 +591,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
     const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
       holderDIDs: undefined,
@@ -707,7 +707,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
     const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
       holderDIDs: undefined,

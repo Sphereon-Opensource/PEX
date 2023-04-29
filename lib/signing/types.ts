@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import { IPresentation, IProof, IProofPurpose, IProofType, OriginalVerifiableCredential } from '@sphereon/ssi-types';
+import { IPresentation, IProof, IProofPurpose, IProofType, OriginalVerifiableCredential, W3CVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { EvaluationResults } from '../evaluation';
 
@@ -67,12 +67,78 @@ export interface SignatureOptions {
   jws?: string; // JWS based proof
 }
 
-export interface PresentationSignOptions {
-  /**
-   * The optional holder of the presentation
-   */
-  holder?: string;
+/**
+ * The location of the presentation submission. Can be external or part of the VP
+ */
+export enum PresentationSubmissionLocation {
+  EXTERNAL, // External to the VP, for instance to use it in OID4VP
+  PRESENTATION, // Part of the VP itself
+}
 
+/**
+ * The result object containing the presentation and presentation submission
+ */
+export interface PresentationResult {
+  /**
+   * The resulting presentation, can have an embedded submission data depending on the location parameter
+   */
+  presentation: IPresentation;
+
+  /**
+   * The resulting location of the presentation submission.
+   * Please note that this result object will always also put the submission in the presentationSubmission property, even if it is also embedded in the Verifiable Presentation
+   */
+  presentationSubmissionLocation: PresentationSubmissionLocation;
+
+  /**
+   * The presentation submission.
+   * Please note that this property will always be populated, even if it is also embedded in the Verifiable Presentation. If you need to determine the location, use the presentationSubmissionLocation property
+   */
+  presentationSubmission: PresentationSubmission;
+}
+
+/**
+ * The result object containing the VP and presentation submission
+ */
+export interface VerifiablePresentationResult {
+  /**
+   * The resulting VP, can have an embedded submission data depending on the location parameter
+   */
+  verifiablePresentation: W3CVerifiablePresentation;
+
+  /**
+   * The resulting location of the presentation submission.
+   * Please note that this result object will always also put the submission in the presentationSubmission property, even if it is also embedded in the Verifiable Presentation
+   */
+  presentationSubmissionLocation: PresentationSubmissionLocation;
+
+  /**
+   * The presentation submission.
+   * Please note that this property will always be populated, even if it is also embedded in the Verifiable Presentation. If you need to determine the location, use the presentationSubmissionLocation property
+   */
+  presentationSubmission: PresentationSubmission;
+}
+
+export interface PresentationFromOpts {
+  /**
+   * The optional holderDID of the presentation
+   */
+  holderDID?: string;
+  /**
+   * The presentation submission data location.
+   *
+   * Can be External, which means it is only returned and not embedded into the VP,
+   * or Presentation, which means it will become part of the VP
+   */
+  presentationSubmissionLocation?: PresentationSubmissionLocation;
+
+  /**
+   * A base presentation payload. Can be used to provide default values. Be aware that any verifiable credential will always be overwritten
+   */
+  basePresentationPayload?: IPresentation;
+}
+
+export interface VerifiablePresentationFromOpts extends PresentationFromOpts {
   /**
    * Proof options
    */
@@ -88,7 +154,7 @@ export interface PresentationSignCallBackParams {
   /**
    * The originally supplied presentation sign options
    */
-  options: PresentationSignOptions;
+  options: VerifiablePresentationFromOpts;
 
   /**
    * The selected credentials to include in the eventual VP as determined by PEX and/or user
@@ -112,7 +178,7 @@ export interface PresentationSignCallBackParams {
   presentationDefinition: PresentationDefinitionV1 | PresentationDefinitionV2;
 
   /**
-   * The presentation submission data, which can also be found in the presentation itself
+   * The presentation submission data, which can also be found in the presentation itself depending on the location param
    */
   presentationSubmission: PresentationSubmission;
 

@@ -11,7 +11,6 @@ import {
   PEXv1,
   PEXv2,
   PresentationSignCallBackParams,
-  PresentationSignOptions,
   ProofOptions,
   SelectResults,
   SignatureOptions,
@@ -21,7 +20,8 @@ import {
   Validation,
   ValidationEngine,
   ValidationPredicate,
-  Validator
+  Validator,
+  VerifiablePresentationFromOpts
 } from './lib';
 
 export {
@@ -42,7 +42,7 @@ export {
   NonEmptyArray,
   SignatureOptions,
   InputFieldType,
-  PresentationSignOptions,
+  VerifiablePresentationFromOpts,
   PresentationSignCallBackParams,
   PEVersion,
   ValidationEngine,

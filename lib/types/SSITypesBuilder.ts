@@ -1,4 +1,9 @@
-import { PresentationDefinitionV1 as PdV1, PresentationDefinitionV2 as PdV2 } from '@sphereon/pex-models';
+import {
+  PresentationDefinitionV1 as PdV1,
+  PresentationDefinitionV2 as PdV2,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
+} from '@sphereon/pex-models';
 import {
   CredentialMapper,
   JwtDecodedVerifiablePresentation,
@@ -8,17 +13,24 @@ import {
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
-import { JsonPathUtils } from '../utils';
+import { definitionVersionDiscovery, JsonPathUtils } from '../utils';
 
-import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2, IPresentationDefinition } from './Internal.types';
+import {
+  DiscoveredVersion,
+  IInternalPresentationDefinition,
+  InternalPresentationDefinitionV1,
+  InternalPresentationDefinitionV2,
+  IPresentationDefinition,
+  PEVersion,
+} from './Internal.types';
 
 export class SSITypesBuilder {
-  public static createInternalPresentationDefinitionV1FromModelEntity(p: PdV1): InternalPresentationDefinitionV1 {
+  public static modelEntityToInternalPresentationDefinitionV1(p: PdV1): InternalPresentationDefinitionV1 {
     const pd: PdV1 = SSITypesBuilder.createCopyAndModifyPresentationDefinition(p) as PdV1;
     return new InternalPresentationDefinitionV1(pd.id, pd.input_descriptors, pd.format, pd.name, pd.purpose, pd.submission_requirements);
   }
 
-  public static createInternalPresentationDefinitionV2FromModelEntity(p: PdV2): InternalPresentationDefinitionV2 {
+  public static modelEntityInternalPresentationDefinitionV2(p: PdV2): InternalPresentationDefinitionV2 {
     const pd: PdV2 = SSITypesBuilder.createCopyAndModifyPresentationDefinition(p);
     return new InternalPresentationDefinitionV2(pd.id, pd.input_descriptors, pd.format, pd.frame, pd.name, pd.purpose, pd.submission_requirements);
   }
@@ -41,5 +53,15 @@ export class SSITypesBuilder {
     verifiableCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[]
   ): WrappedVerifiableCredential[] {
     return CredentialMapper.toWrappedVerifiableCredentials(Array.isArray(verifiableCredentials) ? verifiableCredentials : [verifiableCredentials]);
+  }
+
+  static toInternalPresentationDefinition(presentationDefinition: IPresentationDefinition): IInternalPresentationDefinition {
+    const presentationDefinitionCopy: IPresentationDefinition = JSON.parse(JSON.stringify(presentationDefinition));
+    const versionResult: DiscoveredVersion = definitionVersionDiscovery(presentationDefinitionCopy);
+    if (versionResult.error) throw versionResult.error;
+    if (versionResult.version == PEVersion.v1) {
+      return SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinitionCopy as PresentationDefinitionV1);
+    }
+    return SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinitionCopy as PresentationDefinitionV2);
   }
 }

@@ -55,7 +55,7 @@ describe('should test jsonPathUtils function', () => {
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@book'].accessModeSufficient[(@.length-1)]"]);
   });
 
@@ -71,7 +71,7 @@ describe('should test jsonPathUtils function', () => {
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
   });
 
@@ -87,7 +87,7 @@ describe('should test jsonPathUtils function', () => {
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']", "$.vc['@context']"]);
   });
 
@@ -103,7 +103,7 @@ describe('should test jsonPathUtils function', () => {
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']"]);
   });
 
@@ -119,7 +119,7 @@ describe('should test jsonPathUtils function', () => {
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(pd.input_descriptors[0].constraints!.fields[0].path);
   });
 });
