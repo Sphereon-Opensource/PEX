@@ -398,7 +398,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.did'],
                 filter: {
                   type: 'string',
-                  _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                  const: 'did:example:d23dd687a7dc6787646f2eb98d0',
                 },
               },
             ],
@@ -415,7 +415,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.profile.name'],
                 filter: {
                   type: 'string',
-                  _const: 'John',
+                  const: 'John',
                 },
               },
             ],
@@ -432,7 +432,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.role'],
                 filter: {
                   type: 'string',
-                  _const: 'admin',
+                  const: 'admin',
                 },
               },
             ],
@@ -531,7 +531,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['https://example.com/issuers/14'],
+                  enum: ['https://example.com/issuers/14'],
                 },
               },
             ],
@@ -566,7 +566,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.name', '$.credentialSubject.name'],
                 filter: {
                   type: 'string',
-                  _enum: ['Jane Doe'],
+                  enum: ['Jane Doe'],
                 },
               },
             ],
@@ -583,7 +583,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.id', '$.credentialSubject.id'],
                 filter: {
                   type: 'string',
-                  _enum: ['did:example:abcdef1234567'],
+                  enum: ['did:example:abcdef1234567'],
                 },
               },
             ],
@@ -647,7 +647,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['https://example.com/issuers/15'],
+                  enum: ['https://example.com/issuers/15'],
                 },
               },
             ],
@@ -682,7 +682,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.name', '$.credentialSubject.name'],
                 filter: {
                   type: 'string',
-                  _enum: ['Jane Doe'],
+                  enum: ['Jane Doe'],
                 },
               },
             ],
@@ -699,7 +699,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.id', '$.credentialSubject.id'],
                 filter: {
                   type: 'string',
-                  _enum: ['did:example:abcdef1234567'],
+                  enum: ['did:example:abcdef1234567'],
                 },
               },
             ],

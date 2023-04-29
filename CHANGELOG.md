@@ -16,6 +16,7 @@ Using @sphereon/ssi-types
   - Credential Mapper from @sphereon/ssi-types is now used to create internal uniform VPs/VCs
   - Relax AJV errors
 - Fixed:
+  - No more need for _const and _enum models/properties. They are now `const` and `enum` (fixed in OpenAPI model generation) 
   - Set the format based on detection of the format instead of hard-coding it in the descriptor 
   - Match subject is issuer against all subjects of a VC if present (not common)
 

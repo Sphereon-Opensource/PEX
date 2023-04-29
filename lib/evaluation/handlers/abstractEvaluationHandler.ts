@@ -56,6 +56,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   }
 
   public updatePresentationSubmission(pd: IInternalPresentationDefinition) {
+    this._client.assertPresentationSubmission();
     this.presentationSubmission.descriptor_map.forEach((descriptor, index, descriptorMap) => {
       /**
          * TODO map the nested credential

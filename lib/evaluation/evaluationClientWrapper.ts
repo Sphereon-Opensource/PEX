@@ -211,6 +211,8 @@ export class EvaluationClientWrapper {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      presentationSubmission?: PresentationSubmission;
+      generatePresentationSubmission?: boolean;
     }
   ): EvaluationResults {
     this._client.evaluate(pd, wvcs, opts);
@@ -220,6 +222,8 @@ export class EvaluationClientWrapper {
     };
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
+
+    this._client.assertPresentationSubmission();
     if (this._client.presentationSubmission?.descriptor_map.length) {
       const len = this._client.presentationSubmission?.descriptor_map.length;
       for (let i = 0; i < len; i++) {
@@ -229,7 +233,9 @@ export class EvaluationClientWrapper {
       this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
-    this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
+    if (this._client.generatePresentationSubmission) {
+      this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
+    }
     result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
     result.areRequiredCredentialsPresent = result.value?.descriptor_map?.length ? Status.INFO : Status.ERROR;
     return result;
@@ -251,6 +257,9 @@ export class EvaluationClientWrapper {
   public submissionFrom(pd: IInternalPresentationDefinition, vcs: WrappedVerifiableCredential[]): PresentationSubmission {
     if (!this._client.results.length) {
       throw Error('You need to call evaluate() before pex.presentationFrom()');
+    }
+    if (!this._client.generatePresentationSubmission) {
+      return this._client.presentationSubmission;
     }
 
     if (pd.submission_requirements) {
@@ -289,6 +298,9 @@ export class EvaluationClientWrapper {
   }
 
   private updatePresentationSubmission(updatedIndexes: [string, string][]) {
+    if (!this._client.generatePresentationSubmission) {
+      return; // never update a supplied submission
+    }
     this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map
       .filter((descriptor) => updatedIndexes.find((ui) => ui[0] === descriptor.path))
       .map((descriptor) => {
@@ -508,7 +520,7 @@ export class EvaluationClientWrapper {
       presentationSubmission.descriptor_map.forEach((d) => {
         this.replacePathWithAlias(d, alias);
       });
-    } else {
+    } else if (this._client.generatePresentationSubmission) {
       this._client.presentationSubmission.descriptor_map.forEach((d) => {
         this.replacePathWithAlias(d, alias);
       });

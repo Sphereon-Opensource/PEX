@@ -107,7 +107,7 @@ constraints: {
       path: ['$.credentialSubject.role'],
       filter: {
         type: 'string',
-        _const: 'admin'
+        const: 'admin'
       }
     }
   ];
@@ -942,6 +942,9 @@ Presentation.
 
 The (Verifiable) Presentation object is present in the result object in the presentation resp. verifiablePresentation
 property.
+
+No more need for _const and _enum models/properties in Presentation Definitions. They are now `const` and `enum` (fixed
+in OpenAPI model generation). The code replaces the previous versions to be sure.
 
 ### v0.6.0: class and package renamed
 

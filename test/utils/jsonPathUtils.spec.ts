@@ -26,7 +26,7 @@ function getPresentationDefinitionV1(): PresentationDefinitionV1 {
               purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _const: 'did:example:123|did:example:456',
+                const: 'did:example:123|did:example:456',
               },
             },
           ],
@@ -51,7 +51,7 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We only want books which have the certain access mode.',
         filter: {
           type: 'string',
-          _const: 'auditory',
+          const: 'auditory',
         },
       },
     ];
@@ -67,7 +67,7 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -83,7 +83,7 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context.',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -99,7 +99,7 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context.',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -115,7 +115,7 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We only want books which have the category fiction and their price is 8.95.',
         filter: {
           type: 'string',
-          _const: 'https://schema.org/Book',
+          const: 'https://schema.org/Book',
         },
       },
     ];

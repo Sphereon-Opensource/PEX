@@ -102,7 +102,7 @@ describe('1st scenario', () => {
         type: [],
         verifiableCredential: holderWallet.verifiableCredentials,
       },
-      { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
+      { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES, generatePresentationSubmission: true }
     );
     expect(evaluationResult.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
     expect(evaluationResult.value?.descriptor_map.length).toEqual(2);

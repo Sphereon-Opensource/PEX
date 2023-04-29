@@ -278,7 +278,7 @@ describe('evaluate niwim tests', () => {
     pdSchema.input_descriptors[0].constraints!.fields![0]!.filter = {
       type: 'array',
       contains: {
-        _enum: ['AlumniCredential'],
+        enum: ['AlumniCredential'],
       },
     } as unknown as FilterV1;
     const vcs = getVerifiableCredentials();

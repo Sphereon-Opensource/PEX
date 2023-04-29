@@ -125,6 +125,21 @@ describe('evaluate', () => {
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
 
+  it('Evaluate case with error. No submission data', () => {
+    const pdSchema: PresentationDefinitionV1 = getFileAsJson(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+    ).presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+
+    // Delete the submission to trigger an error
+    delete vpSimple.presentation_submission;
+    const pex: PEX = new PEX();
+    expect(() => pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })).toThrowError(
+      'Either a presentation submission as part of the VP or provided separately was expected'
+    );
+  });
+
   it('Evaluate case without any error 2', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
@@ -415,7 +430,40 @@ describe('evaluate', () => {
     expect(result.error).toEqual('This is not a valid PresentationDefinition');
   });
 
-  it('should pass with jwt vp', function () {
+  it('should pass with jwt vp with submission data', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857',
+      input_descriptors: [
+        {
+          id: 'prc_type',
+          name: 'Name',
+          purpose: 'We can only support a familyName in a Permanent Resident Card',
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.familyName'],
+                filter: {
+                  type: 'string',
+                  const: 'Pasteur',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
+    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
+    expect(evalResult.errors).toEqual([]);
+    expect(evalResult.value?.descriptor_map[0]).toEqual({
+      id: '1',
+      format: 'ldp_vc',
+      path: '$.verifiableCredential[0]',
+    });
+  });
+
+  it('should not pass with jwt vp without submission data', function () {
     const pdSchema: PresentationDefinitionV2 = {
       id: '49768857-aec0-4e9d-8392-0e2e01d20120',
       input_descriptors: [
@@ -429,7 +477,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.degree.type'],
                 filter: {
                   type: 'string',
-                  _enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
+                  enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
                 },
               },
             ],
@@ -439,7 +487,7 @@ describe('evaluate', () => {
     };
     const pex: PEX = new PEX();
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt');
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
+    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp, { generatePresentationSubmission: true });
     expect(evalResult.errors).toEqual([]);
     expect(evalResult.value?.descriptor_map[0]).toEqual({
       id: 'universityDegree_type',
@@ -462,7 +510,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.degree.type'],
                 filter: {
                   type: 'string',
-                  _enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
+                  enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
                 },
               },
             ],

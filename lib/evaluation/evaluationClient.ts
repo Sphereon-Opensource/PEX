@@ -2,7 +2,7 @@ import { Format, PresentationSubmission } from '@sphereon/pex-models';
 import { IProofType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../types/Internal.types';
+import { IInternalPresentationDefinition } from '../types';
 import PexMessages from '../types/Messages';
 
 import { HandlerCheckResult } from './core';
@@ -17,7 +17,7 @@ import {
   SubjectIsIssuerEvaluationHandler,
   UriEvaluationHandler,
 } from './handlers';
-import { FormatRestrictionEvaluationHandler } from './handlers/formatRestrictionEvaluationHandler';
+import { FormatRestrictionEvaluationHandler } from './handlers';
 
 const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -28,6 +28,8 @@ export class EvaluationClient {
     this._presentationSubmission = {};
     this._dids = [];
     this._limitDisclosureSignatureSuites = DEFAULT_LIMIT_DISCLOSURE_TYPES;
+    // this._requirePresentationSubmission = false;
+    this._generatePresentationSubmission = true;
   }
 
   private failed_catched = {
@@ -40,9 +42,12 @@ export class EvaluationClient {
   private _results: HandlerCheckResult[];
   private _wrappedVcs: Partial<WrappedVerifiableCredential>[];
   private _presentationSubmission: Partial<PresentationSubmission>;
+  // private _requirePresentationSubmission: boolean;
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
   private _restrictToFormats: Format | undefined;
+
+  private _generatePresentationSubmission: boolean;
 
   public evaluate(
     pd: IInternalPresentationDefinition,
@@ -51,11 +56,18 @@ export class EvaluationClient {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      presentationSubmission?: PresentationSubmission;
+      generatePresentationSubmission?: boolean;
     }
   ): void {
     this._dids = opts?.holderDIDs || [];
     this._limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     this._restrictToFormats = opts?.restrictToFormats;
+    this._generatePresentationSubmission = opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : true;
+    if (opts?.presentationSubmission) {
+      this._presentationSubmission = opts.presentationSubmission;
+      // this._requirePresentationSubmission = true;
+    }
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, wvcs);
     while (currentHandler?.hasNext()) {
@@ -82,6 +94,26 @@ export class EvaluationClient {
     this._dids = dids;
   }
 
+  public assertPresentationSubmission() {
+    if (!this.generatePresentationSubmission && (!this.presentationSubmission || Object.keys(this.presentationSubmission).length === 0)) {
+      throw Error('No presentation submission present, but required option was set');
+    }
+  }
+
+  get generatePresentationSubmission(): boolean {
+    return this._generatePresentationSubmission;
+  }
+
+  set generatePresentationSubmission(value: boolean) {
+    this._generatePresentationSubmission = value;
+  }
+  /*get requirePresentationSubmission(): boolean {
+    return this._requirePresentationSubmission;
+  }
+
+  set requirePresentationSubmission(value: boolean) {
+    this._requirePresentationSubmission = value;
+  }*/
   public get presentationSubmission(): PresentationSubmission {
     return this._presentationSubmission as PresentationSubmission;
   }

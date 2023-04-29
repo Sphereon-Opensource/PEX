@@ -3,8 +3,7 @@ import fs from 'fs';
 import { FilterV2, PresentationDefinitionV2 } from '@sphereon/pex-models';
 import { IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { PEX, PEXv2, SelectResults, Status, Validated, ValidationEngine } from '../lib';
-import { PresentationDefinitionV2VB } from '../lib/validation';
+import { PEX, PEXv2, SelectResults, Status, Validated } from '../lib';
 
 import {
   assertedMockCallback,
@@ -120,7 +119,7 @@ function getPresentationDefinitionV2_2(): PresentationDefinitionV2 {
               purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _enum: ['red'],
+                enum: ['red'],
               },
             },
           ],
@@ -181,7 +180,7 @@ function getPresentationDefinitionV2_3(): PresentationDefinitionV2 {
               purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _enum: ['red'],
+                enum: ['red'],
               },
             },
             {
@@ -189,7 +188,7 @@ function getPresentationDefinitionV2_3(): PresentationDefinitionV2 {
               purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _enum: ['red'],
+                enum: ['red'],
               },
             },
             {
@@ -197,7 +196,7 @@ function getPresentationDefinitionV2_3(): PresentationDefinitionV2 {
               purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _const: 'Washington State',
+                const: 'Washington State',
               },
             },
           ],
@@ -299,13 +298,13 @@ describe('evaluate', () => {
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
-  it('should return ok if presentation definition with _const is valid', () => {
+  it('should return ok if presentation definition with const is valid', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_1();
     pd.input_descriptors![0].constraints!.fields![0].filter = {
       type: 'string',
-      _const: 'https://yourwatchful.gov/drivers-license-schema.json',
+      const: 'https://yourwatchful.gov/drivers-license-schema.json',
     };
-    const result1 = new ValidationEngine().validate([
+    /*  const result1 = new ValidationEngine().validate([
       {
         bundler: new PresentationDefinitionV2VB('root'),
         target: pd,
@@ -317,10 +316,10 @@ describe('evaluate', () => {
         status: 'error',
         tag: 'presentation_definition.input_descriptor[0].constraints.fields[0]',
       },
-    ]);
+    ]);*/
     const result2 = PEX.validateDefinition(pd);
     expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_const' as keyof FilterV2]).toEqual(
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV2]).toEqual(
       'https://yourwatchful.gov/drivers-license-schema.json'
     );
   });
@@ -329,14 +328,14 @@ describe('evaluate', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_2();
     const result = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
   });
 
   it('should return ok if presentation definition with enum and const are valid', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2_3();
     const result = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
-    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['_enum' as keyof FilterV2]).toEqual(['red']);
+    expect(pd.input_descriptors![0].constraints!.fields![0].filter!['enum' as keyof FilterV2]).toEqual(['red']);
   });
 
   it('should return ok if presentation definition @ is already escaped properly', () => {
@@ -347,7 +346,7 @@ describe('evaluate', () => {
         purpose: 'We can only verify driver licensed if they have a certain context',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -371,7 +370,7 @@ describe('evaluate', () => {
         purpose: 'We can only verify driver licensed if they have a certain context',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -395,7 +394,7 @@ describe('evaluate', () => {
         purpose: 'We can only verify driver licensed if they have a certain context',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
@@ -425,7 +424,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['did:web:vc.transmute.world'],
+                  enum: ['did:web:vc.transmute.world'],
                 },
               },
             ],
@@ -471,7 +470,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['https://example.edu/issuers/565049'],
+                  enum: ['https://example.edu/issuers/565049'],
                 },
               },
             ],
@@ -504,7 +503,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.degree.name', '$.credentialSubject.degree.name'],
                 filter: {
                   type: 'string',
-                  _enum: ['Bachelor of Science and Arts'],
+                  enum: ['Bachelor of Science and Arts'],
                 },
               },
             ],

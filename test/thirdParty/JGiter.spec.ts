@@ -32,7 +32,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -49,7 +49,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -66,7 +66,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -98,7 +98,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -115,7 +115,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -132,7 +132,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -156,7 +156,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -172,7 +172,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -188,7 +188,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -221,7 +221,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -238,7 +238,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -255,7 +255,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -288,7 +288,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -305,7 +305,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -322,7 +322,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -345,7 +345,7 @@ function getPresentationDefinition_6(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -368,7 +368,7 @@ function getPresentationDefinition_7(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -383,7 +383,7 @@ function getPresentationDefinition_7(): PresentationDefinitionV2 {
               path: ['$.issuer'],
               filter: {
                 type: 'string',
-                _const: 'did:example:123456789af312312i',
+                const: 'did:example:123456789af312312i',
               },
             },
           ],
@@ -579,7 +579,9 @@ describe('evaluate JGiter tests', () => {
 
   it('should have 2 errors in the evaluation result', function () {
     const pex: PEX = new PEX();
-    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_6(), getPresentation());
+    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_6(), getPresentation(), {
+      generatePresentationSubmission: true,
+    });
     expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 
@@ -587,7 +589,9 @@ describe('evaluate JGiter tests', () => {
     const pex: PEX = new PEX();
     const sd: EvaluationResults = pex.evaluateCredentials(getPresentationDefinition_7(), getPresentation().verifiableCredential!);
     expect(sd.errors?.length).toEqual(2);
-    const evaluatePresentationResult = new PEX().evaluatePresentation(getPresentationDefinition_7(), getPresentation());
+    const evaluatePresentationResult = new PEX().evaluatePresentation(getPresentationDefinition_7(), getPresentation(), {
+      generatePresentationSubmission: true,
+    });
     expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 });

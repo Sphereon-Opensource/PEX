@@ -47,20 +47,32 @@ export class PEX {
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      presentationSubmission?: PresentationSubmission;
+      generatePresentationSubmission?: boolean;
     }
   ): EvaluationResults {
+    const generatePresentationSubmission =
+      opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission !== undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
+    const presentationSubmission = opts?.presentationSubmission || wrappedPresentation.presentation.presentation_submission;
+    if (!presentationSubmission && !generatePresentationSubmission) {
+      throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
+    }
 
     const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
-    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, {
+    const updatedOpts = {
       ...opts,
       holderDIDs,
-    });
+      presentationSubmission,
+      generatePresentationSubmission,
+    };
+
+    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, updatedOpts);
     if (result.value && result.value.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, opts);
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, updatedOpts);
       if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
         result.errors = [];
       }

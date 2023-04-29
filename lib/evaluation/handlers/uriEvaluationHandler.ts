@@ -49,11 +49,13 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     // TODO: This approach needs to be refactored for a new Major version.
     // Also there is no apparent need for the indirection and state in this class.
     // Simply do the first loops and amend the presentation submission in every loop.
-    this.presentationSubmission = {
-      id: nanoid(),
-      definition_id: definition.id,
-      descriptor_map: descriptorMap,
-    };
+    if (this.client.generatePresentationSubmission && (!this.presentationSubmission || Object.keys(this.presentationSubmission).length === 0)) {
+      this.presentationSubmission = {
+        id: nanoid(),
+        definition_id: definition.id,
+        descriptor_map: descriptorMap,
+      };
+    }
   }
 
   private evaluateUris(
