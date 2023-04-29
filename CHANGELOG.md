@@ -1,17 +1,22 @@
 # Release Notes
-## v2.0.0 - 2023-03-08
+## v2.0.0 - 2023-04-29
 Using @sphereon/ssi-types
 - Added:
-  - Matching of schema strings against the type property in a VC for V1, as this is being used in the wiled
+  - Allow to have an external presentation submission not part of the VP, especially handy in OpenID4VP use cases
+  - Allow to filter against Verifiable Credential Formats, defined outside of a definition. This is handy for instance when OpenID4VP Relying Parties signal support for certain formats in their OpenID4VP metadata, but do not necessarily incorporate these in their specification(s).
+  - Matching of schema strings against the type property in a VC for V1, as this is being used in the wild
   - Allow issuance object to be present in a definition as it is being used in the wild
 - Removed:
   - definitions of ssi-types (lib/types/SSI.types.ts)
 - Changed:
-  - method signatures to use types from @sphereon/ssi-types
-  - Credential Mapper from @sphereon/ssi-types to create internal uniform VPs/VCs
+  - Changed optional arguments to use objects, see the upgrade section of the [README](./README.md#v200-argument-and-result-objects-changed-slightly)
+  - `presentationFrom` and `verifiablePresentationFrom` methods now return an object instead of the presentation directly. see the upgrade section of the [README](./README.md#v200-argument-and-result-objects-changed-slightly)
+  - Certain non-state related methods have moved to static methods in the PEX class
+  - method signatures are using common types from @sphereon/ssi-types
+  - Credential Mapper from @sphereon/ssi-types is now used to create internal uniform VPs/VCs
   - Relax AJV errors
 - Fixed:
-  - Set the format based on detection of the format instead of hardcoding it in the descriptor 
+  - Set the format based on detection of the format instead of hard-coding it in the descriptor 
   - Match subject is issuer against all subjects of a VC if present (not common)
 
 ## v1.1.6 - 2023-02-17

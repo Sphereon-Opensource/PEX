@@ -34,8 +34,8 @@ export class PEXv1 extends PEX {
       restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition);
-    return super.evaluatePresentation(pd, presentation, opts);
+    SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition); // only doing validation
+    return super.evaluatePresentation(presentationDefinition, presentation, opts);
   }
 
   /***
@@ -58,8 +58,8 @@ export class PEXv1 extends PEX {
       restrictToFormats?: Format;
     }
   ): EvaluationResults {
-    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition);
-    return super.evaluateCredentials(pd, verifiableCredentials, opts);
+    SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition); // only doing validation
+    return super.evaluateCredentials(presentationDefinition, verifiableCredentials, opts);
   }
 
   /**

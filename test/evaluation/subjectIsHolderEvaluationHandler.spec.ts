@@ -5,8 +5,8 @@ import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-ty
 
 import { EvaluationClient } from '../../lib/evaluation';
 import { SubjectIsHolderEvaluationHandler } from '../../lib/evaluation/handlers';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
-import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
+import { InternalPresentationDefinitionV1 } from '../../lib/types';
+import { SSITypesBuilder } from '../../lib/types';
 
 function getFile(path: string): InternalPresentationDefinitionV1 | IVerifiablePresentation | IVerifiableCredential {
   const file = JSON.parse(fs.readFileSync(path, 'utf-8'));

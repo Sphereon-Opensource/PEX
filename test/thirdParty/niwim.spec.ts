@@ -270,9 +270,11 @@ describe('evaluate niwim tests', () => {
     expect(selectResult.areRequiredCredentialsPresent).toBe(Status.INFO);
   });
 
-  it('Evaluate case must return success5', () => {
+  // todo: This does not validate against v1 schema. From a first inspection it is indeed invalid
+  xit('Evaluate case must return success5', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_modified5();
+    pdSchema.input_descriptors[0].constraints!.fields![0]!.predicate = 'required';
     pdSchema.input_descriptors[0].constraints!.fields![0]!.filter = {
       type: 'array',
       contains: {
