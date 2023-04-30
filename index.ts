@@ -10,7 +10,10 @@ import {
   PEX,
   PEXv1,
   PEXv2,
+  PresentationFromOpts,
+  PresentationResult,
   PresentationSignCallBackParams,
+  PresentationSubmissionLocation,
   ProofOptions,
   SelectResults,
   SignatureOptions,
@@ -21,7 +24,8 @@ import {
   ValidationEngine,
   ValidationPredicate,
   Validator,
-  VerifiablePresentationFromOpts
+  VerifiablePresentationFromOpts,
+  VerifiablePresentationResult
 } from './lib';
 
 export {
@@ -47,5 +51,9 @@ export {
   PEVersion,
   ValidationEngine,
   IPresentationDefinition,
-  HandlerCheckResult
+  HandlerCheckResult,
+  VerifiablePresentationResult,
+  PresentationResult,
+  PresentationFromOpts,
+  PresentationSubmissionLocation
 };
