@@ -4,9 +4,8 @@ import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
-import { PEVersion } from '../../types';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV1 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV1, PEVersion } from '../../types';
+import PexMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -27,32 +26,36 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private static HASHLINK_QUERY_URL_REGEX =
     /https*?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)(hl=[a-zA-Z0-9]+)/g;
 
-  //TODO: handle context objects
-  //TODO: handle hashlinks
-  public handle(d: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
+  public handle(definition: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     // This filter is removed in V2
-    (<InternalPresentationDefinitionV1>d).input_descriptors.forEach((inDesc: InputDescriptorV1, i: number) => {
-      const uris: string[] = d.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
-      wrappedVcs.forEach((wvc: WrappedVerifiableCredential, j: number) => {
-        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.internalCredential);
-        this.evaluateUris(wvc, vcUris, uris, i, j, d.getVersion());
+    (<InternalPresentationDefinitionV1>definition).input_descriptors.forEach((inDesc: InputDescriptorV1, descriptorIdx: number) => {
+      const uris: string[] = definition.getVersion() !== PEVersion.v2 ? inDesc.schema.map((so) => so.uri) : [];
+      wrappedVcs.forEach((wvc: WrappedVerifiableCredential, wrappedVCIdx: number) => {
+        const vcUris: string[] = UriEvaluationHandler.buildVcContextAndSchemaUris(wvc.credential, definition.getVersion());
+        this.evaluateUris(wvc, vcUris, uris, descriptorIdx, wrappedVCIdx, definition.getVersion());
       });
     });
     const descriptorMap: Descriptor[] = this.getResults()
-      .filter((e) => e.status === Status.INFO)
-      .map((e) => {
-        const inputDescriptor: InputDescriptorV1 = jp.nodes(d, e.input_descriptor_path)[0].value;
+      .filter((result) => result.status === Status.INFO)
+      .map((result) => {
+        const inputDescriptor: InputDescriptorV1 = jp.nodes(definition, result.input_descriptor_path)[0].value;
         return {
           id: inputDescriptor.id,
-          format: 'ldp_vc',
-          path: e.verifiable_credential_path,
+          format: result.payload?.format,
+          path: result.verifiable_credential_path,
         };
       });
-    this.presentationSubmission = {
-      id: nanoid(),
-      definition_id: d.id,
-      descriptor_map: descriptorMap,
-    };
+    // The presentation submission is being created in this handler, then updated in subsequent handler.
+    // TODO: This approach needs to be refactored for a new Major version.
+    // Also there is no apparent need for the indirection and state in this class.
+    // Simply do the first loops and amend the presentation submission in every loop.
+    if (this.client.generatePresentationSubmission && (!this.presentationSubmission || Object.keys(this.presentationSubmission).length === 0)) {
+      this.presentationSubmission = {
+        id: nanoid(),
+        definition_id: definition.id,
+        descriptor_map: descriptorMap,
+      };
+    }
   }
 
   private evaluateUris(
@@ -85,7 +88,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static buildVcContextAndSchemaUris(credential: ICredential) {
+  private static buildVcContextAndSchemaUris(credential: ICredential, version: PEVersion) {
     const uris: string[] = [];
     if (Array.isArray(credential['@context'])) {
       credential['@context'].forEach((value) => uris.push(value as string));
@@ -97,6 +100,10 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     } else if (credential.credentialSchema) {
       uris.push((credential.credentialSchema as ICredentialSchema).id);
     }
+    if (version === PEVersion.v1) {
+      // JWT VC Profile and MS Entry Verified ID do use the schema from V1 to match against types in the VC
+      Array.isArray(credential.type) ? credential.type.forEach((type) => uris.push(type)) : credential.type ? uris.push(credential.type) : undefined;
+    }
     return uris;
   }
 
@@ -105,13 +112,14 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
-  ) {
+  ): HandlerCheckResult {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
-    result.message = PEMessages.URI_EVALUATION_PASSED;
+    result.message = PexMessages.URI_EVALUATION_PASSED;
     result.payload = {
-      vcContext: wvc.internalCredential['@context'],
-      vcCredentialSchema: wvc.internalCredential.credentialSchema,
+      format: wvc.format,
+      vcContext: wvc.credential['@context'],
+      vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;
@@ -122,13 +130,14 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number
-  ) {
+  ): HandlerCheckResult {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;
-    result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
+    result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
-      vcContext: wvc.internalCredential['@context'],
-      vcCredentialSchema: wvc.internalCredential.credentialSchema,
+      format: wvc.format,
+      vcContext: wvc.credential['@context'],
+      vcCredentialSchema: wvc.credential.credentialSchema,
       inputDescriptorsUris,
     };
     return result;
@@ -137,8 +146,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
   private createWarnResultObject(idIdx: number, vcIdx: number) {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.WARN;
-    result.message = PEMessages.URI_EVALUATION_DIDNT_PASS;
-    result.payload = PEMessages.INPUT_DESCRIPTOR_CONTEXT_CONTAINS_HASHLINK_VERIFICATION_NOT_SUPPORTED;
+    result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
+    result.payload = PexMessages.INPUT_DESCRIPTOR_CONTEXT_CONTAINS_HASHLINK_VERIFICATION_NOT_SUPPORTED;
     return result;
   }
 

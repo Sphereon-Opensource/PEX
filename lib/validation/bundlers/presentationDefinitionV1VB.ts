@@ -27,7 +27,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
 
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true, verbose: true });
+    this.ajv = new Ajv({ allowUnionTypes: true, verbose: false, strict: false });
   }
 
   public getValidations(
@@ -88,22 +88,19 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV1) =>
-          PresentationDefinitionV1VB.formatValuesShouldNotBeEmpty(pd?.format),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.formatValuesShouldNotBeEmpty(pd?.format),
         message: 'formats values should not empty',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV1) =>
-          PresentationDefinitionV1VB.formatValuesShouldBeAmongKnownValues(pd?.format),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.formatValuesShouldBeAmongKnownValues(pd?.format),
         message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV1) =>
-          PresentationDefinitionV1VB.groupShouldMatchSubmissionRequirements(pd),
+        predicate: (pd: PresentationDefinitionV1) => PresentationDefinitionV1VB.groupShouldMatchSubmissionRequirements(pd),
         message: 'input descriptor group should match the from in submission requirements.',
       },
       {
@@ -215,9 +212,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 
-      const difference = new Set(
-        [...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x))
-      );
+      const difference = new Set([...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x)));
 
       return difference.size === 0;
     }
@@ -229,9 +224,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
     return srs?.reduce(
       (accumulator: SubmissionRequirement[], submissionRequirement: SubmissionRequirement) =>
         accumulator.concat(
-          Array.isArray(submissionRequirement.from_nested)
-            ? this.flatten(submissionRequirement.from_nested)
-            : submissionRequirement
+          Array.isArray(submissionRequirement.from_nested) ? this.flatten(submissionRequirement.from_nested) : submissionRequirement
         ),
       []
     );

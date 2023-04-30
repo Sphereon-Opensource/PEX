@@ -86,9 +86,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
 
   private getSubValidations(srInd: number, srs: SubmissionRequirement[]): Validation<SubmissionRequirement>[] {
     const fromNested = srs[srInd].from_nested as SubmissionRequirement[];
-    return fromNested != null
-      ? new SubmissionRequirementVB(this.getFromNestedTag(srInd)).getValidations(fromNested)
-      : [];
+    return fromNested != null ? new SubmissionRequirementVB(this.getFromNestedTag(srInd)).getValidations(fromNested) : [];
   }
 
   private getFromNestedTag(srInd: number) {
@@ -100,7 +98,7 @@ export class SubmissionRequirementVB extends ValidationBundler<SubmissionRequire
   }
 
   isMinPositiveInt(sr: SubmissionRequirement): boolean {
-    return sr.rule !== 'pick' || sr.min == null || 0 < sr.min;
+    return sr.rule !== 'pick' || sr.min == null || 0 <= sr.min;
   }
 
   isMaxPositiveInt(sr: SubmissionRequirement): boolean {

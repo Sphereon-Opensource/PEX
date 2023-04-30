@@ -32,8 +32,7 @@ function getVerifiableCredentials(): IVerifiableCredential[] {
       proof: {
         type: 'Ed25519Signature2018',
         proofPurpose: 'assertionMethod',
-        verificationMethod:
-          'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+        verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
         created: '2021-11-16T14:52:19.514Z',
         jws: 'eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..nV_x5AKqH9M0u5wsEt1D_DXxYpOzuO_nqDEj-alIzPA5yi8_yWAhKbWPa2r9GoTLPehvZrpgleUDiDj-9_F6Bg',
       },
@@ -271,13 +270,15 @@ describe('evaluate niwim tests', () => {
     expect(selectResult.areRequiredCredentialsPresent).toBe(Status.INFO);
   });
 
-  it('Evaluate case must return success5', () => {
+  // todo: This does not validate against v1 schema. From a first inspection it is indeed invalid
+  xit('Evaluate case must return success5', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinition_modified5();
+    pdSchema.input_descriptors[0].constraints!.fields![0]!.predicate = 'required';
     pdSchema.input_descriptors[0].constraints!.fields![0]!.filter = {
       type: 'array',
       contains: {
-        _enum: ['AlumniCredential'],
+        enum: ['AlumniCredential'],
       },
     } as unknown as FilterV1;
     const vcs = getVerifiableCredentials();

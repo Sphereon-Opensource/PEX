@@ -1,4 +1,4 @@
-import { ObjectUtils } from '../../utils/ObjectUtils';
+import { ObjectUtils } from '../../utils';
 import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';
@@ -19,9 +19,6 @@ export class FrameVB extends ValidationBundler<unknown> {
 
   private getMyValidations(frame: unknown): Validation<unknown>[] {
     return [
-      //(ps: PresentationSubmission) =>
-      //           PresentationSubmissionVB.descriptorMapMustBePresent(ps?.descriptor_map),
-      //(f as Frame) => FrameVB.
       {
         tag: this.getMyTag(),
         target: frame,
@@ -47,10 +44,7 @@ export class FrameVB extends ValidationBundler<unknown> {
     if (fr && fr['@id' as keyof Frame]) {
       for (const id of ObjectUtils.asArray(frame['@id' as keyof Frame])) {
         // @id must be wildcard or an IRI
-        if (
-          !(ObjectUtils.isObject(id) || ObjectUtils.isUrlAbsolute(id)) ||
-          (ObjectUtils.isString(id) && id.indexOf('_:') === 0)
-        ) {
+        if (!(ObjectUtils.isObject(id) || ObjectUtils.isUrlAbsolute(id)) || (ObjectUtils.isString(id) && id.indexOf('_:') === 0)) {
           return false;
         }
       }
@@ -59,10 +53,7 @@ export class FrameVB extends ValidationBundler<unknown> {
     if (fr['@types' as keyof Frame]) {
       for (const type of ObjectUtils.asArray(frame['@types' as keyof Frame])) {
         // @id must be wildcard or an IRI
-        if (
-          !(ObjectUtils.isObject(type) || ObjectUtils.isUrlAbsolute(type)) ||
-          (ObjectUtils.isString(type) && type.indexOf('_:') === 0)
-        ) {
+        if (!(ObjectUtils.isObject(type) || ObjectUtils.isUrlAbsolute(type)) || (ObjectUtils.isString(type) && type.indexOf('_:') === 0)) {
           return false;
         }
       }

@@ -1,10 +1,10 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
-import { ICredential, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { AdditionalClaims, ICredential, ICredentialSubject, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -24,20 +24,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     (pd as InternalPresentationDefinitionV2).input_descriptors.forEach((inDesc: InputDescriptorV2, index: number) => {
       if (
         inDesc.constraints?.fields &&
-        (inDesc.constraints?.limit_disclosure === Optionality.Required ||
-          inDesc.constraints?.limit_disclosure === Optionality.Preferred)
+        (inDesc.constraints?.limit_disclosure === Optionality.Required || inDesc.constraints?.limit_disclosure === Optionality.Preferred)
       ) {
         this.evaluateLimitDisclosure(wrappedVcs, inDesc.constraints, index);
       }
     });
   }
 
-  private isLimitDisclosureSupported(
-    wvc: WrappedVerifiableCredential,
-    vcIdx: number,
-    idIdx: number,
-    optionality: Optionality
-  ): boolean {
+  private isLimitDisclosureSupported(wvc: WrappedVerifiableCredential, vcIdx: number, idIdx: number, optionality: Optionality): boolean {
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     const proof = (wvc.decoded as IVerifiableCredential).proof;
     if (!proof || Array.isArray(proof) || !proof.type) {
@@ -52,22 +46,18 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return true;
   }
 
-  private evaluateLimitDisclosure(
-    wrappedVcs: WrappedVerifiableCredential[],
-    constraints: ConstraintsV1 | ConstraintsV2,
-    idIdx: number
-  ): void {
+  private evaluateLimitDisclosure(wrappedVcs: WrappedVerifiableCredential[], constraints: ConstraintsV1 | ConstraintsV2, idIdx: number): void {
     const fields = constraints?.fields as FieldV2[];
     const optionality = constraints.limit_disclosure;
     wrappedVcs.forEach((wvc, index) => {
       if (optionality && this.isLimitDisclosureSupported(wvc, index, idIdx, optionality)) {
-        this.enforceLimitDisclosure(wvc.internalCredential, fields, idIdx, index, wrappedVcs, optionality);
+        this.enforceLimitDisclosure(wvc.credential, fields, idIdx, index, wrappedVcs, optionality);
       }
     });
   }
 
   private enforceLimitDisclosure(
-    vc: ICredential,
+    vc: IVerifiableCredential,
     fields: FieldV2[],
     idIdx: number,
     index: number,
@@ -79,18 +69,13 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
      * remain untouched and the verifiable credential won't be submitted.
      */
     if (internalCredentialToSend) {
-      wrappedVcs[index].internalCredential = internalCredentialToSend;
+      wrappedVcs[index].credential = internalCredentialToSend;
       this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
     }
   }
 
-  private createVcWithRequiredFields(
-    vc: ICredential,
-    fields: FieldV2[],
-    idIdx: number,
-    vcIdx: number
-  ): ICredential | undefined {
-    let credentialToSend: ICredential = {} as ICredential;
+  private createVcWithRequiredFields(vc: IVerifiableCredential, fields: FieldV2[], idIdx: number, vcIdx: number): IVerifiableCredential | undefined {
+    let credentialToSend: IVerifiableCredential = {} as IVerifiableCredential;
     credentialToSend = Object.assign(credentialToSend, vc);
     credentialToSend.credentialSubject = {};
 
@@ -111,12 +96,13 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
     internalCredential: ICredential,
-    internalCredentialToSend: ICredential
-  ): ICredential {
-    let credentialSubject = { ...internalCredential.credentialSubject };
+    internalCredentialToSend: IVerifiableCredential
+  ): IVerifiableCredential {
+    //TODO: ESSIFI-186
+    let credentialSubject: ICredentialSubject & AdditionalClaims = { ...internalCredential.credentialSubject };
     requiredField.path.forEach((e) => {
-      if (credentialSubject[e]) {
-        credentialSubject = { [e]: credentialSubject[e] } as { [x: string]: unknown };
+      if (credentialSubject[e as keyof ICredentialSubject]) {
+        credentialSubject = { [e]: credentialSubject[e as keyof ICredentialSubject] } as { [x: string]: unknown };
       }
     });
     internalCredentialToSend.credentialSubject = {
@@ -132,7 +118,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `${path}`,
       evaluator: this.getName(),
       status: limitDisclosure === Optionality.Required ? Status.INFO : Status.WARN,
-      message: PEMessages.LIMIT_DISCLOSURE_APPLIED,
+      message: PexMessages.LIMIT_DISCLOSURE_APPLIED,
       payload: undefined,
     });
   }
@@ -143,7 +129,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: PEMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
+      message: PexMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
       payload: path,
     });
   }
@@ -154,7 +140,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       verifiable_credential_path: `$[${vcIdx}]`,
       evaluator: this.getName(),
       status: Status.ERROR,
-      message: PEMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
+      message: PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
     });
   }
 }

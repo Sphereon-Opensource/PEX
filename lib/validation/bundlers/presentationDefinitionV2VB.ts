@@ -28,7 +28,7 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
 
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+    this.ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
   }
 
   public getValidations(
@@ -60,10 +60,7 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
         ...new SubmissionRequirementVB(this.myTag).getValidations(pd.submission_requirements),
       ];
     } else {
-      validations = [
-        ...this.myValidations(pd),
-        ...new InputDescriptorsV2VB(this.myTag).getValidations(pd.input_descriptors),
-      ];
+      validations = [...this.myValidations(pd), ...new InputDescriptorsV2VB(this.myTag).getValidations(pd.input_descriptors)];
     }
     if (pd.frame) {
       validations.push(...new FrameVB(this.myTag).getValidations(pd.frame));
@@ -107,22 +104,19 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV2) =>
-          PresentationDefinitionV2VB.formatValuesShouldNotBeEmpty(pd?.format),
+        predicate: (pd: PresentationDefinitionV2) => PresentationDefinitionV2VB.formatValuesShouldNotBeEmpty(pd?.format),
         message: 'formats values should not empty',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV2) =>
-          PresentationDefinitionV2VB.formatValuesShouldBeAmongKnownValues(pd?.format),
+        predicate: (pd: PresentationDefinitionV2) => PresentationDefinitionV2VB.formatValuesShouldBeAmongKnownValues(pd?.format),
         message: 'formats should only have known identifiers for alg or proof_type',
       },
       {
         tag: this.getTag(),
         target: pd,
-        predicate: (pd: PresentationDefinitionV2) =>
-          PresentationDefinitionV2VB.groupShouldMatchSubmissionRequirements(pd),
+        predicate: (pd: PresentationDefinitionV2) => PresentationDefinitionV2VB.groupShouldMatchSubmissionRequirements(pd),
         message: 'input descriptor group should match the from in submission requirements.',
       },
     ];
@@ -224,9 +218,7 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
 
       const fromValueStrings: Set<string> = new Set<string>(fromValues);
 
-      const difference = new Set(
-        [...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x))
-      );
+      const difference = new Set([...fromValueStrings].filter((x) => x != null && x.length > 0 && !groupStrings.has(x)));
 
       return difference.size === 0;
     }
@@ -238,9 +230,7 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
     return srs?.reduce(
       (accumulator: SubmissionRequirement[], submissionRequirement: SubmissionRequirement) =>
         accumulator.concat(
-          Array.isArray(submissionRequirement.from_nested)
-            ? this.flatten(submissionRequirement.from_nested)
-            : submissionRequirement
+          Array.isArray(submissionRequirement.from_nested) ? this.flatten(submissionRequirement.from_nested) : submissionRequirement
         ),
       []
     );

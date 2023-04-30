@@ -32,7 +32,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -49,7 +49,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -66,7 +66,7 @@ function getPresentationDefinition_1(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -98,7 +98,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -115,7 +115,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -132,7 +132,7 @@ function getPresentationDefinition_2(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -156,7 +156,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -172,7 +172,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -188,7 +188,7 @@ function getPresentationDefinition_3(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -221,7 +221,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -238,7 +238,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -255,7 +255,7 @@ function getPresentationDefinition_4(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -288,7 +288,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.did'],
               filter: {
                 type: 'string',
-                _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                const: 'did:example:d23dd687a7dc6787646f2eb98d0',
               },
             },
           ],
@@ -305,7 +305,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.profile.name'],
               filter: {
                 type: 'string',
-                _const: 'John',
+                const: 'John',
               },
             },
           ],
@@ -322,7 +322,7 @@ function getPresentationDefinition_5(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -345,7 +345,7 @@ function getPresentationDefinition_6(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -368,7 +368,7 @@ function getPresentationDefinition_7(): PresentationDefinitionV2 {
               path: ['$.credentialSubject.role'],
               filter: {
                 type: 'string',
-                _const: 'admin',
+                const: 'admin',
               },
             },
           ],
@@ -383,7 +383,7 @@ function getPresentationDefinition_7(): PresentationDefinitionV2 {
               path: ['$.issuer'],
               filter: {
                 type: 'string',
-                _const: 'did:example:123456789af312312i',
+                const: 'did:example:123456789af312312i',
               },
             },
           ],
@@ -417,8 +417,7 @@ function getVerifiableCredentials(): IVerifiableCredential[] {
       proof: {
         type: 'Ed25519Signature2018',
         proofPurpose: 'assertionMethod',
-        verificationMethod:
-          'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+        verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
         created: '2021-11-16T14:52:19.514Z',
         jws: 'eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..6QqnZoVBfNzNLa6GO8vnLq7YjIxKvL-e1a4NGYFOwjf9GQtJcD6kenu8Sb_DOXERUUYZnVbsaRRrRAIN0YR0DQ',
       },
@@ -440,8 +439,7 @@ function getVerifiableCredentials(): IVerifiableCredential[] {
       proof: {
         type: 'Ed25519Signature2018',
         proofPurpose: 'assertionMethod',
-        verificationMethod:
-          'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+        verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
         created: '2021-11-16T14:52:19.514Z',
         jws: 'eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..nV_x5AKqH9M0u5wsEt1D_DXxYpOzuO_nqDEj-alIzPA5yi8_yWAhKbWPa2r9GoTLPehvZrpgleUDiDj-9_F6Bg',
       },
@@ -474,8 +472,7 @@ function getPresentation(): IPresentation {
         proof: {
           type: 'Ed25519Signature2018',
           proofPurpose: 'assertionMethod',
-          verificationMethod:
-            'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+          verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
           created: '2021-11-16T14:52:19.514Z',
           jws: 'eyJhbGciOiJFZERTQSIsImtpZCI6InpXTUU5MTNqZFlySUx1WUQtb3QtakRibXpxejM0SHFsQ1VaNkNNZEpueW8iLCJjcml0IjpbImI2NCJdLCJiNjQiOmZhbHNlfQ..b8N7pmZHjWN_QnEdJBXrubP-HOcnkQjkXSUHth6drx3UjEaQpNfGW2lICDWL6qaAcXxcMQX-_GH-8XxtHTdxDQ',
         },
@@ -486,9 +483,8 @@ function getPresentation(): IPresentation {
 
 describe('evaluate JGiter tests', () => {
   it('should return v2 in version discovery', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_1();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v2');
   });
 
@@ -505,10 +501,8 @@ describe('evaluate JGiter tests', () => {
     expect(selectFrom.matches![0]?.vc_path).toEqual(['$.verifiableCredential[0]']);
     expect(selectFrom.matches![1]?.from).toEqual(['B']);
     expect(selectFrom.matches![1]?.vc_path).toEqual(['$.verifiableCredential[1]']);
-    const presentation: IPresentation = pex.presentationFrom(
-      pdSchema,
-      selectFrom.verifiableCredential as IVerifiableCredential[]
-    );
+    const presentationResult = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
+    const presentation = presentationResult.presentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',
@@ -544,14 +538,11 @@ describe('evaluate JGiter tests', () => {
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_4();
     const vcs = getVerifiableCredentials();
     const selectResult = pex.selectFrom(pdSchema, vcs);
-    const resultEvaluation = pex.evaluateCredentials(pdSchema, [
-      selectResult.verifiableCredential![0],
-      selectResult.verifiableCredential![1],
-    ]);
+    const resultEvaluation = pex.evaluateCredentials(pdSchema, [selectResult.verifiableCredential![0], selectResult.verifiableCredential![1]]);
     expect(resultEvaluation.errors?.length).toEqual(6);
     expect(resultEvaluation.areRequiredCredentialsPresent).toEqual(Status.INFO);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
-    expect(presentation.presentation_submission?.descriptor_map).toEqual([
+    const presentationResult = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
+    expect(presentationResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',
         format: 'ldp_vc',
@@ -577,7 +568,10 @@ describe('evaluate JGiter tests', () => {
     const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV2 = getPresentationDefinition_3();
     const vcs = getVerifiableCredentials();
-    const resultSelectFrom = pex.selectFrom(pdSchema, vcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.ERROR);
     expect(resultSelectFrom.matches).toEqual([]);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(0);
@@ -585,18 +579,19 @@ describe('evaluate JGiter tests', () => {
 
   it('should have 2 errors in the evaluation result', function () {
     const pex: PEX = new PEX();
-    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_6(), getPresentation());
+    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_6(), getPresentation(), {
+      generatePresentationSubmission: true,
+    });
     expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 
   it('should have 2 errors in the evaluation result with passing ID', function () {
     const pex: PEX = new PEX();
-    const sd: EvaluationResults = pex.evaluateCredentials(
-      getPresentationDefinition_7(),
-      getPresentation().verifiableCredential
-    );
+    const sd: EvaluationResults = pex.evaluateCredentials(getPresentationDefinition_7(), getPresentation().verifiableCredential!);
     expect(sd.errors?.length).toEqual(2);
-    const evaluatePresentationResult = pex.evaluatePresentation(getPresentationDefinition_7(), getPresentation());
+    const evaluatePresentationResult = new PEX().evaluatePresentation(getPresentationDefinition_7(), getPresentation(), {
+      generatePresentationSubmission: true,
+    });
     expect(evaluatePresentationResult.errors?.length).toEqual(2);
   });
 });

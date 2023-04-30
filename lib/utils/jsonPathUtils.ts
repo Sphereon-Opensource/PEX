@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-import jp from 'jsonpath';
+import jp, { PathComponent } from 'jsonpath';
 
 import { InputFieldType, IPresentationDefinition } from '../types';
 
@@ -48,8 +48,8 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  public static extractInputField(obj: InputFieldType, paths: string[]): any[] {
-    let result: any[] = [];
+  public static extractInputField(obj: InputFieldType, paths: string[]): { value: unknown; path: PathComponent[] }[] {
+    let result: { value: unknown; path: PathComponent[] }[] = [];
     if (paths) {
       for (const path of paths) {
         result = jp.nodes(obj, path);
@@ -66,19 +66,14 @@ export class JsonPathUtils {
     currentPropertyName: string,
     newPropertyName: string
   ) {
-    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, [
-      '$..' + currentPropertyName,
-    ]);
+    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..' + currentPropertyName]);
     for (const existingPath of existingPaths) {
       this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
     }
   }
 
-  private static copyResultPathToDestinationDefinition(
-    pathDetails: (string | number)[],
-    pd: IPresentationDefinition,
-    newPropertyName: string
-  ) {
+  private static copyResultPathToDestinationDefinition(pathDetails: (string | number)[], pd: IPresentationDefinition, newPropertyName: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {
@@ -100,6 +95,7 @@ export class JsonPathUtils {
   }
 
   private static modifyPathsWithSpecialCharacter(pathDetails: (string | number)[], pd: IPresentationDefinition) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;
     for (let i = 1; i < pathDetails.length; i++) {
       if (i + 1 < pathDetails.length) {
@@ -132,21 +128,14 @@ export class JsonPathUtils {
         path = path.charAt(0) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
         indexChanged = true;
         this.modifyPathRecursive(matches, path);
-      } else if (
-        atIdx &&
-        atIdx > 1 &&
-        path.substring(atIdx - 2, atIdx) !== "['" &&
-        path.substring(atIdx - 2, atIdx) !== '["'
-      ) {
+      } else if (atIdx && atIdx > 1 && path.substring(atIdx - 2, atIdx) !== "['" && path.substring(atIdx - 2, atIdx) !== '["') {
         if (path.substring(atIdx - 2, atIdx) === '..') {
-          path =
-            path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          path = path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
           const matches = this.matchAll(path, this.REGEX_PATH);
           this.modifyPathRecursive(matches, path);
         } else if (path.charAt(atIdx - 1) === '.') {
-          path =
-            path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
+          path = path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
           this.modifyPathRecursive(matches, path);
         }

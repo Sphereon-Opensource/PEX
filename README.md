@@ -10,29 +10,40 @@
 
 ## Background
 
-The Presentation Exchange (PEX) Library is a general use presentation exchange library that implements the functionality
+The Presentation Exchange (PEX) Library implements the functionality
 described in the [DIF Presentation Exchange specification](https://identity.foundation/presentation-exchange/) for both
-version 1.0.0 and 2.0.0. It is written in Typescript and can be compiled to any target JavaScript version.
+version 1 and 2.
 
 Sphereon's PEX Library is useful for both verifier systems and holders (e.g. wallets) and can be used in client side
 browsers and mobile applications as well as on server side technology such as REST APIs (e.g. built with NodeJS). It
 allows anyone to add DIF Presentation Exchange logic to their existing wallets, agents and/or verifiers, without making
-any further assumptions about the technologies used in their products.
+any further assumptions about technologies like cryptography, credential representations used in their products.
 
-A Presentation Exchange operates generally as follows; The verifier creates a Presentation Definition asking for
-credentials from the holder. The Presentation Definition for the credentials is sent to the holder, who returns a Verifiable
-Presentation containing Presentation Submission data that links the Credentials in the Presentation to the received Definition as a response.
+A Presentation Exchange generally goes as follows; The verifier creates a Presentation Definition asking for
+credentials from the holder. The Presentation Definition for the credentials is sent to the holder, who returns a
+Verifiable
+Presentation containing Presentation Submission data that links the Credentials in the Presentation to the received
+Definition as a response.
+The Presentation Submission describes the relationship between the Verifiable Presentation and the Presentation
+Definition.
+It can either be part of the Verifiable Presentation or be external, like in OpenID4VC specifications.
 Now the verifier will verify the Verifiable Presentation by checking the signature and other
 accompanying proofs as well as ensuring the Submission Data fulfills the requirements from the specification.
 
-The Presentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
-ensures that the correct parts from the holders credentials are used to create the presentation. The PEX-library contains all
+Presentation Exchange will ensure that the model used by the verifier, can be interpreted by the holder. It then
+ensures that the correct parts from the holders credentials are used to create the presentation. The PEX-library
+contains all
 the logic to interpret the models, therefore removing the need for the verifier and holder to align their specific
 models.
 
-The Typescript data objects (models) used in PEX are generated from Sphereon's DIF PEX OpenAPI Spec component. The code for the
+The Typescript data objects (models) used in PEX are generated from Sphereon's DIF PEX OpenAPI Spec component. The code
+for the
 component can be found at [PEX-OpenAPI github repository](https://github.com/Sphereon-Opensource/pex-openapi). This
-allows the generation of the objects in many programming languages and frameworks consistently by configuring the maven plugin.
+allows the generation of the objects in many programming languages and frameworks consistently by configuring the maven
+plugin.
+
+WARNING: Please be aware that this library does not support the latest V2 specification!. Support will be added as part
+of a V3 major version of this library
 
 ### The PEX Library supports the following actions:
 
@@ -49,7 +60,7 @@ allows the generation of the objects in many programming languages and framework
 
 Stateful storage, signature support or credential management should be implemented in separate libraries/modules that
 make use of this library. By keeping these separate, the PEX library will stay
-platform-agnostic and lean regarding dependencies.
+platform-agnostic and lean with respect to dependencies.
 
 ## For PEX Users
 
@@ -67,90 +78,118 @@ The core functionality of the DIF Presentation Exchange can be outlined as follo
 
 - Verifiers/Agents:
 
-  - [Input Evaluation](#verifier-input-evaluation)
-  - [Utilities](#utilities)
+    - [Input Evaluation](#verifier-input-evaluation)
+    - [Utilities](#utilities)
 
 - Holders/Wallets:
-  - [Credential Query](#holder-credential-query)
-  - [Non-Verifiable Presentation creation](#holder-presentation-creation-non-verifiable)
-  - [Verifiable Presentation creation](#holder-verifiable-presentation-with-callback)
-  - [Utilities](#utilities)
-
+    - [Credential Query](#holder-credential-query)
+    - [Non-Verifiable Presentation creation](#holder-presentation-creation-non-verifiable)
+    - [Verifiable Presentation creation](#holder-verifiable-presentation-with-callback)
+    - [Utilities](#utilities)
 
 ### Verifier: Create a Presentation Definition object:
-[Presentation Definitions](https://identity.foundation/presentation-exchange/#presentation-definition) are objects that articulate what proofs a Verifier requires. These help the Verifier to decide how or whether to interact with a Holder. Presentation Definitions are composed of inputs, which describe the forms and details of the proofs they require, and optional sets of selection rules, to allow Holders flexibility in cases where different types of proofs may satisfy an input requirement.
-PEX library supports two versions of `presentation_definition` object. The details of it can be found in `@spehereon/pex-models` below you can find some tips about querying via a presentation_definition object:
+
+[Presentation Definitions](https://identity.foundation/presentation-exchange/#presentation-definition) are objects that
+articulate what proofs a Verifier requires. These help the Verifier to decide how or whether to interact with a Holder.
+Presentation Definitions are composed of inputs, which describe the forms and details of the proofs they require, and
+optional sets of selection rules, to allow Holders flexibility in cases where different types of proofs may satisfy an
+input requirement.
+PEX library supports two versions of `presentation_definition` object. The details of it can be found
+in `@spehereon/pex-models` below you can find some tips about querying via a presentation_definition object:
+
 - Using the `constraint` field:
-  - You can use the constraint field for creating your query:
+    - You can use the constraint field for creating your query:
+
 ```js
 constraints: {
   fields: [
     {
-       path: ['$.credentialSubject.role'],
-       filter: {
-         type: 'string',
-         _const: 'admin',
-       },
-    },
-  ]
+      path: ['$.credentialSubject.role'],
+      filter: {
+        type: 'string',
+        const: 'admin'
+      }
+    }
+  ];
 }
 ```
+
 - for special cases, like querying fields that start with `@` you can use the following syntax:
-  - You can use the following syntax, PEX will change it to correct query itself:
+    - You can use the following syntax, PEX will change it to correct query itself:
+
 ```js
 path: ['$.@context', '$.vc.@context']
 ```
-For querying the arrays, right now we don't support the [json-schema](http://json-schema.org/draft-07/schema#) fully, but we do support the following syntax:
+
+For querying the arrays, right now we don't support the [json-schema](http://json-schema.org/draft-07/schema#) fully,
+but we do support the following syntax:
 
 - using `[*]` like:
-```json
-{
-    fields: [
-      {
-        path: ['$.type.[*]'],
-        filter: {
-          type: 'string',
-          pattern: 'AlumniCredential'
-        }
-      }
-    ]
-}
-```
 
-- using `.*` like:
 ```json
 {
   fields: [
     {
-      path: ['$.type.*'],
+      path: [
+        '$.type.[*]'
+      ],
       filter: {
         type: 'string',
-        pattern: 'AlumniCredential',
-      },
-    },
-  ],
+        pattern: 'AlumniCredential'
+      }
+    }
+  ]
 }
 ```
-- using `type: array` and `contains` keyword. PEX currently doesn't support this syntax fully, but if you don't rely on our `versionDiscovery` functionality and call the specific version of PEX (PEXv1 or PEXv2) yourself, you can use this syntax as well.
+
+- using `.*` like:
+
+```json
+{
+  fields: [
+    {
+      path: [
+        '$.type.*'
+      ],
+      filter: {
+        type: 'string',
+        pattern: 'AlumniCredential'
+      }
+    }
+  ]
+}
+```
+
+- using `type: array` and `contains` keyword. PEX currently doesn't support this syntax fully, but if you don't rely on
+  our `versionDiscovery` functionality and call the specific version of PEX (PEXv1 or PEXv2) yourself, you can use this
+  syntax as well.
+
 ```json
 {
   "fields": [
     {
-      "path": [ "$.type" ],
+      "path": [
+        "$.type"
+      ],
       "filter": {
         "type": "array",
         "contains": {
-          "enum": ["https://example.com/type"]
+          "enum": [
+            "https://example.com/type"
+          ]
         }
       }
     }
   ]
 }
 ```
+
 ### Verifier: Input Evaluation
 
-Input evaluation is the primary mechanism by which a verifier determines whether a Verifiable Presentation and Presentation Submission from a holder
-matches the requested presentation definition from the request. Obviously a holder/wallet could also use the method to verify whether its submission would be valid, before contacting the verifier.
+Input evaluation is the primary mechanism by which a verifier determines whether a Verifiable Presentation and
+Presentation Submission from a holder
+matches the requested presentation definition from the request. Obviously a holder/wallet could also use the method to
+verify whether its submission would be valid, before contacting the verifier.
 
 ```typescript
 import { PEX } from '@sphereon/pex';
@@ -205,7 +244,8 @@ const { value, warnings, errors } = pex.evaluatePresentation(presentationDefinit
 ### Holder: Credential Query
 
 A credential query allows holders to filter their set of credentials for matches to a given presentation definition.
-This filters out any non-matching Credentials that are passed in. Please note that multiple credentials could be satisfying the definition.
+This filters out any non-matching Credentials that are passed in. Please note that multiple credentials could be
+satisfying the definition.
 
 ```typescript
 import { PEX } from '@sphereon/pex';
@@ -220,13 +260,13 @@ const presentationDefinition = {
 // Finding out which version presentationDefinition is this:
 // The result is either 'v1', 'v2' or an error
 // You only have to do this if you want to apply some custom logic. The PEX class uses feature detection on the definition to determine whether it is v1 or v2 internally
-const result = pex.definitionVersionDiscovery(pdSchema);
+const result = PEX.definitionVersionDiscovery(pdSchema);
 
 // Example for loading credentials from your secure storage
 const credentials: IVerifiableCredential[] = await secureStore.getCredentials();
 
 // Find matching credentials
-const srMatches = pex.selectFrom(presentationDefinition, credentials, holderDid);
+const srMatches = pex.selectFrom(presentationDefinition, credentials, { holderDIDs: [holderDID] });
 
 // An example that selects the first 'count' credentials from
 // the matches. in a real scenario, the user has to select which
@@ -240,7 +280,8 @@ const selectedCredentials = srMatches.map(
 
 ### Holder: Presentation creation (non-verifiable)
 
-To create a Presentation without Proof (for Proofs, see [Verifiable Presentation below](#holder-verifiable-presentation-with-callback)) you have to pass in the
+To create a Presentation without Proof (for Proofs,
+see [Verifiable Presentation below](#holder-verifiable-presentation-with-callback)) you have to pass in the
 Presentation Definition, selected Verifiable Credentials and an optional holder (DID). The result will be a Verifiable
 Presentation, without proofs, so actually a Presentation. It also contains the presentation submission data that the
 verifier can use.
@@ -250,12 +291,13 @@ are different libraries that allow you to do this. You can also use the callback
 chapter for this.
 
 ```typescript
-import { PEX, IPresentation } from '@sphereon/pex';
+import { PEX, IPresentation, PresentationResult } from '@sphereon/pex';
 
 const pex: PEX = new PEX();
 
 // Construct presentation from selected credentials
-const presentation: IPresentation = pex.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
+const presentationResult: PresentationResult = pex.presentationFrom(presentationDefinition, selectedCredentials, { holderDIDs: [holderDID] });
+const presentation = presentationResult.presentation
 /** presentation object:
  *
  *   {
@@ -280,16 +322,15 @@ const presentation: IPresentation = pex.presentationFrom(presentationDefinition,
 rely on all kinds of signature suites and libraries. PEX has minimal dependencies currently, so that it can be used in
 all kinds of scenarios.
 
-How did we solve this? We have created a callback mechanism, allowing you to create a callback function that gets all
+How did we solve this? We have created a callback mechanism, allowing you to supply a callback function that gets all
 input allowing you to use your library of choice to create the signature. The callback needs to accept
 a `PresentationSignCallBackParams` object.
 
 **NOTE:**
 The method `verifiablePresentationFrom` accepts the presentation definition and selected Verifiable Credentials as the
 first two arguments, just like the `presentationFrom` method. Next it accepts the callback function as argument and
-a `PresentationSignOptions` object as last argument. The sign callback params, allow you to control the signature
-process. You will have access in the callback to these params as well. This method is deprecated and will be replaced with the async version.
-You can use the `async` version of this method which is called `verifiablePresentationFromAsync`
+a `VerifiablePresentationFromOpts` object as last argument. The sign callback params, allow you to control the signature
+process. You will have access in the callback to these params as well.
 
 Before calling your callback function a few things happen. First, just like the `presentationFrom` method, it
 will evaluate whether the supplied credentials conform to the supplied presentation definition. Then it creates a
@@ -306,14 +347,27 @@ jws, based upon your options.
 
 #### Presentation Sign Options
 
-The options accepted by the `verifiablePresentationFromAsync` are:
+The options accepted by the `verifiablePresentationFrom` are:
 
 ```typescript
-interface PresentationSignOptions {
+interface VerifiablePresentationFromOpts {
   /**
-   * The optional holder of the presentation
+   * The optional holderDID of the presentation
    */
-  holder?: string;
+  holderDID?: string;
+
+  /**
+   * The presentation submission data location.
+   *
+   * Can be External, which means it is only returned and not embedded into the VP,
+   * or Presentation, which means it will become part of the VP
+   */
+  presentationSubmissionLocation?: PresentationSubmissionLocation;
+
+  /**
+   * A base presentation payload. Can be used to provide default values. Be aware that any verifiable credential will always be overwritten
+   */
+  basePresentationPayload?: IPresentation;
 
   /**
    * IProof options
@@ -412,7 +466,7 @@ export interface PresentationSignCallBackParams {
   /**
    * The originally supplied presentation sign options
    */
-  options: PresentationSignOptions;
+  options: VerifiablePresentationFromOpts;
 
   /**
    * The presentation definition
@@ -464,8 +518,8 @@ import {
 
 const pex: PEX = new PEX();
 
-const params: PresentationSignOptions = {
-  holder: 'did:example:1234....',
+const params: VerifiablePresentationFromOpts = {
+  holderDID: 'did:example:1234....',
   proofOptions: {
     type: ProofType.Ed25519Signature2018,
     proofPurpose: ProofPurpose.assertionMethod,
@@ -477,7 +531,7 @@ const params: PresentationSignOptions = {
   },
 };
 
-const vp = await pex.verifiablePresentationFromAsync(
+const vp = await pex.verifiablePresentationFrom(
   presentationDefinition,
   selectedCredentials,
   simpleSignedProofCallback,
@@ -502,7 +556,7 @@ function simpleSignedProofCallback(callBackParams: PresentationSignCallBackParam
    * }
    */
 
-  // Just an example. Obviously your lib will have a different method signature
+    // Just an example. Obviously your lib will have a different method signature
   const vp = myVPSignLibrary(presentation, { ...proof, privateKeyBase58 });
 
   return vp;
@@ -517,20 +571,18 @@ functions.
 ```typescript
 import { PEX } from '@sphereon/pex';
 
-const pex: PEX = new PEX();
-
 const presentationDefinition = {
   ...
 };
 
-const result = pex.definitionVersionDiscovery(presentationDefinition);
-const { warnings: pdWarnings, errors: pdErrors } = pex.validateDefinition(presentationDefinition);
+const result = PEX.definitionVersionDiscovery(presentationDefinition);
+const { warnings: pdWarnings, errors: pdErrors } = PEX.validateDefinition(presentationDefinition);
 
 const presentationSubmission = {
   ...
 };
 
-const { warnings: psWarnings, errors: psErrors } = pex.validateSubmission(presentationSubmission);
+const { warnings: psWarnings, errors: psErrors } = PEX.validateSubmission(presentationSubmission);
 ```
 
 ## API
@@ -546,7 +598,8 @@ PEXv2.evaluatePresentation(presentationDefinition, verifiablePresentation);
 ##### Description
 
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
-based upon feature detection and acts accordingly. The other two are specific to their Presentation Exchange definition version.
+based upon feature detection and acts accordingly. The other two are specific to their Presentation Exchange definition
+version.
 
 **For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
 
@@ -557,7 +610,7 @@ presentation here.
 #### Parameters
 
 | name                     | type                     | description                                                                                                                                    |
-| ------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | `presentationDefinition` | `PresentationDefinition` | the presentation definition that initiated the request from the verifier                                                                       |
 | `presentation`           | `IPresentation`          | the Presentation object containing the required credentials and a `presentation_submission` object mapping back to the presentation definition |
 
@@ -578,9 +631,9 @@ interface EvaluationResults {
 ### SelectFrom
 
 ```typescript
-PEX.selectFrom(presentationDefinition, credentials, holderDids);
-PEXv1.selectFrom(presentationDefinitionV1, credentials, holderDids);
-PEXv2.selectFrom(presentationDefinitionV2, credentials, holderDids);
+PEX.selectFrom(presentationDefinition, credentials, { holderDIDs });
+PEXv1.selectFrom(presentationDefinitionV1, credentials, { holderDIDs });
+PEXv2.selectFrom(presentationDefinitionV2, credentials, { holderDIDs });
 ```
 
 ##### Description
@@ -588,18 +641,19 @@ PEXv2.selectFrom(presentationDefinitionV2, credentials, holderDids);
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
 based upon feature detection and acts accordingly. The other two are specific to their version.
 
-**For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
+**For more detailed difference between v1 and v2 of the spec please read the [From V1 to V2 section](#from-v1-to-v2)**.
 
-Gathers the matching credentials that fit a given presentation definition. Please note that there could be multiple results fitting the same criteria. This basically only filters out the credentials that do not match the definition.
+Gathers the matching credentials that fit a given presentation definition. Please note that there could be multiple
+results fitting the same criteria. This basically only filters out the credentials that do not match the definition.
 You, or rather the user, typically has to do a final selection.
 
 #### selectFrom Parameters
 
 | name                     | type                                                                    | description                                                                                                                                                  |
-| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|--------------------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `presentationDefinition` | `PresentationDefinition`                                                | the presentation definition that initiated the request from the verifier                                                                                     |
 | `credentials`            | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials to select from                                                                                                           |
-| `holderDids`             | `string[]`                                                              | the holder's dids. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDids retrieved from different places |
+| `{ holderDIDs }`         | `string[]`                                                              | the holder's DIDs. this can be found in VerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### Return value
 
@@ -620,7 +674,7 @@ interface SelectResults {
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required.
-   *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
+   *       To enhance credential holderDID's privacy it is recommended to select credentials which are absolutely required.
    *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object. Do not submit!
    */
   areRequiredCredentialsPresent: Status;
@@ -650,9 +704,9 @@ interface SubmissionRequirementMatch {
 ### PresentationFrom
 
 ```typescript
-PEX.presentationFrom(presentationDefinition, selectedCredentials, holderDID);
-PEXv1.presentationFrom(presentationDefinitionV1, selectedCredentials, holderDID);
-PEXv2.presentationFrom(presentationDefinitionV2, selectedCredentials, holderDID);
+PEX.presentationFrom(presentationDefinition, selectedCredentials, { holderDID });
+PEXv1.presentationFrom(presentationDefinitionV1, selectedCredentials, { holderDID });
+PEXv2.presentationFrom(presentationDefinitionV2, selectedCredentials, { holderDID });
 ```
 
 ##### Description
@@ -660,7 +714,8 @@ PEXv2.presentationFrom(presentationDefinitionV2, selectedCredentials, holderDID)
 These three methods are quite similar. The first One receives a presentation definition object, decides the version
 based upon feature detection and acts accordingly. The other two are specific to their version.
 
-**For more detailed difference between v1 and v2 please read the [From V1 to V2 section](#from-v1-to-v2)**.
+**For more detailed difference between v1 and v2 specification please read the [From V1 to V2 section](#from-v1-to-v2)
+**.
 
 Creates the corresponding Presentation Submission object to be included in the Verifiable Presentation response, which
 maps the submitted credentials to the requested inputs in the `presentationDefinition` input parameter.
@@ -668,18 +723,18 @@ maps the submitted credentials to the requested inputs in the `presentationDefin
 #### presentationFromV1 Parameters
 
 | name                     | type                                                                    | description                                                                                                                                                  |
-| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|--------------------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `presentationDefinition` | `PresentationDefinitionV1`                                              | the v1 presentation definition that initiated the request from the verifier                                                                                  |
 | `selectedCredentials`    | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
-| `holderDid`              | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| `{ holderDID }`          | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### presentationFromV2 Parameters
 
 | name                     | type                                                                    | description                                                                                                                                                  |
-| ------------------------ |-------------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|--------------------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `presentationDefinition` | `PresentationDefinitionV2`                                              | the v2 presentation definition that initiated the request from the verifier                                                                                  |
 | `selectedCredentials`    | `(IVerifiableCredential or JwtWrappedVerifiableCredential or string)[]` | the array of verifiable credentials that meet the submission requirements in the presentation definition                                                     |
-| `holderDid`              | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
+| `{ holderDID }`          | `string`                                                                | the holder's DID. This can be found in IVerifiablePresentation's holder property note that a wallet can have many holderDIDs retrieved from different places |
 
 #### Return value
 
@@ -716,7 +771,7 @@ rules.
 #### Parameters
 
 | name            | type                                                              | description                                                            |
-| --------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+|-----------------|-------------------------------------------------------------------|------------------------------------------------------------------------|
 | `objToValidate` | <code>PresentationDefinition &#124; PresentationSubmission</code> | the presentation definition or presentation submission to be validated |
 
 #### Return value
@@ -747,7 +802,7 @@ presentationDefinition object.
 #### Parameters
 
 | name                     | type                                | description                                                         |
-| ------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
+|--------------------------|-------------------------------------|---------------------------------------------------------------------|
 | `presentationDefinition` | <code>PresentationDefinition</code> | the presentation definition that you need to decide the version for |
 
 #### Return value
@@ -755,9 +810,9 @@ presentationDefinition object.
 The `definitionVersionDiscovery` method returns a version or an error, with following structure:
 
 ```typescript
-{
-  version? : PEVersion;
-  error? : string;
+interface DiscoveredVersion {
+  version?: PEVersion;
+  error?: string;
 }
 
 enum PEVersion {
@@ -768,20 +823,26 @@ enum PEVersion {
 
 ## From V1 to V2
 
-The following changes has been made in the v2 version of the Presentation Exchange specification. We advise people to use V2 whenever they can.
+The following changes has been made in the v2 version of the Presentation Exchange specification. V1 is still the most
+predominant version, because it is typically used quite a bite in OpenID4VC scenarios and interop profiles.
 
-1. The required `schema` has been removed altogether from `InputDescriptor` properties, because it was confusing and redundant.
+1. The required `schema` has been removed altogether from `InputDescriptor` properties, because it was confusing and
+   redundant.
 2. `presentation_definition` has another property called `frame` and if present, its value MUST be a JSON LD Framing
-   Document object. Used for selective disclosure. Although this library does not use it currently, as we can perform it without frames.
+   Document object. Used for selective disclosure. Although this library does not use it currently, as we can perform it
+   without frames.
 3. `filter` has several more options for filtering:
-   - formatMaximum
-   - formatMinimum
-   - formatExclusiveMaximum
-   - formatExclusiveMinimum
+    - formatMaximum
+    - formatMinimum
+    - formatExclusiveMaximum
+    - formatExclusiveMinimum
 
 As a result we introduced the `PEX` class to replace the former `PEJS` class. This class does feature detection on the
 presentation definition to determine whether it is a v1 or v2 spec. Then it delegates the functionality to the PEXv1 or
 PEXv2 class respectively. See also: [v0.6 Breaking changes](#breaking-change-class-and-package-renamed-as-of-v060)
+
+**WARNING: Please be aware that this library does not support the latest V2 specification!. Support will be added as
+part of a V3 major version of this library**
 
 ## Workflow Diagram
 
@@ -795,7 +856,7 @@ It makes no assumptions about the actual transport (DIDComm, SIOPv2/OIDC4VP, CHA
 This project has been created using:
 
 - `yarn` version 1.22.5
-- `node` version 12.22.1
+- `node` version >= 16
 
 ### Install
 
@@ -833,7 +894,7 @@ There are several other utility scripts that help with development.
 # Glossary
 
 | Term                    | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ----------------------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Credential              | A set of one or more claims made by an issuer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Verifiable Credential   | Is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build Verifiable Presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. PEX accepts Verifiable credential in 3 forms: 1. JSON_LD which is know in our system as IVerifiableCredential, 2. JWT-Wrapped VC which is known in our system as JwtWrappedVerifiableCredential or string which is a valid Verifiable credential jwt |
 | Presentation Definition | Presentation Definitions are objects that articulate what proofs a Verifier requires.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -846,13 +907,46 @@ There are several other utility scripts that help with development.
 
 ## Further work:
 
-This implementation fully supports V1 and V2 of the Presentation Exchange specification with the following exception:
+This implementation fully supports V1 and Vpartially 2 of the Presentation Exchange specification with the following
+exception:
 
-- Support for hashlink verification in the schema part of the V1 specification is not fully incorporated as it depends on missing external library support. We generate a warning about the missing verification if we encounter them.
+- Support for hashlink verification in the schema part of the V1 specification is not fully incorporated as it depends
+  on missing external library support. We generate a warning about the missing verification if we encounter them.
 - Support for complete [json-schema](http://json-schema.org/draft-07/schema#) in `pex-models`
-  - which means if you're relying on our version-discovery feature (with calling general `PEX`) and sending `presentation_definition` object with unsupported fields, you'll get an exception. However if you call specific version of PEX (PEXv1 or PEXv2) it will work.
+    - which means if you're relying on our version-discovery feature (with calling general `PEX`) and
+      sending `presentation_definition` object with unsupported fields, you'll get an exception. However if you call
+      specific version of PEX (PEXv1 or PEXv2) it will work.
+- The V2 implementation does not contain latest V2 changes. These will become available in V3 of this library
 
-## Breaking change: class and package renamed as of v0.6.0!
+## Breaking changes
+
+### v2.0.0 Argument and result objects changed slightly
+
+In V2 of the library we have done some refactoring on the PEX external interfaces, to make them more uniform.
+
+Optional arguments for all PEX methods are now part of an optional `opts` Object argument. This allows for cleaner
+future extensions, and
+also solves the problem of optional argument order in case multiple optional arguments are needed.
+
+Certain non state related methods part of the PEX/PEXv1/PEXv2 classes have moved to static methods, to make the
+distinction between state related methods and non-state related methods more clear.
+
+`presentationFrom` and `verifiablePresentationFrom` now return a result object instead of directly returning a (
+Verifiable) Presentation.
+Reason is that in certain use cases you will want to have an external Presentation Submission object, like for instance
+in OpenID4VP.
+
+You can now provide an optional argument where the Presentation Submission object should be located. It will always be
+returned in the methods, as well as an indication whether it is used externally or embedded into the (Verifiable)
+Presentation.
+
+The (Verifiable) Presentation object is present in the result object in the presentation resp. verifiablePresentation
+property.
+
+No more need for _const and _enum models/properties in Presentation Definitions. They are now `const` and `enum` (fixed
+in OpenAPI model generation). The code replaces the previous versions to be sure.
+
+### v0.6.0: class and package renamed
 
 As part of introducing Presentation Exchange v1 and v2 feature based detection support to our Presentation Exchange
 library and not reaching version 1.X yet, we decided to change the name of both the package and the main entry class:
@@ -862,10 +956,10 @@ library and not reaching version 1.X yet, we decided to change the name of both 
   provided definition, delegating the actual implementation to the new `PEXv1` or `PEXv2` class internally. If you don't
   want the automatic feature detection you can also choose to use the `PEXv1` and `PEXv2` classes directly.
 
-
 ## License
 
-This Presentation Exchange library Open Source software released under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).
+This Presentation Exchange library Open Source software released under
+the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).
 
 ## Funded & supported by
 

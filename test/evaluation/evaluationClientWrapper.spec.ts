@@ -2,7 +2,9 @@ import fs from 'fs';
 
 import { Optionality, PresentationDefinitionV2, PresentationSubmission, Rules } from '@sphereon/pex-models';
 import {
+  AdditionalClaims,
   ICredential,
+  ICredentialSubject,
   IVerifiableCredential,
   IVerifiablePresentation,
   WrappedVerifiableCredential,
@@ -34,17 +36,16 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema[0].uri = 'https://www.w3.org/TR/vc-data-model/#types1';
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult0());
-    expect(evaluationClient.results[5]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
+    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
@@ -55,16 +56,14 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
-    const vc: IVerifiableCredential = vpSimple.verifiableCredential[0];
-    const evaluationResults = evaluationClientWrapper.evaluate(
-      pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const vc: IVerifiableCredential = vpSimple.verifiableCredential![0] as IVerifiableCredential;
+    const evaluationResults = evaluationClientWrapper.evaluate(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]), {
+      holderDIDs: evaluationClientWrapperData.getHolderDID(),
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
@@ -76,25 +75,20 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    (<IVerifiableCredential>vpSimple.verifiableCredential[0])['@context' as keyof IVerifiableCredential] = [
+    (<IVerifiableCredential>vpSimple.verifiableCredential![0])['@context' as keyof IVerifiableCredential] = [
       'https://www.w3.org/TR/vc-data-model/#types1',
     ];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.results[0]).toEqual(
-      evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0()
-    );
-    expect(evaluationClient.results[5]).toEqual(
-      evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3()
-    );
+    expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0());
+    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
@@ -103,18 +97,17 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    (<IVerifiableCredential>vpSimple.verifiableCredential[0])['@context' as keyof IVerifiableCredential] = [
+    (<IVerifiableCredential>vpSimple.verifiableCredential![0])['@context' as keyof IVerifiableCredential] = [
       'https://www.w3.org/TR/vc-data-model/#types1',
     ];
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(2);
@@ -128,14 +121,13 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
     const errorResults = evaluationClient.results.filter((result) => result.status === Status.ERROR);
     expect(errorResults.length).toEqual(0);
@@ -148,17 +140,16 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -170,16 +161,15 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     delete pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toEqual('etc');
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toEqual('etc');
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -191,16 +181,15 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema!.input_descriptors![0]!.constraints!.limit_disclosure = Optionality.Preferred;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getWarn().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings).toEqual(evaluationClientWrapperData.getWarn().warnings);
@@ -212,16 +201,15 @@ describe('evaluate', () => {
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/2018/credentials/v1' });
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['birthPlace']).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -231,79 +219,62 @@ describe('evaluate', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
     ).presentation_definition;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    const vpSimple: IVerifiablePresentation = getFileAsJson(
-      './test/dif_pe_examples/vp/vp-simple-age-predicate.json'
-    ) as IVerifiablePresentation;
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const evaluationClient: EvaluationClient = evaluationClientWrapper.getEvaluationClient();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
     const evaluationResults = evaluationClientWrapper.evaluate(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential[0]]),
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
+      { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
-    expect(evaluationClient.wrappedVcs[0].internalCredential.credentialSubject['etc']).toBeUndefined();
+    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
 
   it('Evaluate submission requirements all rule', () => {
-    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
-      './test/resources/sr_rules.json'
-    ).presentation_definition;
-    const vpSimple: IVerifiablePresentation = getFileAsJson(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     pdSchema!.input_descriptors = [pdSchema!.input_descriptors![0]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(
-      pd,
-      wvcs,
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClientWrapper.evaluate(pd, wvcs, {
+      holderDIDs: evaluationClientWrapperData.getHolderDID(),
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, wvcs);
     expect(result.descriptor_map).toEqual(
       expect.objectContaining(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().descriptor_map)
     );
-    expect(result.definition_id).toEqual(
-      evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().definition_id
-    );
+    expect(result.definition_id).toEqual(evaluationClientWrapperData.getForSubmissionRequirementsAllRuleResult0().definition_id);
   });
 
   it('Evaluate submission requirements pick rule', () => {
-    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
-      './test/resources/sr_rules.json'
-    ).presentation_definition;
-    const vpSimple: IVerifiablePresentation = getFileAsJson(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![1]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
-    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
+    (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(
-      pd,
-      wvcs,
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClientWrapper.evaluate(pd, wvcs, {
+      holderDIDs: evaluationClientWrapperData.getHolderDID(),
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, wvcs);
     expect(result).toEqual(
       expect.objectContaining({
@@ -325,28 +296,22 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission from user selected credentials (max 1 from B)', () => {
-    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
-      './test/resources/sr_rules.json'
-    ).presentation_definition;
-    const vpSimple: IVerifiablePresentation = getFileAsJson(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![5]];
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
-    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
+    (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
-    evaluationClientWrapper.evaluate(
-      pd,
-      wvcs,
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClientWrapper.evaluate(pd, wvcs, {
+      holderDIDs: evaluationClientWrapperData.getHolderDID(),
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [wvcs[1]]);
     expect(result).toEqual(
       expect.objectContaining({
@@ -357,28 +322,22 @@ describe('evaluate', () => {
   });
 
   it('Create Presentation Submission without submission requirements', () => {
-    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson(
-      './test/resources/sr_rules.json'
-    ).presentation_definition;
-    const vpSimple: IVerifiablePresentation = getFileAsJson(
-      './test/dif_pe_examples/vp/vp_general.json'
-    ) as IVerifiablePresentation;
+    const pdSchema: InternalPresentationDefinitionV1 = getFileAsJson('./test/resources/sr_rules.json').presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     delete pdSchema!.submission_requirements;
-    const pd = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pdSchema);
-    (vpSimple.verifiableCredential[0] as ICredential).issuer = 'did:foo:123';
+    const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
+    (vpSimple.verifiableCredential![0] as ICredential).issuer = 'did:foo:123';
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([
-      vpSimple.verifiableCredential[0],
-      vpSimple.verifiableCredential[1],
-      vpSimple.verifiableCredential[2],
+      vpSimple.verifiableCredential![0],
+      vpSimple.verifiableCredential![1],
+      vpSimple.verifiableCredential![2],
     ]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     vpSimple!.holder = evaluationClientWrapperData.getHolderDID()[0];
-    evaluationClientWrapper.evaluate(
-      pd,
-      wvcs,
-      evaluationClientWrapperData.getHolderDID(),
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    evaluationClientWrapper.evaluate(pd, wvcs, {
+      holderDIDs: evaluationClientWrapperData.getHolderDID(),
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(pd, [wvcs[1], wvcs[2]]);
     expect(result).toEqual(
       expect.objectContaining({
@@ -403,9 +362,7 @@ describe('evaluate', () => {
     const selectResults = evaluationClientWrapperData.getSelectResults();
     new EvaluationClientWrapper().fillSelectableCredentialsToVerifiableCredentialsMapping(
       selectResults,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-        evaluationClientWrapperData.getVerifiableCredential()
-      )
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(evaluationClientWrapperData.getVerifiableCredential())
     );
     const verifiableCredential = selectResults.verifiableCredential![0];
     expect(verifiableCredential['id' as keyof IVerifiableCredential]).toEqual(
@@ -441,7 +398,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.did'],
                 filter: {
                   type: 'string',
-                  _const: 'did:example:d23dd687a7dc6787646f2eb98d0',
+                  const: 'did:example:d23dd687a7dc6787646f2eb98d0',
                 },
               },
             ],
@@ -458,7 +415,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.profile.name'],
                 filter: {
                   type: 'string',
-                  _const: 'John',
+                  const: 'John',
                 },
               },
             ],
@@ -475,7 +432,7 @@ describe('evaluate', () => {
                 path: ['$.credentialSubject.role'],
                 filter: {
                   type: 'string',
-                  _const: 'admin',
+                  const: 'admin',
                 },
               },
             ],
@@ -483,7 +440,7 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const vcs = [
       {
         '@context': [
@@ -507,8 +464,7 @@ describe('evaluate', () => {
         proof: {
           type: 'Ed25519Signature2018',
           proofPurpose: 'assertionMethod',
-          verificationMethod:
-            'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+          verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
           created: '2021-11-16T14:52:19.514Z',
           jws: 'eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..6QqnZoVBfNzNLa6GO8vnLq7YjIxKvL-e1a4NGYFOwjf9GQtJcD6kenu8Sb_DOXERUUYZnVbsaRRrRAIN0YR0DQ',
         },
@@ -530,22 +486,20 @@ describe('evaluate', () => {
         proof: {
           type: 'Ed25519Signature2018',
           proofPurpose: 'assertionMethod',
-          verificationMethod:
-            'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
+          verificationMethod: 'did:key:z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF#z6MkoB84PJkXzFpbqtfYV5WqBKHCSDf7A1SeepwzvE36QvCF',
           created: '2021-11-16T14:52:19.514Z',
           jws: 'eyJhbGciOiJFZERTQSIsImNyaXQiOlsiYjY0Il0sImI2NCI6ZmFsc2V9..nV_x5AKqH9M0u5wsEt1D_DXxYpOzuO_nqDEj-alIzPA5yi8_yWAhKbWPa2r9GoTLPehvZrpgleUDiDj-9_F6Bg',
         },
       },
     ];
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vcs);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, wvcs);
-    expect(ps.descriptor_map.map((d) => d.path)).toEqual([
-      '$.verifiableCredential[0]',
-      '$.verifiableCredential[0]',
-      '$.verifiableCredential[1]',
-    ]);
+    expect(ps.descriptor_map.map((d) => d.path)).toEqual(['$.verifiableCredential[0]', '$.verifiableCredential[0]', '$.verifiableCredential[1]']);
   });
 
   it('should pass with correct submissionFrom result', function () {
@@ -577,7 +531,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['https://example.com/issuers/14'],
+                  enum: ['https://example.com/issuers/14'],
                 },
               },
             ],
@@ -612,7 +566,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.name', '$.credentialSubject.name'],
                 filter: {
                   type: 'string',
-                  _enum: ['Jane Doe'],
+                  enum: ['Jane Doe'],
                 },
               },
             ],
@@ -629,7 +583,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.id', '$.credentialSubject.id'],
                 filter: {
                   type: 'string',
-                  _enum: ['did:example:abcdef1234567'],
+                  enum: ['did:example:abcdef1234567'],
                 },
               },
             ],
@@ -637,16 +591,17 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(
       internalPD,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-        resultSelectFrom.verifiableCredential as IVerifiableCredential[]
-      )
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(resultSelectFrom.verifiableCredential as IVerifiableCredential[])
     );
     expect(ps.descriptor_map.map((d) => d.path)).toEqual([
       '$.verifiableCredential[0]',
@@ -692,7 +647,7 @@ describe('evaluate', () => {
                 path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
                 filter: {
                   type: 'string',
-                  _enum: ['https://example.com/issuers/15'],
+                  enum: ['https://example.com/issuers/15'],
                 },
               },
             ],
@@ -727,7 +682,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.name', '$.credentialSubject.name'],
                 filter: {
                   type: 'string',
-                  _enum: ['Jane Doe'],
+                  enum: ['Jane Doe'],
                 },
               },
             ],
@@ -744,7 +699,7 @@ describe('evaluate', () => {
                 path: ['$.vc.credentialSubject.id', '$.credentialSubject.id'],
                 filter: {
                   type: 'string',
-                  _enum: ['did:example:abcdef1234567'],
+                  enum: ['did:example:abcdef1234567'],
                 },
               },
             ],
@@ -752,21 +707,18 @@ describe('evaluate', () => {
         },
       ],
     };
-    const internalPD = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pdSchema);
+    const internalPD = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vcjwt]);
-    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, undefined, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const resultSelectFrom = clientWrapper.selectFrom(internalPD, wvcs, {
+      holderDIDs: undefined,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(
       internalPD,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-        resultSelectFrom.verifiableCredential as IVerifiableCredential[]
-      )
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(resultSelectFrom.verifiableCredential as IVerifiableCredential[])
     );
-    expect(ps.descriptor_map.map((d) => d.path)).toEqual([
-      '$.verifiableCredential[0]',
-      '$.verifiableCredential[0]',
-      '$.verifiableCredential[0]',
-    ]);
+    expect(ps.descriptor_map.map((d) => d.path)).toEqual(['$.verifiableCredential[0]', '$.verifiableCredential[0]', '$.verifiableCredential[0]']);
   });
 });

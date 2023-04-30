@@ -5,8 +5,8 @@ import addFormats from 'ajv-formats';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
@@ -25,17 +25,17 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
     wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
-      this.createNoFieldResults(pd, vcIndex);
+      this.createNoFieldResults(pd, vcIndex, wvc);
       fields.forEach((field) => {
-        let inputField = [];
+        let inputField: { path: PathComponent[]; value: unknown }[] = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.credential, field.value.path);
         }
         let resultFound = false;
         for (const inputFieldKey of inputField) {
           if (this.evaluateFilter(inputFieldKey, field.value)) {
             resultFound = true;
-            const payload = { result: { ...inputField[0] }, valid: true };
+            const payload = { result: { ...inputField[0] }, valid: true, format: wvc.format };
             this.getResults().push({
               ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
             });
@@ -43,11 +43,11 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
         if (!resultFound) {
           if (!inputField.length) {
-            const payload = { valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
+            const payload = { valid: false, format: wvc.format };
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_DOESNT_CONTAIN_PROPERTY);
           } else {
-            const payload = { result: { ...inputField[0] }, valid: false };
-            this.createResponse(field, vcIndex, payload, PEMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
+            const payload = { result: { ...inputField[0] }, valid: false, format: wvc.format };
+            this.createResponse(field, vcIndex, payload, PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION);
           }
         }
       });
@@ -55,7 +55,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     this.updatePresentationSubmission(pd);
   }
 
-  private createNoFieldResults(pd: IInternalPresentationDefinition, vcIndex: number) {
+  private createNoFieldResults(pd: IInternalPresentationDefinition, vcIndex: number, credential: WrappedVerifiableCredential) {
     // PresentationDefinitionV2 is the common denominator
     const noFields = (pd as InternalPresentationDefinitionV2).input_descriptors
       .map((inDesc, index) => {
@@ -63,20 +63,16 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       })
       .filter((el) => el.inDesc.constraints?.fields === undefined || el.inDesc.constraints?.fields?.length === 0);
     noFields.forEach((noField) => {
-      const payload = { result: [], ['valid']: true };
+      const payload = { result: [], valid: true, format: credential.format };
       this.getResults().push({
         ...this.createResultObject(`$.input_descriptors[${noField.index}]`, vcIndex, payload),
       });
     });
   }
 
-  private createResponse(
-    field: { path: PathComponent[]; value: FieldV1 | FieldV2 },
-    vcIndex: number,
-    payload: unknown,
-    message: string
-  ): void {
+  private createResponse(field: { path: PathComponent[]; value: FieldV1 | FieldV2 }, vcIndex: number, payload: unknown, message: string): void {
     this.getResults().push({
+      // TODO: why does this code assume a path to contain certain elements in the path?
       ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
       ['status']: Status.ERROR,
       ['message']: message,
@@ -89,16 +85,16 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: `$[${vcIndex}]`,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload,
     };
   }
 
-  private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+  private evaluateFilter(result: { path: PathComponent[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
-    const ajv = new Ajv();
+    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
     addFormats(ajv);
     if (field.filter) {
       return ajv.validate(field.filter, result.value);
@@ -106,7 +102,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     return true;
   }
 
-  private transformDateFormat(result: { path: string[]; value: unknown }) {
+  private transformDateFormat(result: { path: PathComponent[]; value: unknown }) {
     const date: Date = new Date(result.value as string);
     let month = date.getUTCMonth() + 1 + '';
     if (month.length === 1) {

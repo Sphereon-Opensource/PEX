@@ -9,9 +9,8 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
 describe('evaluate gataca tests', () => {
   it('should return v1 in version discovery', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v1');
   });
 
@@ -19,7 +18,10 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(result.matches).toEqual([
       {
@@ -44,26 +46,24 @@ describe('evaluate gataca tests', () => {
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     presentationDefinition.submission_requirements = [presentationDefinition.submission_requirements![0]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const selectFromResult = pex.selectFrom(
-      presentationDefinition,
-      vcs,
-      ['FAsYneKJhWBP2n5E21ZzdY'],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
         path: '$.verifiableCredential[0]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(1);
-    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(1);
+    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
     );
   });
@@ -74,16 +74,16 @@ describe('evaluate gataca tests', () => {
     pdSchema.input_descriptors = [pdSchema.input_descriptors[1], pdSchema.input_descriptors[2]];
     pdSchema.submission_requirements = [pdSchema.submission_requirements![1]];
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual(
-      'urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv'
-    );
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual('urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv');
   });
 
   it('should return v1 in version discovery second example', function () {
-    const pex: PEX = new PEX();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
-    const result = pex.definitionVersionDiscovery(pdSchema);
+    const result = PEX.definitionVersionDiscovery(pdSchema);
     expect(result.version).toEqual('v1');
   });
 
@@ -91,7 +91,10 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const pdSchema: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
-    const result = pex.selectFrom(pdSchema, vcs, ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
     expect(result.matches).toEqual([
       {
@@ -114,18 +117,16 @@ describe('evaluate gataca tests', () => {
     const pex: PEXv1 = new PEXv1();
     const presentationDefinition: PresentationDefinitionV1 = GatacaPresentationDefinition.getPresentationDefinition1();
     const vcs = GatacaSelectedCredentials.getVerifiableCredentials1();
-    const selectFromResult = pex.selectFrom(
-      presentationDefinition,
-      vcs,
-      ['FAsYneKJhWBP2n5E21ZzdY'],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const selectFromResult = pex.selectFrom(presentationDefinition, vcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined
     );
-    expect(presentationFromResult.presentation_submission?.descriptor_map).toEqual([
+    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
@@ -137,8 +138,8 @@ describe('evaluate gataca tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    expect(presentationFromResult.verifiableCredential?.length).toEqual(2);
-    expect(presentationFromResult.verifiableCredential[0]['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(2);
+    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
     );
   });

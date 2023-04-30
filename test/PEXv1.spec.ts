@@ -1,9 +1,9 @@
 import fs from 'fs';
 
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
-import { IPresentation, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
+import { IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
 
-import { PEXv1, Validated } from '../lib';
+import { PEX, PEXv1, Validated } from '../lib';
 
 import {
   assertedMockCallback,
@@ -27,41 +27,36 @@ describe('evaluate', () => {
 
   it('Evaluate case with error result', () => {
     const pex: PEXv1 = new PEXv1();
-    const pdSchema: PresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/dif_pe_examples/pdV1/pd-PermanentResidentCard.json').presentation_definition;
     const vc = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json');
     pdSchema.input_descriptors[0].schema = [{ uri: 'https://www.example.com/schema' }];
-    const result = pex.selectFrom(pdSchema, [vc], ['FAsYneKJhWBP2n5E21ZzdY'], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const result = pex.selectFrom(pdSchema, [vc], {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(result!.errors!.length).toEqual(2);
     expect(result!.errors!.map((e) => e.tag)).toEqual(['UriEvaluation', 'MarkForSubmissionEvaluation']);
   });
 
   it('Evaluate case without any error 1', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pex: PEXv1 = new PEXv1();
-    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, LIMIT_DISCLOSURE_SIGNATURE_SUITES);
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
 
   it('Evaluate case without any error 2', () => {
-    const pdSchema: PresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
-    ).presentation_definition;
+    const pdSchema: PresentationDefinitionV1 = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json').presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pex: PEXv1 = new PEXv1();
-    const evaluationResults = pex.evaluateCredentials(
-      pdSchema,
-      vpSimple.verifiableCredential,
-      [vpSimple.holder as string],
-      LIMIT_DISCLOSURE_SIGNATURE_SUITES
-    );
+    const evaluationResults = pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential!, {
+      holderDIDs: [vpSimple.holder as string],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
@@ -72,20 +67,24 @@ describe('evaluate', () => {
     const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const pex: PEXv1 = new PEXv1();
-    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential, [HOLDER_DID], LIMIT_DISCLOSURE_SIGNATURE_SUITES);
-    const presentation: IPresentation = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential, HOLDER_DID);
+    pex.evaluateCredentials(pdSchema, vpSimple.verifiableCredential!, {
+      holderDIDs: [HOLDER_DID],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    const result = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
+    const presentation = result.presentation;
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
         descriptor_map: [
-          { format: 'ldp_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
+          { format: 'jwt_vc', id: 'Educational transcripts', path: '$.verifiableCredential[0]' },
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
       })
     );
     expect(presentation.holder).toEqual(HOLDER_DID);
-    expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential);
+    expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential!);
     expect(presentation.type).toEqual(['VerifiablePresentation', 'PresentationSubmission']);
     expect(presentation['@context']).toEqual([
       'https://www.w3.org/2018/credentials/v1',
@@ -96,22 +95,19 @@ describe('evaluate', () => {
   it('Evaluate pdV1 schema of our sr_rules.json pdV1', () => {
     const pdSchema: PresentationDefinitionV1 = getFile('./test/resources/sr_rules.json').presentation_definition;
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateDefinition(pdSchema);
+    const result: Validated = PEX.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it("Evaluate presentation submission of our vp_general's presentation_submission", () => {
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp_general.json');
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateSubmission(vpSimple.presentation_submission);
+    const result: Validated = PEX.validateSubmission(vpSimple.presentation_submission);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
   it('Evaluate pdV1 schema of our pd_driver_license_name.json pdV1', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json');
-    const pex: PEXv1 = new PEXv1();
-    const result: Validated = pex.validateDefinition(pdSchema.presentation_definition);
+    const result: Validated = PEX.validateDefinition(pdSchema.presentation_definition);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
@@ -119,16 +115,12 @@ describe('evaluate', () => {
     const pdSchema = getFile('./test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json');
     const vpSimple = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json') as IVerifiablePresentation;
     const pex: PEXv1 = new PEXv1();
-    const vp: IVerifiablePresentation = pex.verifiablePresentationFrom(
-      pdSchema.presentation_definition,
-      vpSimple.verifiableCredential,
-      assertedMockCallback,
-      {
-        proofOptions: getProofOptionsMock(),
-        signatureOptions: getSingatureOptionsMock(),
-        holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      }
-    );
+    const vpr = await pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, assertedMockCallback, {
+      proofOptions: getProofOptionsMock(),
+      signatureOptions: getSingatureOptionsMock(),
+      holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+    });
+    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -144,16 +136,11 @@ describe('evaluate', () => {
     delete proofOptions['type'];
     proofOptions.typeSupportsSelectiveDisclosure = true;
     await expect(
-      pex.verifiablePresentationFromAsync(
-        pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
-        getAsyncCallbackWithoutProofType,
-        {
-          proofOptions,
-          signatureOptions: getSingatureOptionsMock(),
-          holder: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-        }
-      )
+      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncCallbackWithoutProofType, {
+        proofOptions,
+        signatureOptions: getSingatureOptionsMock(),
+        holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
+      })
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
@@ -163,15 +150,10 @@ describe('evaluate', () => {
     const pex: PEXv1 = new PEXv1();
 
     await expect(
-      pex.verifiablePresentationFromAsync(
-        pdSchema.presentation_definition,
-        vpSimple.verifiableCredential,
-        getAsyncErrorThrown,
-        {
-          proofOptions: getProofOptionsMock(),
-          signatureOptions: getSingatureOptionsMock(),
-        }
-      )
+      pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncErrorThrown, {
+        proofOptions: getProofOptionsMock(),
+        signatureOptions: getSingatureOptionsMock(),
+      })
     ).rejects.toThrow(Error);
   });
 });

@@ -8,3 +8,5 @@ export * from './predicateRelatedFieldEvaluationHandler';
 export * from './sameSubjectEvaluationHandler';
 export * from './subjectIsIssuerEvaluationHandler';
 export * from './uriEvaluationHandler';
+export * from './formatRestrictionEvaluationHandler';
+export * from './didRestrictionEvaluationHandler';

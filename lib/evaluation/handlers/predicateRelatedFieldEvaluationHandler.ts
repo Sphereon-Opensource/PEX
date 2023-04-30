@@ -2,7 +2,7 @@ import { ConstraintsV1, ConstraintsV2, InputDescriptorV2, Optionality } from '@s
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types/Internal.types';
-import PEMessages from '../../types/Messages';
+import PexMessages from '../../types/Messages';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -102,7 +102,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
       verifiable_credential_path: results[resultIdx].verifiable_credential_path,
       evaluator: this.getName(),
       status: Status.INFO,
-      message: PEMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
+      message: PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
       payload: evaluationResult,
     };
   }

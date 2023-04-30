@@ -23,11 +23,10 @@ function getPresentationDefinitionV1(): PresentationDefinitionV1 {
           fields: [
             {
               path: ['$.issuer', '$.vc.issuer', '$.iss'],
-              purpose:
-                'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
+              purpose: 'We can only verify bank accounts if they are attested by a trusted bank, auditor, or regulatory authority.',
               filter: {
                 type: 'string',
-                _const: 'did:example:123|did:example:456',
+                const: 'did:example:123|did:example:456',
               },
             },
           ],
@@ -41,9 +40,7 @@ describe('should test jsonPathUtils function', () => {
   it('should return ok if changePropertyNameRecursively works correctly', () => {
     const pdSchema: PresentationDefinitionV1 = getPresentationDefinitionV1();
     JsonPathUtils.changePropertyNameRecursively(pdSchema, '_const', 'const');
-    expect(pdSchema.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV1]).toEqual(
-      'did:example:123|did:example:456'
-    );
+    expect(pdSchema.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV1]).toEqual('did:example:123|did:example:456');
   });
 
   it('should return ok if presentation definition @ in path escapes first and not second', () => {
@@ -54,14 +51,12 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We only want books which have the certain access mode.',
         filter: {
           type: 'string',
-          _const: 'auditory',
+          const: 'auditory',
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual([
-      "$['@book'].accessModeSufficient[(@.length-1)]",
-    ]);
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@book'].accessModeSufficient[(@.length-1)]"]);
   });
 
   it('should return ok if presentation definition @ in path escapes properly', () => {
@@ -72,11 +67,11 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$..['@context']", "$.vc..['@context']"]);
   });
 
@@ -88,11 +83,11 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context.',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']", "$.vc['@context']"]);
   });
 
@@ -104,11 +99,11 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We can only verify driver licensed if they have a certain context.',
         filter: {
           type: 'string',
-          _const: 'https://eu.com/claims/DriversLicense',
+          const: 'https://eu.com/claims/DriversLicense',
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV1FromModelEntity(pd);
+    const result = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pd);
     expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(["$['@context']"]);
   });
 
@@ -120,13 +115,11 @@ describe('should test jsonPathUtils function', () => {
         purpose: 'We only want books which have the category fiction and their price is 8.95.',
         filter: {
           type: 'string',
-          _const: 'https://schema.org/Book',
+          const: 'https://schema.org/Book',
         },
       },
     ];
-    const result = SSITypesBuilder.createInternalPresentationDefinitionV2FromModelEntity(pd);
-    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(
-      pd.input_descriptors[0].constraints!.fields[0].path
-    );
+    const result = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pd);
+    expect(result.input_descriptors[0].constraints!.fields![0].path).toEqual(pd.input_descriptors[0].constraints!.fields[0].path);
   });
 });

@@ -1,6 +1,6 @@
 import { ConstraintsV1, FieldV1, HolderSubject, InputDescriptorV1, Schema } from '@sphereon/pex-models';
 
-import { ObjectValidationUtils } from '../../utils/ObjectValidationUtils';
+import { ObjectValidationUtils } from '../../utils';
 import { Validation, ValidationPredicate } from '../core';
 
 import { ConstraintsVB } from './constraintsVB';
@@ -124,10 +124,8 @@ export class InputDescriptorsV1VB extends ValidationBundler<InputDescriptorV1[]>
     // TODO extract to generic util or use built-in method
     return (inDesc: InputDescriptorV1): boolean => {
       return (
-        inDesc.schema.filter(
-          (schema: Schema) =>
-            this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean')
-        ).length > 0
+        inDesc.schema.filter((schema: Schema) => this.isAValidURI(schema.uri) && (schema.required == null || typeof schema.required == 'boolean'))
+          .length > 0
       );
     };
   }

@@ -17,8 +17,6 @@ describe('sameSubjectEvaluationHandler', () => {
 
     evaluationHandler.handle(new PdRequireSameSubject().getPresentationDefinition(), evaluationClient.wrappedVcs);
 
-    expect(evaluationHandler.client.results).toEqual(
-      new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult()
-    );
+    expect(evaluationHandler.client.results).toEqual(new SameSubjectHandlerCheckResults().getSameSubjectHandlerCheckResult());
   });
 });

@@ -12,7 +12,7 @@ export interface SelectResults {
    * Status can have three values:
    *  1. INFO: everything is fine, you can call `presentationFrom` after this method
    *  2. WARN: method was called with more credentials than required.
-   *       To enhance credential holder's privacy it is recommended to select credentials which are absolutely required.
+   *       To enhance credential holderDID's privacy it is recommended to select credentials which are absolutely required.
    *  3. Error: the credentials you've sent didn't satisfy the requirement defined presentationDefinition object
    */
   areRequiredCredentialsPresent: Status;

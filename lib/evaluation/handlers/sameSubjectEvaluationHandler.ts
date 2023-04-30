@@ -3,7 +3,7 @@ import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../../types/Internal.types';
+import { IInternalPresentationDefinition } from '../../types';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -54,14 +54,9 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
     return results;
   }
 
-  private generateErrorResults(
-    fieldIdOccurrencesCount: Map<string[], number>,
-    handlerCheckResults: HandlerCheckResult[]
-  ) {
+  private generateErrorResults(fieldIdOccurrencesCount: Map<string[], number>, handlerCheckResults: HandlerCheckResult[]) {
     fieldIdOccurrencesCount.forEach((v, k) => {
-      const results = handlerCheckResults
-        .filter((r) => k === r.payload.fieldIdSet)
-        .map((r) => r.payload.credentialSubject.id);
+      const results = handlerCheckResults.filter((r) => k === r.payload.fieldIdSet).map((r) => r.payload.credentialSubject.id);
       if (results.length !== v || new Set(results).size !== 1) {
         handlerCheckResults.forEach((v, i, arr) => {
           if (v.payload.fieldIdSet === k) {
@@ -84,10 +79,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
       const result = handlerCheckResults.filter((c) => s[1].value.field_id === c.payload.fieldIdSet);
       if (result) {
         if (fieldIdOccurrencesCount.has(s[1].value.field_id) && fieldIdOccurrencesCount.get(s[1].value.field_id)) {
-          fieldIdOccurrencesCount.set(
-            s[1].value.field_id,
-            (fieldIdOccurrencesCount.get(s[1].value.field_id) as number) + 1
-          );
+          fieldIdOccurrencesCount.set(s[1].value.field_id, (fieldIdOccurrencesCount.get(s[1].value.field_id) as number) + 1);
         } else {
           fieldIdOccurrencesCount.set(s[1].value.field_id, 1);
         }
@@ -102,7 +94,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   ): HandlerCheckResult[] {
     const subjects = [
       ...jp.nodes(
-        wrappedVcs.map((wvc) => wvc.internalCredential),
+        wrappedVcs.map((wvc) => wvc.credential),
         '$..credentialSubject'
       ),
     ];

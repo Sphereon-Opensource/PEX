@@ -18,6 +18,15 @@ export class PresentationDefinitionSchema {
           required: ['uri'],
           additionalProperties: false,
         },
+        issuance: {
+          type: 'object',
+          properties: {
+            manifest: {
+              type: 'string',
+            },
+          },
+          additionalProperties: true,
+        },
         filter: {
           type: 'object',
           properties: {
@@ -193,6 +202,12 @@ export class PresentationDefinitionSchema {
               type: 'array',
               items: {
                 $ref: '#/definitions/schema',
+              },
+            },
+            issuance: {
+              type: 'array',
+              items: {
+                $ref: '#/definitions/issuance',
               },
             },
             constraints: {
@@ -385,6 +400,15 @@ export class PresentationDefinitionSchema {
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'Presentation Definition',
       definitions: {
+        issuance: {
+          type: 'object',
+          properties: {
+            manifest: {
+              type: 'string',
+            },
+          },
+          additionalProperties: true,
+        },
         format: {
           type: 'object',
           patternProperties: {
@@ -465,6 +489,12 @@ export class PresentationDefinitionSchema {
             id: { type: 'string' },
             name: { type: 'string' },
             purpose: { type: 'string' },
+            issuance: {
+              type: 'array',
+              items: {
+                $ref: '#/definitions/issuance',
+              },
+            },
             group: {
               type: 'array',
               items: { type: 'string' },
