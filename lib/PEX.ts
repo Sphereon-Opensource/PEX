@@ -47,6 +47,7 @@ export class PEX {
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
     }
@@ -98,6 +99,7 @@ export class PEX {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =

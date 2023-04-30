@@ -32,6 +32,7 @@ export class PEXv2 extends PEX {
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): EvaluationResults {
     SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition); // only doing validation
@@ -56,6 +57,7 @@ export class PEXv2 extends PEX {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): EvaluationResults {
     SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition); // only doing validation
@@ -80,6 +82,7 @@ export class PEXv2 extends PEX {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): SelectResults {
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -149,78 +152,4 @@ export class PEXv2 extends PEX {
   public static validateSubmission(presentationSubmission: PresentationSubmission): Validated {
     return PEX.validateSubmission(presentationSubmission);
   }
-
-  /**
-   * This method can be used to combine a definition, selected Verifiable Credentials, together with
-   * signing opts and a callback to sign a presentation, making it a Verifiable Presentation before sending.
-   *
-   * Please note that PEX has no signature support on purpose. We didn't want this library to depend on all kinds of signature suites.
-   * The callback function next to the Signing Params also gets a Presentation which is evaluated against the definition.
-   * It is up to you to decide whether you simply update the supplied partial proof and add it to the presentation in the callback,
-   * or whether you will use the selected Credentials, Presentation definition, evaluation results and/or presentation submission together with the signature opts
-   *
-   * @param presentationDefinition the Presentation Definition V2
-   * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
-   * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
-   *        signing. One example of signing is available in the project named. pe-selective-disclosure.
-   * @param opts: Signing Params these are the signing params required to sign.
-   *
-   * @return the signed and thus Verifiable Presentation.
-   */
-  /*public async verifiablePresentationFrom(
-    presentationDefinition: PresentationDefinitionV2,
-    selectedCredentials: OriginalVerifiableCredential[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => (Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation),
-    opts: VerifiablePresentationFromOpts
-  ): Promise<VerifiablePresentationResult> {
-    const { holderDID, signatureOptions, proofOptions } = opts;
-
-    function limitedDisclosureSuites() {
-      let limitDisclosureSignatureSuites: string[] = [];
-      if (proofOptions?.typeSupportsSelectiveDisclosure) {
-        if (!proofOptions?.type) {
-          throw Error('Please provide a proof type if you enable selective disclosure');
-        }
-        limitDisclosureSignatureSuites = [proofOptions.type];
-      }
-      return limitDisclosureSignatureSuites;
-    }
-
-    const holderDIDs: string[] = holderDID ? [holderDID] : [];
-    const limitDisclosureSignatureSuites = limitedDisclosureSuites();
-    this.evaluateCredentials(presentationDefinition, selectedCredentials, {
-      holderDIDs,
-      limitDisclosureSignatureSuites,
-    });
-
-    const presentation = this.presentationFrom(presentationDefinition, selectedCredentials, { holderDID: holderDID });
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentation, { limitDisclosureSignatureSuites });
-    if (!evaluationResults.value) {
-      throw new Error('Could not get evaluation results from presentation');
-    }
-
-    const proof: Partial<IProof> = {
-      type: proofOptions?.type,
-      verificationMethod: signatureOptions?.verificationMethod,
-      created: proofOptions?.created ? proofOptions.created : new Date().toISOString(),
-      proofPurpose: proofOptions?.proofPurpose,
-      proofValue: signatureOptions?.proofValue,
-      jws: signatureOptions?.jws,
-      challenge: proofOptions?.challenge,
-      nonce: proofOptions?.nonce,
-      domain: proofOptions?.domain,
-    };
-
-    const callBackParams: PresentationSignCallBackParams = {
-      options: opts,
-      presentation,
-      presentationDefinition,
-      selectedCredentials,
-      proof,
-      presentationSubmission: evaluationResults.value,
-      evaluationResults,
-    };
-
-    return await signingCallBack(callBackParams);
-  }*/
 }
