@@ -4,10 +4,13 @@ import { IProofType, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { Status } from '../ConstraintUtils';
 import { IInternalPresentationDefinition } from '../types';
 import PexMessages from '../types/Messages';
+import { filterToRestrictedDIDs, uniformDIDMethods } from '../utils';
 
 import { HandlerCheckResult } from './core';
 import {
+  DIDRestrictionEvaluationHandler,
   EvaluationHandler,
+  FormatRestrictionEvaluationHandler,
   InputDescriptorFilterEvaluationHandler,
   LimitDisclosureEvaluationHandler,
   MarkForSubmissionEvaluationHandler,
@@ -17,7 +20,6 @@ import {
   SubjectIsIssuerEvaluationHandler,
   UriEvaluationHandler,
 } from './handlers';
-import { FormatRestrictionEvaluationHandler } from './handlers';
 
 const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -28,7 +30,7 @@ export class EvaluationClient {
     this._presentationSubmission = {};
     this._dids = [];
     this._limitDisclosureSignatureSuites = DEFAULT_LIMIT_DISCLOSURE_TYPES;
-    // this._requirePresentationSubmission = false;
+    this._restrictToDIDMethods = [];
     this._generatePresentationSubmission = true;
   }
 
@@ -46,6 +48,7 @@ export class EvaluationClient {
   private _dids: string[];
   private _limitDisclosureSignatureSuites: string[] | undefined;
   private _restrictToFormats: Format | undefined;
+  private _restrictToDIDMethods: string[];
 
   private _generatePresentationSubmission: boolean;
 
@@ -56,11 +59,13 @@ export class EvaluationClient {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
     }
   ): void {
-    this._dids = opts?.holderDIDs || [];
+    this._restrictToDIDMethods = opts?.restrictToDIDMethods ? uniformDIDMethods(opts?.restrictToDIDMethods) : [];
+    this._dids = opts?.holderDIDs ? filterToRestrictedDIDs(opts.holderDIDs, this._restrictToDIDMethods) : [];
     this._limitDisclosureSignatureSuites = opts?.limitDisclosureSignatureSuites;
     this._restrictToFormats = opts?.restrictToFormats;
     this._generatePresentationSubmission = opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : true;
@@ -107,13 +112,7 @@ export class EvaluationClient {
   set generatePresentationSubmission(value: boolean) {
     this._generatePresentationSubmission = value;
   }
-  /*get requirePresentationSubmission(): boolean {
-    return this._requirePresentationSubmission;
-  }
 
-  set requirePresentationSubmission(value: boolean) {
-    this._requirePresentationSubmission = value;
-  }*/
   public get presentationSubmission(): PresentationSubmission {
     return this._presentationSubmission as PresentationSubmission;
   }
@@ -138,6 +137,18 @@ export class EvaluationClient {
     this._limitDisclosureSignatureSuites = limitDisclosureSignatureSuites;
   }
 
+  get restrictToDIDMethods(): string[] {
+    return this._restrictToDIDMethods;
+  }
+
+  set restrictToDIDMethods(value: string[]) {
+    this._restrictToDIDMethods = uniformDIDMethods(value);
+  }
+
+  public hasRestrictToDIDMethods(): boolean {
+    return this.restrictToDIDMethods && this.restrictToDIDMethods.length > 0;
+  }
+
   get restrictToFormats(): Format | undefined {
     return this._restrictToFormats;
   }
@@ -148,6 +159,7 @@ export class EvaluationClient {
   private initEvaluationHandlers() {
     const uriEvaluation = new UriEvaluationHandler(this);
     uriEvaluation
+      .setNext(new DIDRestrictionEvaluationHandler(this))
       .setNext(new FormatRestrictionEvaluationHandler(this))
       .setNext(new InputDescriptorFilterEvaluationHandler(this))
       .setNext(new PredicateRelatedFieldEvaluationHandler(this))

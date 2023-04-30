@@ -34,3 +34,29 @@ export function definitionVersionDiscovery(presentationDefinition: IPresentation
   }
   return { error: 'This is not a valid PresentationDefinition' };
 }
+
+export function uniformDIDMethods(dids?: string[], opts?: { removePrefix: 'did:' }) {
+  let result = dids?.map((did) => did.toLowerCase()).map((did) => (did.startsWith('did:') ? did : `did:${did}`)) ?? [];
+  if (opts?.removePrefix) {
+    const length = opts.removePrefix.endsWith(':') ? opts.removePrefix.length : opts.removePrefix.length + 1;
+    result = result.map((did) => (did.startsWith(opts.removePrefix) ? did.substring(length) : did));
+  }
+  if (result.includes('did')) {
+    // The string did denotes every DID method, hence we return an empty array, indicating all methods are supported
+    return [];
+  }
+  return result;
+}
+
+export function isRestrictedDID(DID: string, restrictToDIDMethods: string[]) {
+  const methods = uniformDIDMethods(restrictToDIDMethods);
+  return methods.length === 0 || methods.some((method) => DID.toLowerCase().startsWith(method));
+}
+
+export function filterToRestrictedDIDs(DIDs: string[], restrictToDIDMethods: string[]) {
+  const methods = uniformDIDMethods(restrictToDIDMethods);
+  if (methods.length === 0) {
+    return DIDs;
+  }
+  return methods.flatMap((method) => DIDs.filter((DID) => DID.toLowerCase().startsWith(method)));
+}

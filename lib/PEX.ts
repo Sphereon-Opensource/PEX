@@ -135,6 +135,7 @@ export class PEX {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));

@@ -28,6 +28,7 @@ export class EvaluationClientWrapper {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      restrictToDIDMethods?: string[];
     }
   ): SelectResults {
     let selectResults: SelectResults;

@@ -45,7 +45,7 @@ describe('evaluate', () => {
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult0());
-    expect(evaluationClient.results[6]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
+    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
@@ -88,7 +88,7 @@ describe('evaluate', () => {
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES }
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0());
-    expect(evaluationClient.results[6]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
+    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
