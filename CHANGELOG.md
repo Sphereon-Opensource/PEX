@@ -1,5 +1,10 @@
 # Release Notes
 
+## v2.0.1 - 2023-05-01
+
+- Fixed:
+  - some wrong import paths were used from @sphereon/pex-models
+
 ## v2.0.0 - 2023-04-30
 
 WARNING: This release has several [breaking changes](./README.md#breaking-changes).

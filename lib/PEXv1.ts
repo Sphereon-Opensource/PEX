@@ -1,10 +1,9 @@
-import { PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
-import { Format } from '@sphereon/pex-models/model/format';
+import { Format, PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
 import { IPresentation, OriginalVerifiableCredential, OriginalVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation } from './signing/types';
+import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation } from './signing';
 import { SSITypesBuilder } from './types';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
 

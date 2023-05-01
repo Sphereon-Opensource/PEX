@@ -1,5 +1,4 @@
-import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import { Format } from '@sphereon/pex-models/model/format';
+import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
   IPresentation,
   IProof,
@@ -14,7 +13,7 @@ import { W3CVerifiableCredential } from '@sphereon/ssi-types/src/types/vc';
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationSignCallBackParams, VerifiablePresentationFromOpts } from './signing';
-import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation, VerifiablePresentationResult } from './signing/types';
+import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation, VerifiablePresentationResult } from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
 import { definitionVersionDiscovery } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
