@@ -423,6 +423,7 @@ export class PEX {
     if (result) {
       return { version: PEVersion.v1 };
     }
+    console.log('PEXv2 Errors', JSON.stringify(validateV2.errors, null, 2));
     return { error: 'This is not a valid PresentationDefinition' };
   }
 
