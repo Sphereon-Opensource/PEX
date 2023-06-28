@@ -364,10 +364,8 @@ describe('evaluate', () => {
       selectResults,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(evaluationClientWrapperData.getVerifiableCredential())
     );
-    const verifiableCredential = selectResults.verifiableCredential![0];
-    expect(verifiableCredential['id' as keyof IVerifiableCredential]).toEqual(
-      (<ICredential>evaluationClientWrapperData.getVerifiableCredential()[1]).id
-    );
+    const verifiableCredential = selectResults.verifiableCredential![0] as IVerifiableCredential;
+    expect(verifiableCredential.id).toEqual((<ICredential>evaluationClientWrapperData.getVerifiableCredential()[1]).id);
   });
 
   it('should pass with correct submissionFrom result name and roles with 2 groups', function () {

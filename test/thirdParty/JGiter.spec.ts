@@ -1,4 +1,4 @@
-import { PresentationDefinitionV2 } from '@sphereon/pex-models';
+import { PresentationDefinitionV2, Rules } from '@sphereon/pex-models';
 import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { EvaluationResults, PEX, Status } from '../../lib';
@@ -539,7 +539,7 @@ describe('evaluate JGiter tests', () => {
     const vcs = getVerifiableCredentials();
     const selectResult = pex.selectFrom(pdSchema, vcs);
     const resultEvaluation = pex.evaluateCredentials(pdSchema, [selectResult.verifiableCredential![0], selectResult.verifiableCredential![1]]);
-    expect(resultEvaluation.errors?.length).toEqual(6);
+    expect(resultEvaluation.errors?.length).toEqual(0);
     expect(resultEvaluation.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const presentationResult = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
     expect(presentationResult.presentation.presentation_submission?.descriptor_map).toEqual([
@@ -572,9 +572,25 @@ describe('evaluate JGiter tests', () => {
       holderDIDs: undefined,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.ERROR);
-    expect(resultSelectFrom.matches).toEqual([]);
-    expect(resultSelectFrom.verifiableCredential?.length).toEqual(0);
+    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(resultSelectFrom.matches).toEqual([
+      {
+        name: 'Subject identity input',
+        rule: Rules.All,
+        vc_path: ['$.verifiableCredential[0]'],
+      },
+      {
+        name: 'Subject name input',
+        rule: Rules.All,
+        vc_path: ['$.verifiableCredential[0]'],
+      },
+      {
+        name: 'Admin role input',
+        rule: Rules.All,
+        vc_path: ['$.verifiableCredential[1]'],
+      },
+    ]);
+    expect(resultSelectFrom.verifiableCredential?.length).toEqual(2);
   });
 
   it('should have 2 errors in the evaluation result', function () {

@@ -78,7 +78,7 @@ describe('evaluate gataca tests', () => {
       holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(result.verifiableCredential![0]['id' as keyof IVerifiableCredential]).toEqual('urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv');
+    expect((result.verifiableCredential![0] as IVerifiableCredential).id).toEqual('urn:credential:hEoISQtpfXua6VWzbGUKdON1rqxF3liv');
   });
 
   it('should return v1 in version discovery second example', function () {
