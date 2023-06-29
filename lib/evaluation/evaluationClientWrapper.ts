@@ -30,7 +30,7 @@ export class EvaluationClientWrapper {
       restrictToDIDMethods?: string[];
     }
   ): SelectResults {
-    let selectResults: Partial<SelectResults> = {};
+    let selectResults: SelectResults;
 
     this._client.evaluate(presentationDefinition, wrappedVerifiableCredentials, opts);
     const warnings: Checked[] = [...this.formatNotInfo(Status.WARN)];
@@ -95,7 +95,7 @@ export class EvaluationClientWrapper {
       }
     }
 
-    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults as SelectResults, wrappedVerifiableCredentials);
+    this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
     selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
     this.remapMatches(
       wrappedVerifiableCredentials.map((wrapped) => wrapped.original as IVerifiableCredential),
@@ -112,7 +112,7 @@ export class EvaluationClientWrapper {
       selectResults.warnings = warnings;
       selectResults.verifiableCredential = wrappedVerifiableCredentials.map((value) => value.original);
     }
-    return selectResults as SelectResults;
+    return selectResults;
   }
 
   private remapMatches(
