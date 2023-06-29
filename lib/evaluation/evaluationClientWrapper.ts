@@ -78,7 +78,7 @@ export class EvaluationClientWrapper {
             )[0].value
         );
         selectResults = {
-          errors: [], // fixme: should this be empty?
+          errors: [],
           matches: [...matchSubmissionRequirements],
           areRequiredCredentialsPresent: Status.INFO,
           verifiableCredential: credentials,
