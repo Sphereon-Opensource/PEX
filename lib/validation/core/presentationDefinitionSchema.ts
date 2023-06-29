@@ -412,7 +412,7 @@ export class PresentationDefinitionSchema {
         format: {
           type: 'object',
           patternProperties: {
-            '^jwt$|^jwt_vc$|^jwt_vp$': {
+            '^jwt$|^jwt_vc$|^jwt_vp$|^mso_mdoc$': {
               type: 'object',
               properties: {
                 alg: {
@@ -499,6 +499,7 @@ export class PresentationDefinitionSchema {
               type: 'array',
               items: { type: 'string' },
             },
+            format: { $ref: '#/definitions/format' },
             constraints: {
               type: 'object',
               properties: {
@@ -600,6 +601,7 @@ export class PresentationDefinitionSchema {
                   items: { type: 'string' },
                 },
                 purpose: { type: 'string' },
+                intent_to_retain: { type: 'boolean' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
               },
               required: ['path'],
@@ -613,6 +615,7 @@ export class PresentationDefinitionSchema {
                   items: { type: 'string' },
                 },
                 purpose: { type: 'string' },
+                intent_to_retain: { type: 'boolean' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
                 predicate: {
                   type: 'string',
