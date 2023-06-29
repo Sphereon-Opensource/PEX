@@ -1,7 +1,6 @@
 import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
-import _ from 'lodash';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
@@ -55,10 +54,11 @@ export class EvaluationClientWrapper {
             e
           )[0].value
       );
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
-        errors: errors,
+        errors: areRequiredCredentialsPresent === Status.INFO ? [] : errors,
         matches: [...matchSubmissionRequirements],
-        areRequiredCredentialsPresent: Status.INFO,
+        areRequiredCredentialsPresent,
         verifiableCredential: credentials,
         warnings,
       };
@@ -126,7 +126,7 @@ export class EvaluationClientWrapper {
       } else {
         srm.vc_path.forEach((match, index, matches) => {
           const vc = jp.query(verifiableCredentials, match)[0];
-          const newIndex = vcsToSend?.findIndex((svc) => _.isEqual(svc, vc));
+          const newIndex = vcsToSend?.findIndex((svc) => JSON.stringify(svc) === JSON.stringify(vc));
           if (newIndex === -1) {
             throw new Error(
               `The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`
@@ -481,8 +481,10 @@ export class EvaluationClientWrapper {
     if (selectResults) {
       selectResults.verifiableCredential?.forEach((selectableCredential) => {
         const foundIndex: number = ObjectUtils.isString(selectableCredential)
-          ? wrappedVcs.findIndex((wrappedVc) => _.isEqual(selectableCredential, wrappedVc.original))
-          : wrappedVcs.findIndex((wrappedVc) => _.isEqual((selectableCredential as IVerifiableCredential).proof, wrappedVc.credential.proof));
+          ? wrappedVcs.findIndex((wrappedVc) => selectableCredential === wrappedVc.original)
+          : wrappedVcs.findIndex(
+              (wrappedVc) => JSON.stringify((selectableCredential as IVerifiableCredential).proof) === JSON.stringify(wrappedVc.credential.proof)
+            );
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
@@ -546,15 +548,15 @@ export class EvaluationClientWrapper {
         innerStatus = Status.ERROR;
       }
       if (m.rule === Rules.Pick) {
-        if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+        if (m.vc_path.length == 0) {
           innerStatus = Status.ERROR;
-        } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+        } else if (m.count && m.vc_path.length < m.count) {
           innerStatus = Status.ERROR;
-        } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+        } else if (m.count && m.vc_path.length > m.count) {
           innerStatus = Status.WARN;
-        } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
+        } else if (m.min && m.vc_path.length < m.min) {
           innerStatus = Status.ERROR;
-        } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+        } else if (m.max && m.vc_path.length > m.max) {
           innerStatus = Status.WARN;
         } else if (m.rule === Rules.All && m.vc_path.length > 1) {
           innerStatus = Status.ERROR;

@@ -1,13 +1,11 @@
 import fs from 'fs';
 
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import _ from 'lodash';
 
 import { Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
+import { InternalPresentationDefinitionV1, SSITypesBuilder } from '../../lib/types';
 import PexMessages from '../../lib/types/Messages';
-import { SSITypesBuilder } from '../../lib/types/SSITypesBuilder';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -914,144 +912,98 @@ describe('selectFrom tests', () => {
       holderDIDs: dids,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(
-      _.isEqual(result, {
-        areRequiredCredentialsPresent: Status.WARN,
-        errors: [
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'UriEvaluation',
-            status: 'error',
-            message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          },
-          {
-            tag: 'FilterEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-          },
-          {
-            tag: 'MarkForSubmissionEvaluation',
-            status: 'error',
-            message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-          },
-        ],
-        matches: [
-          {
-            from: ['B'],
-            vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
-            max: 1,
-            name: 'Submission of educational transcripts',
-            rule: 'pick',
-          },
-        ],
-        verifiableCredential: [
-          {
-            '@context': 'https://business-standards.org/schemas/employment-history.json',
-            credentialSubject: {
-              active: true,
-              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            },
-            id: 'https://business-standards.org/schemas/employment-history.json',
-            issuanceDate: '2010-01-01T19:73:24Z',
-            issuer: 'did:foo:123',
-            proof: {
-              created: '2017-06-18T21:19:10Z',
-              jws: '...',
-              proofPurpose: 'assertionMethod',
-              type: 'EcdsaSecp256k1VerificationKey2019',
-              verificationMethod: 'https://example.edu/issuers/keys/1',
-            },
-            type: ['VerifiableCredential', 'GenericEmploymentCredential'],
-          },
-          {
-            '@context': 'https://www.w3.org/2018/credentials/v1',
-            credentialSubject: {
-              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-              license: {
-                dob: '07/13/80',
-                number: '34DGE352',
-              },
-            },
-            id: 'https://eu.com/claims/DriversLicense',
-            issuanceDate: '2010-01-01T19:73:24Z',
-            issuer: 'did:foo:123',
-            proof: {
-              created: '2017-06-18T21:19:10Z',
-              jws: '...',
-              proofPurpose: 'assertionMethod',
-              type: 'RsaSignature2018',
-              verificationMethod: 'https://example.edu/issuers/keys/1',
-            },
-            type: ['EUDriversLicense'],
-          },
-        ],
-        warnings: [],
-      })
-    );
+    expect(result.areRequiredCredentialsPresent).toBe(Status.ERROR);
+    expect(result.errors).toEqual([
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+      },
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+      },
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
+      },
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'UriEvaluation',
+        status: 'error',
+        message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
+      },
+      {
+        tag: 'FilterEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'FilterEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'FilterEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+      },
+      {
+        tag: 'FilterEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[2]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
+      },
+      {
+        tag: 'MarkForSubmissionEvaluation',
+        status: 'error',
+        message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[1]',
+      },
+    ]);
+    expect(result.matches).toEqual([
+      {
+        from: ['B'],
+        vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
+        min: 3,
+        name: 'Submission of educational transcripts',
+        rule: 'pick',
+      },
+    ]);
   });
 
   it('Evaluate submission requirements max 1 from group B', () => {
