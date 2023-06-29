@@ -1,12 +1,12 @@
 import { W3CVerifiableCredential } from '@sphereon/ssi-types';
 
-import { IPresentationDefinition, PEX } from '../../lib';
+import { IPresentationDefinition, PEX, Status } from '../../lib';
 
 describe('evaluate animo tests', () => {
   it('should pass with 2 VCs and 2 IDs', () => {
     const pex: PEX = new PEX();
     const result = pex.evaluateCredentials(pd, vcs);
-    console.log(JSON.stringify(result, null, 2));
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
   });
 
   it('should not pass with 2 VCs and 3 IDs', () => {
@@ -33,7 +33,7 @@ describe('evaluate animo tests', () => {
       },
     });
     const result = pex.evaluateCredentials(pdModified, vcs);
-    console.log(JSON.stringify(result, null, 2));
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.ERROR);
   });
   const vcs: W3CVerifiableCredential[] = [
     {
