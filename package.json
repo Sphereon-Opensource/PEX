@@ -41,8 +41,8 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@sphereon/ssi-types": "^0.10.0",
     "@sphereon/pex-models": "^2.0.2",
+    "@sphereon/ssi-types": "^0.10.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "jsonpath": "^1.1.1",
