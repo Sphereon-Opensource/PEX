@@ -21,7 +21,7 @@ export function definitionVersionDiscovery(presentationDefinition: IPresentation
   JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
   JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
   const data = { presentation_definition: presentationDefinitionCopy };
-  const ajv = new Ajv({ verbose: true, code: { source: true, lines: true, esm: false }, allowUnionTypes: true, allErrors: true, strict: false });
+  const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
   const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
   let result = validateV2(data);
   if (result) {
