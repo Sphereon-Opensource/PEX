@@ -112,6 +112,7 @@ export class PEX {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedVerifiableCredentials, opts);
       result.areRequiredCredentialsPresent = selectResults.areRequiredCredentialsPresent;
+      result.errors = selectResults.errors;
     } else {
       result.areRequiredCredentialsPresent = Status.ERROR;
     }

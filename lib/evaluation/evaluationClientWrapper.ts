@@ -1,10 +1,10 @@
 import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
-import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
-import { IInternalPresentationDefinition, IPresentationDefinition } from '../types';
-import { JsonPathUtils } from '../utils';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
+import { JsonPathUtils, ObjectUtils } from '../utils';
 
 import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
@@ -54,10 +54,11 @@ export class EvaluationClientWrapper {
             e
           )[0].value
       );
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
       selectResults = {
-        errors: errors,
+        errors: areRequiredCredentialsPresent === Status.INFO ? [] : errors,
         matches: [...matchSubmissionRequirements],
-        areRequiredCredentialsPresent: Status.INFO,
+        areRequiredCredentialsPresent,
         verifiableCredential: credentials,
         warnings,
       };
@@ -65,22 +66,33 @@ export class EvaluationClientWrapper {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
-      const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
-      const matches = this.extractMatches(matchSubmissionRequirements);
-      const credentials: IVerifiableCredential[] = matches.map(
-        (e) =>
-          jp.nodes(
-            this._client.wrappedVcs.map((wrapped) => wrapped.original),
-            e
-          )[0].value
-      );
-      selectResults = {
-        errors: errors,
-        matches: [...matchSubmissionRequirements],
-        areRequiredCredentialsPresent: Status.INFO,
-        verifiableCredential: credentials,
-        warnings,
-      };
+      const checkWithoutSRResults: HandlerCheckResult[] = this.checkWithoutSubmissionRequirements(marked, presentationDefinition);
+      if (!checkWithoutSRResults.length) {
+        const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+        const matches = this.extractMatches(matchSubmissionRequirements);
+        const credentials: IVerifiableCredential[] = matches.map(
+          (e) =>
+            jp.nodes(
+              this._client.wrappedVcs.map((wrapped) => wrapped.original),
+              e
+            )[0].value
+        );
+        selectResults = {
+          errors: [],
+          matches: [...matchSubmissionRequirements],
+          areRequiredCredentialsPresent: Status.INFO,
+          verifiableCredential: credentials,
+          warnings,
+        };
+      } else {
+        return {
+          errors: errors,
+          matches: [],
+          areRequiredCredentialsPresent: Status.ERROR,
+          verifiableCredential: wrappedVerifiableCredentials.map((value) => value.original),
+          warnings: warnings,
+        };
+      }
     }
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
@@ -95,14 +107,18 @@ export class EvaluationClientWrapper {
     });
     if (selectResults.areRequiredCredentialsPresent === Status.INFO) {
       selectResults.errors = [];
+    } else {
+      selectResults.errors = errors;
+      selectResults.warnings = warnings;
+      selectResults.verifiableCredential = wrappedVerifiableCredentials.map((value) => value.original);
     }
     return selectResults;
   }
 
   private remapMatches(
-    verifiableCredentials: IVerifiableCredential[],
+    verifiableCredentials: OriginalVerifiableCredential[],
     submissionRequirementMatches?: SubmissionRequirementMatch[],
-    vcsToSend?: IVerifiableCredential[]
+    vcsToSend?: OriginalVerifiableCredential[]
   ) {
     submissionRequirementMatches?.forEach((srm) => {
       if (srm.from_nested) {
@@ -132,6 +148,51 @@ export class EvaluationClientWrapper {
       }
     });
     return Array.from(new Set(matches));
+  }
+
+  /**
+   * Since this is without SubmissionRequirements object, each InputDescriptor has to have at least one corresponding VerifiableCredential
+   * @param marked: info logs for `MarkForSubmissionEvaluation` handler
+   * @param pd
+   * @private
+   */
+  private checkWithoutSubmissionRequirements(marked: HandlerCheckResult[], pd: IInternalPresentationDefinition): HandlerCheckResult[] {
+    const checkResult: HandlerCheckResult[] = [];
+    if (!(pd as InternalPresentationDefinitionV2).input_descriptors) {
+      return [];
+    }
+    if (!marked.length) {
+      return [
+        {
+          input_descriptor_path: '',
+          evaluator: 'checkWithoutSubmissionRequirement',
+          verifiable_credential_path: '',
+          status: Status.ERROR,
+          payload: `Not all the InputDescriptors are addressed`,
+        },
+      ];
+    }
+    const inputDescriptors = (pd as InternalPresentationDefinitionV2).input_descriptors;
+    const markedInputDescriptorPaths: string[] = ObjectUtils.getDistinctFieldInObject(marked, 'input_descriptor_path') as string[];
+    if (markedInputDescriptorPaths.length !== inputDescriptors.length) {
+      const inputDescriptorsFromLogs = (
+        markedInputDescriptorPaths.map((value) => JsonPathUtils.extractInputField(pd, [value])[0].value) as InputDescriptorV2[]
+      ).map((value) => value.id);
+      for (let i = 0; i < (pd as InternalPresentationDefinitionV2).input_descriptors.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (inputDescriptorsFromLogs.indexOf((pd as InternalPresentationDefinitionV2).input_descriptors[i].id) == -1) {
+          checkResult.push({
+            input_descriptor_path: `$.input_descriptors[${i}]`,
+            evaluator: 'checkWithoutSubmissionRequirement',
+            verifiable_credential_path: '',
+            status: Status.ERROR,
+            payload: `Not all the InputDescriptors are addressed`,
+          });
+        }
+      }
+    }
+    return checkResult;
   }
 
   private matchSubmissionRequirements(
@@ -165,18 +226,19 @@ export class EvaluationClientWrapper {
 
   private matchWithoutSubmissionRequirements(marked: HandlerCheckResult[], pd: IInternalPresentationDefinition): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
-    const partitionedResults: Map<string, string[]> = this.createVcToIdMap(marked);
-    for (const [vcPath, sameVcIds] of partitionedResults.entries()) {
-      if (sameVcIds.length && sameVcIds.length === (pd as unknown as IPresentationDefinition).input_descriptors.length) {
-        for (const idPath of sameVcIds) {
-          const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
-          if (idRes.length) {
-            submissionRequirementMatches.push({
-              name: (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name || (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
-              rule: Rules.All,
-              vc_path: [vcPath],
-            });
-          }
+    const partitionedIdToVcMap: Map<string, string[]> = this.createIdToVcMap(marked);
+    for (const [idPath, sameIdVcs] of partitionedIdToVcMap.entries()) {
+      if (!sameIdVcs || !sameIdVcs.length) {
+        continue;
+      }
+      for (const vcPath of sameIdVcs) {
+        const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
+        if (idRes.length) {
+          submissionRequirementMatches.push({
+            name: (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name || (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
+            rule: Rules.All,
+            vc_path: [vcPath],
+          });
         }
       }
     }
@@ -269,7 +331,7 @@ export class EvaluationClientWrapper {
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
       const groupCount = new Map<string, number>();
       //TODO instanceof fails in some cases, need to check how to fix it
-      if (Object.keys(pd).includes('input_descriptors')) {
+      if ('input_descriptors' in pd) {
         (pd as unknown as IPresentationDefinition).input_descriptors.forEach((e: InputDescriptorV1 | InputDescriptorV2) => {
           if (e.group) {
             e.group.forEach((key: string) => {
@@ -417,8 +479,12 @@ export class EvaluationClientWrapper {
 
   public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, wrappedVcs: WrappedVerifiableCredential[]) {
     if (selectResults) {
-      selectResults.verifiableCredential?.forEach((selectableCredential: IVerifiableCredential) => {
-        const foundIndex: number = wrappedVcs.findIndex((wrappedVc) => JSON.stringify(selectableCredential) === JSON.stringify(wrappedVc.original));
+      selectResults.verifiableCredential?.forEach((selectableCredential) => {
+        const foundIndex: number = ObjectUtils.isString(selectableCredential)
+          ? wrappedVcs.findIndex((wrappedVc) => selectableCredential === wrappedVc.original)
+          : wrappedVcs.findIndex(
+              (wrappedVc) => JSON.stringify((selectableCredential as IVerifiableCredential).proof) === JSON.stringify(wrappedVc.credential.proof)
+            );
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
@@ -482,15 +548,15 @@ export class EvaluationClientWrapper {
         innerStatus = Status.ERROR;
       }
       if (m.rule === Rules.Pick) {
-        if (m.vc_path.length == 0 && (!m.from_nested || m.from_nested.length == 0)) {
+        if (m.vc_path.length == 0) {
           innerStatus = Status.ERROR;
-        } else if (m.count && m.vc_path.length < m.count && (!m.from_nested || !m.from_nested?.length)) {
+        } else if (m.count && m.vc_path.length < m.count) {
           innerStatus = Status.ERROR;
-        } else if (m.count && (m.vc_path.length > m.count || (m.from_nested && m.from_nested?.length > m.count))) {
+        } else if (m.count && m.vc_path.length > m.count) {
           innerStatus = Status.WARN;
-        } else if (m.min && m.vc_path.length < m.min && m.from_nested && !m.from_nested?.length) {
+        } else if (m.min && m.vc_path.length < m.min) {
           innerStatus = Status.ERROR;
-        } else if (m.max && (m.vc_path.length > m.max || (m.from_nested && m.from_nested?.length > m.max))) {
+        } else if (m.max && m.vc_path.length > m.max) {
           innerStatus = Status.WARN;
         } else if (m.rule === Rules.All && m.vc_path.length > 1) {
           innerStatus = Status.ERROR;
@@ -534,30 +600,30 @@ export class EvaluationClientWrapper {
     }
   }
 
-  private createVcToIdMap(marked: HandlerCheckResult[]): Map<string, string[]> {
+  private createIdToVcMap(marked: HandlerCheckResult[]): Map<string, string[]> {
     const partitionedResults: Map<string, string[]> = new Map<string, string[]>();
 
-    const partitionedBasedOnVc: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
+    const partitionedBasedOnId: Map<string, HandlerCheckResult[]> = new Map<string, HandlerCheckResult[]>();
     for (let i = 0; i < marked.length; i++) {
-      const currentVcPath: string = marked[i].verifiable_credential_path;
-      if (partitionedBasedOnVc.has(currentVcPath)) {
-        const partBasedOnVc = partitionedBasedOnVc.get(currentVcPath);
-        if (partBasedOnVc) {
-          partBasedOnVc.push(marked[i]);
+      const currentIdPath: string = marked[i].input_descriptor_path;
+      if (partitionedBasedOnId.has(currentIdPath)) {
+        const partBasedOnId = partitionedBasedOnId.get(currentIdPath);
+        if (partBasedOnId) {
+          partBasedOnId.push(marked[i]);
         }
       } else {
-        partitionedBasedOnVc.set(currentVcPath, [marked[i]]);
+        partitionedBasedOnId.set(currentIdPath, [marked[i]]);
       }
     }
 
-    for (const [idPath, sameVcCheckResults] of partitionedBasedOnVc.entries()) {
-      const idPaths: string[] = [];
+    for (const [idPath, sameVcCheckResults] of partitionedBasedOnId.entries()) {
+      const vcPaths: string[] = [];
       for (let i = 0; i < sameVcCheckResults.length; i++) {
-        if (idPaths.indexOf(sameVcCheckResults[i].input_descriptor_path) === -1) {
-          idPaths.push(sameVcCheckResults[i].input_descriptor_path);
+        if (vcPaths.indexOf(sameVcCheckResults[i].verifiable_credential_path) === -1) {
+          vcPaths.push(sameVcCheckResults[i].verifiable_credential_path);
         }
       }
-      partitionedResults.set(idPath, idPaths);
+      partitionedResults.set(idPath, vcPaths);
     }
     return partitionedResults;
   }

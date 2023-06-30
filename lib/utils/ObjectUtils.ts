@@ -16,4 +16,14 @@ export class ObjectUtils {
   public static isString(value: unknown): boolean {
     return typeof value === 'string' || Object.prototype.toString.call(value) === '[object String]';
   }
+
+  /**
+   * Receives an object array and for the field in question, returns the unique values
+   */
+  public static getDistinctFieldInObject(data: unknown[], fieldName: string): unknown[] {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const fieldValues = data.map((item) => item[fieldName]);
+    return Array.from(new Set(fieldValues));
+  }
 }

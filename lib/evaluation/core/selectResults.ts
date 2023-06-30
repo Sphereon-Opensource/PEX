@@ -1,4 +1,4 @@
-import { IVerifiableCredential } from '@sphereon/ssi-types';
+import { OriginalVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../../ConstraintUtils';
 
@@ -19,7 +19,7 @@ export interface SelectResults {
   /**
    * All matched/selectable credentials
    */
-  verifiableCredential?: IVerifiableCredential[];
+  verifiableCredential?: OriginalVerifiableCredential[];
   /**
    * Following are indexes of the verifiableCredentials passed to the selectFrom method that have been selected.
    */
