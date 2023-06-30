@@ -8,4 +8,6 @@ node_modules
 coverage
 *.log
 *.tgz
-/lib/validation/*.js
+/lib/validation/disabled*.js
+/resources/FilterV1.schema.json
+/resources/FilterV2.schema.json
