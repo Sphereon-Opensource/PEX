@@ -31,7 +31,7 @@
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"{lib,test}/**/*.ts\" --write",
     "fix:lint": "eslint . --ext .ts --fix",
-    "test": "run-s build test:*",
+    "test": "run-s test:*",
     "test:lint": "eslint . --ext .ts",
     "test:prettier": "prettier \"{lib,test}/**/*.ts\" --list-different",
     "test:unit": "jest",
