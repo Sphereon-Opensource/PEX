@@ -32,6 +32,7 @@
     "listFiles": false
     /* Print names of files part of the compilation. */,
     "pretty": true,
+    "allowJs": true,
 /*
     "lib": [
       "es7", "dom"
@@ -42,6 +43,7 @@
     "declarations.d.ts",
     "index.ts",
     "lib/**/*.ts",
+    "lib/validation/*.js",
     "test/**/*.ts"
   ],
   "exclude": [

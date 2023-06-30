@@ -47,6 +47,7 @@
     "string.prototype.matchall": "^4.0.8"
   },
   "devDependencies": {
+    "ajv-cli": "^5.0.0",
     "@types/jest": "^29.4.0",
     "@types/jsonpath": "^0.2.0",
     "@types/node": "^16.18.25",
