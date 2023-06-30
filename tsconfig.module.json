@@ -6,8 +6,10 @@
     "module": "esnext"
   },
   "include": [
+    "declarations.d.ts",
     "index.ts",
     "lib/**/*.ts",
+    "lib/**/*.js",
   ],
   "exclude": [
     "node_modules/**",

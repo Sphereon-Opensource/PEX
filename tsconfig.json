@@ -39,6 +39,7 @@
     "types": ["jest", "node"]
   },
   "include": [
+    "declarations.d.ts",
     "index.ts",
     "lib/**/*.ts",
     "test/**/*.ts"

@@ -18,6 +18,8 @@
   ],
   "scripts": {
     "build": "run-p build:*",
+    "build:pdv1schema": "npx ajv compile -s resources/presentation_definition_v1.schema.json -o lib/validation/validatePDv1.js",
+    "build:pdv2schema": "npx ajv compile -s resources/presentation_definition_v2.schema.json -o lib/validation/validatePDv2.js",
     "build:main": "tsc -p tsconfig.main.json",
     "build:browser": "tsc -p tsconfig.browser.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -67,6 +69,8 @@
   },
   "files": [
     "index.ts",
+    "lib/validation/validatePDv1.js",
+    "lib/validation/validatePDv2.js",
     "/dist",
     "CHANGELOG.md",
     "LICENSE",
