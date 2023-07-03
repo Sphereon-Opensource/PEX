@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "2.0.2-unstable.0",
+  "version": "2.0.2-unstable.3",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -17,7 +17,13 @@
     "DIF"
   ],
   "scripts": {
-    "build": "run-p build:*",
+    "build": "run-s build:*",
+    "build:generateFieldv1Schema": "ts-json-schema-generator -p resources/schema-generator-interfaces/filterV1.ts > resources/FilterV1.schema.json",
+    "build:generateFieldv2Schema": "ts-json-schema-generator -p resources/schema-generator-interfaces/filterV2.ts > resources/FilterV2.schema.json",
+    "build:pdv1schema": "npx ajv compile --strict=false --all-errors --inline-refs=false --verbose --allow-union-types -s resources/presentation_definition_v1.schema.json -o lib/validation/validatePDv1.js",
+    "build:pdv2schema": "npx ajv compile --strict=false --all-errors --inline-refs=false --verbose --allow-union-types -s resources/presentation_definition_v2.schema.json -o lib/validation/validatePDv2.js",
+    "build:filterV1schema": "npx ajv compile --strict=false --all-errors --inline-refs=false --verbose --allow-union-types -s resources/FilterV1.schema.json -o lib/validation/validateFilterv1.js",
+    "build:filterV2schema": "npx ajv compile --strict=false --all-errors --inline-refs=false --verbose --allow-union-types -s resources/FilterV2.schema.json -o lib/validation/validateFilterv2.js",
     "build:main": "tsc -p tsconfig.main.json",
     "build:browser": "tsc -p tsconfig.browser.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -25,7 +31,7 @@
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"{lib,test}/**/*.ts\" --write",
     "fix:lint": "eslint . --ext .ts --fix",
-    "test": "run-s build test:*",
+    "test": "run-s test:*",
     "test:lint": "eslint . --ext .ts",
     "test:prettier": "prettier \"{lib,test}/**/*.ts\" --list-different",
     "test:unit": "jest",
@@ -35,8 +41,8 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@sphereon/ssi-types": "^0.10.0",
     "@sphereon/pex-models": "^2.0.2",
+    "@sphereon/ssi-types": "^0.10.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "jsonpath": "^1.1.1",
@@ -45,11 +51,13 @@
     "string.prototype.matchall": "^4.0.8"
   },
   "devDependencies": {
+    "ajv-cli": "^5.0.0",
     "@types/jest": "^29.4.0",
     "@types/jsonpath": "^0.2.0",
     "@types/node": "^16.18.25",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
+    "ts-json-schema-generator": "^1.2.0",
     "codecov": "^3.8.3",
     "cspell": "^6.31.1",
     "eslint": "^8.39.0",
@@ -67,6 +75,8 @@
   },
   "files": [
     "index.ts",
+    "lib/validation/validatePDv1.js",
+    "lib/validation/validatePDv2.js",
     "/dist",
     "CHANGELOG.md",
     "LICENSE",

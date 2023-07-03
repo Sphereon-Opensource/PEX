@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 
 describe('testing schemas with ajv', () => {
   it('test dummy schema should fail', () => {
-    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
+    const ajv = new Ajv({ verbose: true, code: { source: true, lines: true, esm: false }, allowUnionTypes: true, allErrors: true, strict: false });
 
     const schema = {
       type: 'object',
@@ -30,7 +30,7 @@ describe('testing schemas with ajv', () => {
   });
 
   it('test presentation definition v1 should fail', function () {
-    const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
+    const ajv = new Ajv({ verbose: true, code: { source: true, lines: true, esm: false }, allowUnionTypes: true, allErrors: true, strict: false });
     const schema = {
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'Presentation Definition',

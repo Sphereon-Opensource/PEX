@@ -64,7 +64,7 @@ describe('fieldValidator tests', () => {
     const fieldObjInvalid = {
       ...fieldObjExample,
       filter: {
-        type: 'foo',
+        'type-invalid': 'foo',
         pattern: 'bar invalid',
       },
     };

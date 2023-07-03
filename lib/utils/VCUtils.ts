@@ -1,8 +1,12 @@
 import { AdditionalClaims, ICredential, ICredentialSubject, IIssuer } from '@sphereon/ssi-types';
-import Ajv from 'ajv';
 
 import { DiscoveredVersion, IPresentationDefinition, PEVersion } from '../types';
-import { PresentationDefinitionSchema } from '../validation/core/presentationDefinitionSchema';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import validatePDv1 from '../validation/validatePDv1.js';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import validatePDv2 from '../validation/validatePDv2.js';
 
 import { ObjectUtils } from './ObjectUtils';
 import { JsonPathUtils } from './jsonPathUtils';
@@ -21,14 +25,11 @@ export function definitionVersionDiscovery(presentationDefinition: IPresentation
   JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_const', 'const');
   JsonPathUtils.changePropertyNameRecursively(presentationDefinitionCopy, '_enum', 'enum');
   const data = { presentation_definition: presentationDefinitionCopy };
-  const ajv = new Ajv({ verbose: true, allowUnionTypes: true, allErrors: true, strict: false });
-  const validateV2 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV2());
-  let result = validateV2(data);
+  let result = validatePDv2(data);
   if (result) {
     return { version: PEVersion.v2 };
   }
-  const validateV1 = ajv.compile(PresentationDefinitionSchema.getPresentationDefinitionSchemaV1());
-  result = validateV1(data);
+  result = validatePDv1(data);
   if (result) {
     return { version: PEVersion.v1 };
   }

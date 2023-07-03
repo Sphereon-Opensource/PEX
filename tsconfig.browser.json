@@ -9,8 +9,10 @@
     "es2015", "dom", "es6"
   ],
   "include": [
+    "declarations.d.ts",
     "index.ts",
     "lib/**/*.ts",
+    "lib/**/*.js",
   ],
   "exclude": [
     "node_modules/**",

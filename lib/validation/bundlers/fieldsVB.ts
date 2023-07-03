@@ -1,14 +1,20 @@
 import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pex-models';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+// import Ajv from 'ajv';
+// import addFormats from 'ajv-formats';
 import jp from 'jsonpath';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { Validation, ValidationPredicate } from '../core';
+import validateFilterv1 from '../validateFilterv1.js';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import validateFilterv2 from '../validateFilterv2.js';
 
 import { ValidationBundler } from './validationBundler';
 
 export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
-  private readonly schemaValidator: Ajv;
+  // private readonly ajv: Ajv;
 
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
   private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
@@ -20,8 +26,8 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
 
   constructor(parentTag: string) {
     super(parentTag, 'fields');
-    this.schemaValidator = new Ajv();
-    addFormats(this.schemaValidator);
+    // this.ajv = new Ajv();
+    // addFormats(this.ajv);
   }
 
   public getValidations(fields: FieldV1[] | FieldV2[]): Validation<FieldV1 | FieldV2>[] {
@@ -101,12 +107,16 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
     if (filter == null) {
       return true;
     }
+    let valid = false;
     try {
-      this.schemaValidator.compile(filter);
+      valid = validateFilterv2(filter);
+      if (!valid) {
+        valid = validateFilterv1(filter);
+      }
     } catch (err) {
       throw this.toChecked(this.filterIsNotValidJsonSchemaDescriptorMsg + ' Got ' + JSON.stringify(filter));
     }
-    return true;
+    return valid;
   }
 
   private filterIsMustInPresenceOfPredicate() {

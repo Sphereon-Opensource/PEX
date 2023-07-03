@@ -9,12 +9,13 @@ import {
   PresentationDefinitionV1,
   SubmissionRequirement,
 } from '@sphereon/pex-models';
-import Ajv from 'ajv';
 
 import { Validation, ValidationPredicate } from '../core';
 import { JwtAlgos } from '../core/jwtAlgos';
 import { LdpTypes } from '../core/ldpTypes';
-import { PresentationDefinitionSchema } from '../core/presentationDefinitionSchema';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import validatePDv1 from '../validatePDv1.js';
 
 import { InputDescriptorsV1VB } from './inputDescriptorsV1VB';
 import { SubmissionRequirementVB } from './submissionRequirementVB';
@@ -23,11 +24,8 @@ import { ValidationBundler } from './validationBundler';
 export class PresentationDefinitionV1VB extends ValidationBundler<
   FieldV1 | HolderSubject | ConstraintsV1 | InputDescriptorV1 | PresentationDefinitionV1 | SubmissionRequirement
 > {
-  private ajv: Ajv;
-
   constructor(parentTag: string) {
     super(parentTag, 'presentation_definition');
-    this.ajv = new Ajv({ allowUnionTypes: true, verbose: false, strict: false });
   }
 
   public getValidations(
@@ -233,10 +231,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
   private shouldBeAsPerJsonSchema(): ValidationPredicate<PresentationDefinitionV1> {
     // TODO can be be extracted as a generic function
     return (presentationDefinition: PresentationDefinitionV1): boolean => {
-      const presentationDefinitionSchema = PresentationDefinitionSchema.getPresentationDefinitionSchemaV1();
-      const validate = this.ajv.compile(presentationDefinitionSchema);
-      const valid = validate({ presentation_definition: presentationDefinition });
-      return valid;
+      return validatePDv1({ presentation_definition: presentationDefinition });
     };
   }
 
