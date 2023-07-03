@@ -28,7 +28,7 @@ describe('evaluate gataca tests', () => {
         rule: 'all',
         from: ['mandatory'],
         vc_path: ['$.verifiableCredential[0]'],
-        name: 'transcriptOfRecordsCredential',
+        name: 'emailCredential',
       },
       {
         rule: 'pick',
@@ -101,7 +101,7 @@ describe('evaluate gataca tests', () => {
         rule: 'all',
         from: ['mandatory'],
         vc_path: ['$.verifiableCredential[0]'],
-        name: 'transcriptOfRecordsCredential',
+        name: 'emailCredential',
       },
       {
         rule: 'pick',
