@@ -253,8 +253,12 @@ export class EvaluationClientWrapper {
     const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], vc_path: [] };
     if (sr?.from) {
       srm.from?.push(sr.from);
+      // updating the srm.name everytime and since we have only one, we're sending the last one
       for (const m of marked) {
-        const inDesc = jp.query(pd, m.input_descriptor_path)[0];
+        const inDesc: InputDescriptorV2 = jp.query(pd, m.input_descriptor_path)[0];
+        if (inDesc.group && inDesc.group.indexOf(sr.from) === -1) {
+          continue;
+        }
         srm.name = inDesc.name || inDesc.id;
         if (m.payload.group.includes(sr.from)) {
           if (srm.vc_path?.indexOf(m.verifiable_credential_path) === -1) {

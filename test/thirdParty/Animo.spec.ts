@@ -35,6 +35,73 @@ describe('evaluate animo tests', () => {
     const result = pex.evaluateCredentials(pdModified, vcs);
     expect(result.areRequiredCredentialsPresent).toEqual(Status.ERROR);
   });
+
+  it('should have valid name in matches from SelectResults', function () {
+    const pd: IPresentationDefinition = {
+      id: '022c2664-68cc-45cc-b291-789ce8b599eb',
+      name: 'Presentation Definition',
+      purpose: 'We want to know your name and e-mail address (will not be stored)',
+      input_descriptors: [
+        {
+          id: 'c2834d0e-3c95-4721-b21a-40e3d7ea2549',
+          purpose: 'To access this portal your DBC Conference 2023 attendance proof is required.',
+          group: ['A'],
+          schema: [
+            {
+              uri: 'DBCConferenceAttendee',
+              required: true,
+            },
+          ],
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.event.name', '$.vc.credentialSubject.event.name'],
+                filter: {
+                  type: 'string',
+                  pattern: 'DBC Conference 2023',
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 'c2834d0e-3c95-4721-b21a-40e3d7ea25434',
+          purpose: 'To access this portal you need to show your JFF Plugfest OpenBadge credential.',
+          group: ['B'],
+          schema: [
+            {
+              uri: 'OpenBadgeCredential',
+              required: true,
+            },
+          ],
+        },
+      ],
+      submission_requirements: [
+        {
+          rule: 'pick',
+          count: 1,
+          from: 'A',
+        },
+        {
+          rule: 'pick',
+          count: 1,
+          from: 'B',
+        },
+      ],
+    };
+    const vcs = [
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDprZXk6ekRuYWVlY3Vacjg2OXZTNTl4R1BSTmRTTnFEVHBvc2pTWlVqQ1E3c1RoUkExeDRDNyN6RG5hZWVjdVpyODY5dlM1OXhHUFJOZFNOcURUcG9zalNaVWpDUTdzVGhSQTF4NEM3In0.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiREJDQ29uZmVyZW5jZUF0dGVuZGVlIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImZpcnN0TmFtZSI6IkphbiIsImxhc3ROYW1lIjoiUmlldHZlbGQiLCJlbWFpbCI6ImphbkBhbmltby5pZCIsImV2ZW50Ijp7Im5hbWUiOiJEQkMgQ29uZmVyZW5jZSAyMDIzIiwiZGF0ZSI6IjIwMjMtMDYtMjYifX19LCJpc3MiOiJkaWQ6a2V5OnpEbmFlZWN1WnI4Njl2UzU5eEdQUk5kU05xRFRwb3NqU1pVakNRN3NUaFJBMXg0QzciLCJzdWIiOiJkaWQ6andrOmV5SmpjbllpT2lKUUxUSTFOaUlzSW10MGVTSTZJa1ZESWl3aWVDSTZJbUZqWWtsUmFYVk5jek5wT0Y5MWMzcEZha295ZEhCVWRGSk5ORVZWTTNsNk9URlFTRFpEWkVneVZqQWlMQ0o1SWpvaVgwdGplVXhxT1haWFRYQjBibTFMZEcwME5rZHhSSG80ZDJZM05FazFURXRuY213eVIzcElNMjVUUlNKOSIsIm5iZiI6MTY4NTQ0ODAwMH0.GpNndHFkLQlR7wtl4loorizB7jCXArv6YIPW5ckmFP92BXHd4o_bX13osah_3o2iqjN7SWjwex_L3COmB02ysg',
+      'eyJraWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKUFMxQWlMQ0oxYzJVaU9pSnphV2NpTENKamNuWWlPaUpGWkRJMU5URTVJaXdpYTJsa0lqb2lOMlEyWTJKbU1qUTRPV0l6TkRJM05tSXhOekl4T1RBMU5EbGtNak01TVRnaUxDSjRJam9pUm01RlZWVmhkV1J0T1RsT016QmlPREJxY3poV2REUkJiazk0ZGxKM1dIUm5VbU5MY1ROblFrbDFPQ0lzSW1Gc1p5STZJa1ZrUkZOQkluMCMwIiwidHlwIjoiSldUIiwiYWxnIjoiRWREU0EifQ.eyJpc3MiOiJkaWQ6andrOmV5SnJkSGtpT2lKUFMxQWlMQ0oxYzJVaU9pSnphV2NpTENKamNuWWlPaUpGWkRJMU5URTVJaXdpYTJsa0lqb2lOMlEyWTJKbU1qUTRPV0l6TkRJM05tSXhOekl4T1RBMU5EbGtNak01TVRnaUxDSjRJam9pUm01RlZWVmhkV1J0T1RsT016QmlPREJxY3poV2REUkJiazk0ZGxKM1dIUm5VbU5MY1ROblFrbDFPQ0lzSW1Gc1p5STZJa1ZrUkZOQkluMCIsInN1YiI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpQUzFBaUxDSmpjbllpT2lKRlpESTFOVEU1SWl3aWVDSTZJbHBoYVRoNlNHWXdUVU5MY0dkTE9IbHhkMVZoTjA5ak5XSlBhV3h0UWpRMGRFUnlZamRPVVRCMlowa2lmUSIsIm5iZiI6MTY4NjA0NjE4OSwiaWF0IjoxNjg2MDQ2MTg5LCJ2YyI6eyJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiT3BlbkJhZGdlQ3JlZGVudGlhbCJdLCJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vcHVybC5pbXNnbG9iYWwub3JnL3NwZWMvb2IvdjNwMC9jb250ZXh0Lmpzb24iXSwiaWQiOiJ1cm46dXVpZDpiMDczNmEwMy0wYmVjLTQ2YTYtOTFkYS0zMmFlNWRmYmYxNTYiLCJpc3N1ZXIiOnsiaWQiOiJkaWQ6andrOmV5SnJkSGtpT2lKUFMxQWlMQ0oxYzJVaU9pSnphV2NpTENKamNuWWlPaUpGWkRJMU5URTVJaXdpYTJsa0lqb2lOMlEyWTJKbU1qUTRPV0l6TkRJM05tSXhOekl4T1RBMU5EbGtNak01TVRnaUxDSjRJam9pUm01RlZWVmhkV1J0T1RsT016QmlPREJxY3poV2REUkJiazk0ZGxKM1dIUm5VbU5MY1ROblFrbDFPQ0lzSW1Gc1p5STZJa1ZrUkZOQkluMCIsImltYWdlIjp7ImlkIjoiaHR0cHM6Ly93M2MtY2NnLmdpdGh1Yi5pby92Yy1lZC9wbHVnZmVzdC0yLTIwMjIvaW1hZ2VzL0pGRi1WQy1FRFUtUExVR0ZFU1QyLWJhZGdlLWltYWdlLnBuZyIsInR5cGUiOiJJbWFnZSJ9LCJuYW1lIjoiSm9icyBmb3IgdGhlIEZ1dHVyZSAoSkZGKSIsInR5cGUiOiJQcm9maWxlIiwidXJsIjoiaHR0cHM6Ly93M2MtY2NnLmdpdGh1Yi5pby92Yy1lZC9wbHVnZmVzdC0yLTIwMjIvaW1hZ2VzL0pGRi1WQy1FRFUtUExVR0ZFU1QyLWJhZGdlLWltYWdlLnBuZyJ9LCJpc3N1YW5jZURhdGUiOiIyMDIzLTA2LTA2VDEwOjA5OjQ5WiIsImlzc3VlZCI6IjIwMjMtMDYtMDZUMTA6MDk6NDlaIiwidmFsaWRGcm9tIjoiMjAyMy0wNi0wNlQxMDowOTo0OVoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6ImRpZDpqd2s6ZXlKcmRIa2lPaUpQUzFBaUxDSmpjbllpT2lKRlpESTFOVEU1SWl3aWVDSTZJbHBoYVRoNlNHWXdUVU5MY0dkTE9IbHhkMVZoTjA5ak5XSlBhV3h0UWpRMGRFUnlZamRPVVRCMlowa2lmUSIsImFjaGlldmVtZW50Ijp7ImNyaXRlcmlhIjp7Im5hcnJhdGl2ZSI6IlRoZSBjb2hvcnQgb2YgdGhlIEpGRiBQbHVnZmVzdCAyIGluIEF1Z3VzdC1Ob3ZlbWJlciBvZiAyMDIyIGNvbGxhYm9yYXRlZCB0byBwdXNoIGludGVyb3BlcmFiaWxpdHkgb2YgVkNzIGluIGVkdWNhdGlvbiBmb3J3YXJkLiIsInR5cGUiOiJDcml0ZXJpYSJ9LCJkZXNjcmlwdGlvbiI6IlRoaXMgd2FsbGV0IGNhbiBkaXNwbGF5IHRoaXMgT3BlbiBCYWRnZSAzLjAiLCJpZCI6IjAiLCJpbWFnZSI6eyJpZCI6Imh0dHBzOi8vdzNjLWNjZy5naXRodWIuaW8vdmMtZWQvcGx1Z2Zlc3QtMi0yMDIyL2ltYWdlcy9KRkYtVkMtRURVLVBMVUdGRVNUMi1iYWRnZS1pbWFnZS5wbmciLCJ0eXBlIjoiSW1hZ2UifSwibmFtZSI6Ik91ciBXYWxsZXQgUGFzc2VkIEpGRiBQbHVnZmVzdCAjMiAyMDIyIiwidHlwZSI6IkFjaGlldmVtZW50In0sInR5cGUiOiJBY2hpZXZlbWVudFN1YmplY3QifSwibmFtZSI6IkFjaGlldmVtZW50IENyZWRlbnRpYWwifSwianRpIjoidXJuOnV1aWQ6YjA3MzZhMDMtMGJlYy00NmE2LTkxZGEtMzJhZTVkZmJmMTU2In0.M7m5_E1hcCp13x4zWqZA6dASMh9sfNB9sr8Dwtm40vdQtPFyJ5PFESzPLhfv0kzyFAe3f_KMqZIbU7VKpsKACw',
+    ];
+    const pex: PEX = new PEX();
+    const result = pex.selectFrom(pd, vcs);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(result.matches?.length).toEqual(2);
+    expect(new Set(result.matches?.map((value) => value.name)).size).toEqual(2);
+    expect(result.matches?.map((value) => value.name).indexOf('c2834d0e-3c95-4721-b21a-40e3d7ea2549')).toBeGreaterThanOrEqual(0);
+    expect(result.matches?.map((value) => value.name).indexOf('c2834d0e-3c95-4721-b21a-40e3d7ea25434')).toBeGreaterThanOrEqual(0);
+  });
+
   const vcs: W3CVerifiableCredential[] = [
     {
       '@context': ['https://www.w3.org/2018/credentials/v1', 'https://www.w3.org/2018/credentials/examples/v1'],
