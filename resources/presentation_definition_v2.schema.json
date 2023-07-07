@@ -310,6 +310,9 @@
             },
             "filter": {
               "$ref": "http://json-schema.org/schema#"
+            },
+            "name": {
+              "type": "string"
             }
           },
           "required": [
@@ -343,6 +346,9 @@
                 "required",
                 "preferred"
               ]
+            },
+            "name": {
+              "type": "string"
             }
           },
           "required": [
