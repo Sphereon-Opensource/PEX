@@ -8,7 +8,7 @@ describe('submissionRequirementMatch', () => {
       name: 'test srm',
       rule: Rules.All,
       vc_path: ['$.verifiableCredential[1]'],
-      from: ['A'],
+      from: 'A',
     };
     expect(submissionRequirementMatch.from).toContain('A');
     expect(submissionRequirementMatch.rule).toBe(Rules.All);
