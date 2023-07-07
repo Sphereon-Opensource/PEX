@@ -495,7 +495,7 @@ describe('evaluate', () => {
       holderDIDs: undefined,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.WARN);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(internalPD, wvcs);
     expect(ps.descriptor_map.map((d) => d.path)).toEqual(['$.verifiableCredential[0]', '$.verifiableCredential[0]', '$.verifiableCredential[1]']);
   });
@@ -595,7 +595,7 @@ describe('evaluate', () => {
       holderDIDs: undefined,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(resultSelectFrom.areRequiredCredentialsPresent).toEqual(Status.WARN);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(1);
     const ps: PresentationSubmission = clientWrapper.submissionFrom(
       internalPD,

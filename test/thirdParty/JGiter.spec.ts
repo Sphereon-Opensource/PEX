@@ -494,12 +494,12 @@ describe('evaluate JGiter tests', () => {
     const vcs = getVerifiableCredentials();
 
     const selectFrom = pex.selectFrom(pdSchema, vcs);
-    expect(selectFrom.errors?.length).toEqual(0);
-    expect(selectFrom.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(selectFrom.errors?.length).toEqual(6);
+    expect(selectFrom.areRequiredCredentialsPresent).toEqual(Status.WARN);
     expect(selectFrom.verifiableCredential?.length).toEqual(2);
-    expect(selectFrom.matches![0]?.from).toEqual(['A']);
+    expect(selectFrom.matches![0]?.from).toEqual('A');
     expect(selectFrom.matches![0]?.vc_path).toEqual(['$.verifiableCredential[0]']);
-    expect(selectFrom.matches![1]?.from).toEqual(['B']);
+    expect(selectFrom.matches![1]?.from).toEqual('B');
     expect(selectFrom.matches![1]?.vc_path).toEqual(['$.verifiableCredential[1]']);
     const presentationResult = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
     const presentation = presentationResult.presentation;
@@ -530,7 +530,7 @@ describe('evaluate JGiter tests', () => {
     const vcs = getVerifiableCredentials();
     const selectResult = pex.selectFrom(pdSchema, vcs);
     expect(selectResult.errors?.length).toEqual(6);
-    expect(selectResult.areRequiredCredentialsPresent).toEqual(Status.ERROR);
+    expect(selectResult.areRequiredCredentialsPresent).toEqual(Status.WARN);
   });
 
   it('Evaluate case with with single submission requirements (A pick min 2)', () => {

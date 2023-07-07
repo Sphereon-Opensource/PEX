@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+import { Rules } from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../../lib';
@@ -30,92 +31,11 @@ describe('selectFrom tests', () => {
     expect(
       evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
     ).toEqual({
-      areRequiredCredentialsPresent: Status.ERROR,
-      errors: [
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'UriEvaluation',
-          status: 'error',
-          message: PexMessages.URI_EVALUATION_DIDNT_PASS + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'FilterEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_FAILED_FILTER_EVALUATION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[1]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[0]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[1]: $.verifiableCredential[2]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[0]',
-        },
-        {
-          tag: 'MarkForSubmissionEvaluation',
-          status: 'error',
-          message: PexMessages.INPUT_CANDIDATE_IS_NOT_ELIGIBLE_FOR_PRESENTATION_SUBMISSION + ': $.input_descriptors[2]: $.verifiableCredential[1]',
-        },
-      ],
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [],
       matches: [
         {
-          from: ['A'],
+          from: 'A',
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
@@ -233,7 +153,7 @@ describe('selectFrom tests', () => {
       errors: [],
       matches: [
         {
-          from: ['B'],
+          from: 'B',
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           min: 2,
           name: 'Submission of educational transcripts',
@@ -296,107 +216,12 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(
-      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
-    ).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
-      errors: [],
-      matches: [
-        {
-          count: 1,
-          from_nested: [
-            {
-              from: ['A'],
-              vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'all',
-            },
-            {
-              count: 2,
-              from: ['B'],
-              vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'pick',
-            },
-          ],
-          vc_path: [],
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
-          rule: 'pick',
-        },
-      ],
-      verifiableCredential: [
-        {
-          iss: 'did:example:123',
-          vc: {
-            '@context': 'https://eu.com/claims/DriversLicense',
-            credentialSubject: {
-              accounts: [
-                {
-                  id: '1234567890',
-                  route: 'DE-9876543210',
-                },
-                {
-                  id: '2457913570',
-                  route: 'DE-0753197542',
-                },
-              ],
-              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            },
-            id: 'https://eu.com/claims/DriversLicense',
-            issuanceDate: '2010-01-01T19:73:24Z',
-            issuer: 'did:example:123',
-            type: ['EUDriversLicense'],
-          },
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-        },
-        {
-          '@context': 'https://business-standards.org/schemas/employment-history.json',
-          credentialSubject: {
-            active: true,
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-          },
-          id: 'https://business-standards.org/schemas/employment-history.json',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['VerifiableCredential', 'GenericEmploymentCredential'],
-        },
-        {
-          '@context': 'https://www.w3.org/2018/credentials/v1',
-          credentialSubject: {
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            license: {
-              dob: '07/13/80',
-              number: '34DGE352',
-            },
-          },
-          id: 'https://eu.com/claims/DriversLicense',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'RsaSignature2018',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['EUDriversLicense'],
-        },
-      ],
-      warnings: [],
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: dids,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.WARN);
+    expect(result.errors?.length).toEqual(16);
   });
 
   it('Evaluate submission requirements max 2 from group B', () => {
@@ -417,7 +242,7 @@ describe('selectFrom tests', () => {
       errors: [],
       matches: [
         {
-          from: ['B'],
+          from: 'B',
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           max: 2,
           name: 'Submission of educational transcripts',
@@ -483,107 +308,20 @@ describe('selectFrom tests', () => {
     expect(
       evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
     ).toEqual({
-      areRequiredCredentialsPresent: Status.ERROR,
-      errors: [
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[1]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message:
-            '@context URI for the of the candidate input MUST be equal to one of the input_descriptors object uri values exactly.: $.input_descriptors[2]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'UriEvaluation',
-        },
-        {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: 'Input candidate failed filter evaluation: $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'FilterEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[0]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[1]: $.verifiableCredential[2]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[0]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-        {
-          message: 'The input candidate is not eligible for submission: $.input_descriptors[2]: $.verifiableCredential[1]',
-          status: 'error',
-          tag: 'MarkForSubmissionEvaluation',
-        },
-      ],
+      areRequiredCredentialsPresent: Status.INFO,
+      errors: [],
       matches: [
         {
           from_nested: [
             {
-              from: ['A'],
+              from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
-              from: ['B'],
+              from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
@@ -689,14 +427,14 @@ describe('selectFrom tests', () => {
         {
           from_nested: [
             {
-              from: ['A'],
+              from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
-              from: ['B'],
+              from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
@@ -803,14 +541,14 @@ describe('selectFrom tests', () => {
         {
           from_nested: [
             {
-              from: ['A'],
+              from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'all',
             },
             {
               count: 2,
-              from: ['B'],
+              from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
               name: 'Submission of educational transcripts',
               rule: 'pick',
@@ -997,7 +735,7 @@ describe('selectFrom tests', () => {
     ]);
     expect(result.matches).toEqual([
       {
-        from: ['B'],
+        from: 'B',
         vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
         min: 3,
         name: 'Submission of educational transcripts',
@@ -1023,7 +761,7 @@ describe('selectFrom tests', () => {
     });
     expect(result.matches).toEqual([
       {
-        from: ['B'],
+        from: 'B',
         vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
         max: 1,
         name: 'Submission of educational transcripts',
@@ -1071,10 +809,10 @@ describe('selectFrom tests', () => {
       holderDIDs: dids,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(result.errors?.length).toEqual(16);
+    expect(result.errors?.length).toEqual(0);
     expect(result.matches?.length).toEqual(1);
-    expect(result.areRequiredCredentialsPresent).toEqual(Status.ERROR);
-    expect(result.verifiableCredential?.length).toEqual(3);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(result.verifiableCredential?.length).toEqual(2);
   });
 
   it('Evaluate submission requirements min 3: (all from group A or 2 from group B + unexistent)', () => {
@@ -1089,106 +827,32 @@ describe('selectFrom tests', () => {
       vpSimple.verifiableCredential[1],
       vpSimple.verifiableCredential[2],
     ]);
-    expect(
-      evaluationClientWrapper.selectFrom(pd, wvcs, { holderDIDs: dids, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })
-    ).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
-      errors: [],
-      matches: [
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: dids,
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(result.matches?.length).toEqual(1);
+    expect(result.matches![0]).toEqual({
+      from_nested: [
         {
-          from_nested: [
-            {
-              from: ['A'],
-              vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'all',
-            },
-            {
-              count: 2,
-              from: ['B'],
-              vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'pick',
-            },
-          ],
-          vc_path: [],
-          min: 1,
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
-          rule: 'pick',
+          from: 'A',
+          name: 'Submission of educational transcripts',
+          rule: Rules.All,
+          vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+        },
+        {
+          count: 2,
+          from: 'B',
+          name: 'Submission of educational transcripts',
+          rule: Rules.Pick,
+          vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
         },
       ],
-      verifiableCredential: [
-        {
-          iss: 'did:example:123',
-          vc: {
-            '@context': 'https://eu.com/claims/DriversLicense',
-            credentialSubject: {
-              accounts: [
-                {
-                  id: '1234567890',
-                  route: 'DE-9876543210',
-                },
-                {
-                  id: '2457913570',
-                  route: 'DE-0753197542',
-                },
-              ],
-              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            },
-            id: 'https://eu.com/claims/DriversLicense',
-            issuanceDate: '2010-01-01T19:73:24Z',
-            issuer: 'did:example:123',
-            type: ['EUDriversLicense'],
-          },
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-        },
-        {
-          '@context': 'https://business-standards.org/schemas/employment-history.json',
-          credentialSubject: {
-            active: true,
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-          },
-          id: 'https://business-standards.org/schemas/employment-history.json',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['VerifiableCredential', 'GenericEmploymentCredential'],
-        },
-        {
-          '@context': 'https://www.w3.org/2018/credentials/v1',
-          credentialSubject: {
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            license: {
-              dob: '07/13/80',
-              number: '34DGE352',
-            },
-          },
-          id: 'https://eu.com/claims/DriversLicense',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'RsaSignature2018',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['EUDriversLicense'],
-        },
-      ],
-      warnings: [],
+      min: 1,
+      name: '32f54163-7166-48f1-93d8-ff217bdb0653',
+      rule: Rules.Pick,
+      vc_path: [],
     });
   });
 
@@ -1207,105 +871,31 @@ describe('selectFrom tests', () => {
       holderDIDs: dids,
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    expect(result).toEqual({
-      areRequiredCredentialsPresent: Status.INFO,
-      errors: [],
-      matches: [
-        {
-          from_nested: [
-            {
-              from: ['A'],
-              vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'all',
-            },
-            {
-              count: 2,
-              from: ['B'],
-              vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
-              rule: 'pick',
-            },
-          ],
-          vc_path: [],
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
-          rule: 'pick',
-          max: 1,
-        },
-      ],
-      verifiableCredential: [
-        {
-          iss: 'did:example:123',
-          vc: {
-            '@context': 'https://eu.com/claims/DriversLicense',
-            credentialSubject: {
-              accounts: [
-                {
-                  id: '1234567890',
-                  route: 'DE-9876543210',
-                },
-                {
-                  id: '2457913570',
-                  route: 'DE-0753197542',
-                },
-              ],
-              id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            },
-            id: 'https://eu.com/claims/DriversLicense',
-            issuanceDate: '2010-01-01T19:73:24Z',
-            issuer: 'did:example:123',
-            type: ['EUDriversLicense'],
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.WARN);
+    expect(result.matches).toEqual([
+      {
+        from_nested: [
+          {
+            from: 'A',
+            vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+            name: 'Submission of educational transcripts',
+            rule: 'all',
           },
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
+          {
+            count: 2,
+            from: 'B',
+            vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+            name: 'Submission of educational transcripts',
+            rule: 'pick',
           },
-        },
-        {
-          '@context': 'https://business-standards.org/schemas/employment-history.json',
-          credentialSubject: {
-            active: true,
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-          },
-          id: 'https://business-standards.org/schemas/employment-history.json',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'EcdsaSecp256k1VerificationKey2019',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['VerifiableCredential', 'GenericEmploymentCredential'],
-        },
-        {
-          '@context': 'https://www.w3.org/2018/credentials/v1',
-          credentialSubject: {
-            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
-            license: {
-              dob: '07/13/80',
-              number: '34DGE352',
-            },
-          },
-          id: 'https://eu.com/claims/DriversLicense',
-          issuanceDate: '2010-01-01T19:73:24Z',
-          issuer: 'did:foo:123',
-          proof: {
-            created: '2017-06-18T21:19:10Z',
-            jws: '...',
-            proofPurpose: 'assertionMethod',
-            type: 'RsaSignature2018',
-            verificationMethod: 'https://example.edu/issuers/keys/1',
-          },
-          type: ['EUDriversLicense'],
-        },
-      ],
-      warnings: [],
-    });
+        ],
+        vc_path: [],
+        name: '32f54163-7166-48f1-93d8-ff217bdb0653',
+        rule: 'pick',
+        max: 1,
+      },
+    ]);
+    expect(result.errors?.length).toEqual(16);
   });
 
   it('Evaluate case without presentation submission', () => {

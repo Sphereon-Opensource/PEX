@@ -1,3 +1,4 @@
+import { Rules } from '@sphereon/pex-models';
 import { W3CVerifiableCredential } from '@sphereon/ssi-types';
 
 import { IPresentationDefinition, PEX, Status } from '../../lib';
@@ -6,6 +7,42 @@ describe('evaluate animo tests', () => {
   it('should pass with 2 VCs and 2 IDs', () => {
     const pex: PEX = new PEX();
     const result = pex.evaluateCredentials(pd, vcs);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+  });
+
+  it('should pass with 2 VCs and 2 IDs with rule all', () => {
+    const pex: PEX = new PEX();
+    const pdModified = { ...pd };
+    pdModified.submission_requirements = [
+      {
+        rule: Rules.All,
+        name: 'animo test All',
+        from: 'A',
+      },
+    ];
+    for (const inputDescriptor of pdModified.input_descriptors) {
+      inputDescriptor.group = ['A'];
+    }
+    const result = pex.evaluateCredentials(pdModified, vcs);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+  });
+
+  it('should pass with 2 VCs and 2 IDs with rule pick min 1', () => {
+    const pex: PEX = new PEX();
+    const pdModified = { ...pd };
+    pdModified.submission_requirements = [
+      {
+        rule: Rules.Pick,
+        name: 'animo test Pick',
+        from: 'A',
+        min: 1,
+      },
+    ];
+    for (const inputDescriptor of pdModified.input_descriptors) {
+      inputDescriptor.group = ['A'];
+    }
+
+    const result = pex.evaluateCredentials(pdModified, vcs);
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
   });
 
