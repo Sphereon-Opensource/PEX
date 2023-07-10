@@ -41,11 +41,22 @@ export class EvaluationClientWrapper {
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const marked = Array.from(new Set(info));
-      const matchSubmissionRequirements = this.matchSubmissionRequirements(
-        presentationDefinition,
-        presentationDefinition.submission_requirements,
-        marked
-      );
+      let matchSubmissionRequirements;
+      try {
+        matchSubmissionRequirements = this.matchSubmissionRequirements(
+          presentationDefinition,
+          presentationDefinition.submission_requirements,
+          marked
+        );
+      } catch (e) {
+        const matchingError: Checked = { status: Status.ERROR, message: JSON.stringify(e), tag: 'matchSubmissionRequirements' };
+        return {
+          errors: errors ? [...errors, matchingError] : [matchingError],
+          warnings: warnings,
+          areRequiredCredentialsPresent: Status.ERROR,
+        };
+      }
+
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
@@ -229,8 +240,7 @@ export class EvaluationClientWrapper {
           srm.from_nested = this.matchSubmissionRequirements(pd, sr.from_nested, marked);
           submissionRequirementMatches.push(srm);
         } catch (err) {
-          // Handle any errors that occur in the recursive call
-          console.error(err);
+          throw new Error(`Error in handling value of from_nested: ${sr.from_nested}: err: ${err}`);
         }
       } else {
         // Throw an error if neither 'from' nor 'from_nested' is found
