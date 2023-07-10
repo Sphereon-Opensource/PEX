@@ -1,7 +1,7 @@
 import { Descriptor, PresentationSubmission } from '@sphereon/pex-models';
-import jp from 'jsonpath';
 
 import { Checked, Status } from '../../ConstraintUtils';
+import { jp } from '../../utils';
 import { Validation } from '../core';
 
 import { ValidationBundler } from './validationBundler';

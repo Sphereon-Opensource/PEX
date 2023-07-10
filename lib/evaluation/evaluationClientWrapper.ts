@@ -1,10 +1,9 @@
 import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { IInternalPresentationDefinition, IPresentationDefinition } from '../types';
-import { JsonPathUtils } from '../utils';
+import { jp, JsonPathUtils } from '../utils';
 
 import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';

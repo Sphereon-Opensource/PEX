@@ -1,9 +1,9 @@
 import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../../types/Internal.types';
+import { IInternalPresentationDefinition } from '../../types';
 import PexMessages from '../../types/Messages';
+import { jp } from '../../utils';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 

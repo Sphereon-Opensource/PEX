@@ -1,9 +1,8 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
 import { AdditionalClaims, ICredential, ICredentialSubject, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, PathComponent } from '../../types';
 import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';

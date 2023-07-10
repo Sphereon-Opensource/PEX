@@ -969,10 +969,10 @@
   resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-2.0.2.tgz#541b3f77522ab295da70b65baa0994e249073d1b"
   integrity sha512-ptHM72tdQrhMYSItHoGCm3HgK+HGF6tI29zYfS47H3M7ZjKhBgfmVHohuxhxA0Q6cL5gqH1jEA8G5Z2tadHmTw==
 
-"@sphereon/ssi-types@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.10.0.tgz#dbb20d727586b40f1e98c84a1b57da3e899b4850"
-  integrity sha512-ajAUeaR2fMSvlj/au40ltzSoQ+Qy0CdYouPeK6upFma/8g36RbRh0CI+Ee1qOl3R/SbHBzB3XKWFVGHzooVnNQ==
+"@sphereon/ssi-types@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.13.0.tgz#da75ee21d13e3e7b1e492850082b476262888be9"
+  integrity sha512-THzkvgY6AN4/0INgGowinzOFX6NeUQJ/KmAcXrBXx2Rny5v5wCp7LhBIlK21KF2/76fbiCyJvwcd/+Yeb0fjwQ==
   dependencies:
     jwt-decode "^3.1.2"
 
@@ -3495,6 +3495,11 @@ json5@^2.1.3, json5@^2.2.1, json5@^2.2.2, json5@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
+
+jsonpath-plus@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-7.2.0.tgz#7ad94e147b3ed42f7939c315d2b9ce490c5a3899"
+  integrity sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==
 
 jsonpath@^1.1.1:
   version "1.1.1"

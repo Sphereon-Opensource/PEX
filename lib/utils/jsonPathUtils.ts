@@ -1,11 +1,13 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-import jp, { PathComponent } from 'jsonpath';
+import jpOrig from 'jsonpath';
+import { JSONPath } from 'jsonpath-plus';
 
-import { InputFieldType, IPresentationDefinition } from '../types';
+import { InputFieldType, IPresentationDefinition, PathComponent } from '../types';
 
 export class JsonPathUtils {
   static matchAll = require('string.prototype.matchall');
   static REGEX_PATH = /@\w+/g;
+
   /**
    * @param obj: any object can be found in verifiablePresentation.verifiableCredential[i]
    * @param paths: paths that can be found in Field object
@@ -66,7 +68,10 @@ export class JsonPathUtils {
     currentPropertyName: string,
     newPropertyName: string
   ) {
-    const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..' + currentPropertyName]);
+    const existingPaths: {
+      value: unknown;
+      path: (string | number)[];
+    }[] = JsonPathUtils.extractInputField(pd, ['$..' + currentPropertyName]);
     for (const existingPath of existingPaths) {
       this.copyResultPathToDestinationDefinition(existingPath.path, pd, newPropertyName);
     }
@@ -143,5 +148,60 @@ export class JsonPathUtils {
       next = matches.next();
     }
     return path;
+  }
+}
+
+// Class to make the transition from jsonpath to jsonpath-plus
+export class jp {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  static nodes(obj: any, pathExpression: string, count?: number): { path: PathComponent[]; value: any }[] {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return JSONPath({
+      path: pathExpression,
+      json: obj,
+      preventEval: false,
+      flatten: false,
+      resultType: 'all',
+    }).map((result: any) => {
+      return {
+        value: result.value,
+        path:
+          typeof result.path === 'string'
+            ? JSONPath.toPathArray(result.path).map((aelt) => (isNaN(Number.parseInt(aelt)) ? aelt : Number.parseInt(aelt)))
+            : result.path,
+      };
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  static query(obj: any, pathExpression: string, count?: number): any[] {
+    return JSONPath({ path: pathExpression, json: obj, preventEval: false, resultType: 'value' });
+  }
+
+  static parse(pathExpression: string): any[] {
+    const origPaths = JSONPath.toPathArray(pathExpression);
+    const paths = origPaths.filter((r) => r !== undefined && r.length > 0);
+
+    if (!paths || paths.length === 0) {
+      throw Error('Parse error for ' + pathExpression);
+    } else if (paths.length !== origPaths.length) {
+      throw Error('Parse error for ' + pathExpression);
+    } else if (!paths[0].startsWith('$')) {
+      throw Error('Parse error for ' + pathExpression);
+    }
+    /* try {
+      jpOrig.parse(pathExpression);
+    } catch (e) {
+      console.log(e);
+    }*/
+    return paths;
+  }
+
+  static stringify(path: PathComponent[]): string {
+    // todo
+    return jpOrig.stringify(path);
   }
 }

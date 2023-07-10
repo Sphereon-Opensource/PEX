@@ -8,6 +8,7 @@ import {
 } from '@sphereon/pex-models';
 import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
+export type PathComponent = string | number;
 export interface IInternalPresentationDefinition {
   format?: Format;
   id: string;
