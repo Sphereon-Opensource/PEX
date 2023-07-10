@@ -5,7 +5,7 @@ import { Optionality } from '@sphereon/pex-models';
 import { HandlerCheckResult, Status } from '../../lib';
 import { EvaluationClient } from '../../lib/evaluation';
 import { PredicateRelatedFieldEvaluationHandler } from '../../lib/evaluation/handlers';
-import { InternalPresentationDefinitionV1 } from '../../lib/types/Internal.types';
+import { InternalPresentationDefinitionV1 } from '../../lib/types';
 import PexMessages from '../../lib/types/Messages';
 
 function getFile(path: string) {

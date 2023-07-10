@@ -1,9 +1,33 @@
 # Release Notes
 
+## v2.1.0 - 2023-07-10
+
+IMPORTANT: This release moves to @astronautlabs/jsonpathplus in favor of jsonpathplus, bringing a security improvement.
+As such you may need to update your dependencies in case you have a more strict dependency manager like pnpm.
+
+- Changed:
+    - Move to @astronautlabs/jsonpathplus for improved Jsonpath security, whilst working on a permanent
+      fix. ([#110](https://github.com/Sphereon-Opensource/PEX/issues/110))
+
+- Fixed:
+    - Move to build-time compilation of schema's using AJV, instead of runtime. Fixes an issue with the Hermes engine in
+      React-Native, next to bringing execution
+      optimizations. ([#118](https://github.com/Sphereon-Opensource/PEX/issues/118))
+    - Add `name` property to `field` objects included in @sphereon/pex-models
+      2.0.3. ([#123](https://github.com/Sphereon-Opensource/PEX/pull/123))
+    - Invalid name used in matches from selection
+      results. ([#117](https://github.com/Sphereon-Opensource/PEX/issues/117))
+    - Fixed pick and count behaviour matching against all credentials instead of per input
+      descriptor ([#115](https://github.com/Sphereon-Opensource/PEX/issues/115))
+    - Fixed matching logic because of wrong assumptions. Previously all credentials were matched against all input
+      descriptors, now a match per input descriptor suffices, as long as all input descriptors have
+      matches. ([#114](https://github.com/Sphereon-Opensource/PEX/issues/114)
+      and [#113](https://github.com/Sphereon-Opensource/PEX/issues/113))
+
 ## v2.0.1 - 2023-05-01
 
 - Fixed:
-  - some wrong import paths were used from @sphereon/pex-models
+    - some wrong import paths were used from @sphereon/pex-models
 
 ## v2.0.0 - 2023-04-30
 
