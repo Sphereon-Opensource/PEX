@@ -26,13 +26,13 @@ describe('evaluate gataca tests', () => {
     expect(result.matches).toEqual([
       {
         rule: 'all',
-        from: ['mandatory'],
+        from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
         name: 'emailCredential',
       },
       {
         rule: 'pick',
-        from: ['optional'],
+        from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
         name: 'transcriptOfRecordsCredential',
       },
@@ -99,13 +99,13 @@ describe('evaluate gataca tests', () => {
     expect(result.matches).toEqual([
       {
         rule: 'all',
-        from: ['mandatory'],
+        from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
         name: 'emailCredential',
       },
       {
         rule: 'pick',
-        from: ['optional'],
+        from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
         name: 'transcriptOfRecordsCredential',
       },

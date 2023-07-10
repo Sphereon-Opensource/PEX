@@ -41,11 +41,22 @@ export class EvaluationClientWrapper {
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
       const marked = Array.from(new Set(info));
-      const matchSubmissionRequirements = this.matchSubmissionRequirements(
-        presentationDefinition,
-        presentationDefinition.submission_requirements,
-        marked
-      );
+      let matchSubmissionRequirements;
+      try {
+        matchSubmissionRequirements = this.matchSubmissionRequirements(
+          presentationDefinition,
+          presentationDefinition.submission_requirements,
+          marked
+        );
+      } catch (e) {
+        const matchingError: Checked = { status: Status.ERROR, message: JSON.stringify(e), tag: 'matchSubmissionRequirements' };
+        return {
+          errors: errors ? [...errors, matchingError] : [matchingError],
+          warnings: warnings,
+          areRequiredCredentialsPresent: Status.ERROR,
+        };
+      }
+
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
@@ -54,7 +65,7 @@ export class EvaluationClientWrapper {
             e
           )[0].value
       );
-      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(matchSubmissionRequirements);
+      const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(presentationDefinition, matchSubmissionRequirements);
       selectResults = {
         errors: areRequiredCredentialsPresent === Status.INFO ? [] : errors,
         matches: [...matchSubmissionRequirements],
@@ -96,7 +107,7 @@ export class EvaluationClientWrapper {
     }
 
     this.fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults, wrappedVerifiableCredentials);
-    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(selectResults?.matches);
+    selectResults.areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(presentationDefinition, selectResults?.matches);
     this.remapMatches(
       wrappedVerifiableCredentials.map((wrapped) => wrapped.original as IVerifiableCredential),
       selectResults.matches,
@@ -202,23 +213,38 @@ export class EvaluationClientWrapper {
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     for (const sr of submissionRequirements) {
+      // Create a default SubmissionRequirementMatch object
+      const srm: SubmissionRequirementMatch = {
+        name: pd.name || pd.id,
+        rule: sr.rule,
+        vc_path: [],
+      };
+      if (sr.from) {
+        srm.from = sr.from;
+      }
+      // Assign min, max, and count regardless of 'from' or 'from_nested'
+      sr.min ? (srm.min = sr.min) : undefined;
+      sr.max ? (srm.max = sr.max) : undefined;
+      sr.count ? (srm.count = sr.count) : undefined;
+
       if (sr.from) {
         const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
         if (matchingDescriptors) {
-          sr.min ? (matchingDescriptors.min = sr.min) : undefined;
-          sr.max ? (matchingDescriptors.max = sr.max) : undefined;
-          sr.count ? (matchingDescriptors.count = sr.count) : undefined;
-          submissionRequirementMatches.push(matchingDescriptors);
-        }
-      } else if (sr.from_nested) {
-        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], vc_path: [] };
-        if (srm && srm.from_nested) {
-          sr.min ? (srm.min = sr.min) : undefined;
-          sr.max ? (srm.max = sr.max) : undefined;
-          sr.count ? (srm.count = sr.count) : undefined;
-          srm.from_nested.push(...this.matchSubmissionRequirements(pd, sr.from_nested, marked));
+          srm.vc_path.push(...matchingDescriptors.vc_path);
+          srm.name = matchingDescriptors.name;
           submissionRequirementMatches.push(srm);
         }
+      } else if (sr.from_nested) {
+        // Recursive call to matchSubmissionRequirements for nested requirements
+        try {
+          srm.from_nested = this.matchSubmissionRequirements(pd, sr.from_nested, marked);
+          submissionRequirementMatches.push(srm);
+        } catch (err) {
+          throw new Error(`Error in handling value of from_nested: ${sr.from_nested}: err: ${err}`);
+        }
+      } else {
+        // Throw an error if neither 'from' nor 'from_nested' is found
+        throw new Error("Invalid SubmissionRequirement object: Must contain either 'from' or 'from_nested'");
       }
     }
     return submissionRequirementMatches;
@@ -250,9 +276,9 @@ export class EvaluationClientWrapper {
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
-    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], vc_path: [] };
+    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, vc_path: [] };
     if (sr?.from) {
-      srm.from?.push(sr.from);
+      srm.from = sr.from;
       // updating the srm.name everytime and since we have only one, we're sending the last one
       for (const m of marked) {
         const inDesc: InputDescriptorV2 = jp.query(pd, m.input_descriptor_path)[0];
@@ -498,78 +524,92 @@ export class EvaluationClientWrapper {
   }
 
   public determineAreRequiredCredentialsPresent(
+    presentationDefinition: IInternalPresentationDefinition,
     matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined,
     parentMsr?: SubmissionRequirementMatch
   ): Status {
-    let status = Status.INFO;
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
       return Status.ERROR;
     }
+
+    // collect child statuses
+    const childStatuses = matchSubmissionRequirements.map((m) => this.determineSubmissionRequirementStatus(presentationDefinition, m));
+
+    // decide status based on child statuses and parent's rule
     if (!parentMsr) {
-      const childStatuses = [];
-      for (const m of matchSubmissionRequirements) {
-        childStatuses.push(this.determineSubmissionRequirementStatus(m));
-      }
-      if (childStatuses.filter((status) => status === Status.ERROR).length) {
+      if (childStatuses.includes(Status.ERROR)) {
         return Status.ERROR;
-      } else if (childStatuses.filter((status) => status === Status.WARN).length) {
+      } else if (childStatuses.includes(Status.WARN)) {
         return Status.WARN;
       } else {
         return Status.INFO;
       }
     } else {
-      const childStatuses = [];
-      for (const m of matchSubmissionRequirements) {
-        childStatuses.push(this.determineSubmissionRequirementStatus(m));
-      }
-      if (parentMsr.rule === Rules.All && childStatuses.filter((status) => status === Status.ERROR).length) {
+      if (parentMsr.rule === Rules.All && childStatuses.includes(Status.ERROR)) {
         return Status.ERROR;
       }
+
       const nonErrStatCount = childStatuses.filter((status) => status !== Status.ERROR).length;
-      if (parentMsr.count && parentMsr.count < nonErrStatCount) {
-        return Status.ERROR;
-      } else if (parentMsr.count && parentMsr.count > nonErrStatCount) {
-        status = Status.WARN;
-      } else if (parentMsr.min && parentMsr.min > nonErrStatCount) {
-        return Status.ERROR;
-      } else if (parentMsr.max && parentMsr.max < nonErrStatCount) {
-        status = Status.WARN;
+
+      if (parentMsr.count) {
+        return parentMsr.count > nonErrStatCount ? Status.ERROR : parentMsr.count < nonErrStatCount ? Status.WARN : Status.INFO;
+      } else {
+        if (parentMsr.min && parentMsr.min > nonErrStatCount) {
+          return Status.ERROR;
+        } else if (parentMsr.max && parentMsr.max < nonErrStatCount) {
+          return Status.WARN;
+        }
       }
     }
-    return status;
+
+    return Status.INFO;
   }
 
-  private determineSubmissionRequirementStatus(m: SubmissionRequirementMatch): Status {
-    let innerStatus = Status.INFO;
+  private determineSubmissionRequirementStatus(pd: IInternalPresentationDefinition, m: SubmissionRequirementMatch): Status {
     if (m.from && m.from_nested) {
       throw new Error('Invalid submission_requirement object: MUST contain either a from or from_nested property.');
     }
+
     if (!m.from && !m.from_nested && m.vc_path.length !== 1) {
-      innerStatus = Status.ERROR;
+      return Status.ERROR;
     }
+
     if (m.from) {
-      if (m.rule === Rules.All && m.vc_path.length !== 1) {
-        innerStatus = Status.ERROR;
-      }
-      if (m.rule === Rules.Pick) {
-        if (m.vc_path.length == 0) {
-          innerStatus = Status.ERROR;
-        } else if (m.count && m.vc_path.length < m.count) {
-          innerStatus = Status.ERROR;
-        } else if (m.count && m.vc_path.length > m.count) {
-          innerStatus = Status.WARN;
-        } else if (m.min && m.vc_path.length < m.min) {
-          innerStatus = Status.ERROR;
-        } else if (m.max && m.vc_path.length > m.max) {
-          innerStatus = Status.WARN;
-        } else if (m.rule === Rules.All && m.vc_path.length > 1) {
-          innerStatus = Status.ERROR;
-        }
+      const groupCount = this.countGroupIDs((pd as InternalPresentationDefinitionV2).input_descriptors, m.from);
+      switch (m.rule) {
+        case Rules.All:
+          // Ensure that all descriptors associated with `m.from` are satisfied.
+          return m.vc_path.length === groupCount ? Status.INFO : Status.WARN;
+        case Rules.Pick:
+          return this.getPickRuleStatus(m);
+        default:
+          return Status.ERROR;
       }
     } else if (m.from_nested) {
-      innerStatus = this.determineAreRequiredCredentialsPresent(m.from_nested, m);
+      return this.determineAreRequiredCredentialsPresent(pd, m.from_nested, m);
     }
-    return innerStatus;
+
+    return Status.INFO;
+  }
+
+  private getPickRuleStatus(m: SubmissionRequirementMatch): Status {
+    if (m.vc_path.length === 0) {
+      return Status.ERROR;
+    }
+
+    if (m.count && m.vc_path.length !== m.count) {
+      return m.vc_path.length > m.count ? Status.WARN : Status.ERROR;
+    }
+
+    if (m.min && m.vc_path.length < m.min) {
+      return Status.ERROR;
+    }
+
+    if (m.max && m.vc_path.length > m.max) {
+      return Status.WARN;
+    }
+
+    return Status.INFO;
   }
 
   private updateSubmissionRequirementMatchPathToAlias(submissionRequirementMatch: SubmissionRequirementMatch, alias: string) {
@@ -630,5 +670,15 @@ export class EvaluationClientWrapper {
       partitionedResults.set(idPath, vcPaths);
     }
     return partitionedResults;
+  }
+
+  private countGroupIDs(input_descriptors: Array<InputDescriptorV2>, from: string): number {
+    let count = 0;
+    for (const descriptor of input_descriptors) {
+      if (descriptor.group && descriptor.group.includes(from)) {
+        count++;
+      }
+    }
+    return count;
   }
 }
