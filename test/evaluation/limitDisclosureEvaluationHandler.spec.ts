@@ -29,7 +29,7 @@ const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 describe('evaluate', () => {
   it("should return ok if verifiable Credential doesn't have the etc field", () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -41,7 +41,7 @@ describe('evaluate', () => {
 
   it("should return ok if verifiable Credential doesn't have the birthPlace field", () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
+      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]);
@@ -54,7 +54,7 @@ describe('evaluate', () => {
 
   it('should report an error if limit disclosure is not supported', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
+      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     if ('type' in (<IVerifiableCredential>vpSimple.verifiableCredential![0]).proof) {
@@ -77,7 +77,7 @@ describe('evaluate', () => {
 
   it('should report an error if mandatory fields are absent', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
+      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-multiple-constraints.json');
     const vc: IVerifiableCredential = (<IVerifiableCredential>vpSimple.verifiableCredential![0]) as IVerifiableCredential;
@@ -107,7 +107,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)).toEqual(
-      new LimitDisclosureEvaluationResults().getMultiCredentialResultsAllInfo()
+      new LimitDisclosureEvaluationResults().getMultiCredentialResultsAllInfo(),
     );
   });
 
@@ -128,7 +128,7 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(evaluationClient.results.filter((ld) => ld.evaluator === 'LimitDisclosureEvaluation' && ld.status === Status.INFO)).toEqual(
-      new LimitDisclosureEvaluationResults().getMultiCredentialResultsThreeInfos()
+      new LimitDisclosureEvaluationResults().getMultiCredentialResultsThreeInfos(),
     );
     expect(
       evaluationClient.results.filter(
@@ -136,8 +136,8 @@ describe('evaluate', () => {
           ld.evaluator === 'LimitDisclosureEvaluation' &&
           ld.input_descriptor_path === '$.input_descriptors[3]' &&
           ld.verifiable_credential_path === '$[3]' &&
-          ld.status === Status.ERROR
-      )
+          ld.status === Status.ERROR,
+      ),
     ).toEqual(new LimitDisclosureEvaluationResults().getMultiCredentialResultsOneError());
   });
 });

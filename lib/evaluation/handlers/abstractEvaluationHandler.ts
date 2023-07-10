@@ -1,6 +1,6 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { InputDescriptorV1, InputDescriptorV2, PresentationSubmission } from '@sphereon/pex-models';
 import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition } from '../../types';
@@ -78,7 +78,7 @@ export abstract class AbstractEvaluationHandler implements EvaluationHandler {
   public removeDuplicate(results: HandlerCheckResult[]) {
     return results.reduce((arr: HandlerCheckResult[], cur: HandlerCheckResult) => {
       const result = arr.find(
-        (i) => i.input_descriptor_path === cur.input_descriptor_path && i.verifiable_credential_path === cur.verifiable_credential_path
+        (i) => i.input_descriptor_path === cur.input_descriptor_path && i.verifiable_credential_path === cur.verifiable_credential_path,
       );
       if (!result) {
         return arr.concat([cur]);

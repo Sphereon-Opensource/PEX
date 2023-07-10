@@ -115,7 +115,7 @@ describe('evaluate', () => {
 
   it('Evaluate case without any error 1', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
@@ -127,7 +127,7 @@ describe('evaluate', () => {
 
   it('Evaluate case with error. No submission data', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
@@ -136,13 +136,13 @@ describe('evaluate', () => {
     delete vpSimple.presentation_submission;
     const pex: PEX = new PEX();
     expect(() => pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })).toThrowError(
-      'Either a presentation submission as part of the VP or provided separately was expected'
+      'Either a presentation submission as part of the VP or provided separately was expected',
     );
   });
 
   it('Evaluate case without any error 2', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
@@ -175,7 +175,7 @@ describe('evaluate', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
     expect(presentation.holder).toEqual(HOLDER_DID);
     expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential!);
@@ -236,7 +236,7 @@ describe('evaluate', () => {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      }
+      },
     );
     const vp = vpr.verifiablePresentation as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
@@ -275,7 +275,7 @@ describe('evaluate', () => {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      })
+      }),
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
@@ -340,7 +340,7 @@ describe('evaluate', () => {
     jwtVc['exp'] = now.valueOf();
     jwtVc['vc'].expirationDate = new Date(now.getTime() + 2000).toString();
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
-      `Inconsistent expiration dates between JWT claim (${new Date(jwtVc['exp']).toISOString()}) and VC value (${jwtVc['vc'].expirationDate})`
+      `Inconsistent expiration dates between JWT claim (${new Date(jwtVc['exp']).toISOString()}) and VC value (${jwtVc['vc'].expirationDate})`,
     );
   });
 
@@ -357,7 +357,7 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent issuers between JWT claim (${jwtVc['iss' as keyof IVerifiableCredential]}) and VC value (${
         (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuer
-      })`
+      })`,
     );
   });
 
@@ -365,7 +365,7 @@ describe('evaluate', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
     jwtVc['nbf' as keyof IVerifiableCredential] = (+new Date()).toString();
     (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate = new Date(
-      parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)
+      parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string),
     ).toISOString();
     const vcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc]);
     expect(vcs[0].credential.issuanceDate).toEqual(new Date(parseInt(jwtVc['nbf' as keyof IVerifiableCredential] as string)).toISOString());
@@ -379,7 +379,7 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent issuance dates between JWT claim (${new Date(nbf).toISOString().replace(/\.\d\d\dZ/, 'Z')}) and VC value (${
         (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).issuanceDate
-      })`
+      })`,
     );
   });
 
@@ -398,7 +398,7 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent credential subject ids between JWT claim (${jwtVc['sub' as keyof IVerifiableCredential]}) and VC value (${
         ((<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).credentialSubject as ICredentialSubject).id
-      })`
+      })`,
     );
   });
 
@@ -415,7 +415,7 @@ describe('evaluate', () => {
     expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
       `Inconsistent credential ids between JWT claim (${jwtVc['jti' as keyof IVerifiableCredential]}) and VC value (${
         (<ICredential>jwtVc['vc' as keyof IVerifiableCredential]).id
-      })`
+      })`,
     );
   });
 

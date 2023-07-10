@@ -32,7 +32,7 @@ export class PEXv1 extends PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): EvaluationResults {
     SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition); // only doing validation
     return super.evaluatePresentation(presentationDefinition, presentation, opts);
@@ -57,7 +57,7 @@ export class PEXv1 extends PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): EvaluationResults {
     SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition); // only doing validation
     return super.evaluateCredentials(presentationDefinition, verifiableCredentials, opts);
@@ -82,14 +82,14 @@ export class PEXv1 extends PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     this._evaluationClientWrapper = new EvaluationClientWrapper();
     return this._evaluationClientWrapper.selectFrom(
       SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition),
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy),
-      opts
+      opts,
     );
   }
 
@@ -109,12 +109,12 @@ export class PEXv1 extends PEX {
   public presentationFrom(
     presentationDefinition: PresentationDefinitionV1,
     selectedCredentials: OriginalVerifiableCredential[],
-    opts?: PresentationFromOpts
+    opts?: PresentationFromOpts,
   ): PresentationResult {
     const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition),
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials),
     );
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,

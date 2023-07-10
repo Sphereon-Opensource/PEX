@@ -24,7 +24,7 @@ export const HandlerCheckResult = class implements HandlerCheckResult {
     evaluator: string,
     status: Status,
     message?: string,
-    payload?: unknown
+    payload?: unknown,
   ) {
     this.input_descriptor_path = input_descriptor_path;
     this.verifiable_credential_path = verifiable_credential_path;

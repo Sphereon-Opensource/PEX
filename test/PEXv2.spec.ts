@@ -262,7 +262,7 @@ describe('evaluate', () => {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      })
+      }),
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
@@ -276,7 +276,7 @@ describe('evaluate', () => {
     });
     expect(result!.errors!.length).toEqual(0);
     expect(JSON.stringify(result!.matches)).toBe(
-      JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }])
+      JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]),
     );
     expect(result!.areRequiredCredentialsPresent).toBe('info');
   });
@@ -294,7 +294,7 @@ describe('evaluate', () => {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      })
+      }),
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
@@ -320,7 +320,7 @@ describe('evaluate', () => {
     const result2 = PEX.validateDefinition(pd);
     expect(result2).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
     expect(pd.input_descriptors![0].constraints!.fields![0].filter!['const' as keyof FilterV2]).toEqual(
-      'https://yourwatchful.gov/drivers-license-schema.json'
+      'https://yourwatchful.gov/drivers-license-schema.json',
     );
   });
 

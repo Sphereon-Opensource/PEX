@@ -16,7 +16,7 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
   }
 
   public getValidations(
-    inputDescriptors: InputDescriptorV2[]
+    inputDescriptors: InputDescriptorV2[],
   ): (
     | Validation<InputDescriptorV2>
     | Validation<InputDescriptorV2[]>
@@ -50,7 +50,7 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
         target: inputDescriptors,
         predicate: (inDescs: InputDescriptorV2[]) => this.shouldHaveUniqueFieldsIds(inDescs),
         message: 'fields id must be unique',
-      }
+      },
     );
 
     inputDescriptors.forEach((inputDescriptor, inDescInd) => {
@@ -121,7 +121,7 @@ export class InputDescriptorsV2VB extends ValidationBundler<InputDescriptorV2[]>
 
   constraintsValidations(
     inputDescriptor: InputDescriptorV2,
-    inDescInd: number
+    inDescInd: number,
   ): (Validation<ConstraintsV2> | Validation<FieldV2> | Validation<HolderSubject>)[] {
     if (inputDescriptor.constraints) {
       return new ConstraintsVB(this.getMyTag(inDescInd)).getValidations(inputDescriptor.constraints);

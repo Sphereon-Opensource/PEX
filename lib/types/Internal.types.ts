@@ -8,6 +8,7 @@ import {
 } from '@sphereon/pex-models';
 import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
+export type PathComponent = string | number;
 export interface IInternalPresentationDefinition {
   format?: Format;
   id: string;
@@ -27,7 +28,7 @@ export class InternalPresentationDefinitionV1 implements PresentationDefinitionV
     format?: Format,
     name?: string,
     purpose?: string,
-    submission_requirements?: Array<SubmissionRequirement>
+    submission_requirements?: Array<SubmissionRequirement>,
   ) {
     this.id = id;
     this.input_descriptors = input_descriptors;
@@ -66,7 +67,7 @@ export class InternalPresentationDefinitionV2 implements PresentationDefinitionV
     frame?: any,
     name?: string,
     purpose?: string,
-    submission_requirements?: Array<SubmissionRequirement>
+    submission_requirements?: Array<SubmissionRequirement>,
   ) {
     this.format = format;
     this.frame = frame;

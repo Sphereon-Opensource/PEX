@@ -44,13 +44,13 @@ export class SSITypesBuilder {
   }
 
   static mapExternalVerifiablePresentationToWrappedVP(
-    presentation: OriginalVerifiablePresentation | JwtDecodedVerifiablePresentation
+    presentation: OriginalVerifiablePresentation | JwtDecodedVerifiablePresentation,
   ): WrappedVerifiablePresentation {
     return CredentialMapper.toWrappedVerifiablePresentation(presentation);
   }
 
   static mapExternalVerifiableCredentialsToWrappedVcs(
-    verifiableCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[]
+    verifiableCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
   ): WrappedVerifiableCredential[] {
     return CredentialMapper.toWrappedVerifiableCredentials(Array.isArray(verifiableCredentials) ? verifiableCredentials : [verifiableCredentials]);
   }

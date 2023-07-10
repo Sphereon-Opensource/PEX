@@ -53,7 +53,7 @@ describe('evaluate gataca tests', () => {
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
-      undefined
+      undefined,
     );
     expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
@@ -64,7 +64,7 @@ describe('evaluate gataca tests', () => {
     ]);
     expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(1);
     expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
-      'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw'
+      'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw',
     );
   });
 
@@ -124,7 +124,7 @@ describe('evaluate gataca tests', () => {
     const presentationFromResult = pex.presentationFrom(
       presentationDefinition,
       selectFromResult.verifiableCredential as IVerifiableCredential[],
-      undefined
+      undefined,
     );
     expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
       {
@@ -140,7 +140,7 @@ describe('evaluate gataca tests', () => {
     ]);
     expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(2);
     expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
-      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk'
+      'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk',
     );
   });
 });

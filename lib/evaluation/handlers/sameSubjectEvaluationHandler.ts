@@ -1,9 +1,9 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../../types';
+import { IInternalPresentationDefinition, PathComponent } from '../../types';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -39,7 +39,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
   }
 
   private mapSameSubjectFieldIdsToInputDescriptors(
-    pd: IInternalPresentationDefinition
+    pd: IInternalPresentationDefinition,
   ): [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][] {
     this.fieldIds.push(...jp.nodes(pd, '$..fields[*].id'));
     this.sameSubject.push(...jp.nodes(pd, '$..same_subject[*]'));
@@ -72,7 +72,7 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private countSameSubjectOccurrences(
     sameSubjectInDesc: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][],
-    handlerCheckResults: HandlerCheckResult[]
+    handlerCheckResults: HandlerCheckResult[],
   ) {
     const fieldIdOccurrencesCount: Map<string[], number> = new Map<string[], number>();
     sameSubjectInDesc.forEach((s) => {
@@ -90,12 +90,12 @@ export class SameSubjectEvaluationHandler extends AbstractEvaluationHandler {
 
   private mapCredentialsToResultObjecs(
     wrappedVcs: WrappedVerifiableCredential[],
-    results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][]
+    results: [{ path: PathComponent[]; value: string }, { path: PathComponent[]; value: HolderSubject }][],
   ): HandlerCheckResult[] {
     const subjects = [
       ...jp.nodes(
         wrappedVcs.map((wvc) => wvc.credential),
-        '$..credentialSubject'
+        '$..credentialSubject',
       ),
     ];
     const handlerCheckResults: HandlerCheckResult[] = [];

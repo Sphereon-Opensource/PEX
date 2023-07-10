@@ -1,9 +1,8 @@
 import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
 import { CredentialMapper, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, PathComponent } from '../../types';
 import PexMessages from '../../types/Messages';
 import { getIssuerString, getSubjectIdsAsString, JsonPathUtils } from '../../utils';
 import { HandlerCheckResult } from '../core';
@@ -40,17 +39,17 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
       if (currentDescriptor.id === inputDescriptorId) {
         const mappings: { path: PathComponent[]; value: IVerifiableCredential }[] = JsonPathUtils.extractInputField(
           wrappedVcs.map((wvc) => wvc.credential),
-          [currentDescriptor.path]
+          [currentDescriptor.path],
         ) as { path: PathComponent[]; value: IVerifiableCredential }[];
         for (const mapping of mappings) {
           const issuer = getIssuerString(mapping.value);
           if (mapping && mapping.value && getSubjectIdsAsString(mapping.value).every((item) => item === issuer)) {
             this.getResults().push(
-              this.generateSuccessResult(idIdx, currentDescriptor.path, CredentialMapper.toWrappedVerifiableCredential(mapping.value))
+              this.generateSuccessResult(idIdx, currentDescriptor.path, CredentialMapper.toWrappedVerifiableCredential(mapping.value)),
             );
           } else {
             this.getResults().push(
-              this.generateErrorResult(idIdx, currentDescriptor.path, CredentialMapper.toWrappedVerifiableCredential(mapping.value))
+              this.generateErrorResult(idIdx, currentDescriptor.path, CredentialMapper.toWrappedVerifiableCredential(mapping.value)),
             );
           }
         }

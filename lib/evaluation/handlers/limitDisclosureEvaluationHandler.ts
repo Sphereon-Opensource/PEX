@@ -1,9 +1,8 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
 import { AdditionalClaims, ICredential, ICredentialSubject, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2 } from '../../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, PathComponent } from '../../types';
 import PexMessages from '../../types/Messages';
 import { JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
@@ -62,7 +61,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     idIdx: number,
     index: number,
     wrappedVcs: WrappedVerifiableCredential[],
-    limitDisclosure: Optionality
+    limitDisclosure: Optionality,
   ) {
     const internalCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
     /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
@@ -96,7 +95,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   private copyResultPathToDestinationCredential(
     requiredField: { path: PathComponent[]; value: unknown },
     internalCredential: ICredential,
-    internalCredentialToSend: IVerifiableCredential
+    internalCredentialToSend: IVerifiableCredential,
   ): IVerifiableCredential {
     //TODO: ESSIFI-186
     let credentialSubject: ICredentialSubject & AdditionalClaims = { ...internalCredential.credentialSubject };

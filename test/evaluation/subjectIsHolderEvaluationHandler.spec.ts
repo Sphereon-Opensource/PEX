@@ -24,7 +24,7 @@ const HOLDER_DID = 'did:example:ebfeb1f712ebc6f1c276e12ec21';
 describe('SubjectIsHolderEvaluationHandler tests', () => {
   it(`input descriptor's constraints.is_holder is present`, () => {
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/resources/pd_require_is_holder.json'
+      './test/resources/pd_require_is_holder.json',
     ) as InternalPresentationDefinitionV1;
     const results = getFile('./test/resources/isHolderEvaluationResults.json');
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -35,7 +35,7 @@ describe('SubjectIsHolderEvaluationHandler tests', () => {
     evaluationClient.dids = [HOLDER_DID];
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!),
     );
     expect(evaluationHandler.client.results).toEqual(results);
   });

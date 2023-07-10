@@ -1,6 +1,6 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
 import { ICredential, ICredentialSchema, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
@@ -64,7 +64,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     inputDescriptorsUris: string[],
     idIdx: number,
     vcIdx: number,
-    pdVersion: PEVersion
+    pdVersion: PEVersion,
   ): void {
     let hasAnyMatch = false;
     if (pdVersion === PEVersion.v1) {
@@ -111,7 +111,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     wvc: WrappedVerifiableCredential,
     inputDescriptorsUris: string[],
     idIdx: number,
-    vcIdx: number
+    vcIdx: number,
   ): HandlerCheckResult {
     const result: HandlerCheckResult = this.createResult(idIdx, vcIdx);
     result.status = Status.INFO;
@@ -129,7 +129,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     wvc: WrappedVerifiableCredential,
     inputDescriptorsUris: string[],
     idIdx: number,
-    vcIdx: number
+    vcIdx: number,
   ): HandlerCheckResult {
     const result = this.createResult(idIdx, vcIdx);
     result.status = Status.ERROR;

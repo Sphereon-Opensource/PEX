@@ -81,7 +81,7 @@ describe('evaluate', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
     expect(presentation.holder).toEqual(HOLDER_DID);
     expect(presentation.verifiableCredential).toEqual(vpSimple.verifiableCredential!);
@@ -140,7 +140,7 @@ describe('evaluate', () => {
         proofOptions,
         signatureOptions: getSingatureOptionsMock(),
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
-      })
+      }),
     ).rejects.toThrowError('Please provide a proof type if you enable selective disclosure');
   });
 
@@ -153,7 +153,7 @@ describe('evaluate', () => {
       pex.verifiablePresentationFrom(pdSchema.presentation_definition, vpSimple.verifiableCredential!, getAsyncErrorThrown, {
         proofOptions: getProofOptionsMock(),
         signatureOptions: getSingatureOptionsMock(),
-      })
+      }),
     ).rejects.toThrow(Error);
   });
 });

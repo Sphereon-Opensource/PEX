@@ -1,5 +1,5 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, PresentationSubmission } from '@sphereon/pex-models';
-import jp from 'jsonpath';
 
 import { Checked, Status } from '../../ConstraintUtils';
 import { Validation } from '../core';

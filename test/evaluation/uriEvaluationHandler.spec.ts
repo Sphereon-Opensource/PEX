@@ -15,7 +15,7 @@ function getFile(path: string) {
 describe('evaluate', () => {
   it('should return ok if uris match in vpSimple.verifiableCredential![0].credentialSchema[0].id', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -35,7 +35,7 @@ describe('evaluate', () => {
 
   it('should return error for not matching (exactly) any URI for the schema of the candidate input with one of the Input Descriptor schema object uri values.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
@@ -61,13 +61,13 @@ describe('evaluate', () => {
             id: 'https://www.w3.org/TR/vc-data-model/#types',
           },
         ],
-      })
+      }),
     );
   });
 
   it('should generate 6 error result fo this test case.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json');
@@ -88,7 +88,7 @@ describe('evaluate', () => {
 
   it('should generate 5 error result and 1 info.', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json',
     ).presentation_definition;
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
@@ -128,7 +128,7 @@ describe('evaluate', () => {
 
   it('should generate 3 warn for Regular Hashlink (with URL encoded)', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json',
     ).presentation_definition;
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     pdSchema.input_descriptors[0].schema.push({
@@ -150,7 +150,7 @@ describe('evaluate', () => {
 
   it('should generate 3 warn for Hashlink as a query parameter', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json'
+      './test/dif_pe_examples/pdV1/input_descriptor_filter_examples.json',
     ).presentation_definition;
     pdSchema.input_descriptors[0].schema[0].uri = 'https://business-standards.org/schemas/employment-history.json';
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://example.com/hw.txt?hl=zm9YZpCjPLPJ4Epc' });

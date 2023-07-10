@@ -1,7 +1,7 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pex-models';
 // import Ajv from 'ajv';
 // import addFormats from 'ajv-formats';
-import jp from 'jsonpath';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

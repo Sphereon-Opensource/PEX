@@ -76,7 +76,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   it(`Mark input candidates for presentation submission`, () => {
     const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/resources/pd_input_descriptor_filter.json'
+      './test/resources/pd_input_descriptor_filter.json',
     ) as InternalPresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -84,7 +84,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!),
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({
@@ -100,7 +100,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
   it(`Mark input candidates for presentation submission with errors`, () => {
     const presentation: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp_general.json') as IVerifiablePresentation;
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/resources/pd_input_descriptor_filter.json'
+      './test/resources/pd_input_descriptor_filter.json',
     ) as InternalPresentationDefinitionV1;
     presentationDefinition.input_descriptors = [presentationDefinition.input_descriptors[0]];
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -108,7 +108,7 @@ describe('markForSubmissionEvaluationHandler tests', () => {
     const evaluationHandler = new MarkForSubmissionEvaluationHandler(evaluationClient);
     evaluationHandler.handle(
       presentationDefinition,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(presentation.verifiableCredential!),
     );
     const length = evaluationHandler.getResults().length;
     expect(evaluationHandler.getResults()[length - 1]).toEqual({

@@ -29,7 +29,7 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
   }
 
   public getValidations(
-    pd: PresentationDefinitionV1
+    pd: PresentationDefinitionV1,
   ): (
     | Validation<FieldV1>
     | Validation<HolderSubject>
@@ -222,9 +222,9 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
     return srs?.reduce(
       (accumulator: SubmissionRequirement[], submissionRequirement: SubmissionRequirement) =>
         accumulator.concat(
-          Array.isArray(submissionRequirement.from_nested) ? this.flatten(submissionRequirement.from_nested) : submissionRequirement
+          Array.isArray(submissionRequirement.from_nested) ? this.flatten(submissionRequirement.from_nested) : submissionRequirement,
         ),
-      []
+      [],
     );
   }
 

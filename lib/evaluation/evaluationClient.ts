@@ -62,7 +62,7 @@ export class EvaluationClient {
       restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
-    }
+    },
   ): void {
     this._restrictToDIDMethods = opts?.restrictToDIDMethods ? uniformDIDMethods(opts?.restrictToDIDMethods) : [];
     this._dids = opts?.holderDIDs ? filterToRestrictedDIDs(opts.holderDIDs, this._restrictToDIDMethods) : [];

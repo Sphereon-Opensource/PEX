@@ -14,7 +14,7 @@ function getFile(path: string) {
 describe('evaluate', () => {
   it('should return ok if subject_is_issuer is verified', function () {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
@@ -62,7 +62,7 @@ describe('evaluate', () => {
 
   it('should return ok if subject_is_issuer is verified with multiple subjects', function () {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
@@ -118,7 +118,7 @@ describe('evaluate', () => {
 
   it('should return error if subject_is_issuer is verified with multiple subjects one of which is not the issuer', function () {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
@@ -174,7 +174,7 @@ describe('evaluate', () => {
 
   it('should return ok if subject_is_issuer is verified with multiple subjects and issuer object', function () {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);
@@ -231,7 +231,7 @@ describe('evaluate', () => {
 
   it('should return error if subject_is_issuer is not verified', function () {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const subjectIsIssuerEvaluationHandler: SubjectIsIssuerEvaluationHandler = new SubjectIsIssuerEvaluationHandler(evaluationClient);

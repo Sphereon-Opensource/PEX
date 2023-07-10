@@ -1,7 +1,7 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
-import jp, { PathComponent } from 'jsonpath';
 
-import { InputFieldType, IPresentationDefinition } from '../types';
+import { InputFieldType, IPresentationDefinition, PathComponent } from '../types';
 
 export class JsonPathUtils {
   static matchAll = require('string.prototype.matchall');
@@ -64,7 +64,7 @@ export class JsonPathUtils {
   public static changePropertyNameRecursively(
     pd: PresentationDefinitionV1 | PresentationDefinitionV2,
     currentPropertyName: string,
-    newPropertyName: string
+    newPropertyName: string,
   ) {
     const existingPaths: { value: unknown; path: (string | number)[] }[] = JsonPathUtils.extractInputField(pd, ['$..' + currentPropertyName]);
     for (const existingPath of existingPaths) {

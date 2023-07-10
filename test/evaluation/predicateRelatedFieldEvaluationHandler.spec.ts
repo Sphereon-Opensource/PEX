@@ -15,7 +15,7 @@ function getFile(path: string) {
 describe('evaluate', () => {
   it('should return ok if payload value of PredicateRelatedField is integer', function () {
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.results.push({
@@ -66,14 +66,14 @@ describe('evaluate', () => {
         {
           path: ['$', 'credentialSubject', 'age'],
           value: 19,
-        }
-      )
+        },
+      ),
     );
   });
 
   it('should return ok if payload value of PredicateRelatedField is boolean', function () {
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -125,14 +125,14 @@ describe('evaluate', () => {
         {
           path: ['$', 'credentialSubject', 'age'],
           value: true,
-        }
-      )
+        },
+      ),
     );
   });
 
   it('should return error if we process the predicate filter for this PD', function () {
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -176,7 +176,7 @@ describe('evaluate', () => {
 
   it("should return ok if verifiableCredential's age value is matching the specification in the input descriptor", function () {
     const presentationDefinition: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json'
+      './test/dif_pe_examples/pdV1/pd-schema-multiple-constraints.json',
     ).presentation_definition;
     presentationDefinition!.input_descriptors![0]!.constraints!.fields![0]!.predicate = Optionality.Preferred;
     const evaluationClient: EvaluationClient = new EvaluationClient();
@@ -253,8 +253,8 @@ describe('evaluate', () => {
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
         PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
-        { value: true, path: ['$', 'credentialSubject', 'age'] }
-      )
+        { value: true, path: ['$', 'credentialSubject', 'age'] },
+      ),
     );
     expect(evaluationClient.results[5]).toEqual(
       new HandlerCheckResult(
@@ -263,8 +263,8 @@ describe('evaluate', () => {
         'PredicateRelatedFieldEvaluation',
         Status.INFO,
         PexMessages.INPUT_CANDIDATE_IS_ELIGIBLE_FOR_PRESENTATION_SUBMISSION,
-        { value: 'eu', path: ['$', 'credentialSubject', 'details', 'citizenship', 0] }
-      )
+        { value: 'eu', path: ['$', 'credentialSubject', 'details', 'citizenship', 0] },
+      ),
     );
     expect(evaluationClient.results[6]).toEqual(
       new HandlerCheckResult(
@@ -276,8 +276,8 @@ describe('evaluate', () => {
         {
           value: 'NLD',
           path: ['$', 'credentialSubject', 'country', 0, 'abbr'],
-        }
-      )
+        },
+      ),
     );
   });
 });

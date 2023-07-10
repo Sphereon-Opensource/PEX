@@ -42,7 +42,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     resultIdx: number,
     input_descriptor_idx: number,
     constraints: ConstraintsV1 | ConstraintsV2,
-    fieldIdx: number
+    fieldIdx: number,
   ) {
     const resultInputDescriptorIdx = this.retrieveResultInputDescriptorIdx(results[resultIdx].input_descriptor_path);
     if (
@@ -95,7 +95,7 @@ export class PredicateRelatedFieldEvaluationHandler extends AbstractEvaluationHa
     input_descriptor_idx: number,
     resultIdx: number,
     evaluationResult: unknown,
-    results: HandlerCheckResult[]
+    results: HandlerCheckResult[],
   ): HandlerCheckResult {
     return {
       input_descriptor_path: `$.input_descriptors[${input_descriptor_idx}]`,

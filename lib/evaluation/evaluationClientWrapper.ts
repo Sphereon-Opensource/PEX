@@ -1,6 +1,6 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
 import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
@@ -28,7 +28,7 @@ export class EvaluationClientWrapper {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): SelectResults {
     let selectResults: SelectResults;
 
@@ -38,7 +38,7 @@ export class EvaluationClientWrapper {
 
     if (presentationDefinition.submission_requirements) {
       const info: HandlerCheckResult[] = this._client.results.filter(
-        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR,
       );
       const marked = Array.from(new Set(info));
       let matchSubmissionRequirements;
@@ -46,7 +46,7 @@ export class EvaluationClientWrapper {
         matchSubmissionRequirements = this.matchSubmissionRequirements(
           presentationDefinition,
           presentationDefinition.submission_requirements,
-          marked
+          marked,
         );
       } catch (e) {
         const matchingError: Checked = { status: Status.ERROR, message: JSON.stringify(e), tag: 'matchSubmissionRequirements' };
@@ -62,8 +62,8 @@ export class EvaluationClientWrapper {
         (e) =>
           jp.nodes(
             this._client.wrappedVcs.map((wrapped) => wrapped.original),
-            e
-          )[0].value
+            e,
+          )[0].value,
       );
       const areRequiredCredentialsPresent = this.determineAreRequiredCredentialsPresent(presentationDefinition, matchSubmissionRequirements);
       selectResults = {
@@ -75,7 +75,7 @@ export class EvaluationClientWrapper {
       };
     } else {
       const marked: HandlerCheckResult[] = this._client.results.filter(
-        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR,
       );
       const checkWithoutSRResults: HandlerCheckResult[] = this.checkWithoutSubmissionRequirements(marked, presentationDefinition);
       if (!checkWithoutSRResults.length) {
@@ -85,8 +85,8 @@ export class EvaluationClientWrapper {
           (e) =>
             jp.nodes(
               this._client.wrappedVcs.map((wrapped) => wrapped.original),
-              e
-            )[0].value
+              e,
+            )[0].value,
         );
         selectResults = {
           errors: [],
@@ -111,7 +111,7 @@ export class EvaluationClientWrapper {
     this.remapMatches(
       wrappedVerifiableCredentials.map((wrapped) => wrapped.original as IVerifiableCredential),
       selectResults.matches,
-      selectResults?.verifiableCredential
+      selectResults?.verifiableCredential,
     );
     selectResults.matches?.forEach((m) => {
       this.updateSubmissionRequirementMatchPathToAlias(m, 'verifiableCredential');
@@ -129,7 +129,7 @@ export class EvaluationClientWrapper {
   private remapMatches(
     verifiableCredentials: OriginalVerifiableCredential[],
     submissionRequirementMatches?: SubmissionRequirementMatch[],
-    vcsToSend?: OriginalVerifiableCredential[]
+    vcsToSend?: OriginalVerifiableCredential[],
   ) {
     submissionRequirementMatches?.forEach((srm) => {
       if (srm.from_nested) {
@@ -140,7 +140,7 @@ export class EvaluationClientWrapper {
           const newIndex = vcsToSend?.findIndex((svc) => JSON.stringify(svc) === JSON.stringify(vc));
           if (newIndex === -1) {
             throw new Error(
-              `The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`
+              `The index of the VerifiableCredential in your current call can't be found in your previously submitted credentials. Are you trying to send a new Credential?\nverifiableCredential: ${vc}`,
             );
           }
           matches[index] = `$[${newIndex}]`;
@@ -209,7 +209,7 @@ export class EvaluationClientWrapper {
   private matchSubmissionRequirements(
     pd: IInternalPresentationDefinition,
     submissionRequirements: SubmissionRequirement[],
-    marked: HandlerCheckResult[]
+    marked: HandlerCheckResult[],
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     for (const sr of submissionRequirements) {
@@ -274,7 +274,7 @@ export class EvaluationClientWrapper {
   private mapMatchingDescriptors(
     pd: IInternalPresentationDefinition,
     sr: SubmissionRequirement,
-    marked: HandlerCheckResult[]
+    marked: HandlerCheckResult[],
   ): SubmissionRequirementMatch {
     const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, vc_path: [] };
     if (sr?.from) {
@@ -305,7 +305,7 @@ export class EvaluationClientWrapper {
       restrictToFormats?: Format;
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
-    }
+    },
   ): EvaluationResults {
     this._client.evaluate(pd, wvcs, opts);
     const result: EvaluationResults = {
@@ -356,7 +356,7 @@ export class EvaluationClientWrapper {
 
     if (pd.submission_requirements) {
       const marked: HandlerCheckResult[] = this._client.results.filter(
-        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
+        (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR,
       );
       const [updatedMarked, upIdx] = this.matchUserSelectedVcs(marked, vcs);
       const groupCount = new Map<string, number>();
@@ -381,7 +381,7 @@ export class EvaluationClientWrapper {
       return this._client.presentationSubmission;
     }
     const marked: HandlerCheckResult[] = this._client.results.filter(
-      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
+      (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR,
     );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
@@ -432,7 +432,7 @@ export class EvaluationClientWrapper {
     submissionRequirement: SubmissionRequirement[],
     marked: HandlerCheckResult[],
     groupCount: Map<string, number>,
-    level: number
+    level: number,
   ): [number, HandlerCheckResult[]] {
     let total = 0;
     const result: HandlerCheckResult[] = [];
@@ -513,7 +513,7 @@ export class EvaluationClientWrapper {
         const foundIndex: number = ObjectUtils.isString(selectableCredential)
           ? wrappedVcs.findIndex((wrappedVc) => selectableCredential === wrappedVc.original)
           : wrappedVcs.findIndex(
-              (wrappedVc) => JSON.stringify((selectableCredential as IVerifiableCredential).proof) === JSON.stringify(wrappedVc.credential.proof)
+              (wrappedVc) => JSON.stringify((selectableCredential as IVerifiableCredential).proof) === JSON.stringify(wrappedVc.credential.proof),
             );
         if (foundIndex === -1) {
           throw new Error('index is not right');
@@ -526,7 +526,7 @@ export class EvaluationClientWrapper {
   public determineAreRequiredCredentialsPresent(
     presentationDefinition: IInternalPresentationDefinition,
     matchSubmissionRequirements: SubmissionRequirementMatch[] | undefined,
-    parentMsr?: SubmissionRequirementMatch
+    parentMsr?: SubmissionRequirementMatch,
   ): Status {
     if (!matchSubmissionRequirements || !matchSubmissionRequirements.length) {
       return Status.ERROR;

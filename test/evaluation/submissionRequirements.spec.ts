@@ -30,7 +30,7 @@ describe('Submission requirements tests', () => {
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!),
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -40,7 +40,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -57,7 +57,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -65,7 +65,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -82,7 +82,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Count: expected: 1 actual: 2 at level: 1');
   });
 
@@ -100,7 +100,7 @@ describe('Submission requirements tests', () => {
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!),
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -109,7 +109,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -126,7 +126,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Min: expected: 3 actual: 2 at level: 0');
   });
 
@@ -143,7 +143,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Max: expected: 1 actual: 2 at level: 0');
   });
 
@@ -160,7 +160,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Count: expected: 1 actual: 2 at level: 0');
   });
 
@@ -177,7 +177,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -193,7 +193,7 @@ describe('Submission requirements tests', () => {
             path: '$.verifiableCredential[2]',
           },
         ],
-      })
+      }),
     );
   });
 
@@ -211,7 +211,7 @@ describe('Submission requirements tests', () => {
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!),
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -221,7 +221,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -239,7 +239,7 @@ describe('Submission requirements tests', () => {
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!),
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -249,7 +249,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -267,7 +267,7 @@ describe('Submission requirements tests', () => {
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const result: PresentationSubmission = evaluationClientWrapper.submissionFrom(
       pd,
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!),
     );
     expect(result).toEqual(
       expect.objectContaining({
@@ -277,7 +277,7 @@ describe('Submission requirements tests', () => {
           { format: 'ldp_vc', id: 'Educational transcripts 1', path: '$.verifiableCredential[1]' },
           { format: 'ldp_vc', id: 'Educational transcripts 2', path: '$.verifiableCredential[2]' },
         ],
-      })
+      }),
     );
   });
 
@@ -294,7 +294,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Min: expected: 3 actual: 2 at level: 1');
   });
 
@@ -311,7 +311,7 @@ describe('Submission requirements tests', () => {
     ]);
     evaluationClientWrapper.evaluate(pd, wvcs, { holderDIDs: HOLDER_DIDs, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     expect(() =>
-      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!))
+      evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vpSimple.verifiableCredential!)),
     ).toThrowError('Max: expected: 1 actual: 2 at level: 1');
   });
 });

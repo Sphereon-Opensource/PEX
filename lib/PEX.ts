@@ -49,7 +49,7 @@ export class PEX {
       restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
-    }
+    },
   ): EvaluationResults {
     const generatePresentationSubmission =
       opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission !== undefined;
@@ -99,7 +99,7 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
@@ -138,7 +138,7 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    }
+    },
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
@@ -149,7 +149,7 @@ export class PEX {
 
   public presentationSubmissionFrom(
     presentationDefinition: IPresentationDefinition,
-    selectedCredentials: OriginalVerifiableCredential[]
+    selectedCredentials: OriginalVerifiableCredential[],
   ): PresentationSubmission {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials));
@@ -169,7 +169,7 @@ export class PEX {
   public presentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    opts?: PresentationFromOpts
+    opts?: PresentationFromOpts,
   ): PresentationResult {
     const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials);
@@ -190,7 +190,7 @@ export class PEX {
       presentationSubmission?: PresentationSubmission;
       holderDID?: string;
       basePresentationPayload?: IPresentation;
-    }
+    },
   ): IPresentation {
     const holder = opts?.holderDID;
     const type = Array.isArray(opts?.basePresentationPayload?.type)
@@ -290,7 +290,7 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation,
-    opts: VerifiablePresentationFromOpts
+    opts: VerifiablePresentationFromOpts,
   ): Promise<VerifiablePresentationResult> {
     const { holderDID, signatureOptions, proofOptions } = opts;
 

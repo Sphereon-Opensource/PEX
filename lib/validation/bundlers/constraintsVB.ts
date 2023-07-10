@@ -21,7 +21,7 @@ export class ConstraintsVB extends ValidationBundler<FieldV1 | FieldV2 | HolderS
   }
 
   public getValidations(
-    constraints: ConstraintsV1 | ConstraintsV2
+    constraints: ConstraintsV1 | ConstraintsV2,
   ): (Validation<ConstraintsV1> | Validation<ConstraintsV2> | Validation<FieldV1> | Validation<FieldV2> | Validation<HolderSubject>)[] {
     let validations: (
       | Validation<ConstraintsV1>

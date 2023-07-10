@@ -1,5 +1,5 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition } from '../../types/Internal.types';
@@ -30,7 +30,8 @@ export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandle
   private retrieveNoErrorStatus(results: HandlerCheckResult[], errors: HandlerCheckResult[]) {
     const info = results.filter((e) => e.status !== Status.ERROR);
     return info.filter(
-      (a) => !errors.find((b) => a.input_descriptor_path === b.input_descriptor_path && a.verifiable_credential_path === b.verifiable_credential_path)
+      (a) =>
+        !errors.find((b) => a.input_descriptor_path === b.input_descriptor_path && a.verifiable_credential_path === b.verifiable_credential_path),
     );
   }
 

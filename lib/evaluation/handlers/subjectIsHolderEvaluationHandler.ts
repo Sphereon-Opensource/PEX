@@ -1,9 +1,9 @@
+import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { HolderSubject, Optionality } from '@sphereon/pex-models';
 import { ICredentialSubject, WrappedVerifiableCredential } from '@sphereon/ssi-types';
-import jp, { PathComponent } from 'jsonpath';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition } from '../../types';
+import { IInternalPresentationDefinition, PathComponent } from '../../types';
 import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
@@ -67,7 +67,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     fieldsMapping: Map<string, string[]>,
     isHolder: { path: PathComponent[]; value: HolderSubject }[],
     fields: string[],
-    directive: Optionality
+    directive: Optionality,
   ) {
     const error: [string, string[]][] = [];
     isHolder
@@ -86,7 +86,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     //TODO handle nested path
     const credentialSubjects: { path: PathComponent[]; value: ICredentialSubject }[] = jp.nodes(
       wrappedVcs.map((wvc) => wvc.credential),
-      '$..credentialSubject'
+      '$..credentialSubject',
     );
     for (let idx = 0; idx < credentialSubjects.length; idx++) {
       const cs = credentialSubjects[idx];
@@ -98,7 +98,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
 
   private confirmAllFieldSetHasSameSubject(fieldIdsInputDescriptorsGroups: Map<string, string[]>, status: Status, directive: Optionality) {
     const subjectsMatchingFields = Array.from(fieldIdsInputDescriptorsGroups).flatMap((k) =>
-      Array.from(this.credentialsSubjectsByPath).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c)))
+      Array.from(this.credentialsSubjectsByPath).filter((a) => k[1].find((c) => Object.keys(a[1]).includes(c))),
     );
 
     const credentialPathsToInputDescriptors = this.mapCredentialPathsToInputDescriptors(directive);
@@ -116,8 +116,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
             inDescPath,
             subject,
             status,
-            this.credentialsByPath.get(subject[0])
-          )
+            this.credentialsByPath.get(subject[0]),
+          ),
         );
       } else {
         this.getResults().push(
@@ -126,8 +126,8 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
             inDescPath,
             subject,
             Status.ERROR,
-            this.credentialsByPath.get(subject[0])
-          )
+            this.credentialsByPath.get(subject[0]),
+          ),
         );
       }
     });
@@ -153,7 +153,7 @@ export class SubjectIsHolderEvaluationHandler extends AbstractEvaluationHandler 
     credentialSub: [string, ICredentialSubject],
     myStatus: Status,
     wvc?: WrappedVerifiableCredential,
-    message?: string
+    message?: string,
   ): HandlerCheckResult {
     return {
       input_descriptor_path: inputDescriptorPath,

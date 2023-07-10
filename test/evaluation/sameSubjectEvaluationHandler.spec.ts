@@ -11,7 +11,7 @@ describe('sameSubjectEvaluationHandler', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.presentationSubmission = new SameSubjectPresentationSubmission().getPresentationSubmission();
     evaluationClient.wrappedVcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
-      new SameSubjectVerifiableCredential().getVerifiableCredential()
+      new SameSubjectVerifiableCredential().getVerifiableCredential(),
     );
     const evaluationHandler: SameSubjectEvaluationHandler = new SameSubjectEvaluationHandler(evaluationClient);
 

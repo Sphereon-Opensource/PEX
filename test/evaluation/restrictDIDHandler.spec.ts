@@ -15,7 +15,7 @@ function getFile(path: string) {
 describe('evaluate', () => {
   it('should return ok if no DID restrictions are present', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
@@ -36,7 +36,7 @@ describe('evaluate', () => {
 
   it('should return ok if matching DID restrictions are present', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
@@ -60,7 +60,7 @@ describe('evaluate', () => {
 
   it('should return error if no matching DID restrictions are present', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json'
+      './test/dif_pe_examples/pdV1/pd-simple-schema-subject-is-issuer.json',
     ).presentation_definition;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const vpSimple: IVerifiablePresentation = getFile('./test/dif_pe_examples/vp/vp-simple-subject-is-issuer.json');
