@@ -22,7 +22,7 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
 
   constructor(parentTag: string) {
     super(parentTag, 'fields');
-    this.schemaValidator = new Ajv();
+    this.schemaValidator = new Ajv({ allowUnionTypes: true });
     addFormats(this.schemaValidator);
   }
 
