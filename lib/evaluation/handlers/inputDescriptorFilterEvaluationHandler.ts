@@ -98,7 +98,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
-    const ajv = new Ajv();
+    const ajv = new Ajv({ allowUnionTypes: true });
     addFormats(ajv);
     if (field.filter) {
       return ajv.validate(field.filter, result.value);
