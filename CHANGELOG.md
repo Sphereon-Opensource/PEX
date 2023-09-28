@@ -1,5 +1,9 @@
 # Release Notes
 
+## v2.1.1 - 2023-09-28
+No changes except from some updated dependencies
+
+
 ## v2.1.0 - 2023-07-10
 
 IMPORTANT: This release moves to @astronautlabs/jsonpathplus in favor of jsonpathplus, bringing a security improvement.
