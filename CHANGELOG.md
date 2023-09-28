@@ -1,6 +1,6 @@
 # Release Notes
 
-## v2.1.1 - 2023-09-28
+## v2.1.2 and v2.1.1 - 2023-09-28
 No changes except from some updated dependencies
 
 

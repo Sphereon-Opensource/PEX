@@ -694,10 +694,10 @@
   resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-2.0.3.tgz#8ae1cc7fda9e6d10b65266e4ba3f940428e6816f"
   integrity sha512-NsPeYmJLhxRG5fJxpcHnRR3xvi7i8SK8s21kYR9oBWO8cBU9qBCpw3gdUNiyI01/h6fbYqkIZ7eBNsHBIzqk5Q==
 
-"@sphereon/ssi-types@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.13.0.tgz#da75ee21d13e3e7b1e492850082b476262888be9"
-  integrity sha512-THzkvgY6AN4/0INgGowinzOFX6NeUQJ/KmAcXrBXx2Rny5v5wCp7LhBIlK21KF2/76fbiCyJvwcd/+Yeb0fjwQ==
+"@sphereon/ssi-types@^0.15.1":
+  version "0.15.1"
+  resolved "https://registry.yarnpkg.com/@sphereon/ssi-types/-/ssi-types-0.15.1.tgz#120926e1b633b616026ebe3dd6e73ed6fe350110"
+  integrity sha512-NFpgcVHIU8YQ2OkCHpw9YVa5bIDBcfSbp0kvwC0iZa0du1tr3148fV2Xm4ilcLeRNvUKL5BbDEdHl1WuQkmoyw==
   dependencies:
     jwt-decode "^3.1.2"
 
