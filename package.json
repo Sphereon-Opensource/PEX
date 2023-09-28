@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "2.1.2",
+  "version": "2.1.3-unstable.0",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
