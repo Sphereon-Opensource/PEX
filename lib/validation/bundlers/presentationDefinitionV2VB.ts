@@ -139,6 +139,12 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
     if (format?.jwt_vc != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vc.alg?.length > 0;
     }
+    // FIXME: need to wait for new release of @sphereon/pex-models
+    // @ts-ignore
+    if (format?.jwt_vc_json != null) {
+      // @ts-ignore
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vc_json.alg?.length > 0;
+    }
     if (format?.jwt_vp != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vp.alg?.length > 0;
     }

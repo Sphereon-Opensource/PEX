@@ -1,5 +1,6 @@
 import { OneOfNumberString } from './oneOfNumberString';
-export interface FilterV2 {
+
+export interface FilterV2Base {
     const?: OneOfNumberString;
     enum?: Array<OneOfNumberString>;
     exclusiveMinimum?: OneOfNumberString;
@@ -15,5 +16,11 @@ export interface FilterV2 {
     maximum?: OneOfNumberString;
     not?: object;
     pattern?: string;
+    contains?: FilterV2Base;
+    items?: FilterV2 | [FilterV2, ...FilterV2[]];
+    type?: string;
+}
+
+export interface FilterV2 extends FilterV2Base {
     type: string;
 }
