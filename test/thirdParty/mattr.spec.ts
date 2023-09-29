@@ -2,7 +2,7 @@ import { W3CVerifiableCredential } from '@sphereon/ssi-types';
 
 import { IPresentationDefinition, PEX, Status } from '../../lib';
 
-describe('evaluate animo tests', () => {
+describe('evaluate mattr tests', () => {
   it('should validate mattr presentation definition', () => {
     const validated = PEX.validateDefinition(pd);
 
@@ -116,8 +116,6 @@ describe('evaluate animo tests', () => {
               path: ['$.type'],
               filter: {
                 type: 'array',
-                // FIXME: need to wait for new release of @sphereon/pex-models
-                // @ts-ignore
                 items: { type: 'string' },
                 contains: { const: 'OpenBadgeCredential' },
               },
