@@ -56,8 +56,6 @@ describe('evaluate mattr tests', () => {
     input_descriptors: [
       {
         id: 'OpenBadgeCredential',
-        // FIXME: need to update pex models
-        // @ts-ignore
         format: { jwt_vc_json: { alg: ['EdDSA'] }, jwt_vc: { alg: ['EdDSA'] } },
         constraints: {
           fields: [
