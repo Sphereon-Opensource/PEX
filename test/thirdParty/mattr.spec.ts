@@ -9,10 +9,10 @@ describe('evaluate animo tests', () => {
     expect(validated).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should pass with OpenBadgeCredential', () => {
+  it('should not pass with OpenBadgeCredential but as ldp_vc whilst descriptor wants jwt_json', () => {
     const pex: PEX = new PEX();
     const result = pex.evaluateCredentials(pd, vcs);
-    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.ERROR);
   });
 
   it('should not pass when contains is not OpenBadgeCredential type', () => {
@@ -116,8 +116,6 @@ describe('evaluate animo tests', () => {
               path: ['$.type'],
               filter: {
                 type: 'array',
-                // FIXME: need to wait for new release of @sphereon/pex-models
-                // @ts-ignore
                 items: { type: 'string' },
                 contains: { const: 'OpenBadgeCredential' },
               },

@@ -18,10 +18,20 @@ export class FormatRestrictionEvaluationHandler extends AbstractEvaluationHandle
   }
 
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
+    const restrictToFormats = this.client.restrictToFormats ? Object.keys(this.client.restrictToFormats) : undefined;
+
     (pd as InternalPresentationDefinitionV1 | InternalPresentationDefinitionV2).input_descriptors.forEach((_inputDescriptor, index) => {
       wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
-        if (!this.client.restrictToFormats || Object.keys(this.client.restrictToFormats).includes(wvc.format)) {
-          this.getResults().push(this.generateSuccessResult(index, `$[${vcIndex}]`, wvc, `${wvc.format} is allowed`));
+        const formats = 'format' in _inputDescriptor && _inputDescriptor.format ? Object.keys(_inputDescriptor.format) : [wvc.format];
+        let allowedFormats = restrictToFormats ?? formats;
+        if ('format' in _inputDescriptor && _inputDescriptor.format && restrictToFormats !== undefined) {
+          // Take the instersection, as an argument has been supplied for restrictions
+          allowedFormats = Object.keys(_inputDescriptor.format).filter((k) => restrictToFormats.includes(k));
+        }
+        if (allowedFormats.includes(wvc.format)) {
+          this.getResults().push(
+            this.generateSuccessResult(index, `$[${vcIndex}]`, wvc, `${wvc.format} is allowed from ${JSON.stringify(allowedFormats)}`),
+          );
         } else {
           this.getResults().push(this.generateErrorResult(index, `$[${vcIndex}]`, wvc));
         }
