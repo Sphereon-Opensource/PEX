@@ -1,5 +1,6 @@
 import { OneOfNumberString } from './oneOfNumberString';
-export interface FilterV1 {
+
+export interface FilterV1Base {
     const?: OneOfNumberString;
     enum?: Array<OneOfNumberString>;
     exclusiveMinimum?: OneOfNumberString;

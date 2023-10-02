@@ -238,7 +238,7 @@ export class PEX {
   public static validateDefinition(presentationDefinition: IPresentationDefinition): Validated {
     const result = definitionVersionDiscovery(presentationDefinition);
     if (result.error) {
-      throw result.error;
+      throw new Error(result.error);
     }
     const validators = [];
     result.version === PEVersion.v1

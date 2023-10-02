@@ -1,7 +1,5 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { FieldV1, FieldV2, FilterV1, FilterV2, Optionality } from '@sphereon/pex-models';
-// import Ajv from 'ajv';
-// import addFormats from 'ajv-formats';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,8 +12,6 @@ import validateFilterv2 from '../validateFilterv2.js';
 import { ValidationBundler } from './validationBundler';
 
 export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
-  // private readonly ajv: Ajv;
-
   private readonly mustHaveValidJsonPathsMsg = 'field object "path" property must contain array of valid json paths';
   private readonly pathObjMustHaveValidJsonPathMsg = 'field object "path" property must contain valid json paths.';
   private readonly filterMustBeValidJsonSchemaMsg = 'field object "filter" property must be valid json schema';
@@ -26,8 +22,6 @@ export class FieldsVB extends ValidationBundler<FieldV1[] | FieldV2[]> {
 
   constructor(parentTag: string) {
     super(parentTag, 'fields');
-    // this.ajv = new Ajv();
-    // addFormats(this.ajv);
   }
 
   public getValidations(fields: FieldV1[] | FieldV2[]): Validation<FieldV1 | FieldV2>[] {

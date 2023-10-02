@@ -139,6 +139,9 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
     if (format?.jwt_vc != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vc.alg?.length > 0;
     }
+    if (format?.jwt_vc_json != null) {
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vc_json.alg?.length > 0;
+    }
     if (format?.jwt_vp != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vp.alg?.length > 0;
     }
@@ -210,7 +213,7 @@ export class PresentationDefinitionV2VB extends ValidationBundler<
       const fromValues: string[] = [];
       PresentationDefinitionV2VB.flatten(pd.submission_requirements).forEach((srs: SubmissionRequirement) => {
         if (srs.from) {
-          fromValues.push(...srs.from);
+          fromValues.push(srs.from);
         }
       });
 

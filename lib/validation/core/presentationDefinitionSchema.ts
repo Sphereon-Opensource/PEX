@@ -77,7 +77,7 @@ export class PresentationDefinitionSchema {
         format: {
           type: 'object',
           patternProperties: {
-            '^jwt$|^jwt_vc$|^jwt_vp$': {
+            '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|': {
               type: 'object',
               properties: {
                 alg: {
@@ -412,7 +412,7 @@ export class PresentationDefinitionSchema {
         format: {
           type: 'object',
           patternProperties: {
-            '^jwt$|^jwt_vc$|^jwt_vp$|^mso_mdoc$': {
+            '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|^mso_mdoc$': {
               type: 'object',
               properties: {
                 alg: {
