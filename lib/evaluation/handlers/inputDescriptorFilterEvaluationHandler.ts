@@ -29,7 +29,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       fields.forEach((field) => {
         let inputField: { path: PathComponent[]; value: unknown }[] = [];
         if (field.value.path) {
-          inputField = JsonPathUtils.extractInputField(wvc.credential, field.value.path);
+          inputField = JsonPathUtils.extractInputField(wvc.decoded, field.value.path);
         }
         let resultFound = false;
         for (const inputFieldKey of inputField) {
