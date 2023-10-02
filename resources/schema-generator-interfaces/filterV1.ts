@@ -12,11 +12,5 @@ export interface FilterV1Base {
     maximum?: OneOfNumberString;
     not?: object;
     pattern?: string;
-    contains?: FilterV1Base;
-    items?: FilterV1 | [FilterV1, ...FilterV1[]];
-    type?: string;
-}
-
-export interface FilterV1 extends FilterV1Base {
     type: string;
 }
