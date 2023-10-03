@@ -12,8 +12,14 @@ import { W3CVerifiableCredential } from '@sphereon/ssi-types/src/types/vc';
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationSignCallBackParams, VerifiablePresentationFromOpts } from './signing';
-import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation, VerifiablePresentationResult } from './signing';
+import {
+  PresentationFromOpts,
+  PresentationResult,
+  PresentationSignCallBackParams,
+  PresentationSubmissionLocation,
+  VerifiablePresentationFromOpts,
+  VerifiablePresentationResult,
+} from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
 import { definitionVersionDiscovery } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
@@ -318,7 +324,12 @@ export class PEX {
       ...opts,
       presentationSubmissionLocation,
     });
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, { limitDisclosureSignatureSuites });
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
+      limitDisclosureSignatureSuites,
+      ...(presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
+        presentationSubmission: presentationResult.presentationSubmission,
+      }),
+    });
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentationResult');
     }
