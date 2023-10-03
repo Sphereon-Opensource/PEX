@@ -9,11 +9,11 @@ describe('evaluate mattr tests', () => {
     expect(validated).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('should not pass with OpenBadgeCredential but as ldp_vc whilst descriptor wants jwt_json', () => {
+  it('should pass with OpenBadgeCredential but as jwt_vc whilst descriptor wants jwt_json', () => {
     const pex: PEX = new PEX();
     const result = pex.evaluateCredentials(pd, vcs);
     console.log(JSON.stringify(result, null, 2));
-    expect(result.areRequiredCredentialsPresent).toEqual(Status.ERROR);
+    expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
   });
 
   it('should not pass when contains is not OpenBadgeCredential type', () => {

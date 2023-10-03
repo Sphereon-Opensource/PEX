@@ -474,7 +474,7 @@ describe('evaluate', () => {
           constraints: {
             fields: [
               {
-                path: ['$.credentialSubject.degree.type'],
+                path: ['$.vc.credentialSubject.degree.type'],
                 filter: {
                   type: 'string',
                   enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],
@@ -507,7 +507,7 @@ describe('evaluate', () => {
           constraints: {
             fields: [
               {
-                path: ['$.credentialSubject.degree.type'],
+                path: ['$.vc.credentialSubject.degree.type'],
                 filter: {
                   type: 'string',
                   enum: ['BachelorDegree', 'MasterDegree', 'AssociateDegree', 'DoctorateDegree'],

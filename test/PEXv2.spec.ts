@@ -467,7 +467,7 @@ describe('evaluate', () => {
           constraints: {
             fields: [
               {
-                path: ['$.vc.issuer.id', '$.issuer.id', '$.issuer'],
+                path: ['$.vc.issuer.id', '$.issuer.id', '$.vc.issuer'],
                 filter: {
                   type: 'string',
                   enum: ['https://example.edu/issuers/565049'],

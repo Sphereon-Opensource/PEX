@@ -31,6 +31,7 @@
   "verifiableCredential": [
     {
       "iss": "did:example:123",
+      "FIXME": "THIS DOESNT MAKE SENSE. The is a decoded JWT as an object in the array. It should just be a JWT VC as string",
       "vc": {
         "@context": "https://eu.com/claims/DriversLicense",
         "id": "https://eu.com/claims/DriversLicense",

@@ -44,6 +44,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           iss: 'did:example:123',
+          FIXME: 'THIS DOESNT MAKE SENSE. The is a decoded JWT as an object in the array. It should just be a JWT VC as string',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -334,6 +335,7 @@ describe('selectFrom tests', () => {
       ],
       verifiableCredential: [
         {
+          FIXME: 'THIS DOESNT MAKE SENSE. The is a decoded JWT as an object in the array. It should just be a JWT VC as string',
           iss: 'did:example:123',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
@@ -449,6 +451,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           iss: 'did:example:123',
+          FIXME: 'THIS DOESNT MAKE SENSE. The is a decoded JWT as an object in the array. It should just be a JWT VC as string',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
@@ -563,6 +566,7 @@ describe('selectFrom tests', () => {
       verifiableCredential: [
         {
           iss: 'did:example:123',
+          FIXME: 'THIS DOESNT MAKE SENSE. The is a decoded JWT as an object in the array. It should just be a JWT VC as string',
           vc: {
             '@context': 'https://eu.com/claims/DriversLicense',
             credentialSubject: {
