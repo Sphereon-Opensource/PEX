@@ -3,6 +3,7 @@ import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationS
 import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../ConstraintUtils';
+import { PresentationSubmissionLocation } from '../signing';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
 import { JsonPathUtils, ObjectUtils } from '../utils';
 
@@ -346,7 +347,13 @@ export class EvaluationClientWrapper {
       });
   }
 
-  public submissionFrom(pd: IInternalPresentationDefinition, vcs: WrappedVerifiableCredential[]): PresentationSubmission {
+  public submissionFrom(
+    pd: IInternalPresentationDefinition,
+    vcs: WrappedVerifiableCredential[],
+    opts?: {
+      presentationSubmissionLocation?: PresentationSubmissionLocation;
+    },
+  ): PresentationSubmission {
     if (!this._client.results.length) {
       throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
@@ -378,6 +385,9 @@ export class EvaluationClientWrapper {
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
       this.updatePresentationSubmission(finalIdx);
       this.updatePresentationSubmissionPathToAlias('verifiableCredential');
+      if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
+        this.updatePresentationSubmissionToExternal();
+      }
       return this._client.presentationSubmission;
     }
     const marked: HandlerCheckResult[] = this._client.results.filter(
@@ -386,6 +396,9 @@ export class EvaluationClientWrapper {
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
     this.updatePresentationSubmissionPathToAlias('verifiableCredential');
+    if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
+      this.updatePresentationSubmissionToExternal();
+    }
     return this._client.presentationSubmission;
   }
 
@@ -402,6 +415,31 @@ export class EvaluationClientWrapper {
         }
         return descriptor;
       });
+  }
+
+  private updatePresentationSubmissionToExternal() {
+    const descriptors = this._client.presentationSubmission.descriptor_map;
+    this._client.presentationSubmission.descriptor_map = descriptors.map((descriptor) => {
+      if (descriptor.path_nested) {
+        return descriptor;
+      }
+      const format = descriptor.format;
+      const nestedDescriptor = { ...descriptor };
+      nestedDescriptor.path_nested = { ...descriptor };
+      // todo: delete id?
+      nestedDescriptor.path = '$';
+      // todo: We really should also look at the context of the VP, to determine whether it is jwt_vp vs jwt_vp_json instead of relying on the VC type
+      if (format.startsWith('ldp_')) {
+        nestedDescriptor.format = 'ldp_vp';
+      } else if (format === 'jwt_vc') {
+        nestedDescriptor.format = 'jwt_vp';
+        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[')
+      } else if (format === 'jwt_vc_json') {
+        nestedDescriptor.format = 'jwt_vp_json';
+        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[')
+      }
+      return nestedDescriptor;
+    });
   }
 
   private matchUserSelectedVcs(marked: HandlerCheckResult[], vcs: WrappedVerifiableCredential[]): [HandlerCheckResult[], [string, string][]] {
@@ -638,7 +676,7 @@ export class EvaluationClientWrapper {
   }
 
   private replacePathWithAlias(descriptor: Descriptor, alias: string) {
-    descriptor.path = descriptor.path.replace('$', '$.' + alias);
+    descriptor.path = descriptor.path.replace(`$[`, `$.${alias}[`);
     if (descriptor.path_nested) {
       this.replacePathWithAlias(descriptor.path_nested, alias);
     }

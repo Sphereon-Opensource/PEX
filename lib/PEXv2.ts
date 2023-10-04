@@ -112,6 +112,7 @@ export class PEXv2 extends PEX {
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition),
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials),
+      opts,
     );
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,

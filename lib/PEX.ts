@@ -62,7 +62,7 @@ export class PEX {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    const presentationSubmission = opts?.presentationSubmission || wrappedPresentation.presentation.presentation_submission;
+    const presentationSubmission = opts?.presentationSubmission ?? wrappedPresentation.decoded.presentation_submission;
     if (!presentationSubmission && !generatePresentationSubmission) {
       throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
     }
@@ -76,7 +76,7 @@ export class PEX {
     };
 
     const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, updatedOpts);
-    if (result.value && result.value.descriptor_map.length) {
+    if (result.value?.descriptor_map.length) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
       const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, updatedOpts);
       if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
@@ -156,9 +156,18 @@ export class PEX {
   public presentationSubmissionFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
+    opts?: {
+      /**
+       * The presentation submission data location.
+       *
+       * Can be External, which means it is only returned and not embedded into the VP,
+       * or Presentation, which means it will become part of the VP
+       */
+      presentationSubmissionLocation?: PresentationSubmissionLocation;
+    },
   ): PresentationSubmission {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
-    return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials));
+    return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials), opts);
   }
 
   /**
@@ -168,7 +177,7 @@ export class PEX {
    * @param presentationDefinition the v1 or v2 definition of what is expected in the presentation.
    * @param selectedCredentials the credentials which were declared selectable by getSelectableCredentials and then chosen by the intelligent-user
    * (e.g. human).
-   * @param opts? - holderDID optional; the decentralized identity of the wallet holderDID. This is used to identify the holderDID of the presentation.
+   * @param opts - holderDID optional; the decentralized identity of the wallet holderDID. This is used to identify the holderDID of the presentation.
    *
    * @return the presentation.
    */
@@ -178,7 +187,7 @@ export class PEX {
     opts?: PresentationFromOpts,
   ): PresentationResult {
     const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
-    const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials);
+    const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
@@ -237,7 +246,7 @@ export class PEX {
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *
-   * @param presentationDefinition: presentationDefinition of V1 or v2 to be validated.
+   * @param presentationDefinition presentationDefinition of V1 or v2 to be validated.
    *
    * @return the validation results to reveal what is acceptable/unacceptable about the passed object to be considered a valid presentation definition
    */
@@ -288,7 +297,7 @@ export class PEX {
    * @param selectedCredentials the PEX and/or User selected/filtered credentials that will become part of the Verifiable Presentation
    * @param signingCallBack the function which will be provided as a parameter. And this will be the method that will be able to perform actual
    *        signing. One example of signing is available in the project named. pe-selective-disclosure.
-   * @param opts: Signing Params these are the signing params required to sign.
+   * @param opts Signing Params these are the signing params required to sign.
    *
    * @return the signed and thus Verifiable Presentation.
    */
@@ -301,6 +310,7 @@ export class PEX {
     const { holderDID, signatureOptions, proofOptions } = opts;
 
     const presentationSubmissionLocation = opts.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
+    const updatedOpts = {...opts, presentationSubmissionLocation}
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -320,10 +330,7 @@ export class PEX {
       limitDisclosureSignatureSuites,
     });
 
-    const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, {
-      ...opts,
-      presentationSubmissionLocation,
-    });
+    const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, updatedOpts);
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
       limitDisclosureSignatureSuites,
       ...(presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
@@ -347,7 +354,7 @@ export class PEX {
     };
 
     const callBackParams: PresentationSignCallBackParams = {
-      options: opts,
+      options: updatedOpts,
       presentation: presentationResult.presentation,
       presentationDefinition,
       selectedCredentials,
