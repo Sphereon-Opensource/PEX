@@ -1,8 +1,22 @@
 # Release Notes
 
-## v2.1.2 and v2.1.1 - 2023-09-28
-No changes except from some updated dependencies
+## v2.2.0 - 2023-10-12
 
+- Updated:
+    - Updated to latest PEX models package
+- Fixed:
+    - Use decoded VC values to match paths against, instead of internal stable VC representation. We didn't map the "vc"
+      property in a JWT VP correctly.
+    - Fix issue with verifiableCredential path dereferencing
+
+- Added:
+  - Support for external presentation submission paths for VPs and VCs as used by OID4VP (path_nested)
+  - Support for `jwt_vc_json` format
+  - Support for the `format` property at tje input descriptor level next to the global level
+
+## v2.1.2 and v2.1.1 - 2023-09-28
+
+No changes except from some updated dependencies
 
 ## v2.1.0 - 2023-07-10
 
