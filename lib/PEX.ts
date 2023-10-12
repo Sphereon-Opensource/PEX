@@ -310,7 +310,7 @@ export class PEX {
     const { holderDID, signatureOptions, proofOptions } = opts;
 
     const presentationSubmissionLocation = opts.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
-    const updatedOpts = {...opts, presentationSubmissionLocation}
+    const updatedOpts = { ...opts, presentationSubmissionLocation };
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];

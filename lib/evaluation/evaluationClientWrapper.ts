@@ -433,10 +433,10 @@ export class EvaluationClientWrapper {
         nestedDescriptor.format = 'ldp_vp';
       } else if (format === 'jwt_vc') {
         nestedDescriptor.format = 'jwt_vp';
-        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[')
+        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[');
       } else if (format === 'jwt_vc_json') {
         nestedDescriptor.format = 'jwt_vp_json';
-        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[')
+        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[');
       }
       return nestedDescriptor;
     });
