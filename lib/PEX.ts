@@ -1,28 +1,49 @@
-import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
+  Format,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
+  PresentationSubmission
+} from '@sphereon/pex-models';
+import {
+  CredentialMapper,
+  ICredentialSubject,
   IPresentation,
   IProof,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
+  WrappedVerifiablePresentation
 } from '@sphereon/ssi-types';
 import { W3CVerifiableCredential } from '@sphereon/ssi-types/src/types/vc';
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import {
+  PresentationConstruction,
   PresentationFromOpts,
   PresentationResult,
+  PresentationResultType,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult,
+  VerifiablePresentationResult
 } from './signing';
-import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
+import {
+  DiscoveredVersion,
+  IInternalPresentationDefinition,
+  IPresentationDefinition,
+  PEVersion,
+  SSITypesBuilder
+} from './types';
 import { definitionVersionDiscovery } from './utils';
-import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import {
+  PresentationDefinitionV1VB,
+  PresentationDefinitionV2VB,
+  PresentationSubmissionVB,
+  Validated,
+  ValidationEngine
+} from './validation';
 
 /**
  * This is the main interfacing class to be used by developers using the PEX library.
@@ -48,42 +69,51 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentation: OriginalVerifiablePresentation | IPresentation,
+    presentation: OriginalVerifiablePresentation | IPresentation | (OriginalVerifiablePresentation | IPresentation)[],
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
       generatePresentationSubmission?: boolean;
-    },
-  ): EvaluationResults {
+    }
+  ): EvaluationResults[] {
     const generatePresentationSubmission =
-      opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission !== undefined;
+      opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission === undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
-    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
-    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
-    const presentationSubmission = opts?.presentationSubmission ?? wrappedPresentation.decoded.presentation_submission;
+    const presentationCopy: OriginalVerifiablePresentation| OriginalVerifiablePresentation[] = JSON.parse(JSON.stringify(presentation));
+    const presentations = Array.isArray(presentationCopy) ? presentationCopy : [presentationCopy]
+    const wrappedPresentations: WrappedVerifiablePresentation[] = presentations.map(presentation => SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentation));
+    const presentationSubmission = opts?.presentationSubmission ?? wrappedPresentations.find(presentation => presentation.presentation.presentation_submission !== undefined)?.presentation?.presentation_submission;
     if (!presentationSubmission && !generatePresentationSubmission) {
       throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
     }
+    const results: EvaluationResults[] =[]
 
-    const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
-    const updatedOpts = {
-      ...opts,
-      holderDIDs,
-      presentationSubmission,
-      generatePresentationSubmission,
-    };
+    wrappedPresentations.forEach(wrappedPresentation => {
+      const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
+      const updatedOpts = {
+        ...opts,
+        holderDIDs,
+        presentationSubmission,
+        generatePresentationSubmission
+      };
 
-    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, updatedOpts);
-    if (result.value?.descriptor_map.length) {
-      const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, updatedOpts);
-      if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
-        result.errors = [];
+      const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, updatedOpts);
+      if (result.value?.descriptor_map.length) {
+        const selectFromClientWrapper = new EvaluationClientWrapper();
+        const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, updatedOpts);
+        if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
+          result.errors = [];
+        }
       }
+      results.push(result)
+    })
+  /*  if (results.length === 1) {
+      return results[0]
     }
-    return result;
+*/
+    return results;
   }
 
   /***
@@ -105,7 +135,7 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    },
+    }
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
@@ -144,7 +174,7 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    },
+    }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
@@ -164,7 +194,7 @@ export class PEX {
        * or Presentation, which means it will become part of the VP
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
-    },
+    }
   ): PresentationSubmission {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials), opts);
@@ -184,35 +214,162 @@ export class PEX {
   public presentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    opts?: PresentationFromOpts,
+    opts?: PresentationFromOpts<Partial<IPresentation>|Partial<IPresentation>[]>
   ): PresentationResult {
     const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
-    const presentation = PEX.constructPresentation(selectedCredentials, {
+    const presentation = PEX.constructPresentations(selectedCredentials, {
       ...opts,
-      presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
+      presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined
     });
     return {
       presentation,
       presentationSubmissionLocation,
-      presentationSubmission,
+      presentationSubmission
     };
+  }
+
+
+  public static constructPresentations(selectedCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
+                                       opts?: PresentationFromOpts<Partial<IPresentation>|Partial<IPresentation>[]> & { presentationSubmission?: PresentationSubmission }) {
+
+    const buildConstructions = (
+      vc: WrappedVerifiableCredential,
+      constructions: Record<string, PresentationConstruction>,
+      opts?: PresentationFromOpts<Partial<IPresentation> | Partial<IPresentation>[]>) => {
+      if (opts?.presentationFormat && Object.keys(opts.presentationFormat).length > 1) {
+        throw Error(`Connot use more than one format when creating a VP currently: ${JSON.stringify(opts.presentationFormat)}`);
+      }
+      const subjects = Array.isArray(vc.credential.credentialSubject) ? vc.credential.credentialSubject : [vc.credential.credentialSubject];
+      const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
+      const presentationResultType = opts?.presentationResultType ?? PresentationResultType.VP_FORMAT_BASED;
+      const presentationFormat: Format | undefined = opts?.presentationFormat;
+
+      subjects.forEach(subject => {
+        const holderDID = subject.id ?? opts?.holderDID;
+
+        if (!holderDID) {
+          throw Error(`No subject id found or holderDID supplied. Cannot create a Presentation without this information: ${JSON.stringify(vc.credential)}`);
+        }
+        let construction: PresentationConstruction;
+        if (!Object.keys(constructions).includes(holderDID)) {
+          construction = {
+            presentationFormat,
+            presentationResultType,
+            credentials: new Set(),
+            holderDID,
+            presentationSubmissionLocation,
+            jwtVCCount: 0,
+            ldpVCCount: 0
+          };
+          constructions[holderDID] = construction;
+        } else {
+          construction = constructions[holderDID]!;
+        }
+        if (vc.format.includes('jwt')) {
+          construction.jwtVCCount++;
+        } else {
+          construction.ldpVCCount++;
+        }
+        construction.credentials.add(vc.original);
+      });
+    };
+
+
+    const constructionCounters = (constructions: Record<string, PresentationConstruction>) => {
+      let jwtCnt = 0;
+      let ldpCnt = 0;
+      let totalCnt = 0;
+      Object.entries(constructions).forEach(([_did, construction]) => {
+        const keys = construction.presentationFormat ? Object.keys(construction.presentationFormat) : [];
+        const jwt = keys.find(key => key.includes('jwt'));
+        const ldp = keys.find(key => key.includes('ldp'));
+        totalCnt++;
+        if (keys.length === 0 || (!jwt && !ldp)) {
+          // we are setting the VP format based on what type of VCs we have most
+          if (construction.ldpVCCount >= construction.jwtVCCount) {
+            construction.presentationFormat = {
+              ldp_vp: {
+                proof_type: ['']
+              }
+            };
+          }
+          Array.from(construction.credentials).map(vc => CredentialMapper.toWrappedVerifiableCredential(vc));
+        }
+
+        jwt && jwtCnt++;
+        ldp && ldpCnt++;
+      });
+      return { jwtCnt, ldpCnt, totalCnt };
+    };
+
+    const allVCs = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
+    const constructions: Record<string, PresentationConstruction> = {};
+    allVCs.map(vc => CredentialMapper.toWrappedVerifiableCredential(vc)).forEach(vc => {
+      buildConstructions(vc, constructions, opts);
+    });
+
+    const { totalCnt } = constructionCounters(constructions);
+
+    if (totalCnt > 1 && opts?.presentationResultType === PresentationResultType.SINGLE_PRESENTATION) {
+      if (opts.presentationFormat && Object.keys(opts.presentationFormat).find(format => format.includes('jwt'))) {
+        throw Error(`Impossible combination. ${totalCnt} different holder DIDs found, but mode is single presentation using JWTs. `);
+      }
+      // Put everything into one presentation
+      return [PEX.constructPresentationImpl(selectedCredentials, opts)];
+    }
+    const results = Object.entries(constructions).map(([holderDID, construction]) => {
+      return PEX.constructPresentationImpl(Array.from(construction.credentials), { ...opts, holderDID });
+    });
+    return results;
   }
 
   public static constructPresentation(
     selectedCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
-    opts?: {
-      presentationSubmission?: PresentationSubmission;
-      holderDID?: string;
-      basePresentationPayload?: IPresentation;
-    },
+    opts?: PresentationFromOpts<Partial<IPresentation>> & { presentationSubmission?: PresentationSubmission }
   ): IPresentation {
-    const holder = opts?.holderDID;
-    const type = Array.isArray(opts?.basePresentationPayload?.type)
-      ? opts?.basePresentationPayload?.type || []
-      : opts?.basePresentationPayload?.type
-      ? [opts.basePresentationPayload.type]
-      : [];
+    return PEX.constructPresentations(selectedCredentials, opts)[0]
+  }
+
+  static constructPresentationImpl(
+    selectedCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
+    opts?: PresentationFromOpts<Partial<IPresentation>> & { presentationSubmission?: PresentationSubmission }
+  ): IPresentation {
+    const vcs = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
+    const holderDIDs = Array.from(new Set(vcs.map(vc => CredentialMapper.toWrappedVerifiableCredential(vc)).flatMap((vc: WrappedVerifiableCredential) => vc.credential.credentialSubject).map((subject: ICredentialSubject) => subject.id).filter(id => id !== undefined)));
+    let holder = opts?.holderDID ?? opts?.basePresentationPayload?.holder;
+
+    const formatKeys = opts?.presentationFormat && Object.keys(opts.presentationFormat);
+    if (!holder && holderDIDs.length > 1) {
+      if (opts?.presentationResultType === PresentationResultType.MULTIPLE_PRESENTATIONS) {
+        throw Error('Please call constructPresentations() instead to create multiple presentations from input credentials');
+      } else if (formatKeys?.includes('jwt') && opts?.presentationResultType === PresentationResultType.VP_FORMAT_BASED) {
+        throw Error('Please call constructPresentations() instead to create multiple presentations from input credentials');
+      }
+    }
+    if (holder && holderDIDs.length > 0 && !holderDIDs.includes(holder)) {
+      console.log(`Holder DID ${holder} for VP is different from some VC subject IDs (${JSON.stringify(holderDIDs)}) being used in the VP. This typically isn't intended`);
+    }
+    if (formatKeys?.includes('jwt') && holderDIDs.length > 1) {
+      // todo: Would not apply to SD-JWT
+      if (!holder) {
+        throw Error(`Cannot sign a single JWT when no holder is supplied and multiple credential subject DIDs are found ${JSON.stringify(holderDIDs)}`);
+      } else {
+        console.log(`JWT presentation format is used, multiple DIDs are found in credential subjects (${JSON.stringify(holderDIDs)}, but signing single VP with ${holder})`);
+      }
+    }
+    if (holderDIDs.length === 1 && !holder) {
+      holder = holderDIDs[0];
+    }
+
+    let type: string[] = [];
+    if (opts?.basePresentationPayload?.type) {
+      if (Array.isArray(opts.basePresentationPayload.type)) {
+        type = opts.basePresentationPayload.type;
+      } else {
+        type = [opts.basePresentationPayload.type];
+      }
+    }
     const context = opts?.basePresentationPayload?.['@context']
       ? Array.isArray(opts.basePresentationPayload['@context'])
         ? opts.basePresentationPayload['@context']
@@ -225,7 +382,7 @@ export class PEX {
     if (!type.includes('VerifiablePresentation')) {
       type.push('VerifiablePresentation');
     }
-    if (opts?.presentationSubmission) {
+    if (opts?.presentationSubmissionLocation !== PresentationSubmissionLocation.EXTERNAL && opts?.presentationSubmission) {
       if (!type.includes('PresentationSubmission')) {
         type.push('PresentationSubmission');
       }
@@ -233,13 +390,14 @@ export class PEX {
         context.push('https://identity.foundation/presentation-exchange/submission/v1');
       }
     }
+
     return {
       ...opts?.basePresentationPayload,
       '@context': context,
       type,
       holder,
       ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
-      verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[],
+      verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[]
     };
   }
 
@@ -258,13 +416,13 @@ export class PEX {
     const validators = [];
     result.version === PEVersion.v1
       ? validators.push({
-          bundler: new PresentationDefinitionV1VB('root'),
-          target: SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition as PresentationDefinitionV1),
-        })
+        bundler: new PresentationDefinitionV1VB('root'),
+        target: SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition as PresentationDefinitionV1)
+      })
       : validators.push({
-          bundler: new PresentationDefinitionV2VB('root'),
-          target: SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition as PresentationDefinitionV2),
-        });
+        bundler: new PresentationDefinitionV2VB('root'),
+        target: SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition as PresentationDefinitionV2)
+      });
     return new ValidationEngine().validate(validators);
   }
 
@@ -279,8 +437,8 @@ export class PEX {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationSubmissionVB('root'),
-        target: presentationSubmission,
-      },
+        target: presentationSubmission
+      }
     ]);
   }
 
@@ -305,12 +463,13 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation,
-    opts: VerifiablePresentationFromOpts,
+    opts: VerifiablePresentationFromOpts
   ): Promise<VerifiablePresentationResult> {
     const { holderDID, signatureOptions, proofOptions } = opts;
 
     const presentationSubmissionLocation = opts.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
-    const updatedOpts = {...opts, presentationSubmissionLocation}
+    const updatedOpts = { ...opts, presentationSubmissionLocation };
+    if (Array.isArray(opts.))
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -327,18 +486,23 @@ export class PEX {
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
     const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, {
       holderDIDs,
-      limitDisclosureSignatureSuites,
+      limitDisclosureSignatureSuites
     });
 
     const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, updatedOpts);
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
       limitDisclosureSignatureSuites,
       ...(presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
-        presentationSubmission: presentationResult.presentationSubmission,
-      }),
+        presentationSubmission: presentationResult.presentationSubmission
+      })
     });
-    if (!evaluationResults.value) {
+    if (evaluationResults.some(result => !result.value)) {
       throw new Error('Could not get evaluation results from presentationResult');
+    }
+    if (evaluationResults.length > 1) {
+      if (signatureOptions?.jws || signatureOptions?.proofValue) {
+        throw Error(`Multiple presentations need to be signed. That is impossible with a single JWS or ProofValue`)
+      }
     }
 
     const proof: Partial<IProof> = {
@@ -346,11 +510,11 @@ export class PEX {
       verificationMethod: signatureOptions?.verificationMethod,
       created: proofOptions?.created ? proofOptions.created : new Date().toISOString(),
       proofPurpose: proofOptions?.proofPurpose,
-      proofValue: signatureOptions?.proofValue,
-      jws: signatureOptions?.jws,
+      ...(signatureOptions?.proofValue && {proofValue: signatureOptions.proofValue}),
+      ...(signatureOptions?.jws && {jws: signatureOptions.jws}),
       challenge: proofOptions?.challenge,
       nonce: proofOptions?.nonce,
-      domain: proofOptions?.domain,
+      domain: proofOptions?.domain
     };
 
     const callBackParams: PresentationSignCallBackParams = {
@@ -360,14 +524,14 @@ export class PEX {
       selectedCredentials,
       proof,
       presentationSubmission: evaluationResults.value,
-      evaluationResults,
+      evaluationResults
     };
     const verifiablePresentation = await signingCallBack(callBackParams);
 
     return {
       verifiablePresentation,
       presentationSubmissionLocation,
-      presentationSubmission: evaluationResults.value,
+      presentationSubmission: evaluationResults.value
     };
   }
 

@@ -1,5 +1,17 @@
-import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import { IPresentation, IProof, IProofPurpose, IProofType, OriginalVerifiableCredential, W3CVerifiablePresentation } from '@sphereon/ssi-types';
+import {
+  Format,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
+  PresentationSubmission
+} from '@sphereon/pex-models';
+import {
+  IPresentation,
+  IProof,
+  IProofPurpose,
+  IProofType,
+  OriginalVerifiableCredential,
+  W3CVerifiablePresentation
+} from '@sphereon/ssi-types';
 
 import { EvaluationResults } from '../evaluation';
 
@@ -80,9 +92,9 @@ export enum PresentationSubmissionLocation {
  */
 export interface PresentationResult {
   /**
-   * The resulting presentation, can have an embedded submission data depending on the location parameter
+   * The resulting presentation(s), can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation;
+  presentation: IPresentation | IPresentation[];
 
   /**
    * The resulting location of the presentation submission.
@@ -119,11 +131,70 @@ export interface VerifiablePresentationResult {
   presentationSubmission: PresentationSubmission;
 }
 
-export interface PresentationFromOpts {
+/**
+ * Whether the input results in a single presentation, always in multiple presentations, or whether it takes the type of presentation and amount of holder DIDs into account
+ */
+export enum PresentationResultType {
+  SINGLE_PRESENTATION, // single presentation with potentially multiple proofs/signatures (does not work for regular JWTs)
+  MULTIPLE_PRESENTATIONS, // Always create separate VPs. Not compatible with presentation submissions internal to the VP, can only be used with external
+  VP_FORMAT_BASED // Determines whether there is one holder DID, then create a single VP. If there are multiple holder DIDs, it will create a single VP for LDP/JSON-ld VPs, but multiple for JWT VPs. Auto mode requires a format for the presentation
+
+}
+
+export interface PresentationConstruction {
+
   /**
-   * The optional holderDID of the presentation
+   * The format that the presentation should be in (not necessarily influences the encoding of methods using these options, but always influences logic, like for instance the result type handling)
+   */
+  presentationFormat?: Format;
+
+  /**
+   * Whether the input results in a single presentation, always in multiple presentations, or whether it takes the type of presentation and amount of holder DIDs into account
+   */
+  presentationResultType: PresentationResultType;
+
+  /**
+   * The optional holderDID of the presentation. If used it will be the sole holder DID of any resulting presentation, regardless of subject DIDs from VCs
+   *
+   * If you have multiple presentations and want to provide multiple holder DIDs, then you should use basePresentationPayload to pre-fill values corresponding to the presentation.
+   * This option is incompatible with multiple presentations and as a result an error will be thrown
+   *
    */
   holderDID?: string;
+
+  /**
+   * The presentation submission data location.
+   *
+   * Can be External, which means it is only returned and not embedded into the VP,
+   * or Presentation, which means it will become part of the VP
+   */
+  presentationSubmissionLocation: PresentationSubmissionLocation;
+
+  credentials: Set<OriginalVerifiableCredential>
+  jwtVCCount: number
+  ldpVCCount: number
+}
+
+export interface PresentationFromOpts<PayloadType extends Partial<IPresentation> | Partial<IPresentation>[]> {
+  /**
+   * The format that the presentation should be in (not necessarily influences the encoding of methods using these options, but always influences logic, like for instance the result type handling)
+   */
+  presentationFormat?: Format;
+
+  /**
+   * Whether the input results in a single presentation, always in multiple presentations, or whether it takes the type of presentation and amount of holder DIDs into account
+   */
+  presentationResultType?: PresentationResultType;
+
+  /**
+   * The optional holderDID of the presentation. If used it will be the sole holder DID of any resulting presentation, regardless of subject DIDs from VCs
+   *
+   * If you have multiple presentations and want to provide multiple holder DIDs, then you should use basePresentationPayload to pre-fill values corresponding to the presentation.
+   * This option is incompatible with multiple presentations and as a result an error will be thrown
+   *
+   */
+  holderDID?: string;
+
   /**
    * The presentation submission data location.
    *
@@ -133,12 +204,14 @@ export interface PresentationFromOpts {
   presentationSubmissionLocation?: PresentationSubmissionLocation;
 
   /**
-   * A base presentation payload. Can be used to provide default values. Be aware that any verifiable credential will always be overwritten
+   * A base presentation payload. Can be used to provide default values. Be aware that any verifiable credential's proofs will always be overwritten here.
+   *
+   * If multiple presentations are supplied, the logic needs to be able to match Presentations it created to the payloads, so probably at least the holder property should be filled
    */
-  basePresentationPayload?: IPresentation;
+  basePresentationPayload?: PayloadType;
 }
 
-export interface VerifiablePresentationFromOpts extends PresentationFromOpts {
+export interface VerifiablePresentationFromOpts extends PresentationFromOpts<Partial<IPresentation>|Partial<IPresentation>[]> {
   /**
    * Proof options
    */
