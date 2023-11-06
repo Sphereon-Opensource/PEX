@@ -152,7 +152,13 @@ export class EvaluationClientWrapper {
           submissionRequirementMatches.push(matchingDescriptors);
         }
       } else if (sr.from_nested) {
-        const srm: SubmissionRequirementMatch = { name: pd.name || pd.id, rule: sr.rule, from_nested: [], vc_path: [] };
+        const srm: SubmissionRequirementMatch = {
+          name: sr.name,
+          purpose: sr.purpose,
+          rule: sr.rule,
+          from_nested: [],
+          vc_path: [],
+        };
         if (srm && srm.from_nested) {
           sr.min ? (srm.min = sr.min) : undefined;
           sr.max ? (srm.max = sr.max) : undefined;
@@ -200,8 +206,12 @@ export class EvaluationClientWrapper {
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
+        console.log('marked', m);
         const inDesc = jp.query(pd, m.input_descriptor_path)[0];
-        srm.name = inDesc.name || inDesc.id;
+        console.log('inDesc', inDesc);
+        // srm.name = inDesc.name || inDesc.id;
+        srm.name = sr.name;
+        srm.purpose = sr.purpose;
         if (m.payload.group.includes(sr.from)) {
           if (srm.vc_path?.indexOf(m.verifiable_credential_path) === -1) {
             srm.vc_path.push(m.verifiable_credential_path);
@@ -361,7 +371,7 @@ export class EvaluationClientWrapper {
         const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
         if (sr.rule === Rules.All) {
           if (count !== groupCount.get(sr.from)) {
-            if(level === 0) throw Error(`Not all input descriptors are members of group ${sr.from}`);
+            if (level === 0) throw Error(`Not all input descriptors are members of group ${sr.from}`);
             continue;
           }
           total++;
@@ -377,9 +387,9 @@ export class EvaluationClientWrapper {
         }
       } else if (sr.from_nested) {
         const [count, matched] = this.evaluateRequirements(sr.from_nested, marked, groupCount, ++level);
-        if(sr.rule === Rules.All) {
+        if (sr.rule === Rules.All) {
           if (count !== sr.from_nested.length) {
-            if(level === 0) throw Error(`Not all input descriptors are matched.`);
+            if (level === 0) throw Error(`Not all input descriptors are matched.`);
             continue;
           }
           total++;

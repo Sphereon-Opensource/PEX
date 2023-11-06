@@ -2,6 +2,7 @@ import { Rules } from '@sphereon/pex-models';
 
 export interface SubmissionRequirementMatch {
   name?: string;
+  purpose?: string;
   rule: Rules;
   min?: number;
   count?: number;
