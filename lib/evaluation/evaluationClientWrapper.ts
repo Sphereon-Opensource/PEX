@@ -144,7 +144,8 @@ export class EvaluationClientWrapper {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
     for (const sr of submissionRequirements) {
       if (sr.from) {
-        const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
+        // const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
+        const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
         if (matchingDescriptors) {
           sr.min ? (matchingDescriptors.min = sr.min) : undefined;
           sr.max ? (matchingDescriptors.max = sr.max) : undefined;
@@ -198,7 +199,7 @@ export class EvaluationClientWrapper {
   }
 
   private mapMatchingDescriptors(
-    pd: IInternalPresentationDefinition,
+    // pd: IInternalPresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
@@ -206,9 +207,8 @@ export class EvaluationClientWrapper {
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
-        console.log('marked', m);
-        const inDesc = jp.query(pd, m.input_descriptor_path)[0];
-        console.log('inDesc', inDesc);
+        // const inDesc = jp.query(pd, m.input_descriptor_path)[0];
+        // console.log('[mapMatchingDescriptors]', { sr, marked: m, inDesc });
         // srm.name = inDesc.name || inDesc.id;
         srm.name = sr.name;
         srm.purpose = sr.purpose;
