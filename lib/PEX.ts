@@ -1,5 +1,6 @@
 import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
+  CredentialMapper,
   IPresentation,
   IProof,
   OriginalVerifiableCredential,
@@ -21,7 +22,7 @@ import {
   VerifiablePresentationResult,
 } from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
-import { definitionVersionDiscovery } from './utils';
+import { definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 
 /**
@@ -58,7 +59,7 @@ export class PEX {
     },
   ): EvaluationResults {
     const generatePresentationSubmission =
-      opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission !== undefined;
+      opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission === undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
     const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
@@ -190,6 +191,7 @@ export class PEX {
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,
+      // We only pass in the submission in case it needs to be included in the presentation
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
     });
     return {
@@ -207,12 +209,28 @@ export class PEX {
       basePresentationPayload?: IPresentation;
     },
   ): IPresentation {
-    const holder = opts?.holderDID;
-    const type = Array.isArray(opts?.basePresentationPayload?.type)
-      ? opts?.basePresentationPayload?.type || []
-      : opts?.basePresentationPayload?.type
-      ? [opts.basePresentationPayload.type]
+    if (!selectedCredentials) {
+      throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
+    }
+    const verifiableCredential = (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[];
+    const wVCs = verifiableCredential.map((vc) => CredentialMapper.toWrappedVerifiableCredential(vc));
+    const holders = Array.from(new Set(wVCs.flatMap((wvc) => getSubjectIdsAsString(wvc.credential))));
+    if (holders.length !== 1 && !opts?.holderDID) {
+      console.log(
+        `We deduced ${holders.length} subject from ${wVCs.length} Verifiable Credentials, and no holder property was given. This might lead to undesired results`,
+      );
+    }
+    const holder = opts?.holderDID ?? (holders.length === 1 ? holders[0] : undefined);
+
+    const type = opts?.basePresentationPayload?.type
+      ? Array.isArray(opts.basePresentationPayload.type)
+        ? opts.basePresentationPayload.type
+        : [opts.basePresentationPayload.type]
       : [];
+    if (!type.includes('VerifiablePresentation')) {
+      type.push('VerifiablePresentation');
+    }
+
     const context = opts?.basePresentationPayload?.['@context']
       ? Array.isArray(opts.basePresentationPayload['@context'])
         ? opts.basePresentationPayload['@context']
@@ -222,9 +240,6 @@ export class PEX {
       context.push('https://www.w3.org/2018/credentials/v1');
     }
 
-    if (!type.includes('VerifiablePresentation')) {
-      type.push('VerifiablePresentation');
-    }
     if (opts?.presentationSubmission) {
       if (!type.includes('PresentationSubmission')) {
         type.push('PresentationSubmission');
@@ -238,8 +253,8 @@ export class PEX {
       '@context': context,
       type,
       holder,
-      ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
-      verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[],
+      ...(opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
+      verifiableCredential,
     };
   }
 
@@ -334,6 +349,7 @@ export class PEX {
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
       limitDisclosureSignatureSuites,
       ...(presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
+        // The method will pickup submissions included in the Presentation anyway
         presentationSubmission: presentationResult.presentationSubmission,
       }),
     });

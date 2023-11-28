@@ -1,5 +1,20 @@
 # Release Notes
 
+## v2.2.2 - 2023-11-28
+
+- Updated:
+    - Updated pex-model deps
+    - Added more logic to deduce holder(s) for a VP
+- Fixed:
+  - Logic when to generate a presentation submission was incorrect 
+
+## v2.2.1 - 2023-10-23
+
+- Updated:
+    - Updated logic to return holder DID when constructing presentation
+- Fixed:
+    - Issue with determining whether to generate submission data or not.
+
 ## v2.2.0 - 2023-10-12
 
 - Updated:
