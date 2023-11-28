@@ -50,7 +50,8 @@
             "jwt_vp",
             "ldp",
             "ldp_vc",
-            "ldp_vp"
+            "ldp_vp",
+            "vc+sd-jwt"
           ]
         }
       },
