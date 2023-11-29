@@ -1,5 +1,14 @@
 import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
-import { IPresentation, IProof, IProofPurpose, IProofType, OriginalVerifiableCredential, W3CVerifiablePresentation } from '@sphereon/ssi-types';
+import {
+  CompactSdJwtVc,
+  IPresentation,
+  IProof,
+  IProofPurpose,
+  IProofType,
+  OriginalVerifiableCredential,
+  SdJwtDecodedVerifiablePresentation,
+  W3CVerifiablePresentation,
+} from '@sphereon/ssi-types';
 
 import { EvaluationResults } from '../evaluation';
 
@@ -62,7 +71,7 @@ export interface SignatureOptions {
   proofValue?: string; // One of any number of valid representations of proof values
 
   /**
-   * Can be used if you want to provide the JSW proof value directly without relying on the callback function generating it
+   * Can be used if you want to provide the JWS proof value directly without relying on the callback function generating it
    */
   jws?: string; // JWS based proof
 }
@@ -82,7 +91,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation;
+  presentation: IPresentation | SdJwtDecodedVerifiablePresentation;
 
   /**
    * The resulting location of the presentation submission.
@@ -104,7 +113,7 @@ export interface VerifiablePresentationResult {
   /**
    * The resulting VP, can have an embedded submission data depending on the location parameter
    */
-  verifiablePresentation: W3CVerifiablePresentation;
+  verifiablePresentation: W3CVerifiablePresentation | CompactSdJwtVc;
 
   /**
    * The resulting location of the presentation submission.
@@ -158,14 +167,20 @@ export interface PresentationSignCallBackParams {
 
   /**
    * The selected credentials to include in the eventual VP as determined by PEX and/or user
+   *
+   * NOTE: when the presentation is a decoded SD-JWT, this property will only contain a single SD-JWT credential
    */
   selectedCredentials: OriginalVerifiableCredential[];
 
   /**
    * The presentation object created from the definition and verifiable credentials.
    * Can be used directly or in more complex situations can be discarded by using the definition, credentials, proof options, submission and evaluation results
+   *
+   * When the presentation is a decoded SD-JWT VP, the the compact SD-JWT contains the SD-JWT with the (optionally selectively disclosed) disclosures
+   * and only the optional KB-JWT should be appended to the `compactSdJwt` property. If no KB-JWT is needed on the presentation, the `compactSdJwt` property
+   * from the decoded SD-JWT can be returned as-is.
    */
-  presentation: IPresentation;
+  presentation: IPresentation | SdJwtDecodedVerifiablePresentation;
 
   /**
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already

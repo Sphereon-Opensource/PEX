@@ -1,5 +1,5 @@
 import { Format, PresentationDefinitionV1, PresentationSubmission } from '@sphereon/pex-models';
-import { IPresentation, OriginalVerifiableCredential, OriginalVerifiablePresentation } from '@sphereon/ssi-types';
+import { CredentialMapper, IPresentation, OriginalVerifiableCredential, OriginalVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { PEX } from './PEX';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
@@ -11,10 +11,6 @@ import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './valid
  * This is the main interfacing class for using this library for v1 of presentation exchange
  */
 export class PEXv1 extends PEX {
-  constructor() {
-    super();
-  }
-
   /***
    * The evaluatePresentationV1 compares what is expected from a presentation with a presentationDefinitionV1.
    *
@@ -111,16 +107,29 @@ export class PEXv1 extends PEX {
     selectedCredentials: OriginalVerifiableCredential[],
     opts?: PresentationFromOpts,
   ): PresentationResult {
-    const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this._evaluationClientWrapper.submissionFrom(
       SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition),
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials),
       opts,
     );
+
+    const hasSdJwtCredentials = selectedCredentials.some(CredentialMapper.isSdJwtDecodedCredential);
+
+    // We could include it in the KB-JWT? Not sure if we want that
+    if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION && hasSdJwtCredentials) {
+      throw new Error('Presentation submission location cannot be set to presentation when creating a presentation with an SD-JWT VC');
+    }
+
+    const presentationSubmissionLocation =
+      opts?.presentationSubmissionLocation ?? hasSdJwtCredentials
+        ? PresentationSubmissionLocation.EXTERNAL
+        : PresentationSubmissionLocation.PRESENTATION;
+
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
     });
+
     return {
       presentation,
       presentationSubmissionLocation,

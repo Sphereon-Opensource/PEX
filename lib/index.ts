@@ -6,6 +6,7 @@ import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequire
 import { InputFieldType, IPresentationDefinition, PEVersion } from './types';
 import { Validated, Validation, ValidationEngine, ValidationPredicate, Validator } from './validation';
 
+export { decodeSdJwtVc } from './utils';
 export { SubmissionRequirementMatch, HandlerCheckResult, EvaluationResults, SelectResults };
 export * from './signing';
 export { Validation, Validated, ValidationPredicate, Validator, ValidationEngine };

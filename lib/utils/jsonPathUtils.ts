@@ -72,6 +72,13 @@ export class JsonPathUtils {
     }
   }
 
+  public static setValue<O, T>(obj: O, path: string | PathComponent[], newValue: T): O {
+    const stringPath = typeof path === 'string' ? path : jp.stringify(path);
+    jp.value(obj, stringPath, newValue);
+
+    return obj;
+  }
+
   private static copyResultPathToDestinationDefinition(pathDetails: (string | number)[], pd: IPresentationDefinition, newPropertyName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let objectCursor: any = pd;

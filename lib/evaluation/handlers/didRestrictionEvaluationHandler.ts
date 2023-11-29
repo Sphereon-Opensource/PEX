@@ -1,4 +1,4 @@
-import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { CredentialMapper, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from '../../types';
@@ -21,14 +21,14 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     (pd as InternalPresentationDefinitionV1 | InternalPresentationDefinitionV2).input_descriptors.forEach((_inputDescriptor, index) => {
       wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
-        const issuer = typeof wvc.credential.issuer === 'object' ? wvc.credential.issuer.id : wvc.credential.issuer;
+        const issuerId = this.getIssuerIdFromWrappedVerifiableCredential(wvc);
         if (
           !this.client.hasRestrictToDIDMethods() ||
-          !issuer ||
-          isRestrictedDID(issuer, this.client.restrictToDIDMethods) ||
-          !issuer.toLowerCase().startsWith('did:')
+          !issuerId ||
+          isRestrictedDID(issuerId, this.client.restrictToDIDMethods) ||
+          !issuerId.toLowerCase().startsWith('did:')
         ) {
-          this.getResults().push(this.generateSuccessResult(index, `$[${vcIndex}]`, wvc, `${issuer} is allowed`));
+          this.getResults().push(this.generateSuccessResult(index, `$[${vcIndex}]`, wvc, `${issuerId} is allowed`));
         } else {
           this.getResults().push(this.generateErrorResult(index, `$[${vcIndex}]`, wvc));
         }
@@ -36,6 +36,16 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
     });
 
     this.updatePresentationSubmission(pd);
+  }
+
+  private getIssuerIdFromWrappedVerifiableCredential(wrappedVc: WrappedVerifiableCredential) {
+    if (CredentialMapper.isW3cCredential(wrappedVc.credential)) {
+      return typeof wrappedVc.credential.issuer === 'object' ? wrappedVc.credential.issuer.id : wrappedVc.credential.issuer;
+    } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.original)) {
+      return wrappedVc.original.decodedPayload.iss;
+    }
+
+    throw new Error('Unsupported credential type');
   }
 
   private generateErrorResult(idIdx: number, vcPath: string, wvc: WrappedVerifiableCredential): HandlerCheckResult {

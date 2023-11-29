@@ -12,7 +12,6 @@ describe('evaluate mattr tests', () => {
   it('should pass with OpenBadgeCredential but as jwt_vc whilst descriptor wants jwt_json', () => {
     const pex: PEX = new PEX();
     const result = pex.evaluateCredentials(pd, vcs);
-    console.log(JSON.stringify(result, null, 2));
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
   });
 

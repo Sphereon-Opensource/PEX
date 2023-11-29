@@ -1,9 +1,13 @@
 import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
+  CompactSdJwtVc,
+  CredentialMapper,
   IPresentation,
   IProof,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
+  OrPromise,
+  SdJwtDecodedVerifiablePresentation,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
@@ -67,7 +71,13 @@ export class PEX {
       throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
     }
 
-    const holderDIDs = wrappedPresentation.presentation.holder ? [wrappedPresentation.presentation.holder] : [];
+    // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
+    // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
+    const holderDIDs =
+      CredentialMapper.isW3cPresentation(wrappedPresentation.presentation) && wrappedPresentation.presentation.holder
+        ? [wrappedPresentation.presentation.holder]
+        : [];
+
     const updatedOpts = {
       ...opts,
       holderDIDs,
@@ -186,12 +196,24 @@ export class PEX {
     selectedCredentials: OriginalVerifiableCredential[],
     opts?: PresentationFromOpts,
   ): PresentationResult {
-    const presentationSubmissionLocation = opts?.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
+    const hasSdJwtCredentials = selectedCredentials.some(CredentialMapper.isSdJwtDecodedCredential);
+
+    // We could include it in the KB-JWT? Not sure if we want that
+    if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION && hasSdJwtCredentials) {
+      throw new Error('Presentation submission location cannot be set to presentation when creating a presentation with an SD-JWT VC');
+    }
+
+    const presentationSubmissionLocation =
+      opts?.presentationSubmissionLocation ?? hasSdJwtCredentials
+        ? PresentationSubmissionLocation.EXTERNAL
+        : PresentationSubmissionLocation.PRESENTATION;
+
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
     });
+
     return {
       presentation,
       presentationSubmissionLocation,
@@ -206,41 +228,67 @@ export class PEX {
       holderDID?: string;
       basePresentationPayload?: IPresentation;
     },
-  ): IPresentation {
-    const holder = opts?.holderDID;
-    const type = Array.isArray(opts?.basePresentationPayload?.type)
-      ? opts?.basePresentationPayload?.type || []
-      : opts?.basePresentationPayload?.type
-      ? [opts.basePresentationPayload.type]
-      : [];
-    const context = opts?.basePresentationPayload?.['@context']
-      ? Array.isArray(opts.basePresentationPayload['@context'])
-        ? opts.basePresentationPayload['@context']
-        : [opts.basePresentationPayload['@context']]
-      : [];
-    if (!context.includes('https://www.w3.org/2018/credentials/v1')) {
-      context.push('https://www.w3.org/2018/credentials/v1');
-    }
+  ): IPresentation | SdJwtDecodedVerifiablePresentation {
+    const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
-    if (!type.includes('VerifiablePresentation')) {
-      type.push('VerifiablePresentation');
-    }
-    if (opts?.presentationSubmission) {
-      if (!type.includes('PresentationSubmission')) {
-        type.push('PresentationSubmission');
+    // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
+    // in addition we want to create the KB-JWT payload as well.
+    // FIXME: include the KB-JWT payload?
+    if (credentials.some(CredentialMapper.isSdJwtDecodedCredential)) {
+      if (credentials.length > 1) {
+        // Until there's some consensus around the following issue, we'll only support a single
+        // SD-JWT credential in a presentation
+        // https://github.com/decentralized-identity/presentation-exchange/issues/462
+        throw new Error('Only a single credential is supported when creating a presentation with an SD-JWT VC');
       }
-      if (!context.includes('https://identity.foundation/presentation-exchange/submission/v1')) {
-        context.push('https://identity.foundation/presentation-exchange/submission/v1');
+
+      if (opts?.presentationSubmission) {
+        throw new Error('Presentation submission cannot be included in the presentation when creating a presentation with an SD-JWT VC');
       }
+
+      // FIXME: should we allow setting the KB-JWT as the basePresentationPayload?
+      if (opts?.basePresentationPayload) {
+        throw new Error('Base presentation payload cannot be when creating a presentation from an SD-JWT VC');
+      }
+
+      // FIXME: we want to apply selective disclosure here, based on the presentationFrame that may be present in the SD-JWT (or it should already be done)
+      return credentials[0] as SdJwtDecodedVerifiablePresentation;
+    } else {
+      const holder = opts?.holderDID;
+      const type = Array.isArray(opts?.basePresentationPayload?.type)
+        ? opts?.basePresentationPayload?.type || []
+        : opts?.basePresentationPayload?.type
+        ? [opts.basePresentationPayload.type]
+        : [];
+      const context = opts?.basePresentationPayload?.['@context']
+        ? Array.isArray(opts.basePresentationPayload['@context'])
+          ? opts.basePresentationPayload['@context']
+          : [opts.basePresentationPayload['@context']]
+        : [];
+      if (!context.includes('https://www.w3.org/2018/credentials/v1')) {
+        context.push('https://www.w3.org/2018/credentials/v1');
+      }
+
+      if (!type.includes('VerifiablePresentation')) {
+        type.push('VerifiablePresentation');
+      }
+      if (opts?.presentationSubmission) {
+        if (!type.includes('PresentationSubmission')) {
+          type.push('PresentationSubmission');
+        }
+        if (!context.includes('https://identity.foundation/presentation-exchange/submission/v1')) {
+          context.push('https://identity.foundation/presentation-exchange/submission/v1');
+        }
+      }
+      return {
+        ...opts?.basePresentationPayload,
+        '@context': context,
+        type,
+        holder,
+        ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
+        verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[],
+      };
     }
-    return {
-      ...opts?.basePresentationPayload,
-      '@context': context,
-      type,
-      holder,
-      ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
-      verifiableCredential: (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[],
-    };
   }
 
   /**
@@ -304,13 +352,10 @@ export class PEX {
   public async verifiablePresentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    signingCallBack: (callBackParams: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation> | W3CVerifiablePresentation,
+    signingCallBack: (callBackParams: PresentationSignCallBackParams) => OrPromise<W3CVerifiablePresentation | CompactSdJwtVc>,
     opts: VerifiablePresentationFromOpts,
   ): Promise<VerifiablePresentationResult> {
     const { holderDID, signatureOptions, proofOptions } = opts;
-
-    const presentationSubmissionLocation = opts.presentationSubmissionLocation ?? PresentationSubmissionLocation.PRESENTATION;
-    const updatedOpts = { ...opts, presentationSubmissionLocation };
 
     function limitedDisclosureSuites() {
       let limitDisclosureSignatureSuites: string[] = [];
@@ -330,10 +375,10 @@ export class PEX {
       limitDisclosureSignatureSuites,
     });
 
-    const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, updatedOpts);
+    const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, opts);
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
       limitDisclosureSignatureSuites,
-      ...(presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
+      ...(presentationResult.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
         presentationSubmission: presentationResult.presentationSubmission,
       }),
     });
@@ -354,7 +399,10 @@ export class PEX {
     };
 
     const callBackParams: PresentationSignCallBackParams = {
-      options: updatedOpts,
+      options: {
+        ...opts,
+        presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
+      },
       presentation: presentationResult.presentation,
       presentationDefinition,
       selectedCredentials,
@@ -366,7 +414,7 @@ export class PEX {
 
     return {
       verifiablePresentation,
-      presentationSubmissionLocation,
+      presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
       presentationSubmission: evaluationResults.value,
     };
   }

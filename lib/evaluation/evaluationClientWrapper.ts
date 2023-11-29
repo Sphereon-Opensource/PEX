@@ -1,6 +1,12 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
-import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import {
+  CredentialMapper,
+  IVerifiableCredential,
+  OriginalVerifiableCredential,
+  SdJwtDecodedVerifiableCredential,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { PresentationSubmissionLocation } from '../signing';
@@ -311,7 +317,8 @@ export class EvaluationClientWrapper {
     this._client.evaluate(pd, wvcs, opts);
     const result: EvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
-      verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential),
+      // TODO: we should handle the string case
+      verifiableCredential: wvcs.map((wrapped) => wrapped.original as IVerifiableCredential | SdJwtDecodedVerifiableCredential),
     };
     result.warnings = this.formatNotInfo(Status.WARN);
     result.errors = this.formatNotInfo(Status.ERROR);
@@ -327,7 +334,7 @@ export class EvaluationClientWrapper {
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
     if (this._client.generatePresentationSubmission) {
-      this.updatePresentationSubmissionPathToAlias('verifiableCredential', result.value);
+      this.updatePresentationSubmissionPathToVpPath(result.value);
     }
     result.verifiableCredential = this._client.wrappedVcs.map((wrapped) => wrapped.original as IVerifiableCredential);
     result.areRequiredCredentialsPresent = result.value?.descriptor_map?.length ? Status.INFO : Status.ERROR;
@@ -384,7 +391,7 @@ export class EvaluationClientWrapper {
       const result: [number, HandlerCheckResult[]] = this.evaluateRequirements(pd.submission_requirements, updatedMarked, groupCount, 0);
       const finalIdx = upIdx.filter((ui) => result[1].find((r) => r.verifiable_credential_path === ui[1]));
       this.updatePresentationSubmission(finalIdx);
-      this.updatePresentationSubmissionPathToAlias('verifiableCredential');
+      this.updatePresentationSubmissionPathToVpPath();
       if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
         this.updatePresentationSubmissionToExternal();
       }
@@ -395,7 +402,8 @@ export class EvaluationClientWrapper {
     );
     const updatedIndexes = this.matchUserSelectedVcs(marked, vcs);
     this.updatePresentationSubmission(updatedIndexes[1]);
-    this.updatePresentationSubmissionPathToAlias('verifiableCredential');
+
+    this.updatePresentationSubmissionPathToVpPath();
     if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
       this.updatePresentationSubmissionToExternal();
     }
@@ -548,11 +556,10 @@ export class EvaluationClientWrapper {
   public fillSelectableCredentialsToVerifiableCredentialsMapping(selectResults: SelectResults, wrappedVcs: WrappedVerifiableCredential[]) {
     if (selectResults) {
       selectResults.verifiableCredential?.forEach((selectableCredential) => {
-        const foundIndex: number = ObjectUtils.isString(selectableCredential)
-          ? wrappedVcs.findIndex((wrappedVc) => selectableCredential === wrappedVc.original)
-          : wrappedVcs.findIndex(
-              (wrappedVc) => JSON.stringify((selectableCredential as IVerifiableCredential).proof) === JSON.stringify(wrappedVc.credential.proof),
-            );
+        const foundIndex = wrappedVcs.findIndex((wrappedVc) =>
+          CredentialMapper.areOriginalVerifiableCredentialsEqual(wrappedVc.original, selectableCredential),
+        );
+
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
@@ -663,16 +670,27 @@ export class EvaluationClientWrapper {
     }
   }
 
-  private updatePresentationSubmissionPathToAlias(alias: string, presentationSubmission?: PresentationSubmission) {
-    if (presentationSubmission) {
-      presentationSubmission.descriptor_map.forEach((d) => {
-        this.replacePathWithAlias(d, alias);
-      });
-    } else if (this._client.generatePresentationSubmission) {
-      this._client.presentationSubmission.descriptor_map.forEach((d) => {
-        this.replacePathWithAlias(d, alias);
-      });
-    }
+  private updatePresentationSubmissionPathToVpPath(presentationSubmission?: PresentationSubmission) {
+    const descriptorMap = presentationSubmission
+      ? presentationSubmission.descriptor_map
+      : this._client.generatePresentationSubmission
+      ? this._client.presentationSubmission.descriptor_map
+      : undefined;
+
+    descriptorMap?.forEach((d) => {
+      // NOTE: currently we only support a single VP for a single PD, so that means an SD-JWT will always have the path '$'.
+      // If there is more consensus on whether a PD can result in one submission with multiple VPs, we could tweak this logic
+      // to keep supporting arrays (so it will just stay as the input format) if there's multiple SD-JWTs that are included
+      // in the presentation submission (we would allow the presentationFrom and verifiablePresentationFrom to just return
+      // an array of VPs, while still one submission is returned. This will also help with creating multiple VPs for JWT credentials)
+      // See https://github.com/decentralized-identity/presentation-exchange/issues/462
+      // Also see: https://github.com/openid/OpenID4VP/issues/69
+      if (d.format === 'vc+sd-jwt') {
+        d.path = '$';
+      } else {
+        this.replacePathWithAlias(d, 'verifiableCredential');
+      }
+    });
   }
 
   private replacePathWithAlias(descriptor: Descriptor, alias: string) {

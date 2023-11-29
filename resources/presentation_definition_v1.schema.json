@@ -96,7 +96,7 @@
     "format": {
       "type": "object",
       "properties": {
-        "^vc+sd-jwt$": {
+        "vc+sd-jwt": {
           "type": "object",
           "properties": {
             "sd-jwt_alg_values": {
