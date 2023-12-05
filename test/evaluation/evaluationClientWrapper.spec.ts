@@ -8,6 +8,7 @@ import {
   IVerifiableCredential,
   IVerifiablePresentation,
   WrappedVerifiableCredential,
+  WrappedW3CVerifiableCredential,
 } from '@sphereon/ssi-types';
 
 import { Status } from '../../lib';
@@ -149,7 +150,8 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -169,7 +171,8 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toEqual('etc');
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toEqual('etc');
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getSuccess().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -189,7 +192,8 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getWarn().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings).toEqual(evaluationClientWrapperData.getWarn().warnings);
@@ -209,7 +213,8 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);
@@ -229,7 +234,8 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]),
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
     expect(evaluationResults.value).toEqual(evaluationClientWrapperData.getSuccess().value);
     expect(evaluationResults.errors?.length).toEqual(0);
     expect(evaluationResults.warnings?.length).toEqual(0);

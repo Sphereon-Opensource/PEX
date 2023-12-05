@@ -41,8 +41,8 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
   private getIssuerIdFromWrappedVerifiableCredential(wrappedVc: WrappedVerifiableCredential) {
     if (CredentialMapper.isW3cCredential(wrappedVc.credential)) {
       return typeof wrappedVc.credential.issuer === 'object' ? wrappedVc.credential.issuer.id : wrappedVc.credential.issuer;
-    } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.original)) {
-      return wrappedVc.original.decodedPayload.iss;
+    } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.credential)) {
+      return wrappedVc.credential.decodedPayload.iss;
     }
 
     throw new Error('Unsupported credential type');

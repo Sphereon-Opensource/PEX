@@ -1,10 +1,10 @@
-import { IProof, IProofPurpose, IProofType, W3CVerifiablePresentation } from '@sphereon/ssi-types';
+import { IPresentation, IProof, IProofPurpose, IProofType, W3CVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { KeyEncoding, PresentationSignCallBackParams, ProofOptions, SignatureOptions } from '../../lib';
 
 export function mockCallback(opts: PresentationSignCallBackParams): W3CVerifiablePresentation {
   return {
-    ...opts.presentation,
+    ...(opts.presentation as IPresentation),
     proof: {
       ...opts.proof,
       proofValue: 'fake',

@@ -74,15 +74,17 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     wrappedVcs: WrappedVerifiableCredential[],
     limitDisclosure: Optionality,
   ) {
-    if (CredentialMapper.isSdJwtDecodedCredential(wvc.original)) {
-      const presentationFrame = this.createSdJwtPresentationFrame(wvc.original, fields, idIdx, index);
+    if (CredentialMapper.isWrappedSdJwtVerifiableCredential(wvc)) {
+      const presentationFrame = this.createSdJwtPresentationFrame(wvc.credential, fields, idIdx, index);
 
       // We update the SD-JWT to it's presentation format (remove disclosures, update pretty payload, etc..), except
       // we don't create or include the (optional) KB-JWT yet, this is done when we create the presentation
       if (presentationFrame) {
-        applySdJwtLimitDisclosure(wvc.original, presentationFrame);
-        wvc.credential = wvc.original.decodedPayload;
-        wvc.decoded = wvc.original.decodedPayload;
+        applySdJwtLimitDisclosure(wvc.credential, presentationFrame);
+        wvc.decoded = wvc.credential.decodedPayload
+        // We need to overwrite the original, as that is returned in the selectFrom method
+        // But we also want to keep the format of the original credential.
+        wvc.original = CredentialMapper.isSdJwtDecodedCredential(wvc.original) ? wvc.credential : wvc.credential.compactSdJwtVc
 
         this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
       }

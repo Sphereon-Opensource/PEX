@@ -3,7 +3,7 @@
   "name": "Permanent Resident Card",
   "type": [
     "PermanentResidentCard",
-    "verifiableCredential"
+    "VerifiableCredential"
   ],
   "id": "https://issuer.oidp.uscis.gov/credentials/83627465dsdsdsd",
   "credentialSubject": {

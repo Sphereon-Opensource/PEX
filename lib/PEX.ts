@@ -2,17 +2,18 @@ import { Format, PresentationDefinitionV1, PresentationDefinitionV2, Presentatio
 import {
   CompactSdJwtVc,
   CredentialMapper,
+  Hasher,
   IPresentation,
   IProof,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   OrPromise,
-  SdJwtDecodedVerifiablePresentation,
+  SdJwtDecodedVerifiableCredential,
+  W3CVerifiableCredential,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
   WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
-import { W3CVerifiableCredential } from '@sphereon/ssi-types/src/types/vc';
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
@@ -21,22 +22,39 @@ import {
   PresentationResult,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
+  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
+  SdJwtKbJwtInput,
   VerifiablePresentationFromOpts,
   VerifiablePresentationResult,
 } from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
-import { definitionVersionDiscovery } from './utils';
+import { calculateSdHash, definitionVersionDiscovery } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+
+export interface PEXOptions {
+  /**
+   * Hasher implementation, can be used for tasks such as decoding a compact SD-JWT VC to it's encoded variant.
+   * When decoding SD-JWT credentials the hasher must be provided. The hasher implementation must be sync. When using
+   * an async hasher implementation, you must manually decode the credential or presentation first according to the
+   * `SdJwtDecodedVerifiableCredential` interface. You can use the `CredentialMapper.decodeSdJwtAsync` method for
+   *  this from the `@sphereon/ssi-types` package. NOTE that this is only needed when using an async hasher, and
+   * that for sync hashers providing it here is enough for the decoding to be done automatically.
+   */
+  hasher?: Hasher;
+}
 
 /**
  * This is the main interfacing class to be used by developers using the PEX library.
  */
 export class PEX {
   protected _evaluationClientWrapper: EvaluationClientWrapper;
+  protected options?: PEXOptions;
 
-  constructor() {
+  constructor(options?: PEXOptions) {
     // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it elsewhere. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
+
+    this.options = options;
   }
 
   /***
@@ -65,7 +83,10 @@ export class PEX {
       opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission !== undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
-    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(presentationCopy);
+    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(
+      presentationCopy,
+      this.options?.hasher,
+    );
     const presentationSubmission = opts?.presentationSubmission ?? wrappedPresentation.decoded.presentation_submission;
     if (!presentationSubmission && !generatePresentationSubmission) {
       throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
@@ -117,8 +138,10 @@ export class PEX {
       restrictToDIDMethods?: string[];
     },
   ): EvaluationResults {
-    const wrappedVerifiableCredentials: WrappedVerifiableCredential[] =
-      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentials);
+    const wrappedVerifiableCredentials: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
+      verifiableCredentials,
+      this.options?.hasher,
+    );
 
     // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it here. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
@@ -160,7 +183,11 @@ export class PEX {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it here. We need to retrhink how to instantiate PEX
     this._evaluationClientWrapper = new EvaluationClientWrapper();
-    return this._evaluationClientWrapper.selectFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy), opts);
+    return this._evaluationClientWrapper.selectFrom(
+      pd,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy, this.options?.hasher),
+      opts,
+    );
   }
 
   public presentationSubmissionFrom(
@@ -177,7 +204,11 @@ export class PEX {
     },
   ): PresentationSubmission {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
-    return this._evaluationClientWrapper.submissionFrom(pd, SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials), opts);
+    return this._evaluationClientWrapper.submissionFrom(
+      pd,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials, this.options?.hasher),
+      opts,
+    );
   }
 
   /**
@@ -197,7 +228,7 @@ export class PEX {
     opts?: PresentationFromOpts,
   ): PresentationResult {
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
-    const hasSdJwtCredentials = selectedCredentials.some(CredentialMapper.isSdJwtDecodedCredential);
+    const hasSdJwtCredentials = selectedCredentials.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c));
 
     // We could include it in the KB-JWT? Not sure if we want that
     if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION && hasSdJwtCredentials) {
@@ -212,6 +243,7 @@ export class PEX {
     const presentation = PEX.constructPresentation(selectedCredentials, {
       ...opts,
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
+      hasher: this.options?.hasher,
     });
 
     return {
@@ -227,14 +259,18 @@ export class PEX {
       presentationSubmission?: PresentationSubmission;
       holderDID?: string;
       basePresentationPayload?: IPresentation;
+      /**
+       * Hasher to use when decoding an SD-JWT credential.
+       */
+      hasher?: Hasher;
     },
-  ): IPresentation | SdJwtDecodedVerifiablePresentation {
+  ): IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput {
     const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
     // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
     // in addition we want to create the KB-JWT payload as well.
     // FIXME: include the KB-JWT payload?
-    if (credentials.some(CredentialMapper.isSdJwtDecodedCredential)) {
+    if (credentials.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c))) {
       if (credentials.length > 1) {
         // Until there's some consensus around the following issue, we'll only support a single
         // SD-JWT credential in a presentation
@@ -246,13 +282,40 @@ export class PEX {
         throw new Error('Presentation submission cannot be included in the presentation when creating a presentation with an SD-JWT VC');
       }
 
-      // FIXME: should we allow setting the KB-JWT as the basePresentationPayload?
       if (opts?.basePresentationPayload) {
         throw new Error('Base presentation payload cannot be when creating a presentation from an SD-JWT VC');
       }
 
-      // FIXME: we want to apply selective disclosure here, based on the presentationFrame that may be present in the SD-JWT (or it should already be done)
-      return credentials[0] as SdJwtDecodedVerifiablePresentation;
+      // NOTE: we assume the credential already has selective disclosure applied, even if it is encoded. Is
+      // that a valid assumption? It seems to be this way for BBS SD as well
+      const decoded = (
+        CredentialMapper.isSdJwtEncoded(credentials[0]) ? CredentialMapper.decodeVerifiableCredential(credentials[0], opts?.hasher) : credentials[0]
+      ) as SdJwtDecodedVerifiableCredential;
+
+      if (!opts?.hasher) {
+        throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
+      }
+
+      // extract sd_alg or default to sha-256
+      const hashAlg = decoded.signedPayload._sd_alg ?? 'sha-256';
+      const sdHash = calculateSdHash(decoded.compactSdJwtVc, hashAlg, opts.hasher);
+
+      const kbJwt = {
+        // alg MUST be set by the signer
+        header: {
+          typ: 'kb+jwt',
+        },
+        // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
+        payload: {
+          iat: new Date().getTime(),
+          _sd_hash: sdHash,
+        },
+      } satisfies SdJwtKbJwtInput;
+
+      return {
+        ...decoded,
+        kbJwt,
+      };
     } else {
       const holder = opts?.holderDID;
       const type = Array.isArray(opts?.basePresentationPayload?.type)
@@ -398,12 +461,42 @@ export class PEX {
       domain: proofOptions?.domain,
     };
 
+    let presentation = presentationResult.presentation;
+
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation)) {
+      if (!this.options?.hasher) {
+        throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
+      }
+
+      // extract sd_alg or default to sha-256
+      const hashAlg = presentationResult.presentation.signedPayload._sd_alg ?? 'sha-256';
+      const sdHash = calculateSdHash(presentationResult.presentation.compactSdJwtVc, hashAlg, this.options.hasher);
+
+      const kbJwt = {
+        // alg MUST be set by the signer
+        header: {
+          typ: 'kb+jwt',
+        },
+        // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
+        payload: {
+          iat: new Date().getTime(),
+          nonce: proofOptions?.nonce,
+          _sd_hash: sdHash,
+        },
+      } satisfies SdJwtKbJwtInput;
+
+      presentation = {
+        ...presentation,
+        kbJwt,
+      };
+    }
+
     const callBackParams: PresentationSignCallBackParams = {
       options: {
         ...opts,
         presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
       },
-      presentation: presentationResult.presentation,
+      presentation,
       presentationDefinition,
       selectedCredentials,
       proof,

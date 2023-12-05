@@ -1,11 +1,12 @@
 import { createHash } from 'crypto';
 
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
-import { SdJwtDecodedVerifiableCredential, SdJwtDecodedVerifiablePresentation } from '@sphereon/ssi-types';
+import { SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
-import { decodeSdJwtVc, PEX, PresentationSubmissionLocation, Status, Validated } from '../lib';
+import { PEX, PresentationSubmissionLocation, SdJwtDecodedVerifiableCredentialWithKbJwtInput, Status, Validated } from '../lib';
+import { calculateSdHash } from '../lib/utils';
 
-const hasher = async (data: string) => createHash('sha256').update(data).digest();
+const hasher = (data: string) => createHash('sha256').update(data).digest();
 
 const decodedSdJwtVc = {
   compactSdJwtVc:
@@ -111,6 +112,10 @@ const decodedSdJwtVcWithDisclosuresRemoved = {
   signedPayload: decodedSdJwtVc.signedPayload,
 } satisfies SdJwtDecodedVerifiableCredential;
 
+const pex = new PEX({
+  hasher,
+});
+
 function getPresentationDefinitionV2(): PresentationDefinitionV2 {
   return {
     id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -158,14 +163,29 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
 //  - correctly set up KB-JWT payload and sign this in the presentation callback
 
 describe('evaluate', () => {
+  it('throws error when no hasher is provided an compact sd-jwt is passed', () => {
+    const pex = new PEX();
+    expect(() => pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc.compactSdJwtVc])).toThrow(
+      'Hasher implementation is required to decode SD-JWT',
+    );
+  });
   it('Evaluate presentationDefinition with vc+sd-jwt format', () => {
     const pd: PresentationDefinitionV2 = getPresentationDefinitionV2();
     const result: Validated = PEX.validateDefinition(pd);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
   });
 
-  it('Evaluate selectFrom with vc+sd-jwt format', () => {
-    const pex = new PEX();
+  it('selectFrom with vc+sd-jwt format compact', () => {
+    const result = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc.compactSdJwtVc]);
+    expect(result.errors?.length).toEqual(0);
+    expect(result.matches).toEqual([{ name: 'Washington State Business License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]);
+    expect(result.areRequiredCredentialsPresent).toBe('info');
+
+    // Should have already applied selective disclosure on the SD-JWT
+    expect(result.verifiableCredential).toEqual([decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc]);
+  });
+
+  it('selectFrom with vc+sd-jwt format already decoded', () => {
     const result = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc]);
     expect(result.errors?.length).toEqual(0);
     expect(result.matches).toEqual([{ name: 'Washington State Business License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]);
@@ -175,16 +195,10 @@ describe('evaluate', () => {
     expect(result.verifiableCredential).toEqual([decodedSdJwtVcWithDisclosuresRemoved]);
   });
 
-  it('decodeSdJwt', async () => {
-    const decoded = await decodeSdJwtVc(decodedSdJwtVc.compactSdJwtVc, { hasher });
-
-    expect(decoded).toEqual(decodedSdJwtVc);
-  });
-
   it('presentationFrom vc+sd-jwt format', () => {
-    const pex = new PEX();
-    const selectResults = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc]);
-    const presentationResult = pex.presentationFrom(getPresentationDefinitionV2(), selectResults.verifiableCredential!);
+    const presentationDefinition = getPresentationDefinitionV2();
+    const selectResults = pex.selectFrom(presentationDefinition, [decodedSdJwtVc]);
+    const presentationResult = pex.presentationFrom(presentationDefinition, selectResults.verifiableCredential!);
 
     expect(presentationResult.presentationSubmission).toEqual({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -200,19 +214,45 @@ describe('evaluate', () => {
 
     // Must be external for SD-JWT
     expect(presentationResult.presentationSubmissionLocation).toEqual(PresentationSubmissionLocation.EXTERNAL);
-    expect(presentationResult.presentation).toEqual(decodedSdJwtVcWithDisclosuresRemoved);
+    expect(presentationResult.presentation).toEqual({
+      ...decodedSdJwtVcWithDisclosuresRemoved,
+      kbJwt: {
+        header: {
+          typ: 'kb+jwt',
+        },
+        payload: {
+          iat: expect.any(Number),
+          nonce: undefined,
+          _sd_hash: calculateSdHash(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc, 'sha-256', hasher),
+        },
+      },
+    });
   });
 
   it('verifiablePresentationFrom and evalutePresentation with vc+sd-jwt format', async () => {
-    const pex = new PEX();
-    const selectResults = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc]);
+    const presentationDefinition = getPresentationDefinitionV2();
+    const selectResults = pex.selectFrom(presentationDefinition, [decodedSdJwtVc]);
+    let kbJwt: string | undefined = undefined;
     const presentationResult = await pex.verifiablePresentationFrom(
-      getPresentationDefinitionV2(),
+      presentationDefinition,
       selectResults.verifiableCredential!,
       async (options) => {
-        const presentation = options.presentation as SdJwtDecodedVerifiablePresentation;
+        const presentation = options.presentation as SdJwtDecodedVerifiableCredentialWithKbJwtInput;
 
-        return presentation.compactSdJwtVc;
+        kbJwt = `${Buffer.from(
+          JSON.stringify({
+            ...presentation.kbJwt.header,
+            alg: 'EdDSA',
+          }),
+        ).toString('base64url')}.${Buffer.from(
+          JSON.stringify({
+            ...presentation.kbJwt.payload,
+            nonce: 'nonce-from-request',
+            // verifier identifier url (not clear yet in HAIP what this should be, but it MUST be present)
+            aud: 'did:web:something',
+          }),
+        ).toString('base64url')}.signature`;
+        return `${presentation.compactSdJwtVc}${kbJwt}`;
       },
       {},
     );
@@ -231,19 +271,16 @@ describe('evaluate', () => {
 
     // Must be external for SD-JWT
     expect(presentationResult.presentationSubmissionLocation).toEqual(PresentationSubmissionLocation.EXTERNAL);
-    expect(presentationResult.verifiablePresentation).toEqual(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc);
+    // Expect the KB-JWT to be appended
+    expect(presentationResult.verifiablePresentation).toEqual(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt);
 
-    // PEX library currently doesn't support decoding SD-JWTs directly, due to it requiring a hasher and
-    // potentially being async
-    const decodedSdJwtVp = await decodeSdJwtVc(presentationResult.verifiablePresentation as string, { hasher });
-
-    const evaluateResults = pex.evaluatePresentation(getPresentationDefinitionV2(), decodedSdJwtVp, {
+    const evaluateResults = pex.evaluatePresentation(presentationDefinition, presentationResult.verifiablePresentation, {
       presentationSubmission: presentationResult.presentationSubmission,
     });
 
     expect(evaluateResults).toEqual({
       // Do we want to return the compact variant here? Or the decoded/pretty variant?
-      verifiableCredential: [decodedSdJwtVcWithDisclosuresRemoved],
+      verifiableCredential: [decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt],
       areRequiredCredentialsPresent: Status.INFO,
       warnings: [],
       errors: [],

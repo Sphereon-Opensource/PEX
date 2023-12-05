@@ -6,7 +6,7 @@ import {
   IProofPurpose,
   IProofType,
   OriginalVerifiableCredential,
-  SdJwtDecodedVerifiablePresentation,
+  SdJwtDecodedVerifiableCredential,
   W3CVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
@@ -84,6 +84,19 @@ export enum PresentationSubmissionLocation {
   PRESENTATION, // Part of the VP itself
 }
 
+export interface SdJwtKbJwtInput {
+  header: {
+    typ: 'kb+jwt';
+  };
+  payload: {
+    iat: number;
+    _sd_hash: string;
+    nonce?: string;
+  };
+}
+
+export type SdJwtDecodedVerifiableCredentialWithKbJwtInput = SdJwtDecodedVerifiableCredential & { kbJwt: SdJwtKbJwtInput };
+
 /**
  * The result object containing the presentation and presentation submission
  */
@@ -91,7 +104,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation | SdJwtDecodedVerifiablePresentation;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput;
 
   /**
    * The resulting location of the presentation submission.
@@ -180,7 +193,7 @@ export interface PresentationSignCallBackParams {
    * and only the optional KB-JWT should be appended to the `compactSdJwt` property. If no KB-JWT is needed on the presentation, the `compactSdJwt` property
    * from the decoded SD-JWT can be returned as-is.
    */
-  presentation: IPresentation | SdJwtDecodedVerifiablePresentation;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput;
 
   /**
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already

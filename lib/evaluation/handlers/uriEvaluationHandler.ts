@@ -4,7 +4,7 @@ import {
   CredentialMapper,
   ICredential,
   ICredentialSchema,
-  SdJwtDecodedVerifiableCredentialPayload,
+  SdJwtDecodedVerifiableCredential,
   WrappedVerifiableCredential,
 } from '@sphereon/ssi-types';
 import { nanoid } from 'nanoid';
@@ -94,7 +94,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static buildVcContextAndSchemaUris(credential: ICredential | SdJwtDecodedVerifiableCredentialPayload, version: PEVersion) {
+  private static buildVcContextAndSchemaUris(credential: ICredential | SdJwtDecodedVerifiableCredential, version: PEVersion) {
     const uris: string[] = [];
 
     // W3C credential
@@ -122,9 +122,9 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     // NOTE: we add the `vct` field of an SD-JWT to the list of uris, to allow SD-JWT
     // to work with PEX v1 in the same way that JWT vcs can work with pex v1. If we don't
     // add this, then SD-JWTs can only be used with PEX v2.
-    if (CredentialMapper.isSdJwtDecodedCredentialPayload(credential)) {
+    if (CredentialMapper.isSdJwtDecodedCredential(credential)) {
       if (version === PEVersion.v1) {
-        uris.push(credential.vct);
+        uris.push(credential.decodedPayload.vct);
       }
     }
 

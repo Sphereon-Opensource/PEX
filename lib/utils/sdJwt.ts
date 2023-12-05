@@ -1,52 +1,19 @@
-import { Disclosure, SdJwtVc } from '@sd-jwt/core';
+import { Disclosure } from '@sd-jwt/core';
+import { Base64url } from '@sd-jwt/core/build/base64url';
 import { getDisclosuresForPresentationFrame } from '@sd-jwt/core/build/sdJwt';
 import { swapClaims } from '@sd-jwt/core/build/sdJwt/swapClaim';
 import { PresentationFrame } from '@sd-jwt/core/build/types/present';
 import {
+  Hasher,
   SdJwtDecodedDisclosure,
   SdJwtDecodedVerifiableCredential,
   SdJwtDecodedVerifiableCredentialPayload,
   SdJwtPresentationFrame,
 } from '@sphereon/ssi-types';
 
-/**
- * Decode an SD-JWT vc from its compact format (string) to an object containing the disclosures,
- * signed payload, decoded payload and the compact SD-JWT vc.
- *
- * Both the input and output interfaces of this method are defined in `@sphereon/ssi-types`, so
- * this method hides the actual implementation of SD-JWT (which is currently based on @sd-jwt/core)
- */
-export async function decodeSdJwtVc(
-  compactSdJwtVc: string,
-  { hasher }: { hasher: (data: string, alg: string) => Promise<Uint8Array> },
-): Promise<SdJwtDecodedVerifiableCredential> {
-  const sdJwtVc = SdJwtVc.fromCompact(compactSdJwtVc);
-
-  // Default (should be handled by the sd-jwt library)
-  let sdAlg = 'sha-256';
-  try {
-    sdAlg = sdJwtVc.getClaimInPayload('_sd_alg');
-  } catch {
-    /* no-op */
-  }
-
-  sdJwtVc.withHasher({
-    algorithm: sdAlg,
-    hasher: (data) => hasher(data, sdAlg),
-  });
-
-  const disclosuresWithDigests = (await sdJwtVc.disclosuresWithDigest()) ?? [];
-
-  return {
-    compactSdJwtVc: compactSdJwtVc,
-    decodedPayload: await sdJwtVc.getPrettyClaims(),
-    disclosures: disclosuresWithDigests.map((d) => ({
-      decoded: d.decoded as SdJwtDecodedDisclosure,
-      digest: d.digest,
-      encoded: d.encoded,
-    })),
-    signedPayload: sdJwtVc.payload as SdJwtDecodedVerifiableCredentialPayload,
-  };
+export function calculateSdHash(compactSdJwtVc: string, alg: string, hasher: Hasher): string {
+  const digest = hasher(compactSdJwtVc, alg);
+  return Base64url.encode(digest);
 }
 
 /**
@@ -56,7 +23,7 @@ export async function decodeSdJwtVc(
  * Both the input and output interfaces of this method are defined in `@sphereon/ssi-types`, so
  * this method hides the actual implementation of SD-JWT (which is currently based on @sd-jwt/core)
  */
-export async function applySdJwtLimitDisclosure(
+export function applySdJwtLimitDisclosure(
   sdJwtDecodedVerifiableCredential: SdJwtDecodedVerifiableCredential,
   presentationFrame: SdJwtPresentationFrame,
 ) {
@@ -68,7 +35,6 @@ export async function applySdJwtLimitDisclosure(
     sdJwtDecodedVerifiableCredential.disclosures.map((d) => Disclosure.fromString(d.encoded).withDigest(d.digest)),
   );
 
-  // NOTE: any way we can prevent mapping twice?
   sdJwtDecodedVerifiableCredential.disclosures = requiredDisclosures.map((d) => ({
     encoded: d.encoded,
     decoded: d.decoded as SdJwtDecodedDisclosure,

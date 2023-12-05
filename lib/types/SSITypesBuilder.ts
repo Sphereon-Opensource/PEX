@@ -6,6 +6,7 @@ import {
 } from '@sphereon/pex-models';
 import {
   CredentialMapper,
+  Hasher,
   JwtDecodedVerifiablePresentation,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
@@ -45,14 +46,18 @@ export class SSITypesBuilder {
 
   static mapExternalVerifiablePresentationToWrappedVP(
     presentation: OriginalVerifiablePresentation | JwtDecodedVerifiablePresentation,
+    hasher?: Hasher
   ): WrappedVerifiablePresentation {
-    return CredentialMapper.toWrappedVerifiablePresentation(presentation);
+    return CredentialMapper.toWrappedVerifiablePresentation(presentation, { hasher });
   }
 
   static mapExternalVerifiableCredentialsToWrappedVcs(
     verifiableCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
+    hasher?: Hasher
   ): WrappedVerifiableCredential[] {
-    return CredentialMapper.toWrappedVerifiableCredentials(Array.isArray(verifiableCredentials) ? verifiableCredentials : [verifiableCredentials]);
+    return CredentialMapper.toWrappedVerifiableCredentials(Array.isArray(verifiableCredentials) ? verifiableCredentials : [verifiableCredentials], {
+      hasher
+    });
   }
 
   static toInternalPresentationDefinition(presentationDefinition: IPresentationDefinition): IInternalPresentationDefinition {
