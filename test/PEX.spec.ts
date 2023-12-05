@@ -137,9 +137,12 @@ describe('evaluate', () => {
     // Delete the submission to trigger an error
     delete vpSimple.presentation_submission;
     const pex: PEX = new PEX();
-    expect(() => pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES })).toThrowError(
-      'Either a presentation submission as part of the VP or provided separately was expected',
-    );
+    expect(() =>
+      pex.evaluatePresentation(pdSchema, vpSimple, {
+        limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+        generatePresentationSubmission: false,
+      }),
+    ).toThrowError('Either a presentation submission as part of the VP or provided separately was expected');
   });
 
   it('Evaluate case without any error 2', () => {
