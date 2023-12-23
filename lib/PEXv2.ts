@@ -109,7 +109,7 @@ export class PEXv2 extends PEX {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials),
       opts,
     );
-    const hasSdJwtCredentials = selectedCredentials.some(c => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c));
+    const hasSdJwtCredentials = selectedCredentials.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c));
 
     // We could include it in the KB-JWT? Not sure if we want that
     if (opts?.presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION && hasSdJwtCredentials) {

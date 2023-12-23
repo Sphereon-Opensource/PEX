@@ -1,12 +1,6 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
-import {
-  CredentialMapper,
-  ICredential,
-  ICredentialSchema,
-  SdJwtDecodedVerifiableCredential,
-  WrappedVerifiableCredential,
-} from '@sphereon/ssi-types';
+import { CredentialMapper, ICredential, ICredentialSchema, SdJwtDecodedVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';

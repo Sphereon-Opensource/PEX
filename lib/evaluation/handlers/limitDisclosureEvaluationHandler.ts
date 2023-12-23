@@ -81,10 +81,10 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       // we don't create or include the (optional) KB-JWT yet, this is done when we create the presentation
       if (presentationFrame) {
         applySdJwtLimitDisclosure(wvc.credential, presentationFrame);
-        wvc.decoded = wvc.credential.decodedPayload
+        wvc.decoded = wvc.credential.decodedPayload;
         // We need to overwrite the original, as that is returned in the selectFrom method
         // But we also want to keep the format of the original credential.
-        wvc.original = CredentialMapper.isSdJwtDecodedCredential(wvc.original) ? wvc.credential : wvc.credential.compactSdJwtVc
+        wvc.original = CredentialMapper.isSdJwtDecodedCredential(wvc.original) ? wvc.credential : wvc.credential.compactSdJwtVc;
 
         this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
       }

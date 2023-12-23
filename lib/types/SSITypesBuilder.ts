@@ -46,17 +46,17 @@ export class SSITypesBuilder {
 
   static mapExternalVerifiablePresentationToWrappedVP(
     presentation: OriginalVerifiablePresentation | JwtDecodedVerifiablePresentation,
-    hasher?: Hasher
+    hasher?: Hasher,
   ): WrappedVerifiablePresentation {
     return CredentialMapper.toWrappedVerifiablePresentation(presentation, { hasher });
   }
 
   static mapExternalVerifiableCredentialsToWrappedVcs(
     verifiableCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
-    hasher?: Hasher
+    hasher?: Hasher,
   ): WrappedVerifiableCredential[] {
     return CredentialMapper.toWrappedVerifiableCredentials(Array.isArray(verifiableCredentials) ? verifiableCredentials : [verifiableCredentials], {
-      hasher
+      hasher,
     });
   }
 
