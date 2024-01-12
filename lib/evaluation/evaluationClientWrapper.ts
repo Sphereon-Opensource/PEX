@@ -4,7 +4,7 @@ import { IVerifiableCredential, OriginalVerifiableCredential, WrappedVerifiableC
 
 import { Checked, Status } from '../ConstraintUtils';
 import { PresentationSubmissionLocation } from '../signing';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
+import { IInternalPresentationDefinition, IPresentationDefinition, InternalPresentationDefinitionV2 } from '../types';
 import { JsonPathUtils, ObjectUtils } from '../utils';
 
 import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
@@ -478,7 +478,7 @@ export class EvaluationClientWrapper {
       if (sr.from) {
         if (sr.rule === Rules.All) {
           const [count, matched] = this.countMatchingInputDescriptors(sr, marked);
-          if (count !== groupCount.get(sr.from)) {
+          if (count !== (groupCount.get(sr.from) || 0)) {
             throw Error(`Not all input descriptors are members of group ${sr.from}`);
           }
           total++;
