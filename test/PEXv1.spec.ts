@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
-import { IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
+import { IPresentation, IProofType, IVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { PEX, PEXv1, Validated } from '../lib';
 
@@ -72,7 +72,7 @@ describe('evaluate', () => {
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
     const result = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
-    const presentation = result.presentation;
+    const presentation = result.presentation as IPresentation;
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',

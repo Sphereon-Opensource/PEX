@@ -1,5 +1,5 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
-import { IVerifiableCredential } from '@sphereon/ssi-types';
+import { IVerifiableCredential, SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../../ConstraintUtils';
 
@@ -20,6 +20,6 @@ export interface EvaluationResults {
    */
   errors?: Checked[];
   value?: PresentationSubmission;
-  verifiableCredential: IVerifiableCredential[];
+  verifiableCredential: Array<IVerifiableCredential | SdJwtDecodedVerifiableCredential>;
   warnings?: Checked[];
 }

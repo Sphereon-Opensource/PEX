@@ -8,6 +8,7 @@ import {
   IVerifiableCredential,
   IVerifiablePresentation,
   WrappedVerifiableCredential,
+  WrappedW3CVerifiableCredential,
 } from '@sphereon/ssi-types';
 
 import { Status } from '../../lib';
@@ -36,7 +37,8 @@ describe('evaluate', () => {
     const evaluationClient: EvaluationClient = new EvaluationClient();
     const wvcs = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vpSimple.verifiableCredential![0]]);
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['etc']).toBeUndefined();
   });
 
   it("should return ok if verifiable Credential doesn't have the birthPlace field", () => {
@@ -49,7 +51,8 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toBeUndefined();
   });
 
   it('should report an error if limit disclosure is not supported', () => {
@@ -65,7 +68,8 @@ describe('evaluate', () => {
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toEqual('Maarssen');
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['birthPlace']).toEqual('Maarssen');
     expect(evaluationClient.results[9]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
@@ -87,7 +91,8 @@ describe('evaluate', () => {
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([vc]);
     const evaluationClient: EvaluationClient = new EvaluationClient();
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
-    expect((evaluationClient.wrappedVcs[0].credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']).toBeUndefined();
+    const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
+    expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']).toBeUndefined();
     expect(evaluationClient.results[8]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',

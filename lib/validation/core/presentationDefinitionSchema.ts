@@ -76,6 +76,33 @@ export class PresentationDefinitionSchema {
         },
         format: {
           type: 'object',
+          properties: {
+            'vc+sd-jwt': {
+              type: 'object',
+              properties: {
+                'sd-jwt_alg_values': {
+                  type: 'array',
+                  description:
+                    'A JSON array containing identifiers of cryptographic algorithms the verifier supports for protection of a SD-JWT. If present, the alg JOSE header (as defined in [RFC7515]) of the presented SD-JWT MUST match one of the array values.',
+                  minItems: 1,
+                  items: {
+                    type: 'string',
+                  },
+                },
+                'kb-jwt_alg_values': {
+                  type: 'array',
+                  description:
+                    'A JSON array containing identifiers of cryptographic algorithms the verifier supports for protection of a KB-JWT. If present, the alg JOSE header (as defined in [RFC7515]) of the presented KB-JWT MUST match one of the array values.',
+                  minItems: 1,
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+              required: [],
+              additionalProperties: false,
+            },
+          },
           patternProperties: {
             '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|': {
               type: 'object',
@@ -411,6 +438,15 @@ export class PresentationDefinitionSchema {
         },
         format: {
           type: 'object',
+          properties: {
+            'vc+sd-jwt': {
+              type: 'object',
+              // No properties for vc+sd-jwt format
+              properties: {},
+              required: [],
+              additionalProperties: false,
+            },
+          },
           patternProperties: {
             '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|^mso_mdoc$': {
               type: 'object',

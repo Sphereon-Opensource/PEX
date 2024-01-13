@@ -1,5 +1,5 @@
 import { PresentationDefinitionV1 } from '@sphereon/pex-models';
-import { IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
+import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { PEX, PEXv1, Status } from '../../lib';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
@@ -55,15 +55,16 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined,
     );
-    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
+    const presentation = presentationFromResult.presentation as IPresentation;
+    expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
         path: '$.verifiableCredential[0]',
       },
     ]);
-    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(1);
-    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentation.verifiableCredential?.length).toEqual(1);
+    expect((presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:ZTQ3Y2EyZGFkZTdlMGM5ODRiZjFjOTcw',
     );
   });
@@ -126,7 +127,8 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined,
     );
-    expect(presentationFromResult.presentation.presentation_submission?.descriptor_map).toEqual([
+    const presentation = presentationFromResult.presentation as IPresentation;
+    expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
         id: 'emailCredential',
@@ -138,8 +140,8 @@ describe('evaluate gataca tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    expect(presentationFromResult.presentation.verifiableCredential?.length).toEqual(2);
-    expect((presentationFromResult.presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
+    expect(presentation.verifiableCredential?.length).toEqual(2);
+    expect((presentation.verifiableCredential![0] as IVerifiableCredential)['id' as keyof IVerifiableCredential]).toEqual(
       'cred:gatc:NjMxNjc0NTA0ZjVmZmYwY2U0Y2M3NTRk',
     );
   });

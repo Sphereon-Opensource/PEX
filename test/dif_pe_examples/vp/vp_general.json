@@ -36,6 +36,7 @@
         "@context": "https://eu.com/claims/DriversLicense",
         "id": "https://eu.com/claims/DriversLicense",
         "type": [
+          "VerifiableCredential",
           "EUDriversLicense"
         ],
         "issuer": "did:example:123",
@@ -87,6 +88,7 @@
       "@context": "https://www.w3.org/2018/credentials/v1",
       "id": "https://eu.com/claims/DriversLicense",
       "type": [
+        "VerifiableCredential",
         "EUDriversLicense"
       ],
       "issuer": "did:foo:123",

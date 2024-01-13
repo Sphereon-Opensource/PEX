@@ -97,7 +97,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
   private static formatsShouldBeKnown(descriptor_map: Array<Descriptor>): boolean {
     let isProofFormatKnown = true;
     if (descriptor_map != null) {
-      const formats: string[] = ['jwt', 'jwt_vc', 'jwt_vc_json', 'jwt_vp', 'ldp', 'ldp_vc', 'ldp_vp'];
+      const formats: string[] = ['jwt', 'jwt_vc', 'jwt_vc_json', 'jwt_vp', 'ldp', 'ldp_vc', 'ldp_vp', 'vc+sd-jwt'];
 
       for (let i = 0; i < descriptor_map.length; i++) {
         isProofFormatKnown = PresentationSubmissionVB.formatShouldBeKnown(descriptor_map[i], formats);

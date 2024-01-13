@@ -1,10 +1,19 @@
 import { ConstraintsV1, ConstraintsV2, FieldV2, InputDescriptorV2, Optionality } from '@sphereon/pex-models';
-import { AdditionalClaims, ICredential, ICredentialSubject, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import {
+  AdditionalClaims,
+  CredentialMapper,
+  ICredential,
+  ICredentialSubject,
+  IVerifiableCredential,
+  SdJwtDecodedVerifiableCredential,
+  SdJwtPresentationFrame,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, PathComponent } from '../../types';
 import PexMessages from '../../types/Messages';
-import { JsonPathUtils } from '../../utils';
+import { applySdJwtLimitDisclosure, JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
@@ -31,6 +40,8 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private isLimitDisclosureSupported(wvc: WrappedVerifiableCredential, vcIdx: number, idIdx: number, optionality: Optionality): boolean {
+    if (wvc.format === 'vc+sd-jwt') return true;
+
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     const proof = (wvc.decoded as IVerifiableCredential).proof;
     if (!proof || Array.isArray(proof) || !proof.type) {
@@ -50,27 +61,73 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const optionality = constraints.limit_disclosure;
     wrappedVcs.forEach((wvc, index) => {
       if (optionality && this.isLimitDisclosureSupported(wvc, index, idIdx, optionality)) {
-        this.enforceLimitDisclosure(wvc.credential, fields, idIdx, index, wrappedVcs, optionality);
+        this.enforceLimitDisclosure(wvc, fields, idIdx, index, wrappedVcs, optionality);
       }
     });
   }
 
   private enforceLimitDisclosure(
-    vc: IVerifiableCredential,
+    wvc: WrappedVerifiableCredential,
     fields: FieldV2[],
     idIdx: number,
     index: number,
     wrappedVcs: WrappedVerifiableCredential[],
     limitDisclosure: Optionality,
   ) {
-    const internalCredentialToSend = this.createVcWithRequiredFields(vc, fields, idIdx, index);
-    /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
-     * remain untouched and the verifiable credential won't be submitted.
-     */
-    if (internalCredentialToSend) {
-      wrappedVcs[index].credential = internalCredentialToSend;
-      this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+    if (CredentialMapper.isWrappedSdJwtVerifiableCredential(wvc)) {
+      const presentationFrame = this.createSdJwtPresentationFrame(wvc.credential, fields, idIdx, index);
+
+      // We update the SD-JWT to it's presentation format (remove disclosures, update pretty payload, etc..), except
+      // we don't create or include the (optional) KB-JWT yet, this is done when we create the presentation
+      if (presentationFrame) {
+        applySdJwtLimitDisclosure(wvc.credential, presentationFrame);
+        wvc.decoded = wvc.credential.decodedPayload;
+        // We need to overwrite the original, as that is returned in the selectFrom method
+        // But we also want to keep the format of the original credential.
+        wvc.original = CredentialMapper.isSdJwtDecodedCredential(wvc.original) ? wvc.credential : wvc.credential.compactSdJwtVc;
+
+        this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+      }
+    } else if (CredentialMapper.isW3cCredential(wvc.credential)) {
+      const internalCredentialToSend = this.createVcWithRequiredFields(wvc.credential, fields, idIdx, index);
+      /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
+       * remain untouched and the verifiable credential won't be submitted.
+       */
+      if (internalCredentialToSend) {
+        wrappedVcs[index].credential = internalCredentialToSend;
+        this.createSuccessResult(idIdx, `$[${index}]`, limitDisclosure);
+      }
+    } else {
+      throw new Error(`Unsupported format for selective disclosure ${wvc.format}`);
     }
+  }
+
+  private createSdJwtPresentationFrame(
+    vc: SdJwtDecodedVerifiableCredential,
+    fields: FieldV2[],
+    idIdx: number,
+    vcIdx: number,
+  ): SdJwtPresentationFrame | undefined {
+    // Mapping of key -> true to indicate which values should be disclosed in an SD-JWT
+    // Can be nested array / object
+    const presentationFrame: SdJwtPresentationFrame = {};
+
+    for (const field of fields) {
+      if (field.path) {
+        const inputField = JsonPathUtils.extractInputField(vc.decodedPayload, field.path);
+
+        // We set the value to true at the path in the presentation frame,
+        if (inputField.length > 0) {
+          const selectedField = inputField[0];
+          JsonPathUtils.setValue(presentationFrame, selectedField.path, true);
+        } else {
+          this.createMandatoryFieldNotFoundResult(idIdx, vcIdx, field.path);
+          return undefined;
+        }
+      }
+    }
+
+    return presentationFrame;
   }
 
   private createVcWithRequiredFields(vc: IVerifiableCredential, fields: FieldV2[], idIdx: number, vcIdx: number): IVerifiableCredential | undefined {

@@ -15,6 +15,7 @@ import {
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
   ProofOptions,
+  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
   SelectResults,
   SignatureOptions,
   Status,
@@ -25,7 +26,7 @@ import {
   ValidationPredicate,
   Validator,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult
+  VerifiablePresentationResult,
 } from './lib';
 
 export {
@@ -55,5 +56,6 @@ export {
   VerifiablePresentationResult,
   PresentationResult,
   PresentationFromOpts,
-  PresentationSubmissionLocation
+  PresentationSubmissionLocation,
+  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
 };

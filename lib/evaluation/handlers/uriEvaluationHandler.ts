@@ -1,6 +1,6 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
-import { ICredential, ICredentialSchema, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { CredentialMapper, ICredential, ICredentialSchema, SdJwtDecodedVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
@@ -88,22 +88,40 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     }
   }
 
-  private static buildVcContextAndSchemaUris(credential: ICredential, version: PEVersion) {
+  private static buildVcContextAndSchemaUris(credential: ICredential | SdJwtDecodedVerifiableCredential, version: PEVersion) {
     const uris: string[] = [];
-    if (Array.isArray(credential['@context'])) {
-      credential['@context'].forEach((value) => uris.push(value as string));
-    } else {
-      uris.push(<string>credential['@context']);
+
+    // W3C credential
+    if (CredentialMapper.isW3cCredential(credential)) {
+      if (Array.isArray(credential['@context'])) {
+        credential['@context'].forEach((value) => uris.push(value as string));
+      } else {
+        uris.push(<string>credential['@context']);
+      }
+      if (Array.isArray(credential.credentialSchema) && (credential.credentialSchema as ICredentialSchema[]).length > 0) {
+        (credential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
+      } else if (credential.credentialSchema) {
+        uris.push((credential.credentialSchema as ICredentialSchema).id);
+      }
+      if (version === PEVersion.v1) {
+        // JWT VC Profile and MS Entry Verified ID do use the schema from V1 to match against types in the VC
+        Array.isArray(credential.type)
+          ? credential.type.forEach((type) => uris.push(type))
+          : credential.type
+          ? uris.push(credential.type)
+          : undefined;
+      }
     }
-    if (Array.isArray(credential.credentialSchema) && (credential.credentialSchema as ICredentialSchema[]).length > 0) {
-      (credential.credentialSchema as ICredentialSchema[]).forEach((element) => uris.push(element.id));
-    } else if (credential.credentialSchema) {
-      uris.push((credential.credentialSchema as ICredentialSchema).id);
+
+    // NOTE: we add the `vct` field of an SD-JWT to the list of uris, to allow SD-JWT
+    // to work with PEX v1 in the same way that JWT vcs can work with pex v1. If we don't
+    // add this, then SD-JWTs can only be used with PEX v2.
+    if (CredentialMapper.isSdJwtDecodedCredential(credential)) {
+      if (version === PEVersion.v1) {
+        uris.push(credential.decodedPayload.vct);
+      }
     }
-    if (version === PEVersion.v1) {
-      // JWT VC Profile and MS Entry Verified ID do use the schema from V1 to match against types in the VC
-      Array.isArray(credential.type) ? credential.type.forEach((type) => uris.push(type)) : credential.type ? uris.push(credential.type) : undefined;
-    }
+
     return uris;
   }
 
@@ -118,8 +136,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.message = PexMessages.URI_EVALUATION_PASSED;
     result.payload = {
       format: wvc.format,
-      vcContext: wvc.credential['@context'],
-      vcCredentialSchema: wvc.credential.credentialSchema,
+      vcContext: CredentialMapper.isW3cCredential(wvc.credential) ? wvc.credential['@context'] : undefined,
+      vcCredentialSchema: CredentialMapper.isW3cCredential(wvc.credential) ? wvc.credential.credentialSchema : undefined,
       inputDescriptorsUris,
     };
     return result;
@@ -136,8 +154,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     result.message = PexMessages.URI_EVALUATION_DIDNT_PASS;
     result.payload = {
       format: wvc.format,
-      vcContext: wvc.credential['@context'],
-      vcCredentialSchema: wvc.credential.credentialSchema,
+      vcContext: CredentialMapper.isW3cCredential(wvc.credential) ? wvc.credential['@context'] : undefined,
+      vcCredentialSchema: CredentialMapper.isW3cCredential(wvc.credential) ? wvc.credential.credentialSchema : undefined,
       inputDescriptorsUris,
     };
     return result;
