@@ -10,7 +10,7 @@ import {
 
 import { Checked, Status } from '../ConstraintUtils';
 import { PresentationSubmissionLocation } from '../signing';
-import { IInternalPresentationDefinition, IPresentationDefinition, InternalPresentationDefinitionV2 } from '../types';
+import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
 import { JsonPathUtils, ObjectUtils } from '../utils';
 
 import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
