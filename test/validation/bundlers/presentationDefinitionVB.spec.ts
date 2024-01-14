@@ -44,6 +44,7 @@ function getPresentationDefinitionV2(): PresentationDefinitionV2 {
         id: 'wa_driver_license',
         name: 'Washington State Business License',
         purpose: 'We can only allow licensed Washington State business representatives into the WA Business Conference',
+        constraints: {},
       },
     ],
     frame: {

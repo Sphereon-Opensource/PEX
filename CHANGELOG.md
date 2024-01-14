@@ -1,12 +1,22 @@
 # Release Notes
 
+## v3.0.0 - 2024-01-14
+
+- Added:
+    - Initial support for Selective Disclosure JWTs (SD-JWT). API is mostly the same, but to be sure we released it as a
+      new major version
+- Updated:
+  - Update to latest pex-models, containing some definition updates
+- Fixed:
+    - Fix evaluation rule All when there are no marked input descriptors
+
 ## v2.2.2 - 2023-11-28
 
 - Updated:
     - Updated pex-model deps
     - Added more logic to deduce holder(s) for a VP
 - Fixed:
-  - Logic when to generate a presentation submission was incorrect 
+    - Logic when to generate a presentation submission was incorrect
 
 ## v2.2.1 - 2023-10-23
 
@@ -25,9 +35,9 @@
     - Fix issue with verifiableCredential path dereferencing
 
 - Added:
-  - Support for external presentation submission paths for VPs and VCs as used by OID4VP (path_nested)
-  - Support for `jwt_vc_json` format
-  - Support for the `format` property at tje input descriptor level next to the global level
+    - Support for external presentation submission paths for VPs and VCs as used by OID4VP (path_nested)
+    - Support for `jwt_vc_json` format
+    - Support for the `format` property at tje input descriptor level next to the global level
 
 ## v2.1.2 and v2.1.1 - 2023-09-28
 

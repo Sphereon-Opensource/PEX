@@ -32,7 +32,7 @@ export class SSITypesBuilder {
   }
 
   public static modelEntityInternalPresentationDefinitionV2(p: PdV2): InternalPresentationDefinitionV2 {
-    const pd: PdV2 = SSITypesBuilder.createCopyAndModifyPresentationDefinition(p);
+    const pd: PdV2 = SSITypesBuilder.createCopyAndModifyPresentationDefinition(p) as PresentationDefinitionV2;
     return new InternalPresentationDefinitionV2(pd.id, pd.input_descriptors, pd.format, pd.frame, pd.name, pd.purpose, pd.submission_requirements);
   }
 

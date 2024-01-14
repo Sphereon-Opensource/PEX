@@ -1,8 +1,8 @@
 import { Disclosure } from '@sd-jwt/core';
-import { Base64url } from '@sd-jwt/core/build/base64url';
 import { getDisclosuresForPresentationFrame } from '@sd-jwt/core/build/sdJwt';
 import { swapClaims } from '@sd-jwt/core/build/sdJwt/swapClaim';
 import { PresentationFrame } from '@sd-jwt/core/build/types/present';
+import { Base64url } from '@sd-jwt/utils';
 import {
   Hasher,
   SdJwtDecodedDisclosure,

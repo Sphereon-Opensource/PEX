@@ -674,8 +674,8 @@ export class EvaluationClientWrapper {
     const descriptorMap = presentationSubmission
       ? presentationSubmission.descriptor_map
       : this._client.generatePresentationSubmission
-      ? this._client.presentationSubmission.descriptor_map
-      : undefined;
+        ? this._client.presentationSubmission.descriptor_map
+        : undefined;
 
     descriptorMap?.forEach((d) => {
       // NOTE: currently we only support a single VP for a single PD, so that means an SD-JWT will always have the path '$'.

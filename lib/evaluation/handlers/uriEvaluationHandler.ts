@@ -108,8 +108,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         Array.isArray(credential.type)
           ? credential.type.forEach((type) => uris.push(type))
           : credential.type
-          ? uris.push(credential.type)
-          : undefined;
+            ? uris.push(credential.type)
+            : undefined;
       }
     }
 

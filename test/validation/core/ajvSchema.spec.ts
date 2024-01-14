@@ -375,6 +375,7 @@ describe('testing schemas with ajv', () => {
     expect(valid).toBe(false);
 
     // Remove the offending frame to double check it is now okay
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { frame, ...rest } = { ...data.presentation_definition };
     const result = validate({ presentation_definition: { ...rest } });
     expect(result).toBe(true);
