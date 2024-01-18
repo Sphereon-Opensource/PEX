@@ -703,34 +703,33 @@
   dependencies:
     buffer "*"
 
-"@sd-jwt/core@^0.1.2-alpha.2":
-  version "0.1.2-alpha.2"
-  resolved "https://registry.yarnpkg.com/@sd-jwt/core/-/core-0.1.2-alpha.2.tgz#572680c388f8c9d0922b849ac87b43c5c88e2672"
-  integrity sha512-MNBzv3TtBRwnlYoCrzS0tMcQIdesiN4H3XbCYbZr7Ku0lLbBJtWR2hp6xEyC3VQPlphC6XCUNOvNoRhDsVgVmg==
+"@sd-jwt/decode@^0.1.2-alpha.9":
+  version "0.1.2-alpha.9"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/decode/-/decode-0.1.2-alpha.9.tgz#02bb88725ba8e3ca0957624ef3eee7d2e3dc2ef9"
+  integrity sha512-3Hx5yd1b9gDC0wK7ZkNVzKevyvdGGkmV+mK7/LBUIR+q5SLZlwOmIHz80EM+8Eg0WFAnAmRgWKjn7jWWRQO5dw==
   dependencies:
-    "@sd-jwt/decode" "workspace:*"
-    "@sd-jwt/types" "workspace:*"
-    "@sd-jwt/utils" "workspace:*"
+    "@sd-jwt/types" "0.1.2-alpha.9"
+    "@sd-jwt/utils" "0.1.2-alpha.9"
 
-"@sd-jwt/decode@0.1.2-alpha.1", "@sd-jwt/decode@workspace:*":
-  version "0.1.2-alpha.1"
-  resolved "https://registry.yarnpkg.com/@sd-jwt/decode/-/decode-0.1.2-alpha.1.tgz#163c6bf4f0702c6d310ccc3f3f3c726863d8c30e"
-  integrity sha512-gm6iQeNVZFErk2yvhsK1Q48koGbJPGh6yFDEd9ACdprOkzHI/TAz9ytJbxmHk4wTmpy1MBxnKuljzaSGOcQXEw==
+"@sd-jwt/present@^0.1.2-alpha.9":
+  version "0.1.2-alpha.9"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/present/-/present-0.1.2-alpha.9.tgz#f0577dcc66dc08e6bc91faf108565e0fc40d2383"
+  integrity sha512-LR7uIoC4As2EmGke+lCv2GifG2Xmr4iEFacx30GJW1n35T7vRBDpldIuoMNqHmsR+z3eHx/TWtjrXsh7lGcFtw==
   dependencies:
-    "@sd-jwt/types" "workspace:*"
-    "@sd-jwt/utils" "workspace:*"
+    "@sd-jwt/types" "0.1.2-alpha.9"
+    "@sd-jwt/utils" "0.1.2-alpha.9"
 
-"@sd-jwt/types@0.1.2-alpha.3", "@sd-jwt/types@workspace:*":
-  version "0.1.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@sd-jwt/types/-/types-0.1.2-alpha.3.tgz#5e42ceb18a6b6e3cb9cdc9607a2c3d27d7ab12df"
-  integrity sha512-xeP2Z+Ub8nsdbuT2JqQDYs93C1TTNm9efZI8+rAxlyeUuCl2sbJnWiUR39kU6jlYKYs1U7c31wMf8aP4yMMUdg==
+"@sd-jwt/types@0.1.2-alpha.9":
+  version "0.1.2-alpha.9"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/types/-/types-0.1.2-alpha.9.tgz#198899e3a98f9329f35b20fd8af5c1ee37e1e739"
+  integrity sha512-j7Nf3RhQshkEjf3RQhF5hWMMOPQmzwhXBUhjcOoF5eJNgkpF6R13ryb3GDJHkRomIhkygaWaFEzC+ioRAZ7FzQ==
 
-"@sd-jwt/utils@0.1.2-alpha.2", "@sd-jwt/utils@workspace:*":
-  version "0.1.2-alpha.2"
-  resolved "https://registry.yarnpkg.com/@sd-jwt/utils/-/utils-0.1.2-alpha.2.tgz#df94cc675bb0a43df44f327ec5142260ccf49add"
-  integrity sha512-jl6Tk7agFdi9Ebeg3S3HdI7wl0uvelknSKM/X5DGx6a5EomJyx40dOc+KKeNf22me+8l8QJ7a0JyNkD/RP3KQQ==
+"@sd-jwt/utils@0.1.2-alpha.9", "@sd-jwt/utils@^0.1.2-alpha.9":
+  version "0.1.2-alpha.9"
+  resolved "https://registry.yarnpkg.com/@sd-jwt/utils/-/utils-0.1.2-alpha.9.tgz#efbde280798afb964e829726214167f50e7022a3"
+  integrity sha512-oPNWO/XDUkJxdEyOZvmLoqCo0uwiu5Xk0wGkmpwB9KtzeaioVW3JziFUswEczE9RED4+dOWtQwbSpEcy1DEWQw==
   dependencies:
-    "@sd-jwt/types" "workspace:*"
+    "@sd-jwt/types" "0.1.2-alpha.9"
     buffer "*"
 
 "@sinclair/typebox@^0.27.8":

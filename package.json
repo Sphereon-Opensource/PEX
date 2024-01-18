@@ -42,7 +42,9 @@
   },
   "dependencies": {
     "@astronautlabs/jsonpath": "^1.1.2",
-    "@sd-jwt/core": "^0.1.2-alpha.2",
+    "@sd-jwt/present": "^0.1.2-alpha.9",
+    "@sd-jwt/decode": "^0.1.2-alpha.9",
+    "@sd-jwt/utils": "^0.1.2-alpha.9",
     "@sphereon/pex-models": "^2.1.5",
     "@sphereon/ssi-types": "0.18.0",
     "ajv": "^8.12.0",
@@ -71,11 +73,6 @@
     "ts-json-schema-generator": "^1.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  },
-  "resolutions": {
-    "@sd-jwt/utils": "0.1.2-alpha.2",
-    "@sd-jwt/decode": "0.1.2-alpha.1",
-    "@sd-jwt/types": "0.1.2-alpha.3"
   },
   "files": [
     "index.ts",
