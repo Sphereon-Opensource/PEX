@@ -1,5 +1,11 @@
 # Release Notes
 
+## v3.0.1 - 2024-01-19
+
+- Updated:
+  - SD-JWT dependency updated to 0.2.0
+  - SSS types updated to 0.18.1
+
 ## v3.0.0 - 2024-01-14
 
 - Added:
