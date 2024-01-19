@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "@astronautlabs/jsonpath": "^1.1.2",
-    "@sd-jwt/present": "^0.1.2-alpha.9",
-    "@sd-jwt/decode": "^0.1.2-alpha.9",
-    "@sd-jwt/utils": "^0.1.2-alpha.9",
+    "@sd-jwt/present": "^0.2.0",
+    "@sd-jwt/decode": "^0.2.0",
+    "@sd-jwt/utils": "^0.2.0",
     "@sphereon/pex-models": "^2.1.5",
     "@sphereon/ssi-types": "0.18.0",
     "ajv": "^8.12.0",
