@@ -50,7 +50,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       return false;
     }
 
-    const signatureSuite = proof.type === 'DataIntegrityProof' ? `${proof.type}.${proof.cryptosuite}` : proof.type;
+    const signatureSuite = proof.cryptosuite ? `${proof.type}.${proof.cryptosuite}` : proof.type;
     if (!limitDisclosureSignatures?.includes(signatureSuite)) {
       if (optionality == Optionality.Required) {
         this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);

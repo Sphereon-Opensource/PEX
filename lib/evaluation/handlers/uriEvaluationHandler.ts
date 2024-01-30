@@ -60,7 +60,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
           const vcDataIntegrityProofs = verifibaleCredentials.map((vc) => {
             if (vc.type !== OriginalType.JSONLD) return [];
             const proofs = Array.isArray(vc.credential.proof) ? vc.credential.proof : [vc.credential.proof];
-            const dataIntegrityProofs = proofs.filter((proof) => proof.type === 'DataIntegrityProof' && proof.cryptosuite !== undefined);
+            const dataIntegrityProofs = proofs.filter((proof) => proof.cryptosuite !== undefined);
 
             return dataIntegrityProofs;
           });

@@ -138,10 +138,8 @@ export class PresentationDefinitionSchema {
                 proof_type: {
                   type: 'array',
                   minItems: 1,
-                  maxItems: 1,
                   items: {
                     type: 'string',
-                    const: 'DataIntegrityProof',
                   },
                 },
                 cryptosuite: {
@@ -501,10 +499,8 @@ export class PresentationDefinitionSchema {
                 proof_type: {
                   type: 'array',
                   minItems: 1,
-                  maxItems: 1,
                   items: {
                     type: 'string',
-                    const: 'DataIntegrityProof',
                   },
                 },
                 cryptosuite: {
