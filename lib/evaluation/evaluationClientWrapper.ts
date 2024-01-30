@@ -439,6 +439,8 @@ export class EvaluationClientWrapper {
       // todo: We really should also look at the context of the VP, to determine whether it is jwt_vp vs jwt_vp_json instead of relying on the VC type
       if (format.startsWith('ldp_')) {
         nestedDescriptor.format = 'ldp_vp';
+      } else if (format.startsWith('di_')) {
+        nestedDescriptor.format = 'di_vp';
       } else if (format === 'jwt_vc') {
         nestedDescriptor.format = 'jwt_vp';
         nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[');

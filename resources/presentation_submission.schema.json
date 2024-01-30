@@ -51,6 +51,9 @@
             "ldp",
             "ldp_vc",
             "ldp_vp",
+            "di",
+            "di_vc",
+            "di_vp",
             "vc+sd-jwt"
           ]
         }

@@ -1,6 +1,13 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
 import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
-import { CredentialMapper, ICredential, ICredentialSchema, SdJwtDecodedVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import {
+  CredentialMapper,
+  ICredential,
+  ICredentialSchema,
+  OriginalType,
+  SdJwtDecodedVerifiableCredential,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
@@ -35,13 +42,41 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         this.evaluateUris(wvc, vcUris, uris, descriptorIdx, wrappedVCIdx, definition.getVersion());
       });
     });
+
+    const definitionSupportsDataIntegrity = definition.format?.di || definition.format?.di_vc || definition.format?.di_vp;
+    const definitionSupportsLinkedDataProofs = definition.format?.ldp || definition.format?.ldp_vc || definition.format?.ldp_vp;
+
     const descriptorMap: Descriptor[] = this.getResults()
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
+        let format = result.payload?.format;
+        let cryptosuite: string | undefined = undefined;
+
+        if (definitionSupportsDataIntegrity && !definitionSupportsLinkedDataProofs) {
+          const verifibaleCredentials: WrappedVerifiableCredential[] = jp
+            .nodes(wrappedVcs, result.verifiable_credential_path)
+            .map((node) => node.value);
+
+          const vcDataIntegrityProofs = verifibaleCredentials.map((vc) => {
+            if (vc.type !== OriginalType.JSONLD) return [];
+            const proofs = Array.isArray(vc.credential.proof) ? vc.credential.proof : [vc.credential.proof];
+            const dataIntegrityProofs = proofs.filter((proof) => proof.type === 'DataIntegrityProof' && proof.cryptosuite !== undefined);
+
+            return dataIntegrityProofs;
+          });
+          const commonCryptosuites = vcDataIntegrityProofs.reduce((a, b) => a.filter((c) => b.includes(c)));
+
+          if (commonCryptosuites.length > 0) {
+            format = 'di_vp';
+            cryptosuite = commonCryptosuites[0].cryptosuite as string;
+          }
+        }
+
         const inputDescriptor: InputDescriptorV1 = jp.nodes(definition, result.input_descriptor_path)[0].value;
         return {
           id: inputDescriptor.id,
-          format: result.payload?.format,
+          format,
+          cryptosuite,
           path: result.verifiable_credential_path,
         };
       });

@@ -132,6 +132,29 @@ export class PresentationDefinitionSchema {
               required: ['proof_type'],
               additionalProperties: false,
             },
+            '^di_vc$|^di_vp$|^di$': {
+              type: 'object',
+              properties: {
+                proof_type: {
+                  type: 'array',
+                  minItems: 1,
+                  maxItems: 1,
+                  items: {
+                    type: 'string',
+                    const: 'DataIntegrityProof',
+                  },
+                },
+                cryptosuite: {
+                  type: 'array',
+                  minItems: 1,
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+              required: ['proof_type', 'cryptosuite'],
+              additionalProperties: false,
+            },
             additionalProperties: false,
           },
           additionalProperties: false,
@@ -470,6 +493,29 @@ export class PresentationDefinitionSchema {
                 },
               },
               required: ['proof_type'],
+              additionalProperties: false,
+            },
+            '^di_vc$|^di_vp$|^di$': {
+              type: 'object',
+              properties: {
+                proof_type: {
+                  type: 'array',
+                  minItems: 1,
+                  maxItems: 1,
+                  items: {
+                    type: 'string',
+                    const: 'DataIntegrityProof',
+                  },
+                },
+                cryptosuite: {
+                  type: 'array',
+                  minItems: 1,
+                  items: {
+                    type: 'string',
+                  },
+                },
+              },
+              required: ['proof_type', 'cryptosuite'],
               additionalProperties: false,
             },
             additionalProperties: false,
