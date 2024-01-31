@@ -643,7 +643,6 @@ describe('evaluate', () => {
     });
     expect(vpr.presentationSubmission.descriptor_map).toHaveLength(1);
     expect(vpr.presentationSubmission.descriptor_map[0].format).toEqual('di_vp');
-    expect(vpr.presentationSubmission.descriptor_map[0].cryptosuite).toEqual('anoncredsvc-2023');
     const vp = vpr.verifiablePresentation as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');

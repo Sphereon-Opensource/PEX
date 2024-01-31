@@ -44,21 +44,16 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
     });
 
     const definitionSupportsDataIntegrity = definition.format?.di || definition.format?.di_vc || definition.format?.di_vp;
-    const definitionSupportsLinkedDataProofs = definition.format?.ldp || definition.format?.ldp_vc || definition.format?.ldp_vp;
 
     const descriptorMap: Descriptor[] = this.getResults()
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
         let format = result.payload?.format;
-        let cryptosuite: string | undefined = undefined;
+        if (definitionSupportsDataIntegrity && format === 'ldp_vc' || format === 'ldp') {
+          const wvcs: WrappedVerifiableCredential[] = jp.nodes(wrappedVcs, result.verifiable_credential_path).map((node) => node.value);
 
-        if (definitionSupportsDataIntegrity && !definitionSupportsLinkedDataProofs) {
-          const verifibaleCredentials: WrappedVerifiableCredential[] = jp
-            .nodes(wrappedVcs, result.verifiable_credential_path)
-            .map((node) => node.value);
-
-          const vcDataIntegrityProofs = verifibaleCredentials.map((vc) => {
-            if (vc.type !== OriginalType.JSONLD) return [];
+          const vcDataIntegrityProofs = wvcs.map((vc) => {
+            if (vc.type !== OriginalType.JSONLD || !vc.credential.proof) return [];
             const proofs = Array.isArray(vc.credential.proof) ? vc.credential.proof : [vc.credential.proof];
             const dataIntegrityProofs = proofs.filter((proof) => proof.cryptosuite !== undefined);
 
@@ -68,7 +63,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
           if (commonCryptosuites.length > 0) {
             format = 'di_vp';
-            cryptosuite = commonCryptosuites[0].cryptosuite as string;
           }
         }
 
@@ -76,7 +70,6 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         return {
           id: inputDescriptor.id,
           format,
-          cryptosuite,
           path: result.verifiable_credential_path,
         };
       });
