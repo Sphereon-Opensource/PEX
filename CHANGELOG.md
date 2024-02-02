@@ -1,12 +1,13 @@
 # Release Notes
 
-## v3.0.2 - 2024-02-02
+## v3.1.0 - 2024-02-02
 
-- Added:
-    - In the wild a presentation submission sometimes comes in as a double stringified JSON and thus string format. We
-      detect and fix that, also providing a warning
 - Updated:
     - Update to PEX models 2.2.0 which adds support for Verifiable Credential Data Integrity 1.0
+- Fixed:
+    - Do not use path nested for sd-jwt
+    - In the wild a presentation submission sometimes comes in as a double stringified JSON and thus string format. We
+        detect and fix that, also providing a warning
 
 ## v3.0.1 - 2024-01-19
 
