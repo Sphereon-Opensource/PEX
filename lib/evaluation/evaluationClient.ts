@@ -21,7 +21,7 @@ import {
   UriEvaluationHandler,
 } from './handlers';
 
-const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020, "DataIntegrityProof.anoncreds-2023"];
+const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020, 'DataIntegrityProof.anoncreds-2023'];
 
 export class EvaluationClient {
   constructor() {
@@ -100,6 +100,10 @@ export class EvaluationClient {
   }
 
   public assertPresentationSubmission() {
+    if (typeof this._presentationSubmission === 'string') {
+      console.log('Presentation submission present, but as string not object. External calls did not follow contract. Correcting');
+      this._presentationSubmission = JSON.parse(this._presentationSubmission);
+    }
     if (!this.generatePresentationSubmission && (!this.presentationSubmission || Object.keys(this.presentationSubmission).length === 0)) {
       throw Error('No presentation submission present, but required option was set');
     }

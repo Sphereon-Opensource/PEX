@@ -1,12 +1,27 @@
 # Release Notes
 
+## v3.1.0 - 2024-02-02
+
+- Updated:
+    - Update to PEX models 2.2.0 which adds support for Verifiable Credential Data Integrity 1.0
+- Fixed:
+    - Do not use path nested for sd-jwt
+    - In the wild a presentation submission sometimes comes in as a double stringified JSON and thus string format. We
+        detect and fix that, also providing a warning
+
+## v3.0.1 - 2024-01-19
+
+- Updated:
+    - SD-JWT dependency updated to 0.2.0
+    - SSS types updated to 0.18.1
+
 ## v3.0.0 - 2024-01-14
 
 - Added:
     - Initial support for Selective Disclosure JWTs (SD-JWT). API is mostly the same, but to be sure we released it as a
       new major version
 - Updated:
-  - Update to latest pex-models, containing some definition updates
+    - Update to latest pex-models, containing some definition updates
 - Fixed:
     - Fix evaluation rule All when there are no marked input descriptors
 

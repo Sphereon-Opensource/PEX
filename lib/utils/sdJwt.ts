@@ -1,7 +1,5 @@
-import { Disclosure } from '@sd-jwt/core';
-import { getDisclosuresForPresentationFrame } from '@sd-jwt/core/build/sdJwt';
-import { swapClaims } from '@sd-jwt/core/build/sdJwt/swapClaim';
-import { PresentationFrame } from '@sd-jwt/core/build/types/present';
+import { decodeDisclosuresInPayload } from '@sd-jwt/decode';
+import { getDisclosuresForPresentationFrame, PresentationFrame } from '@sd-jwt/present';
 import { Base64url } from '@sd-jwt/utils';
 import {
   Hasher,
@@ -21,7 +19,7 @@ export function calculateSdHash(compactSdJwtVc: string, alg: string, hasher: Has
  * `decodedPayload`, `compactSdJwt` and `disclosures` properties.
  *
  * Both the input and output interfaces of this method are defined in `@sphereon/ssi-types`, so
- * this method hides the actual implementation of SD-JWT (which is currently based on @sd-jwt/core)
+ * this method hides the actual implementation of SD-JWT (which is currently based on @sd-jwt/*)
  */
 export function applySdJwtLimitDisclosure(
   sdJwtDecodedVerifiableCredential: SdJwtDecodedVerifiableCredential,
@@ -32,12 +30,18 @@ export function applySdJwtLimitDisclosure(
     presentationFrame as PresentationFrame<Record<string, unknown>>,
     sdJwtDecodedVerifiableCredential.decodedPayload,
     // Map to sd-jwt disclosure format
-    sdJwtDecodedVerifiableCredential.disclosures.map((d) => Disclosure.fromString(d.encoded).withDigest(d.digest)),
+    sdJwtDecodedVerifiableCredential.disclosures.map((d) => ({
+      digest: d.digest,
+      encoded: d.encoded,
+      salt: d.decoded[0],
+      value: d.decoded.length === 3 ? d.decoded[2] : d.decoded[1],
+      key: d.decoded.length === 3 ? d.decoded[1] : undefined,
+    })),
   );
 
   sdJwtDecodedVerifiableCredential.disclosures = requiredDisclosures.map((d) => ({
     encoded: d.encoded,
-    decoded: d.decoded as SdJwtDecodedDisclosure,
+    decoded: (d.key ? [d.salt, d.key, d.value] : [d.salt, d.value]) as SdJwtDecodedDisclosure,
     digest: d.digest,
   }));
 
@@ -50,7 +54,7 @@ export function applySdJwtLimitDisclosure(
     .join('~');
 
   // Update the decoded / 'pretty' payload
-  sdJwtDecodedVerifiableCredential.decodedPayload = swapClaims(
+  sdJwtDecodedVerifiableCredential.decodedPayload = decodeDisclosuresInPayload(
     sdJwtDecodedVerifiableCredential.signedPayload,
     requiredDisclosures,
   ) as SdJwtDecodedVerifiableCredentialPayload;

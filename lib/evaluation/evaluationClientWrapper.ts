@@ -431,10 +431,14 @@ export class EvaluationClientWrapper {
       if (descriptor.path_nested) {
         return descriptor;
       }
+      // sd-jwt doesn't use path_nested and format is the same for vc or vp
+      else if (descriptor.format === 'vc+sd-jwt') {
+        return descriptor;
+      }
+
       const format = descriptor.format;
       const nestedDescriptor = { ...descriptor };
       nestedDescriptor.path_nested = { ...descriptor };
-      // todo: delete id?
       nestedDescriptor.path = '$';
       // todo: We really should also look at the context of the VP, to determine whether it is jwt_vp vs jwt_vp_json instead of relying on the VC type
       if (format.startsWith('ldp_')) {
