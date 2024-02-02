@@ -49,7 +49,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
         let format = result.payload?.format;
-        if (definitionSupportsDataIntegrity && format === 'ldp_vc' || format === 'ldp') {
+        if (definitionSupportsDataIntegrity && (format === 'ldp_vc' || format === 'ldp')) {
           const wvcs: WrappedVerifiableCredential[] = jp.nodes(wrappedVcs, result.verifiable_credential_path).map((node) => node.value);
 
           const vcDataIntegrityProofs = wvcs.map((vc) => {
