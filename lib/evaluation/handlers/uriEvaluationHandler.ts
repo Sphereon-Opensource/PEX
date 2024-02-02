@@ -1,5 +1,5 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
-import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
+import { Descriptor, InputDescriptorV1, InputDescriptorV2 } from '@sphereon/pex-models';
 import {
   CredentialMapper,
   ICredential,
@@ -43,13 +43,13 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       });
     });
 
-    const definitionSupportsDataIntegrity = definition.format?.di || definition.format?.di_vc || definition.format?.di_vp;
+    const definitionAllowsDataIntegrity = definition.format?.di || definition.format?.di_vc || definition.format?.di_vp;
 
     const descriptorMap: Descriptor[] = this.getResults()
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
         let format = result.payload?.format;
-        if (definitionSupportsDataIntegrity && (format === 'ldp_vc' || format === 'ldp')) {
+        if (definitionAllowsDataIntegrity && (format === 'ldp_vc' || format === 'ldp')) {
           const wvcs: WrappedVerifiableCredential[] = jp.nodes(wrappedVcs, result.verifiable_credential_path).map((node) => node.value);
 
           const vcDataIntegrityProofs = wvcs.map((vc) => {
@@ -61,7 +61,11 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
           });
           const commonCryptosuites = vcDataIntegrityProofs.reduce((a, b) => a.filter((c) => b.includes(c)));
 
-          if (commonCryptosuites.length > 0) {
+          const inputDescriptor: InputDescriptorV2 = jp.nodes(definition, result.input_descriptor_path)[0].value;
+          const inputDescriptorAllowsDataIntegrity =
+            !inputDescriptor['format'] || inputDescriptor?.format?.di || inputDescriptor?.format?.di_vc || inputDescriptor?.format?.di_vp;
+
+          if (commonCryptosuites.length > 0 && inputDescriptorAllowsDataIntegrity) {
             format = 'di_vp';
           }
         }
