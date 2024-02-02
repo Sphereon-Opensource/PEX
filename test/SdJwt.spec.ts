@@ -254,9 +254,13 @@ describe('evaluate', () => {
         ).toString('base64url')}.signature`;
         return `${presentation.compactSdJwtVc}${kbJwt}`;
       },
-      {},
+      {
+        presentationSubmissionLocation: PresentationSubmissionLocation.EXTERNAL,
+      },
     );
 
+    // path_nested should not be used for sd-jwt
+    expect(presentationResult.presentationSubmission.descriptor_map[0].path_nested).toBeUndefined();
     expect(presentationResult.presentationSubmission).toEqual({
       definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
       descriptor_map: [
