@@ -43,7 +43,7 @@
   "dependencies": {
     "@astronautlabs/jsonpath": "^1.1.2",
     "@sd-jwt/core": "^0.1.2-alpha.2",
-    "@sphereon/pex-models": "^2.1.5",
+    "@sphereon/pex-models": "^2.2.0",
     "@sphereon/ssi-types": "0.18.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",

@@ -752,10 +752,10 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@sphereon/pex-models@^2.1.5":
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-2.1.5.tgz#ba4474a3783081392b72403c4c8ee6da3d2e5585"
-  integrity sha512-7THexvdYUK/Dh8olBB46ErT9q/RnecnMdb5r2iwZ6be0Dt4vQLAUN7QU80H0HZBok4jRTb8ydt12x0raBSTHOg==
+"@sphereon/pex-models@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@sphereon/pex-models/-/pex-models-2.2.0.tgz#32013fff43d4f47df03e213792a9bcc6866a1f06"
+  integrity sha512-dGDRdoxJj+P0TRqu0R8R0/IdIzrCya1MsnxIFbcmSW3rjPsbwXbV0EojEfxXGD5LhqsUJiuAffMtyE2dtVI/XQ==
 
 "@sphereon/ssi-types@0.18.0":
   version "0.18.0"
