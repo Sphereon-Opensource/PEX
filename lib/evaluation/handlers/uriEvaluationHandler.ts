@@ -1,6 +1,13 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
-import { Descriptor, InputDescriptorV1 } from '@sphereon/pex-models';
-import { CredentialMapper, ICredential, ICredentialSchema, SdJwtDecodedVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { Descriptor, InputDescriptorV1, InputDescriptorV2 } from '@sphereon/pex-models';
+import {
+  CredentialMapper,
+  ICredential,
+  ICredentialSchema,
+  OriginalType,
+  SdJwtDecodedVerifiableCredential,
+  WrappedVerifiableCredential,
+} from '@sphereon/ssi-types';
 import { nanoid } from 'nanoid';
 
 import { Status } from '../../ConstraintUtils';
@@ -35,13 +42,45 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
         this.evaluateUris(wvc, vcUris, uris, descriptorIdx, wrappedVCIdx, definition.getVersion());
       });
     });
+
+    const definitionAllowsDataIntegrity = definition.format?.di || definition.format?.di_vc || definition.format?.di_vp;
+
     const descriptorMap: Descriptor[] = this.getResults()
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
+        let format = result.payload?.format;
+
+        // This checks if the new data integrity format should be used.
+        // That may be the case if the input descriptor points to credentials that are in ldp_vc or ldp format,
+        // and the presentation definition allows data integrity.
+        if (definitionAllowsDataIntegrity && (format === 'ldp_vc' || format === 'ldp')) {
+          const wvcs: WrappedVerifiableCredential[] = jp.nodes(wrappedVcs, result.verifiable_credential_path).map((node) => node.value);
+
+          // check if all vc's have a data integrity proof
+          const vcDataIntegrityProofs = wvcs.map((vc) => {
+            if (vc.type !== OriginalType.JSONLD || !vc.credential.proof) return [];
+            const proofs = Array.isArray(vc.credential.proof) ? vc.credential.proof : [vc.credential.proof];
+            const dataIntegrityProofs = proofs.filter((proof) => proof.type === 'DataIntegrityProof' && proof.cryptosuite !== undefined);
+
+            return dataIntegrityProofs;
+          });
+          // determine the common cryptosuites of all vc's
+          const commonCryptosuites = vcDataIntegrityProofs.reduce((a, b) => a.filter((c) => b.includes(c)));
+
+          // the input descriptor should also allow data integrity
+          const inputDescriptor: InputDescriptorV2 = jp.nodes(definition, result.input_descriptor_path)[0].value;
+          const inputDescriptorAllowsDataIntegrity =
+            !inputDescriptor['format'] || inputDescriptor?.format?.di || inputDescriptor?.format?.di_vc || inputDescriptor?.format?.di_vp;
+
+          if (commonCryptosuites.length > 0 && inputDescriptorAllowsDataIntegrity) {
+            format = 'di_vp';
+          }
+        }
+
         const inputDescriptor: InputDescriptorV1 = jp.nodes(definition, result.input_descriptor_path)[0].value;
         return {
           id: inputDescriptor.id,
-          format: result.payload?.format,
+          format,
           path: result.verifiable_credential_path,
         };
       });

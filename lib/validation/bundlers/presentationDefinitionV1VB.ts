@@ -144,6 +144,15 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
     if (format?.ldp_vp != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.ldp_vp.proof_type?.length > 0;
     }
+    if (format?.di != null) {
+      areExpectedValuesPresent = areExpectedValuesPresent && format.di.proof_type?.length > 0;
+    }
+    if (format?.di_vc != null) {
+      areExpectedValuesPresent = areExpectedValuesPresent && format.di_vc.proof_type?.length > 0;
+    }
+    if (format?.di_vp != null) {
+      areExpectedValuesPresent = areExpectedValuesPresent && format.di_vp.proof_type?.length > 0;
+    }
 
     return areExpectedValuesPresent;
   }

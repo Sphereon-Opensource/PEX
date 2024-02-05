@@ -12,6 +12,7 @@ export class LdpTypes {
       'JcsEd25519Signature2020',
       'BbsBlsSignature2020',
       'Bls12381G2Key2020',
+      'DataIntegrityProof',
     ];
   }
 }

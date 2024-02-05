@@ -21,7 +21,7 @@ import {
   UriEvaluationHandler,
 } from './handlers';
 
-const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020];
+const DEFAULT_LIMIT_DISCLOSURE_TYPES = [IProofType.BbsBlsSignatureProof2020, 'DataIntegrityProof.anoncreds-2023'];
 
 export class EvaluationClient {
   constructor() {

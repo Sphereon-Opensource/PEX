@@ -44,10 +44,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     const proof = (wvc.decoded as IVerifiableCredential).proof;
+
     if (!proof || Array.isArray(proof) || !proof.type) {
       // todo: Support/inspect array based proofs
       return false;
-    } else if (!limitDisclosureSignatures?.includes(proof.type)) {
+    }
+
+    const signatureSuite = proof.cryptosuite ? `${proof.type}.${proof.cryptosuite}` : proof.type;
+    if (!limitDisclosureSignatures?.includes(signatureSuite)) {
       if (optionality == Optionality.Required) {
         this.createLimitDisclosureNotSupportedResult(idIdx, vcIdx);
       }
