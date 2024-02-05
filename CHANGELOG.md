@@ -1,5 +1,9 @@
 # Release Notes
 
+## v3.2.0 - 2024-02-05
+- Added:
+    Support for Data Integrity Proofs, using Anoncreds 2023 format.
+
 ## v3.1.0 - 2024-02-02
 
 - Updated:
