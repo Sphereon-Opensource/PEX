@@ -49,18 +49,25 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
       .filter((result) => result.status === Status.INFO)
       .map((result) => {
         let format = result.payload?.format;
+
+        // This checks if the new data integrity format should be used.
+        // That may be the case if the input descriptor points to credentials that are in ldp_vc or ldp format,
+        // and the presentation definition allows data integrity.
         if (definitionAllowsDataIntegrity && (format === 'ldp_vc' || format === 'ldp')) {
           const wvcs: WrappedVerifiableCredential[] = jp.nodes(wrappedVcs, result.verifiable_credential_path).map((node) => node.value);
 
+          // check if all vc's have a data integrity proof
           const vcDataIntegrityProofs = wvcs.map((vc) => {
             if (vc.type !== OriginalType.JSONLD || !vc.credential.proof) return [];
             const proofs = Array.isArray(vc.credential.proof) ? vc.credential.proof : [vc.credential.proof];
-            const dataIntegrityProofs = proofs.filter((proof) => proof.cryptosuite !== undefined);
+            const dataIntegrityProofs = proofs.filter((proof) => proof.type === 'DataIntegrityProof' && proof.cryptosuite !== undefined);
 
             return dataIntegrityProofs;
           });
+          // determine the common cryptosuites of all vc's
           const commonCryptosuites = vcDataIntegrityProofs.reduce((a, b) => a.filter((c) => b.includes(c)));
 
+          // the input descriptor should also allow data integrity
           const inputDescriptor: InputDescriptorV2 = jp.nodes(definition, result.input_descriptor_path)[0].value;
           const inputDescriptorAllowsDataIntegrity =
             !inputDescriptor['format'] || inputDescriptor?.format?.di || inputDescriptor?.format?.di_vc || inputDescriptor?.format?.di_vp;
