@@ -73,7 +73,7 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
             !inputDescriptor['format'] || inputDescriptor?.format?.di || inputDescriptor?.format?.di_vc || inputDescriptor?.format?.di_vp;
 
           if (commonCryptosuites.length > 0 && inputDescriptorAllowsDataIntegrity) {
-            format = 'di_vp';
+            format = 'di_vc';
           }
         }
 
