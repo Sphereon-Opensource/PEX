@@ -42,7 +42,7 @@ export class PresentationSubmissionSchema {
             },
             format: {
               type: 'string',
-              enum: ['jwt', 'jwt_vc', 'jwt_vc_json', 'jwt_vp', 'ldp', 'ldp_vc', 'ldp_vp', 'di', 'di_vc', 'di_vp', 'vc+sd-jwt'],
+              enum: ['jwt', 'jwt_vc', 'jwt_vc_json', 'jwt_vp', 'jwt_vp_json', 'ldp', 'ldp_vc', 'ldp_vp', 'di', 'di_vc', 'di_vp', 'vc+sd-jwt'],
             },
           },
           required: ['id', 'path', 'format'],

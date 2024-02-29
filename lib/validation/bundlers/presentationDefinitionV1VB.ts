@@ -135,6 +135,9 @@ export class PresentationDefinitionV1VB extends ValidationBundler<
     if (format?.jwt_vp != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vp.alg?.length > 0;
     }
+    if (format?.jwt_vp_json != null) {
+      areExpectedValuesPresent = areExpectedValuesPresent && format.jwt_vp_json.alg?.length > 0;
+    }
     if (format?.ldp != null) {
       areExpectedValuesPresent = areExpectedValuesPresent && format.ldp.proof_type?.length > 0;
     }

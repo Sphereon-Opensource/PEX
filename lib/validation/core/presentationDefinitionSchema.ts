@@ -104,7 +104,7 @@ export class PresentationDefinitionSchema {
             },
           },
           patternProperties: {
-            '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|': {
+            '^jwt$|^jwt_vc$|^jwt_vc_json$|^jwt_vp$|^jwt_vp_json$': {
               type: 'object',
               properties: {
                 alg: {
