@@ -1,8 +1,19 @@
 # Release Notes
 
-## v3.2.0 - 2024-02-05
+## v3.3.0 - 2024-02-29
+
 - Added:
-    Support for Data Integrity Proofs, using Anoncreds 2023 format.
+    - Significant performance improvement: Add cache for AJV field validation as the operation is expensive and can be
+      called multiple times. The improvement is in the order of 10 times or higher especially when larger definitions
+      are encountered
+    - Expose jwt_vp_json format
+- Updated:
+    - Update to PEX models 2.2.2
+  
+## v3.2.0 - 2024-02-05
+
+- Added:
+    - Support for Data Integrity Proofs, using Anoncreds 2023 format.
 
 ## v3.1.0 - 2024-02-02
 
@@ -11,7 +22,7 @@
 - Fixed:
     - Do not use path nested for sd-jwt
     - In the wild a presentation submission sometimes comes in as a double stringified JSON and thus string format. We
-        detect and fix that, also providing a warning
+      detect and fix that, also providing a warning
 
 ## v3.0.1 - 2024-01-19
 
