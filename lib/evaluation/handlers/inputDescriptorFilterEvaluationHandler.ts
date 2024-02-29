@@ -13,9 +13,24 @@ import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
+const AJV_FIELD_FILTER = new Ajv({
+  verbose: false,
+  code: { source: false, lines: true, esm: false },
+  allowUnionTypes: true,
+  allErrors: true,
+  strict: false,
+});
+addFormats(AJV_FIELD_FILTER);
+
 export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHandler {
+  private static FILTER_CACHE: Map<string, { ts: number; value: boolean }> = new Map();
+  private static DEFAULT_MAX_FILTER_CACHE_SIZE = 100;
+  private static DEFAULT_FILTER_CACHE_TTL = 1000 * 30; // 30 seconds
+  private static DEFAULT_RESET_CACHE_SIZE = InputDescriptorFilterEvaluationHandler.DEFAULT_MAX_FILTER_CACHE_SIZE / 2;
+
   constructor(client: EvaluationClient) {
     super(client);
+    InputDescriptorFilterEvaluationHandler.keepCacheSizeInCheck();
   }
 
   public getName(): string {
@@ -70,7 +85,15 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     });
   }
 
-  private createResponse(field: { path: PathComponent[]; value: FieldV1 | FieldV2 }, vcIndex: number, payload: unknown, message: string): void {
+  private createResponse(
+    field: {
+      path: PathComponent[];
+      value: FieldV1 | FieldV2;
+    },
+    vcIndex: number,
+    payload: unknown,
+    message: string,
+  ): void {
     this.getResults().push({
       // TODO: why does this code assume a path to contain certain elements in the path?
       ...this.createResultObject(jp.stringify(field.path.slice(0, 3)), vcIndex, payload),
@@ -94,12 +117,23 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
-    const ajv = new Ajv({ verbose: true, code: { source: true, lines: true, esm: false }, allowUnionTypes: true, allErrors: true, strict: false });
-    addFormats(ajv);
+
+    let evalResult: boolean | undefined = true;
     if (field.filter) {
-      return ajv.validate(field.filter, result.value);
+      const successCacheKey = JSON.stringify({ filter: field.filter, value: result.value });
+
+      const now = Date.now();
+      evalResult = InputDescriptorFilterEvaluationHandler.FILTER_CACHE.get(successCacheKey)?.value;
+      if (evalResult === undefined) {
+        InputDescriptorFilterEvaluationHandler.keepCacheSizeInCheck();
+        evalResult = AJV_FIELD_FILTER.validate(field.filter, result.value);
+        InputDescriptorFilterEvaluationHandler.FILTER_CACHE.set(successCacheKey, {
+          value: evalResult,
+          ts: now + InputDescriptorFilterEvaluationHandler.DEFAULT_FILTER_CACHE_TTL,
+        });
+      }
     }
-    return true;
+    return evalResult;
   }
 
   private transformDateFormat(result: { path: PathComponent[]; value: unknown }) {
@@ -115,5 +149,27 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
     result.value = date.getUTCFullYear() + '-' + month + '-' + day;
 
     result.value = date.toISOString().substring(0, date.toISOString().indexOf('T'));
+  }
+
+  static keepCacheSizeInCheck(opts?: { ttl?: number; maxCacheSize?: number; resetCacheSize?: number }) {
+    const ttl = opts?.ttl ?? InputDescriptorFilterEvaluationHandler.DEFAULT_FILTER_CACHE_TTL;
+    const maxCacheSize = opts?.maxCacheSize ?? InputDescriptorFilterEvaluationHandler.DEFAULT_MAX_FILTER_CACHE_SIZE;
+    const resetCacheSize = opts?.resetCacheSize ?? InputDescriptorFilterEvaluationHandler.DEFAULT_RESET_CACHE_SIZE;
+
+    const now = Date.now();
+    for (const [key, result] of InputDescriptorFilterEvaluationHandler.FILTER_CACHE) {
+      if (result.ts + ttl < now) {
+        InputDescriptorFilterEvaluationHandler.FILTER_CACHE.delete(key);
+      }
+    }
+    const size = InputDescriptorFilterEvaluationHandler.FILTER_CACHE.size;
+    if (size > maxCacheSize) {
+      const keys = InputDescriptorFilterEvaluationHandler.FILTER_CACHE.keys();
+      // Since we cannot use a WeakMap, as the key is constructed on the fly and thus has no references, we need to clear the cache to avoid memory leaks
+      for (let nr = 0; nr < size - resetCacheSize; nr++) {
+        // would be wise to have sorted on oldest ts
+        InputDescriptorFilterEvaluationHandler.FILTER_CACHE.delete(keys.next().value);
+      }
+    }
   }
 }
