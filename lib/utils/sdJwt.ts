@@ -1,5 +1,5 @@
 import { getSDAlgAndPayload, unpackObj } from '@sd-jwt/decode';
-import { selectDisclosures } from '@sd-jwt/present';
+import { createHashMappingForSerializedDisclosure, selectDisclosures } from '@sd-jwt/present';
 import { PresentationFrame } from '@sd-jwt/types';
 import { Uint8ArrayToBase64Url } from '@sd-jwt/utils';
 import {
@@ -56,7 +56,7 @@ export function applySdJwtLimitDisclosure(
     .join('~');
 
   const { payload } = getSDAlgAndPayload(sdJwtDecodedVerifiableCredential.signedPayload);
-  const disclosureHashMap = createHashMappingForSerializedDisclosure(sdJwtDecodedVerifiableCredential.signedPayload, requiredDisclosures);
+  const disclosureHashMap = createHashMappingForSerializedDisclosure(requiredDisclosures);
   const { unpackedObj: decodedPayload } = unpackObj(payload, disclosureHashMap);
 
   // Update the decoded / 'pretty' payload
