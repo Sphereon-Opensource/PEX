@@ -10,6 +10,8 @@ import {
   SdJwtPresentationFrame,
 } from '@sphereon/ssi-types';
 
+import { ObjectUtils } from './ObjectUtils';
+
 export function calculateSdHash(compactSdJwtVc: string, alg: string, hasher: Hasher): string {
   const digest = hasher(compactSdJwtVc, alg);
   return Uint8ArrayToBase64Url(digest);
@@ -35,7 +37,7 @@ export function applySdJwtLimitDisclosure(
   }));
 
   const requiredDisclosures = selectDisclosures(
-    sdJwtDecodedVerifiableCredential.signedPayload,
+    ObjectUtils.cloneDeep(sdJwtDecodedVerifiableCredential.signedPayload),
     // Map to sd-jwt disclosure format
     SerializedDisclosures,
     presentationFrame as PresentationFrame<Record<string, unknown>>,
@@ -55,7 +57,7 @@ export function applySdJwtLimitDisclosure(
     .filter((item, index) => index === 0 || index === sdJwtParts.length - 1 || includedDisclosures.includes(item))
     .join('~');
 
-  const { payload } = getSDAlgAndPayload(sdJwtDecodedVerifiableCredential.signedPayload);
+  const { payload } = getSDAlgAndPayload(ObjectUtils.cloneDeep(sdJwtDecodedVerifiableCredential.signedPayload));
   const disclosureHashMap = createHashMappingForSerializedDisclosure(requiredDisclosures);
   const { unpackedObj: decodedPayload } = unpackObj(payload, disclosureHashMap);
 

@@ -26,4 +26,24 @@ export class ObjectUtils {
     const fieldValues = data.map((item) => item[fieldName]);
     return Array.from(new Set(fieldValues));
   }
+  /**
+   * Receives an object and clone deep, return the cloned object
+   */
+  public static cloneDeep<T>(obj: T): T {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      const arrCopy: Array<unknown> = [];
+      obj.forEach((v, i) => (arrCopy[i] = ObjectUtils.cloneDeep<T>(v)));
+      return arrCopy as T;
+    }
+
+    const copiedObj: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      copiedObj[key] = ObjectUtils.cloneDeep<T>(value);
+    }
+    return copiedObj as T;
+  }
 }
