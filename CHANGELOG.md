@@ -1,5 +1,13 @@
 # Release Notes
 
+## v3.3.1 - 2024-03-19
+
+- Updated:
+    - Update sd-jwt packages to 0.6.1 from 0.3.0
+    - Update to latest @sphereon/ssi-types
+    - Move to pnpm from yarn, given our other libraries also use pnpm
+
+
 ## v3.3.0 - 2024-02-29
 
 - Added:
