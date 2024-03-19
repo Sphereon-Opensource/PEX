@@ -1,6 +1,7 @@
-import { decodeDisclosuresInPayload } from '@sd-jwt/decode';
-import { getDisclosuresForPresentationFrame, PresentationFrame } from '@sd-jwt/present';
-import { Base64url } from '@sd-jwt/utils';
+import { getSDAlgAndPayload, unpackObj } from '@sd-jwt/decode';
+import { createHashMappingForSerializedDisclosure, selectDisclosures } from '@sd-jwt/present';
+import { PresentationFrame } from '@sd-jwt/types';
+import { uint8ArrayToBase64Url } from '@sd-jwt/utils';
 import {
   Hasher,
   SdJwtDecodedDisclosure,
@@ -9,9 +10,11 @@ import {
   SdJwtPresentationFrame,
 } from '@sphereon/ssi-types';
 
+import { ObjectUtils } from './ObjectUtils';
+
 export function calculateSdHash(compactSdJwtVc: string, alg: string, hasher: Hasher): string {
   const digest = hasher(compactSdJwtVc, alg);
-  return Base64url.encode(digest);
+  return uint8ArrayToBase64Url(digest);
 }
 
 /**
@@ -25,18 +28,19 @@ export function applySdJwtLimitDisclosure(
   sdJwtDecodedVerifiableCredential: SdJwtDecodedVerifiableCredential,
   presentationFrame: SdJwtPresentationFrame,
 ) {
-  const requiredDisclosures = getDisclosuresForPresentationFrame(
-    sdJwtDecodedVerifiableCredential.signedPayload,
-    presentationFrame as PresentationFrame<Record<string, unknown>>,
-    sdJwtDecodedVerifiableCredential.decodedPayload,
+  const SerializedDisclosures = sdJwtDecodedVerifiableCredential.disclosures.map((d) => ({
+    digest: d.digest,
+    encoded: d.encoded,
+    salt: d.decoded[0],
+    value: d.decoded.length === 3 ? d.decoded[2] : d.decoded[1],
+    key: d.decoded.length === 3 ? d.decoded[1] : undefined,
+  }));
+
+  const requiredDisclosures = selectDisclosures(
+    ObjectUtils.cloneDeep(sdJwtDecodedVerifiableCredential.signedPayload),
     // Map to sd-jwt disclosure format
-    sdJwtDecodedVerifiableCredential.disclosures.map((d) => ({
-      digest: d.digest,
-      encoded: d.encoded,
-      salt: d.decoded[0],
-      value: d.decoded.length === 3 ? d.decoded[2] : d.decoded[1],
-      key: d.decoded.length === 3 ? d.decoded[1] : undefined,
-    })),
+    SerializedDisclosures,
+    presentationFrame as PresentationFrame<Record<string, unknown>>,
   );
 
   sdJwtDecodedVerifiableCredential.disclosures = requiredDisclosures.map((d) => ({
@@ -53,9 +57,10 @@ export function applySdJwtLimitDisclosure(
     .filter((item, index) => index === 0 || index === sdJwtParts.length - 1 || includedDisclosures.includes(item))
     .join('~');
 
+  const { payload } = getSDAlgAndPayload(ObjectUtils.cloneDeep(sdJwtDecodedVerifiableCredential.signedPayload));
+  const disclosureHashMap = createHashMappingForSerializedDisclosure(requiredDisclosures);
+  const { unpackedObj: decodedPayload } = unpackObj(payload, disclosureHashMap);
+
   // Update the decoded / 'pretty' payload
-  sdJwtDecodedVerifiableCredential.decodedPayload = decodeDisclosuresInPayload(
-    sdJwtDecodedVerifiableCredential.signedPayload,
-    requiredDisclosures,
-  ) as SdJwtDecodedVerifiableCredentialPayload;
+  sdJwtDecodedVerifiableCredential.decodedPayload = decodedPayload as SdJwtDecodedVerifiableCredentialPayload;
 }

@@ -26,4 +26,10 @@ export class ObjectUtils {
     const fieldValues = data.map((item) => item[fieldName]);
     return Array.from(new Set(fieldValues));
   }
+  /**
+   * Receives an object and clone deep, return the cloned object
+   */
+  public static cloneDeep<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
+  }
 }
