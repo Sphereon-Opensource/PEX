@@ -341,11 +341,11 @@ describe('evaluate', () => {
 
   it('should throw an error if expiration date and exp are different in JWT vc', () => {
     const jwtVc: IVerifiableCredential = getFileAsJson('test/dif_pe_examples/vp/vp_general.json').verifiableCredential[0];
-    const now = new Date();
-    jwtVc['exp'] = now.valueOf();
-    jwtVc['vc'].expirationDate = new Date(now.getTime() + 2000).toString();
-    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrowError(
-      `Inconsistent expiration dates between JWT claim (${new Date(jwtVc['exp']).toISOString()}) and VC value (${jwtVc['vc'].expirationDate})`,
+    const now = Date.now();
+    jwtVc['exp'] = now / 1000;
+    jwtVc['vc'].expirationDate = new Date(now + 2000).toISOString();
+    expect(() => SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([jwtVc])).toThrow(
+      `Inconsistent expiration dates between JWT claim (${new Date(jwtVc['exp'] * 1000).toISOString().replace(/\.[0-9]+Z/, 'Z')}) and VC value (${jwtVc['vc'].expirationDate})`,
     );
   });
 
