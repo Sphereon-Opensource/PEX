@@ -8,6 +8,8 @@ export interface SubmissionRequirementMatch {
   count?: number;
   max?: number;
   vc_path: string[];
+  input_descriptor_path: string[];
+  matches: Record<string, string>;
   from?: string[];
   from_nested?: SubmissionRequirementMatch[];
 }

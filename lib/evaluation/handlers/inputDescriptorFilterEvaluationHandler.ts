@@ -24,14 +24,18 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
 
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
     const fields: { path: PathComponent[]; value: FieldV1 | FieldV2 }[] = jp.nodes(pd, '$..fields[*]');
+
     wrappedVcs.forEach((wvc: WrappedVerifiableCredential, vcIndex: number) => {
       this.createNoFieldResults(pd, vcIndex);
+
       fields.forEach((field) => {
         let inputField = [];
         if (field.value.path) {
           inputField = JsonPathUtils.extractInputField(wvc.internalCredential, field.value.path);
         }
+
         let resultFound = false;
+
         for (const inputFieldKey of inputField) {
           if (this.evaluateFilter(inputFieldKey, field.value)) {
             resultFound = true;
@@ -52,6 +56,7 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
         }
       });
     });
+
     this.updatePresentationSubmission(pd);
   }
 
@@ -95,13 +100,25 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
   }
 
   private evaluateFilter(result: { path: string[]; value: unknown }, field: FieldV1 | FieldV2): boolean {
+    // console.debug('InputDescriptorFilterEvaluationHandler [FIELD MATCHED VALUE]', result.value);
+
     if (field.filter?.format && field.filter.format === 'date') {
       this.transformDateFormat(result);
     }
+
     const ajv = new Ajv({ allowUnionTypes: true });
     addFormats(ajv);
+
     if (field.filter) {
-      return ajv.validate(field.filter, result.value);
+      const ajvResult = ajv.validate(field.filter, result.value);
+
+      if (ajvResult) {
+        // console.debug('InputDescriptorFilterEvaluationHandler [FIELD MATCHED VALUE IS VALID] ✅');
+      } else {
+        // console.warn('InputDescriptorFilterEvaluationHandler [FIELD MATCHED VALUE IS INVALID] ⚠️');
+      }
+
+      return ajvResult;
     }
     return true;
   }

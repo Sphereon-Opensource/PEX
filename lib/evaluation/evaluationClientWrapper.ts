@@ -41,6 +41,7 @@ export class EvaluationClientWrapper {
         (result) =>
           result.evaluator === 'MarkForSubmissionEvaluation' && result.payload.group && result.status !== Status.ERROR
       );
+
       const marked = Array.from(new Set(info));
 
       const matchSubmissionRequirements = this.matchSubmissionRequirements(
@@ -50,6 +51,7 @@ export class EvaluationClientWrapper {
       );
 
       const matches = this.extractMatches(matchSubmissionRequirements);
+
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
           jp.nodes(
@@ -68,7 +70,9 @@ export class EvaluationClientWrapper {
       const marked: HandlerCheckResult[] = this._client.results.filter(
         (result) => result.evaluator === 'MarkForSubmissionEvaluation' && result.status !== Status.ERROR
       );
+
       const matchSubmissionRequirements = this.matchWithoutSubmissionRequirements(marked, presentationDefinition);
+
       const matches = this.extractMatches(matchSubmissionRequirements);
       const credentials: IVerifiableCredential[] = matches.map(
         (e) =>
@@ -146,6 +150,7 @@ export class EvaluationClientWrapper {
       if (sr.from) {
         // const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
         const matchingDescriptors = this.mapMatchingDescriptors(sr, marked);
+
         if (matchingDescriptors) {
           sr.min ? (matchingDescriptors.min = sr.min) : undefined;
           sr.max ? (matchingDescriptors.max = sr.max) : undefined;
@@ -159,6 +164,8 @@ export class EvaluationClientWrapper {
           rule: sr.rule,
           from_nested: [],
           vc_path: [],
+          input_descriptor_path: [],
+          matches: {},
         };
         if (srm && srm.from_nested) {
           sr.min ? (srm.min = sr.min) : undefined;
@@ -190,6 +197,8 @@ export class EvaluationClientWrapper {
               name: idRes[0].value.name || idRes[0].value.id,
               rule: Rules.All,
               vc_path: [vcPath],
+              input_descriptor_path: [], // TODO
+              matches: {}, // TODO
             });
           }
         }
@@ -203,18 +212,30 @@ export class EvaluationClientWrapper {
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[]
   ): SubmissionRequirementMatch {
-    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, from: [], vc_path: [] };
+    const srm: Partial<SubmissionRequirementMatch> = {
+      rule: sr.rule,
+      from: [],
+      vc_path: [],
+      input_descriptor_path: [],
+      matches: {},
+    };
     if (sr?.from) {
       srm.from?.push(sr.from);
       for (const m of marked) {
-        // const inDesc = jp.query(pd, m.input_descriptor_path)[0];
-        // console.log('[mapMatchingDescriptors]', { sr, marked: m, inDesc });
-        // srm.name = inDesc.name || inDesc.id;
         srm.name = sr.name;
         srm.purpose = sr.purpose;
+
         if (m.payload.group.includes(sr.from)) {
           if (srm.vc_path?.indexOf(m.verifiable_credential_path) === -1) {
             srm.vc_path.push(m.verifiable_credential_path);
+          }
+
+          if (srm.input_descriptor_path?.indexOf(m.input_descriptor_path) === -1) {
+            srm.input_descriptor_path.push(m.input_descriptor_path);
+          }
+
+          if (srm.matches && !srm.matches?.[m.input_descriptor_path]) {
+            srm.matches[m.input_descriptor_path] = m.verifiable_credential_path;
           }
         }
       }
