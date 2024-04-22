@@ -1,30 +1,14 @@
 {
-  "description": "Government of Example Permanent Resident Card.",
   "expirationDate": "2029-12-03T12:19:52Z",
   "issuanceDate": "2019-12-03T12:19:52Z",
-  "id": "https://issuer.oidp.uscis.gov/credentials/83627465",
-  "name": "Permanent Resident Card",
+  "name": "DriversLicense",
   "identifier": "83627465",
   "credentialSubject": {
-    "birthDate": "1958-07-17",
-    "lprCategory": "C09",
-    "lprNumber": "999-999-999",
-    "image": "data:image/png;base64,iVBORw0KGgokJggg==",
-    "type": [
-      "PermanentResident",
-      "Person"
-    ],
-    "commuterClassification": "C1",
-    "familyName": "SMITH",
-    "id": "did:example:b34ca6cd37bbf23",
-    "givenName": "JANE",
-    "gender": "Female",
-    "residentSince": "2015-01-01",
-    "birthCountry": "Bahamas"
+    "driversLicenseType": "B"
   },
   "type": [
     "VerifiableCredential",
-    "PermanentResidentCard"
+    "DriversLicnese"
   ],
   "@context": [
     "https://www.w3.org/2018/credentials/v1",

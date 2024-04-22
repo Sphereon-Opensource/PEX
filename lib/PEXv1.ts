@@ -2,7 +2,7 @@ import { Format, PresentationDefinitionV1, PresentationSubmission } from '@spher
 import { CredentialMapper, IPresentation, OriginalVerifiableCredential, OriginalVerifiablePresentation } from '@sphereon/ssi-types';
 
 import { PEX } from './PEX';
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { EvaluationClientWrapper, EvaluationResults, PresentationEvaluationResults, SelectResults } from './evaluation';
 import { PresentationFromOpts, PresentationResult, PresentationSubmissionLocation } from './signing';
 import { SSITypesBuilder } from './types';
 import { PresentationDefinitionV1VB, Validated, ValidationEngine } from './validation';
@@ -29,7 +29,7 @@ export class PEXv1 extends PEX {
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
     },
-  ): EvaluationResults {
+  ): PresentationEvaluationResults {
     SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition); // only doing validation
     return super.evaluatePresentation(presentationDefinition, presentation, opts);
   }

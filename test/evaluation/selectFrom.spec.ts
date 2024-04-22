@@ -925,7 +925,7 @@ describe('selectFrom tests', () => {
     const pdSchema: InternalPresentationDefinitionV1 = getFile('./test/dif_pe_examples/pdV1/pd_driver_license_name.json')
       .presentation_definition as InternalPresentationDefinitionV1;
     const pd = SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(pdSchema);
-    const verifiableCredential: IVerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-driverLicense.json') as IVerifiableCredential;
+    const verifiableCredential: IVerifiableCredential = getFile('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json') as IVerifiableCredential;
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs([verifiableCredential]);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const result = evaluationClientWrapper.selectFrom(pd, wvcs, {

@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pex-models';
+import { PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
 import {
   ICredential,
   ICredentialSubject,
@@ -12,10 +12,12 @@ import {
   WrappedW3CVerifiableCredential,
 } from '@sphereon/ssi-types';
 
-import { EvaluationResults, PEX, Validated } from '../lib';
-import { VerifiablePresentationResult } from '../lib/signing/types';
+import { PEX, Status, Validated } from '../lib';
+import { PresentationEvaluationResults } from '../lib/evaluation/core';
+import { PresentationSubmissionLocation, VerifiablePresentationResult } from '../lib/signing/types';
 import { SSITypesBuilder } from '../lib/types';
 
+import { hasher } from './SdJwt.spec';
 import {
   assertedMockCallback,
   assertedMockCallbackWithoutProofType,
@@ -127,6 +129,524 @@ describe('evaluate', () => {
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
 
+  it('Evaluate case multiple presentations multiple formats submission generated without any error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json')],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json')],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+      getFile('./test/dif_pe_examples/vp/vp_state-business-license.sd-jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp.json',
+    ).presentation_definition;
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+
+    // Should correctly generate the presentation submission with nested values
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      presentation: vps,
+      errors: [],
+      warnings: [],
+      value: {
+        id: expect.any(String),
+        definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+        descriptor_map: [
+          {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vp',
+            path: '$[0]',
+            path_nested: {
+              id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+              format: 'ldp_vc',
+              path: '$.verifiableCredential[0]',
+            },
+          },
+          {
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            format: 'ldp_vp',
+            path: '$[1]',
+            path_nested: {
+              id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+              format: 'ldp_vc',
+              path: '$.verifiableCredential[0]',
+            },
+          },
+          {
+            id: 'ddc4a62f-73d4-4410-a3d7-b20720a113ed',
+            format: 'vc+sd-jwt',
+            path: '$[3]',
+          },
+          {
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            format: 'jwt_vp',
+            path: '$[2]',
+            path_nested: {
+              id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+              format: 'jwt_vc',
+              path: '$.vp.verifiableCredential[0]',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  it('Evaluate case multiple presentations multiple formats submission provided without any error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json')],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json')],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+      getFile('./test/dif_pe_examples/vp/vp_state-business-license.sd-jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp.json',
+    ).presentation_definition;
+
+    const submission: PresentationSubmission = {
+      id: 'fbc551d2-9ca7-4e87-a553-790e93eb13fb',
+      definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+      descriptor_map: [
+        {
+          id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+          format: 'ldp_vp',
+          path: '$[0]',
+          path_nested: {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+          format: 'ldp_vp',
+          path: '$[1]',
+          path_nested: {
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'ddc4a62f-73d4-4410-a3d7-b20720a113ed',
+          format: 'vc+sd-jwt',
+          path: '$[3]',
+        },
+        {
+          id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+          format: 'jwt_vp',
+          path: '$[2]',
+          path_nested: {
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            format: 'jwt_vc',
+            path: '$.vp.verifiableCredential[0]',
+          },
+        },
+      ],
+    };
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: JSON.parse(JSON.stringify(submission)),
+    });
+
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      presentation: vps,
+      errors: [],
+      warnings: [],
+      // Should return the same presentation submission if provided
+      value: submission,
+    });
+  });
+
+  it('Evaluate case multiple presentations with matching input descriptor multiple formats submission generated without any error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [
+          getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json'),
+          getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json'),
+        ],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [
+          getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json'),
+          getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json'),
+        ],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+      getFile('./test/dif_pe_examples/vp/vp_state-business-license.sd-jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp.json',
+    ).presentation_definition;
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.INFO,
+      presentation: vps,
+      errors: [],
+      warnings: [],
+      // Should return the same presentation submission if provided
+      value: {
+        id: expect.any(String),
+        definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+        descriptor_map: [
+          {
+            format: 'ldp_vp',
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            path: '$[0]',
+            path_nested: {
+              format: 'ldp_vc',
+              id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+              path: '$.verifiableCredential[1]',
+            },
+          },
+          {
+            format: 'ldp_vp',
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            path: '$[1]',
+            path_nested: {
+              format: 'ldp_vc',
+              id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+              path: '$.verifiableCredential[0]',
+            },
+          },
+          {
+            format: 'ldp_vp',
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            path: '$[0]',
+            path_nested: {
+              format: 'ldp_vc',
+              id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+              path: '$.verifiableCredential[0]',
+            },
+          },
+          {
+            format: 'ldp_vp',
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            path: '$[1]',
+            path_nested: {
+              format: 'ldp_vc',
+              id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+              path: '$.verifiableCredential[1]',
+            },
+          },
+          {
+            format: 'vc+sd-jwt',
+            id: 'ddc4a62f-73d4-4410-a3d7-b20720a113ed',
+            path: '$[3]',
+          },
+          {
+            format: 'jwt_vp',
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            path: '$[2]',
+            path_nested: {
+              format: 'jwt_vc',
+              id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+              path: '$.vp.verifiableCredential[0]',
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  it('Evaluate case multiple presentations with matching input descriptor multiple formats invalid submission provided with error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [
+          getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json'),
+          getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json'),
+        ],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [
+          getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json'),
+          getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json'),
+        ],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+      getFile('./test/dif_pe_examples/vp/vp_state-business-license.sd-jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp.json',
+    ).presentation_definition;
+
+    const submission: PresentationSubmission = {
+      id: '984129ed-32a9-4e5e-ae7a-f83a75a49c5b',
+      definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+      descriptor_map: [
+        {
+          id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+          format: 'ldp_vp',
+          path: '$[0]',
+          path_nested: {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+          format: 'ldp_vp',
+          path: '$[1]',
+          path_nested: {
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'ddc4a62f-73d4-4410-a3d7-b20720a113ed',
+          format: 'vc+sd-jwt',
+          path: '$[3]',
+        },
+        {
+          id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+          format: 'jwt_vp',
+          path: '$[2]',
+          path_nested: {
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            format: 'jwt_vc',
+            path: '$.vp.verifiableCredential[0]',
+          },
+        },
+      ],
+    };
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: submission,
+    });
+
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.ERROR,
+      presentation: vps,
+      errors: [
+        {
+          message:
+            'Input candidate does not contain property: submission.descriptor_map[0]: presentation $[0] with nested credential $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: submission.descriptor_map[0]: presentation $[0] with nested credential $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+        {
+          message:
+            'Input candidate does not contain property: submission.descriptor_map[1]: presentation $[1] with nested credential $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'FilterEvaluation',
+        },
+        {
+          message:
+            'The input candidate is not eligible for submission: submission.descriptor_map[1]: presentation $[1] with nested credential $.verifiableCredential[0]',
+          status: 'error',
+          tag: 'MarkForSubmissionEvaluation',
+        },
+      ],
+      warnings: [],
+      value: submission,
+    });
+  });
+
+  it('Evaluate case multiple presentations multiple formats submission provided not satisfying definition no submission_requirements with error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json')],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json')],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp.json',
+    ).presentation_definition;
+
+    const submission: PresentationSubmission = {
+      id: 'fbc551d2-9ca7-4e87-a553-790e93eb13fb',
+      definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+      descriptor_map: [
+        {
+          id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+          format: 'ldp_vp',
+          path: '$[0]',
+          path_nested: {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+          format: 'ldp_vp',
+          path: '$[1]',
+          path_nested: {
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+          format: 'jwt_vp',
+          path: '$[2]',
+          path_nested: {
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            format: 'jwt_vc',
+            path: '$.vp.verifiableCredential[0]',
+          },
+        },
+      ],
+    };
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: JSON.parse(JSON.stringify(submission)),
+    });
+
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.ERROR,
+      presentation: vps,
+      errors: [
+        {
+          message: 'Expected all input descriptors (4) to be satisfifed in submission, but found 3. Missing ddc4a62f-73d4-4410-a3d7-b20720a113ed',
+          status: 'error',
+          tag: 'SubmissionDoesNotSatisfyDefinition',
+        },
+      ],
+      warnings: [],
+      // Should return the same presentation submission if provided
+      value: submission,
+    });
+  });
+
+  it('Evaluate case multiple presentations multiple formats submission provided not satisfying definition with submission_requirements with error 1', () => {
+    const vps = [
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-PermanentResidentCard.json')],
+      },
+      {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation'],
+        verifiableCredential: [getFileAsJson('./test/dif_pe_examples/vc/vc-driverLicense.json')],
+      },
+      getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'),
+    ];
+
+    const presentationDefinition: PresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-formats-multi-vp-submission-requirements.json',
+    ).presentation_definition;
+
+    const submission: PresentationSubmission = {
+      id: 'fbc551d2-9ca7-4e87-a553-790e93eb13fb',
+      definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+      descriptor_map: [
+        {
+          id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+          format: 'ldp_vp',
+          path: '$[0]',
+          path_nested: {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+          format: 'ldp_vp',
+          path: '$[1]',
+          path_nested: {
+            id: 'f09f7000-6bf2-4239-8e8d-13014e681eba',
+            format: 'ldp_vc',
+            path: '$.verifiableCredential[0]',
+          },
+        },
+        {
+          id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+          format: 'jwt_vp',
+          path: '$[2]',
+          path_nested: {
+            id: 'e0556bbf-d1c0-48d8-8564-09f6e07bac9b',
+            format: 'jwt_vc',
+            path: '$.vp.verifiableCredential[0]',
+          },
+        },
+      ],
+    };
+
+    const pex: PEX = new PEX({ hasher });
+    const evaluationResults = pex.evaluatePresentation(presentationDefinition, vps, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: JSON.parse(JSON.stringify(submission)),
+    });
+
+    expect(evaluationResults).toEqual({
+      areRequiredCredentialsPresent: Status.ERROR,
+      presentation: vps,
+      errors: [
+        {
+          message: 'Expected all submission requirements (1) to be satisfifed in submission, but found 0.',
+          status: 'error',
+          tag: 'SubmissionDoesNotSatisfyDefinition',
+        },
+      ],
+      warnings: [],
+      // Should return the same presentation submission if provided
+      value: submission,
+    });
+  });
+
   it('Evaluate case with error. No submission data', () => {
     const pdSchema: PresentationDefinitionV1 = getFileAsJson(
       './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
@@ -142,7 +662,7 @@ describe('evaluate', () => {
         limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
         generatePresentationSubmission: false,
       }),
-    ).toThrowError('Either a presentation submission as part of the VP or provided separately was expected');
+    ).toThrow('Either a presentation submission as part of the VP or provided in options was expected');
   });
 
   it('Evaluate case without any error 2', () => {
@@ -459,12 +979,123 @@ describe('evaluate', () => {
     };
     const pex: PEX = new PEX();
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
     expect(evalResult.errors).toEqual([]);
     expect(evalResult.value?.descriptor_map[0]).toEqual({
-      id: '1',
+      id: 'prc_type',
       format: 'ldp_vc',
       path: '$.verifiableCredential[0]',
+    });
+  });
+
+  it('when array of presentations is passed, submission is always constructed as external', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857',
+      input_descriptors: [
+        {
+          id: 'prc_type',
+          name: 'Name',
+          purpose: 'We can only support a familyName in a Permanent Resident Card',
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.familyName'],
+                filter: {
+                  type: 'string',
+                  const: 'Pasteur',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, [jwtEncodedVp]);
+    expect(evalResult.errors).toEqual([]);
+    expect(evalResult.value?.descriptor_map[0]).toEqual({
+      id: 'prc_type',
+      format: 'ldp_vp',
+      path: '$[0]',
+      path_nested: {
+        id: 'prc_type',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
+    });
+  });
+
+  it('when single presentation is passed, it defaults to non-external submission', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857',
+      input_descriptors: [
+        {
+          id: 'prc_type',
+          name: 'Name',
+          purpose: 'We can only support a familyName in a Permanent Resident Card',
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.familyName'],
+                filter: {
+                  type: 'string',
+                  const: 'Pasteur',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp);
+    expect(evalResult.errors).toEqual([]);
+    expect(evalResult.value?.descriptor_map[0]).toEqual({
+      id: 'prc_type',
+      format: 'ldp_vc',
+      path: '$.verifiableCredential[0]',
+    });
+  });
+
+  it('when single presentation is passed with presentationSubmissionLocation.EXTERNAL, it generates the submission as external', function () {
+    const pdSchema: PresentationDefinitionV2 = {
+      id: '49768857',
+      input_descriptors: [
+        {
+          id: 'prc_type',
+          name: 'Name',
+          purpose: 'We can only support a familyName in a Permanent Resident Card',
+          constraints: {
+            fields: [
+              {
+                path: ['$.credentialSubject.familyName'],
+                filter: {
+                  type: 'string',
+                  const: 'Pasteur',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const pex: PEX = new PEX();
+    const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp, {
+      presentationSubmissionLocation: PresentationSubmissionLocation.EXTERNAL,
+    });
+    expect(evalResult.errors).toEqual([]);
+    expect(evalResult.value?.descriptor_map[0]).toEqual({
+      id: 'prc_type',
+      format: 'ldp_vp',
+      path: '$',
+      path_nested: {
+        id: 'prc_type',
+        format: 'ldp_vc',
+        path: '$.verifiableCredential[0]',
+      },
     });
   });
 
@@ -492,7 +1123,7 @@ describe('evaluate', () => {
     };
     const pex: PEX = new PEX();
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt');
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp, { generatePresentationSubmission: true });
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, jwtEncodedVp, { generatePresentationSubmission: true });
     expect(evalResult.errors).toEqual([]);
     expect(evalResult.value?.descriptor_map[0]).toEqual({
       id: 'universityDegree_type',

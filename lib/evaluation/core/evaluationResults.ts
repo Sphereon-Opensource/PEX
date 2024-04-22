@@ -1,7 +1,12 @@
 import { PresentationSubmission } from '@sphereon/pex-models';
-import { IVerifiableCredential, SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
+import { IPresentation, IVerifiableCredential, OriginalVerifiablePresentation, SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../../ConstraintUtils';
+import { OrArray } from '../../types';
+
+export interface PresentationEvaluationResults extends Omit<EvaluationResults, 'verifiableCredential'> {
+  presentation: OrArray<OriginalVerifiablePresentation | IPresentation>;
+}
 
 export interface EvaluationResults {
   /**

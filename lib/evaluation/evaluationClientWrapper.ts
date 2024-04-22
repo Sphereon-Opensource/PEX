@@ -1,20 +1,53 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
-import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules, SubmissionRequirement } from '@sphereon/pex-models';
+import { Descriptor, Format, InputDescriptorV1, InputDescriptorV2, PresentationSubmission, Rules } from '@sphereon/pex-models';
+import type { SubmissionRequirement } from '@sphereon/pex-models';
 import {
   CredentialMapper,
   IVerifiableCredential,
   OriginalVerifiableCredential,
   SdJwtDecodedVerifiableCredential,
   WrappedVerifiableCredential,
+  WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
 import { Checked, Status } from '../ConstraintUtils';
 import { PresentationSubmissionLocation } from '../signing';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, IPresentationDefinition } from '../types';
+import {
+  IInternalPresentationDefinition,
+  InternalPresentationDefinitionV1,
+  InternalPresentationDefinitionV2,
+  IPresentationDefinition,
+  OrArray,
+} from '../types';
 import { JsonPathUtils, ObjectUtils } from '../utils';
+import { getVpFormatForVcFormat } from '../utils/formatMap';
 
-import { EvaluationResults, HandlerCheckResult, SelectResults, SubmissionRequirementMatch } from './core';
+import { EvaluationResults, HandlerCheckResult, PresentationEvaluationResults, SelectResults, SubmissionRequirementMatch } from './core';
 import { EvaluationClient } from './evaluationClient';
+
+interface SubmissionSatisfiesSubmissionRequirementResult {
+  isSubmissionRequirementSatisfied: boolean;
+  totalMatches: number;
+  minRequiredMatches?: number;
+  totalRequiredMatches?: number;
+  maxRequiredMatches?: number;
+
+  errors: string[];
+
+  nested?: SubmissionSatisfiesSubmissionRequirementResult[];
+}
+
+interface SubmissionSatisfiesDefinitionResult {
+  doesSubmissionSatisfyDefinition: boolean;
+  error?: string;
+  totalMatches: number;
+  totalRequiredMatches: number;
+
+  /**
+   * Only populated if submission requirements are present
+   */
+  submisisonRequirementResults?: SubmissionSatisfiesSubmissionRequirementResult[];
+}
 
 export class EvaluationClientWrapper {
   private _client: EvaluationClient;
@@ -325,14 +358,10 @@ export class EvaluationClientWrapper {
 
     this._client.assertPresentationSubmission();
     if (this._client.presentationSubmission?.descriptor_map.length) {
-      const len = this._client.presentationSubmission?.descriptor_map.length;
-      for (let i = 0; i < len; i++) {
-        this._client.presentationSubmission.descriptor_map[i] &&
-          this._client.presentationSubmission.descriptor_map.push(this._client.presentationSubmission.descriptor_map[i]);
-      }
-      this._client.presentationSubmission.descriptor_map.splice(0, len); // cut the array and leave only the non-empty values
+      this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map.filter((v) => v !== undefined);
       result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
     }
+
     if (this._client.generatePresentationSubmission) {
       this.updatePresentationSubmissionPathToVpPath(result.value);
     }
@@ -341,15 +370,366 @@ export class EvaluationClientWrapper {
     return result;
   }
 
-  private formatNotInfo(status: Status): Checked[] {
+  public evaluatePresentations(
+    pd: IInternalPresentationDefinition,
+    wvps: OrArray<WrappedVerifiablePresentation>,
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
+      presentationSubmission?: PresentationSubmission;
+      generatePresentationSubmission?: boolean;
+      /**
+       * The location of the presentation submission. By default {@link PresentationSubmissionLocation.PRESENTATION}
+       * is used when one presentation is passed (not as array), while {@link PresentationSubmissionLocation.EXTERNAL} is
+       * used when an array is passed
+       */
+      presentationSubmissionLocation?: PresentationSubmissionLocation;
+    },
+  ): PresentationEvaluationResults {
+    // If submission is provided as input, we match the presentations against the submission. In this case the submission MUST be valid
+    if (opts?.presentationSubmission) {
+      return this.evaluatePresentationsAgainstSubmission(pd, wvps, opts.presentationSubmission, opts);
+    }
+
+    const wrappedPresentations = Array.isArray(wvps) ? wvps : [wvps];
+    const allWvcs = wrappedPresentations.reduce((all, wvp) => [...all, ...wvp.vcs], [] as WrappedVerifiableCredential[]);
+
+    const result: PresentationEvaluationResults = {
+      areRequiredCredentialsPresent: Status.INFO,
+      presentation: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      errors: [],
+      warnings: [],
+    };
+
+    this._client.evaluate(pd, allWvcs, opts);
+    result.warnings = this.formatNotInfo(Status.WARN);
+    result.errors = this.formatNotInfo(Status.ERROR);
+
+    this._client.assertPresentationSubmission();
+    if (this._client.presentationSubmission?.descriptor_map.length) {
+      this._client.presentationSubmission.descriptor_map = this._client.presentationSubmission.descriptor_map.filter((v) => v !== undefined);
+      result.value = JSON.parse(JSON.stringify(this._client.presentationSubmission));
+    }
+
+    const useExternalSubmission =
+      opts?.presentationSubmissionLocation !== undefined
+        ? opts.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL
+        : Array.isArray(wvps);
+
+    if (this._client.generatePresentationSubmission && result.value && useExternalSubmission) {
+      // we map the descriptors of the generated submisison to take into account the nexted values
+      result.value.descriptor_map = result.value.descriptor_map.map((descriptor) => {
+        const [wvcResult] = JsonPathUtils.extractInputField(allWvcs, [descriptor.path]) as Array<{ value: WrappedVerifiableCredential }>;
+        if (!wvcResult) {
+          throw new Error(`Could not find descriptor path ${descriptor.path} in wrapped verifiable credentials`);
+        }
+        const matchingWvc = wvcResult.value;
+        const matchingVpIndex = wrappedPresentations.findIndex((wvp) => (wvp.vcs as WrappedVerifiableCredential[]).includes(matchingWvc));
+        const matchingVp = wrappedPresentations[matchingVpIndex];
+        const matcingWvcIndexInVp = matchingVp.vcs.findIndex((wvc) => wvc === matchingWvc);
+
+        return this.updateDescriptorToExternal(descriptor, {
+          // We don't want to add vp index if the input to evaluate was a single presentation
+          vpIndex: Array.isArray(wvps) ? matchingVpIndex : undefined,
+          vcIndex: matcingWvcIndexInVp,
+        });
+      });
+    } else if (this._client.generatePresentationSubmission && result.value) {
+      this.updatePresentationSubmissionPathToVpPath(result.value);
+    }
+
+    result.areRequiredCredentialsPresent = result.value?.descriptor_map?.length ? Status.INFO : Status.ERROR;
+
+    return result;
+  }
+
+  private evaluatePresentationsAgainstSubmission(
+    pd: IInternalPresentationDefinition,
+    wvps: OrArray<WrappedVerifiablePresentation>,
+    submission: PresentationSubmission,
+    opts?: {
+      holderDIDs?: string[];
+      limitDisclosureSignatureSuites?: string[];
+      restrictToFormats?: Format;
+    },
+  ): PresentationEvaluationResults {
+    const result: PresentationEvaluationResults = {
+      areRequiredCredentialsPresent: Status.INFO,
+      presentation: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      errors: [],
+      warnings: [],
+      value: submission,
+    };
+
+    // We loop over all the descriptors in the submission
+    for (const descriptorIndex in submission.descriptor_map) {
+      const descriptor = submission.descriptor_map[descriptorIndex];
+
+      // Extract the VP from the wrapped VPs
+      const [vpResult] = JsonPathUtils.extractInputField(wvps, [descriptor.path]) as Array<{ value: WrappedVerifiablePresentation }>;
+      if (!vpResult) {
+        result.areRequiredCredentialsPresent = Status.ERROR;
+        result.errors?.push({
+          status: Status.ERROR,
+          tag: 'SubmissionPathNotFound',
+          message: `Unable to extract path ${descriptor.path} for submission.descriptor_path[${descriptorIndex}] from presentation(s)`,
+        });
+        continue;
+      }
+      const vp = vpResult.value;
+      let vcPath = `presentation ${descriptor.path}`;
+
+      if (vp.format !== descriptor.format) {
+        result.areRequiredCredentialsPresent = Status.ERROR;
+        result.errors?.push({
+          status: Status.ERROR,
+          tag: 'SubmissionFormatNoMatch',
+          message: `VP at path ${descriptor.path} has format ${vp.format}, while submission.descriptor_path[${descriptorIndex}] has format ${descriptor.format}`,
+        });
+        continue;
+      }
+
+      let vc: WrappedVerifiableCredential;
+      if (descriptor.path_nested) {
+        const [vcResult] = JsonPathUtils.extractInputField(vp.decoded, [descriptor.path_nested.path]) as Array<{
+          value: string | IVerifiableCredential;
+        }>;
+
+        if (!vcResult) {
+          result.areRequiredCredentialsPresent = Status.ERROR;
+          result.errors?.push({
+            status: Status.ERROR,
+            tag: 'SubmissionPathNotFound',
+            message: `Unable to extract path_nested.path ${descriptor.path_nested.path} for submission.descriptor_path[${descriptorIndex}] from verifiable presentation`,
+          });
+          continue;
+        }
+
+        // Find the wrapped VC based on the orignial VC
+        const originalVc = vcResult.value;
+        const wvc = vp.vcs.find((wvc) => CredentialMapper.areOriginalVerifiableCredentialsEqual(wvc.original, originalVc));
+
+        if (!wvc) {
+          result.areRequiredCredentialsPresent = Status.ERROR;
+          result.errors?.push({
+            status: Status.ERROR,
+            tag: 'SubmissionPathNotFound',
+            message: `Unable to find wrapped vc`,
+          });
+          continue;
+        }
+
+        vc = wvc;
+        vcPath += ` with nested credential ${descriptor.path_nested.path}`;
+      } else if (descriptor.format === 'vc+sd-jwt') {
+        vc = vp.vcs[0];
+      } else {
+        result.areRequiredCredentialsPresent = Status.ERROR;
+        result.errors?.push({
+          status: Status.ERROR,
+          tag: 'UnsupportedFormat',
+          message: `VP format ${vp.format} is not supported`,
+        });
+        continue;
+      }
+
+      // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
+      // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
+      const holderDIDs = CredentialMapper.isW3cPresentation(vp.presentation) && vp.presentation.holder ? [vp.presentation.holder] : [];
+
+      // Get the presentation definition only for this descriptor, so we can evaluate it separately
+      const pdForDescriptor = this.internalPresentationDefinitionForDescriptor(pd, descriptor.id);
+
+      // Reset the client on each iteration.
+      this._client = new EvaluationClient();
+      this._client.evaluate(pdForDescriptor, [vc], {
+        ...opts,
+        holderDIDs,
+        presentationSubmission: undefined,
+        generatePresentationSubmission: undefined,
+      });
+
+      if (this._client.presentationSubmission.descriptor_map.length !== 1) {
+        const submissionDescriptor = `submission.descriptor_map[${descriptorIndex}]`;
+        result.areRequiredCredentialsPresent = Status.ERROR;
+        result.errors?.push(...this.formatNotInfo(Status.ERROR, submissionDescriptor, vcPath));
+        result.warnings?.push(...this.formatNotInfo(Status.WARN, submissionDescriptor, vcPath));
+      }
+    }
+
+    // Output submission is same as input presentation submission, it's just that if it doesn't match, we return Error.
+    const submissionAgainstDefinitionResult = this.validateIfSubmissionSatisfiesDefinition(pd, submission);
+    if (!submissionAgainstDefinitionResult.doesSubmissionSatisfyDefinition) {
+      result.errors?.push({
+        status: Status.ERROR,
+        tag: 'SubmissionDoesNotSatisfyDefinition',
+        // TODO: it would be nice to add the nested errors here for beter understanding WHY the submission
+        // does not satisfy the definition, as we have that info, but we can only include one message here
+        message: submissionAgainstDefinitionResult.error,
+      });
+      result.areRequiredCredentialsPresent = Status.ERROR;
+    }
+
+    return result;
+  }
+
+  private checkIfSubmissionSatisfiesSubmissionRequirement(
+    pd: IInternalPresentationDefinition,
+    submission: PresentationSubmission,
+    submissionRequirement: SubmissionRequirement,
+    submissionRequirementName: string,
+  ): SubmissionSatisfiesSubmissionRequirementResult {
+    if ((submissionRequirement.from && submissionRequirement.from_nested) || (!submissionRequirement.from && !submissionRequirement.from_nested)) {
+      return {
+        isSubmissionRequirementSatisfied: false,
+        totalMatches: 0,
+        errors: [
+          `Either 'from' OR 'from_nested' MUST be present on submission requirement ${submissionRequirementName}, but not neither and not both`,
+        ],
+      };
+    }
+
+    const result: SubmissionSatisfiesSubmissionRequirementResult = {
+      isSubmissionRequirementSatisfied: false,
+      totalMatches: 0,
+      maxRequiredMatches: submissionRequirement.rule === Rules.Pick ? submissionRequirement.max : undefined,
+      minRequiredMatches: submissionRequirement.rule === Rules.Pick ? submissionRequirement.min : undefined,
+      errors: [],
+    };
+
+    // Populate from_nested requirements
+    if (submissionRequirement.from_nested) {
+      const nestedResults = submissionRequirement.from_nested.map((nestedSubmissionRequirement, index) =>
+        this.checkIfSubmissionSatisfiesSubmissionRequirement(
+          pd,
+          submission,
+          nestedSubmissionRequirement,
+          `${submissionRequirementName}.from_nested[${index}]`,
+        ),
+      );
+
+      result.totalRequiredMatches = submissionRequirement.rule === Rules.All ? submissionRequirement.from_nested.length : submissionRequirement.count;
+      result.totalMatches = nestedResults.filter((n) => n.isSubmissionRequirementSatisfied).length;
+      result.nested = nestedResults;
+    }
+
+    // Populate from requirements
+    if (submissionRequirement.from) {
+      const inputDescriptorsForGroup = pd.input_descriptors.filter((descriptor) => descriptor.group?.includes(submissionRequirement.from as string));
+      const descriptorIdsInSubmission = submission.descriptor_map.map((descriptor) => descriptor.id);
+      const inputDescriptorsInSubmission = inputDescriptorsForGroup.filter((inputDescriptor) =>
+        descriptorIdsInSubmission.includes(inputDescriptor.id),
+      );
+
+      result.totalMatches = inputDescriptorsInSubmission.length;
+      result.totalRequiredMatches = submissionRequirement.rule === Rules.All ? inputDescriptorsForGroup.length : submissionRequirement.count;
+    }
+
+    // Validate if the min/max/count requirements are satisfied
+    if (result.totalRequiredMatches !== undefined && result.totalMatches !== result.totalRequiredMatches) {
+      result.errors.push(
+        `Expected ${result.totalRequiredMatches} requirements to be satisfied for submission requirement ${submissionRequirementName}, but found ${result.totalMatches}`,
+      );
+    }
+
+    if (result.minRequiredMatches !== undefined && result.totalMatches < result.minRequiredMatches) {
+      result.errors.push(
+        `Expected at least ${result.minRequiredMatches} requirements to be satisfied from submission requirement ${submissionRequirementName}, but found ${result.totalMatches}`,
+      );
+    }
+
+    if (result.maxRequiredMatches !== undefined && result.totalMatches > result.maxRequiredMatches) {
+      result.errors.push(
+        `Expected at most ${result.maxRequiredMatches} requirements to be satisfied from submission requirement ${submissionRequirementName}, but found ${result.totalMatches}`,
+      );
+    }
+
+    result.isSubmissionRequirementSatisfied = result.errors.length === 0;
+    return result;
+  }
+
+  /**
+   * Checks whether a submission satisfies the requirements of a presentation definition
+   */
+  private validateIfSubmissionSatisfiesDefinition(
+    pd: IInternalPresentationDefinition,
+    submission: PresentationSubmission,
+  ): SubmissionSatisfiesDefinitionResult {
+    const submissionDescriptorIds = submission.descriptor_map.map((descriptor) => descriptor.id);
+
+    const result: SubmissionSatisfiesDefinitionResult = {
+      doesSubmissionSatisfyDefinition: false,
+      totalMatches: 0,
+      totalRequiredMatches: 0,
+    };
+
+    // All MUST match
+    if (pd.submission_requirements) {
+      const submissionRequirementResults = pd.submission_requirements.map((submissionRequirement, index) =>
+        this.checkIfSubmissionSatisfiesSubmissionRequirement(pd, submission, submissionRequirement, `$.submission_requirements[${index}]`),
+      );
+
+      result.totalRequiredMatches = pd.submission_requirements.length;
+      result.totalMatches = submissionRequirementResults.filter((r) => r.isSubmissionRequirementSatisfied).length;
+      result.submisisonRequirementResults = submissionRequirementResults;
+
+      if (result.totalMatches !== result.totalRequiredMatches) {
+        result.error = `Expected all submission requirements (${result.totalRequiredMatches}) to be satisfifed in submission, but found ${result.totalMatches}.`;
+      }
+    } else {
+      result.totalRequiredMatches = pd.input_descriptors.length;
+      result.totalMatches = submissionDescriptorIds.length;
+      const notInSubmission = pd.input_descriptors.filter((inputDescriptor) => !submissionDescriptorIds.includes(inputDescriptor.id));
+
+      if (notInSubmission.length > 0) {
+        result.error = `Expected all input descriptors (${pd.input_descriptors.length}) to be satisfifed in submission, but found ${submissionDescriptorIds.length}. Missing ${notInSubmission.map((d) => d.id).join(', ')}`;
+      }
+    }
+
+    result.doesSubmissionSatisfyDefinition = result.error === undefined;
+    return result;
+  }
+
+  private internalPresentationDefinitionForDescriptor(pd: IInternalPresentationDefinition, descriptorId: string): IInternalPresentationDefinition {
+    if (pd instanceof InternalPresentationDefinitionV2) {
+      const inputDescriptorIndex = pd.input_descriptors.findIndex((i) => i.id === descriptorId);
+      return new InternalPresentationDefinitionV2(
+        pd.id,
+        [pd.input_descriptors[inputDescriptorIndex]],
+        pd.format,
+        pd.frame,
+        pd.name,
+        pd.purpose,
+        // we ignore submission requirements as we're verifying a single input descriptor here
+        undefined,
+      );
+    } else if (pd instanceof InternalPresentationDefinitionV1) {
+      const inputDescriptorIndex = pd.input_descriptors.findIndex((i) => i.id === descriptorId);
+      return new InternalPresentationDefinitionV1(
+        pd.id,
+        [pd.input_descriptors[inputDescriptorIndex]],
+        pd.format,
+        pd.name,
+        pd.purpose,
+        // we ignore submission requirements as we're verifying a single input descriptor here
+        undefined,
+      );
+    }
+
+    throw new Error('Unrecognized presentation definition instance');
+  }
+
+  private formatNotInfo(status: Status, descriptorPath?: string, vcPath?: string): Checked[] {
     return this._client.results
       .filter((result) => result.status === status)
       .map((x) => {
-        const vcPath = x.verifiable_credential_path.substring(1);
+        const _vcPath = vcPath ?? `$.verifiableCredential${x.verifiable_credential_path.substring(1)}`;
+        const _descriptorPath = descriptorPath ?? x.input_descriptor_path;
         return {
           tag: x.evaluator,
           status: x.status,
-          message: `${x.message}: ${x.input_descriptor_path}: $.verifiableCredential${vcPath}`,
+          message: `${x.message}: ${_descriptorPath}: ${_vcPath}`,
         };
       });
   }
@@ -425,35 +805,53 @@ export class EvaluationClientWrapper {
       });
   }
 
-  private updatePresentationSubmissionToExternal() {
-    const descriptors = this._client.presentationSubmission.descriptor_map;
-    this._client.presentationSubmission.descriptor_map = descriptors.map((descriptor) => {
-      if (descriptor.path_nested) {
-        return descriptor;
-      }
-      // sd-jwt doesn't use path_nested and format is the same for vc or vp
-      else if (descriptor.format === 'vc+sd-jwt') {
-        return descriptor;
-      }
+  private updatePresentationSubmissionToExternal(presentationSubmission?: PresentationSubmission): PresentationSubmission {
+    const descriptors = presentationSubmission?.descriptor_map ?? this._client.presentationSubmission.descriptor_map;
+    const updatedDescriptors = descriptors.map((d) => this.updateDescriptorToExternal(d));
 
-      const format = descriptor.format;
-      const nestedDescriptor = { ...descriptor };
-      nestedDescriptor.path_nested = { ...descriptor };
-      nestedDescriptor.path = '$';
-      // todo: We really should also look at the context of the VP, to determine whether it is jwt_vp vs jwt_vp_json instead of relying on the VC type
-      if (format.startsWith('ldp_')) {
-        nestedDescriptor.format = 'ldp_vp';
-      } else if (format.startsWith('di_')) {
-        nestedDescriptor.format = 'di_vp';
-      } else if (format === 'jwt_vc') {
-        nestedDescriptor.format = 'jwt_vp';
-        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[');
-      } else if (format === 'jwt_vc_json') {
-        nestedDescriptor.format = 'jwt_vp_json';
-        nestedDescriptor.path_nested.path = nestedDescriptor.path_nested.path.replace('$.verifiableCredential[', '$.vp.verifiableCredential[');
-      }
-      return nestedDescriptor;
-    });
+    if (presentationSubmission) {
+      return {
+        ...presentationSubmission,
+        descriptor_map: updatedDescriptors,
+      };
+    }
+
+    this._client.presentationSubmission.descriptor_map = updatedDescriptors;
+    return this._client.presentationSubmission;
+  }
+
+  private updateDescriptorToExternal(
+    descriptor: Descriptor,
+    {
+      vpIndex,
+      vcIndex,
+    }: {
+      /* index of the vp. if not provided $ will be used */
+      vpIndex?: number;
+      /* index of the vc in the vp. if not provided, the current index on the descriptor will be used */
+      vcIndex?: number;
+    } = {},
+  ) {
+    if (descriptor.path_nested) {
+      return descriptor;
+    }
+
+    const { nestedCredentialPath, vpFormat } = getVpFormatForVcFormat(descriptor.format);
+
+    const newDescriptor = {
+      ...descriptor,
+      format: vpFormat,
+      path: vpIndex !== undefined ? `$[${vpIndex}]` : '$',
+    };
+
+    if (nestedCredentialPath) {
+      newDescriptor.path_nested = {
+        ...descriptor,
+        path: vcIndex !== undefined ? `${nestedCredentialPath}[${vcIndex}]` : descriptor.path.replace('$.', nestedCredentialPath),
+      };
+    }
+
+    return newDescriptor;
   }
 
   private matchUserSelectedVcs(marked: HandlerCheckResult[], vcs: WrappedVerifiableCredential[]): [HandlerCheckResult[], [string, string][]] {

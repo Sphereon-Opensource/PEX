@@ -18,6 +18,7 @@ import {
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
+import { PresentationEvaluationResults } from './evaluation/core';
 import {
   PresentationFromOpts,
   PresentationResult,
@@ -28,7 +29,7 @@ import {
   VerifiablePresentationFromOpts,
   VerifiablePresentationResult,
 } from './signing';
-import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, PEVersion, SSITypesBuilder } from './types';
+import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, OrArray, PEVersion, SSITypesBuilder } from './types';
 import { calculateSdHash, definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
 import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
 
@@ -59,46 +60,67 @@ export class PEX {
   }
 
   /***
-   * The evaluatePresentation compares what is expected from a presentation with a presentationDefinition.
+   * The evaluatePresentation compares what is expected from one or more presentations with a presentationDefinition.
    * presentationDefinition: It can be either v1 or v2 of presentationDefinition
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
-   * @param presentation the presentation which has to be evaluated in comparison of the definition.
+   * @param presentations the presentation(s) which have to be evaluated in comparison of the definition.
    * @param opts - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
-   * were not fulfilled by the presentation.
+   * were not fulfilled by the presentation(s).
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentation: OriginalVerifiablePresentation | IPresentation,
+    presentations: OrArray<OriginalVerifiablePresentation | IPresentation>,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
       presentationSubmission?: PresentationSubmission;
+      /**
+       * The location of the presentation submission. By default {@link PresentationSubmissionLocation.PRESENTATION}
+       * is used when one presentation is passed (not as array), while {@link PresentationSubmissionLocation.EXTERNAL} is
+       * used when an array is passed
+       */
+      presentationSubmissionLocation?: PresentationSubmissionLocation;
       generatePresentationSubmission?: boolean;
     },
-  ): EvaluationResults {
+  ): PresentationEvaluationResults {
+    // We map it to an array for now to make processing on the presentations easier, but before checking against the submission
+    // we will transform it to the original structure (array vs single) so the references in the submission stay correct
+    const presentationsArray = Array.isArray(presentations) ? presentations : [presentations];
+
     const generatePresentationSubmission =
       opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission === undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
-    const presentationCopy: OriginalVerifiablePresentation = JSON.parse(JSON.stringify(presentation));
-    const wrappedPresentation: WrappedVerifiablePresentation = SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(
-      presentationCopy,
-      this.options?.hasher,
+    const presentationsCopy: OriginalVerifiablePresentation[] = JSON.parse(JSON.stringify(presentationsArray));
+
+    if (presentationsArray.length === 0) {
+      throw new Error('At least one presentation must be provided');
+    }
+
+    const wrappedPresentations: WrappedVerifiablePresentation[] = presentationsCopy.map((p) =>
+      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(p, this.options?.hasher),
     );
-    const presentationSubmission = opts?.presentationSubmission ?? wrappedPresentation.decoded.presentation_submission;
-    if (!presentationSubmission && !generatePresentationSubmission) {
-      throw Error(`Either a presentation submission as part of the VP or provided separately was expected`);
+
+    let presentationSubmission = opts?.presentationSubmission;
+
+    // When only one presentation, we also allow it to be present in the VP
+    if (!presentationSubmission && presentationsArray.length === 1 && !generatePresentationSubmission) {
+      presentationSubmission = wrappedPresentations[0].decoded.presentation_submission;
+      if (!presentationSubmission) {
+        throw Error(`Either a presentation submission as part of the VP or provided in options was expected`);
+      }
+    } else if (!presentationSubmission && !generatePresentationSubmission) {
+      throw new Error('Presentation submission in options was expected.');
     }
 
     // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
     // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
-    const holderDIDs =
-      CredentialMapper.isW3cPresentation(wrappedPresentation.presentation) && wrappedPresentation.presentation.holder
-        ? [wrappedPresentation.presentation.holder]
-        : [];
+    const holderDIDs = wrappedPresentations
+      .map((p) => (CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined))
+      .filter((d): d is string => d !== undefined);
 
     const updatedOpts = {
       ...opts,
@@ -107,14 +129,21 @@ export class PEX {
       generatePresentationSubmission,
     };
 
-    const result: EvaluationResults = this._evaluationClientWrapper.evaluate(pd, wrappedPresentation.vcs, updatedOpts);
-    if (result.value?.descriptor_map.length) {
+    const allWvcs = wrappedPresentations.reduce((all, wvp) => [...all, ...wvp.vcs], [] as WrappedVerifiableCredential[]);
+    const result = this._evaluationClientWrapper.evaluatePresentations(
+      pd,
+      Array.isArray(presentations) ? wrappedPresentations : wrappedPresentations[0],
+      updatedOpts,
+    );
+
+    if (result.areRequiredCredentialsPresent !== Status.ERROR) {
       const selectFromClientWrapper = new EvaluationClientWrapper();
-      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, wrappedPresentation.vcs, updatedOpts);
+      const selectResults: SelectResults = selectFromClientWrapper.selectFrom(pd, allWvcs, updatedOpts);
       if (selectResults.areRequiredCredentialsPresent !== Status.ERROR) {
         result.errors = [];
       }
     }
+
     return result;
   }
 

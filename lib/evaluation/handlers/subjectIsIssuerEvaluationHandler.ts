@@ -1,5 +1,5 @@
 import { ConstraintsV1, ConstraintsV2, Optionality } from '@sphereon/pex-models';
-import { CredentialMapper, IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
+import { CredentialMapper, IVerifiableCredential, SdJwtDecodedVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../../ConstraintUtils';
 import { IInternalPresentationDefinition, InternalPresentationDefinitionV2, PathComponent } from '../../types';
@@ -37,10 +37,11 @@ export class SubjectIsIssuerEvaluationHandler extends AbstractEvaluationHandler 
   private checkSubjectIsIssuer(inputDescriptorId: string, wrappedVcs: WrappedVerifiableCredential[], idIdx: number): void {
     this.client.presentationSubmission.descriptor_map.forEach((currentDescriptor) => {
       if (currentDescriptor.id === inputDescriptorId) {
-        const mappings: { path: PathComponent[]; value: IVerifiableCredential }[] = JsonPathUtils.extractInputField(
+        const mappings = JsonPathUtils.extractInputField(
           wrappedVcs.map((wvc) => wvc.credential),
           [currentDescriptor.path],
-        ) as { path: PathComponent[]; value: IVerifiableCredential }[];
+        ) as { path: PathComponent[]; value: IVerifiableCredential | SdJwtDecodedVerifiableCredential }[];
+
         for (const mapping of mappings) {
           const issuer = getIssuerString(mapping.value);
           if (mapping && mapping.value && getSubjectIdsAsString(mapping.value).every((item) => item === issuer)) {

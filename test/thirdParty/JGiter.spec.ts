@@ -2,6 +2,7 @@ import { PresentationDefinitionV2, Rules } from '@sphereon/pex-models';
 import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { EvaluationResults, PEX, Status } from '../../lib';
+import { PresentationEvaluationResults } from '../../lib/evaluation';
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -520,7 +521,7 @@ describe('evaluate JGiter tests', () => {
         path: '$.verifiableCredential[1]',
       },
     ]);
-    const evalResult: EvaluationResults = pex.evaluatePresentation(pdSchema, presentation);
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, presentation);
     expect(evalResult.errors?.length).toEqual(0);
   });
 
