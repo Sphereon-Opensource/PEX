@@ -58,7 +58,7 @@ export class PresentationDefinitionSchema {
               type: ['number', 'string'],
             },
             const: {
-              type: ['number', 'string'],
+              type: ['number', 'string', 'boolean'],
             },
             enum: {
               type: 'array',

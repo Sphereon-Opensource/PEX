@@ -56,7 +56,7 @@ describe('testing schemas with ajv', () => {
             exclusiveMinimum: { type: ['number', 'string'] },
             exclusiveMaximum: { type: ['number', 'string'] },
             maximum: { type: ['number', 'string'] },
-            const: { type: ['number', 'string'] },
+            const: { type: ['number', 'string', 'boolean'] },
             enum: {
               type: 'array',
               items: { type: ['number', 'string'] },
