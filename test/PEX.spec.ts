@@ -12,7 +12,7 @@ import {
   WrappedW3CVerifiableCredential,
 } from '@sphereon/ssi-types';
 
-import { EvaluationResults, PEX, Validated } from '../lib';
+import { EvaluationResults, PEX, PEXv2, Validated } from '../lib';
 import { VerifiablePresentationResult } from '../lib/signing/types';
 import { SSITypesBuilder } from '../lib/types';
 
@@ -196,6 +196,19 @@ describe('evaluate', () => {
     pdSchema!.submission_requirements = [pdSchema!.submission_requirements![0]];
     const result: Validated = PEX.validateDefinition(pdSchema);
     expect(result).toEqual([{ message: 'ok', status: 'info', tag: 'root' }]);
+  });
+
+  it('correct handles presentation definition with const values in filter', () => {
+    const pdSchema: PresentationDefinitionV2 = getFileAsJson('./test/resources/pd_const_values.json').presentation_definition;
+    const result = PEXv2.validateDefinition(pdSchema);
+
+    expect(result).toEqual([
+      {
+        tag: 'root',
+        status: 'info',
+        message: 'ok',
+      },
+    ]);
   });
 
   it('Evaluate presentationDefinition v2', () => {
