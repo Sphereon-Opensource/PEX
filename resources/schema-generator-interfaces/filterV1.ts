@@ -1,7 +1,8 @@
 import { OneOfNumberString } from './oneOfNumberString';
+import { OneOfNumberStringBoolean } from './oneOfNumberStringBoolean';
 
 export interface FilterV1Base {
-    const?: OneOfNumberString;
+    const?: OneOfNumberStringBoolean;
     enum?: Array<OneOfNumberString>;
     exclusiveMinimum?: OneOfNumberString;
     exclusiveMaximum?: OneOfNumberString;
