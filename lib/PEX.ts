@@ -90,15 +90,14 @@ export class PEX {
     // We map it to an array for now to make processing on the presentations easier, but before checking against the submission
     // we will transform it to the original structure (array vs single) so the references in the submission stay correct
     const presentationsArray = Array.isArray(presentations) ? presentations : [presentations];
+    if (presentationsArray.length === 0) {
+      throw new Error('At least one presentation must be provided');
+    }
 
     const generatePresentationSubmission =
       opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : opts?.presentationSubmission === undefined;
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     const presentationsCopy: OriginalVerifiablePresentation[] = JSON.parse(JSON.stringify(presentationsArray));
-
-    if (presentationsArray.length === 0) {
-      throw new Error('At least one presentation must be provided');
-    }
 
     const wrappedPresentations: WrappedVerifiablePresentation[] = presentationsCopy.map((p) =>
       SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(p, this.options?.hasher),
