@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "3.3.2-unstable.0",
+  "version": "3.3.3",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -46,7 +46,7 @@
     "@sd-jwt/decode": "^0.6.1",
     "@sd-jwt/present": "^0.6.1",
     "@sd-jwt/types": "^0.6.1",
-    "@sphereon/pex-models": "^2.2.2",
+    "@sphereon/pex-models": "^2.2.4",
     "@sphereon/ssi-types": "0.22.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",

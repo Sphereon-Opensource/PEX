@@ -18,8 +18,8 @@ dependencies:
     specifier: ^0.6.1
     version: 0.6.1
   '@sphereon/pex-models':
-    specifier: ^2.2.2
-    version: 2.2.2
+    specifier: ^2.2.4
+    version: 2.2.4
   '@sphereon/ssi-types':
     specifier: 0.22.0
     version: 0.22.0
@@ -869,8 +869,8 @@ packages:
       '@sinonjs/commons': 3.0.1
     dev: true
 
-  /@sphereon/pex-models@2.2.2:
-    resolution: {integrity: sha512-CZIsBoaV5rMZEWYBsmH+RxsdoxpXf5FSDwDz0GB0qOf5WFk1BGUnzpZzi5yJ+2L151mhPk97dlRc9Wb01Awr4Q==}
+  /@sphereon/pex-models@2.2.4:
+    resolution: {integrity: sha512-pGlp+wplneE1+Lk3U48/2htYKTbONMeG5/x7vhO6AnPUOsnOXeJdftPrBYWVSzz/JH5GJptAc6+pAyYE1zMu4Q==}
     dev: false
 
   /@sphereon/ssi-types@0.22.0:

@@ -1,12 +1,24 @@
 # Release Notes
 
+## v3.3.3 - 2024-04-25
+
+- Fixed: 
+  - const boolean value was missing in schema file
+
+## v3.3.2 - 2024-04-24
+
+- Updated:
+    - Allow to use const boolean in filters.
+    - Allow to use 'optional' boolean in V2 Fields object. Please be aware we do not take that value into account yet.
+      We just added the field, so it doesn't fail validation
+    - Update to PEX models 2.2.4
+
 ## v3.3.1 - 2024-03-19
 
 - Updated:
     - Update sd-jwt packages to 0.6.1 from 0.3.0
     - Update to latest @sphereon/ssi-types
     - Move to pnpm from yarn, given our other libraries also use pnpm
-
 
 ## v3.3.0 - 2024-02-29
 
@@ -17,7 +29,7 @@
     - Expose jwt_vp_json format
 - Updated:
     - Update to PEX models 2.2.2
-  
+
 ## v3.2.0 - 2024-02-05
 
 - Added:

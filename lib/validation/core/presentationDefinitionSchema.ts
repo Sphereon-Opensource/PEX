@@ -58,7 +58,7 @@ export class PresentationDefinitionSchema {
               type: ['number', 'string'],
             },
             const: {
-              type: ['number', 'string'],
+              type: ['number', 'string', 'boolean'],
             },
             enum: {
               type: 'array',
@@ -680,6 +680,7 @@ export class PresentationDefinitionSchema {
                 },
                 purpose: { type: 'string' },
                 intent_to_retain: { type: 'boolean' },
+                optional: { type: 'boolean' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
               },
               required: ['path'],
@@ -694,6 +695,7 @@ export class PresentationDefinitionSchema {
                 },
                 purpose: { type: 'string' },
                 intent_to_retain: { type: 'boolean' },
+                optional: { type: 'boolean' },
                 filter: { $ref: 'http://json-schema.org/schema#' },
                 predicate: {
                   type: 'string',
