@@ -223,7 +223,7 @@ describe('evaluate', () => {
         payload: {
           iat: expect.any(Number),
           nonce: undefined,
-          _sd_hash: calculateSdHash(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc, 'sha-256', hasher),
+          sd_hash: calculateSdHash(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc, 'sha-256', hasher),
         },
       },
     });
