@@ -6,7 +6,7 @@ import { SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 import { PEX, PresentationSubmissionLocation, SdJwtDecodedVerifiableCredentialWithKbJwtInput, Status, Validated } from '../lib';
 import { calculateSdHash } from '../lib/utils';
 
-const hasher = (data: string) => createHash('sha256').update(data).digest();
+export const hasher = (data: string) => createHash('sha256').update(data).digest();
 
 const decodedSdJwtVc = {
   compactSdJwtVc:
@@ -284,7 +284,7 @@ describe('evaluate', () => {
 
     expect(evaluateResults).toEqual({
       // Do we want to return the compact variant here? Or the decoded/pretty variant?
-      verifiableCredential: [decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt],
+      presentation: decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt,
       areRequiredCredentialsPresent: Status.INFO,
       warnings: [],
       errors: [],

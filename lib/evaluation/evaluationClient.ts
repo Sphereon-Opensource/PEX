@@ -71,7 +71,6 @@ export class EvaluationClient {
     this._generatePresentationSubmission = opts?.generatePresentationSubmission !== undefined ? opts.generatePresentationSubmission : true;
     if (opts?.presentationSubmission) {
       this._presentationSubmission = opts.presentationSubmission;
-      // this._requirePresentationSubmission = true;
     }
     let currentHandler: EvaluationHandler | undefined = this.initEvaluationHandlers();
     currentHandler?.handle(pd, wvcs);
@@ -85,6 +84,12 @@ export class EvaluationClient {
         throw this.failed_catched;
       }
     }
+
+    // filter the presentation submission
+    this.presentationSubmission = {
+      ...this.presentationSubmission,
+      descriptor_map: this.presentationSubmission.descriptor_map.filter((d) => d),
+    };
   }
 
   public get results(): HandlerCheckResult[] {

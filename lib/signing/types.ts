@@ -10,7 +10,7 @@ import {
   W3CVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
-import { EvaluationResults } from '../evaluation';
+import { PresentationEvaluationResults } from '../evaluation';
 
 export interface ProofOptions {
   /**
@@ -213,7 +213,7 @@ export interface PresentationSignCallBackParams {
   /**
    * The evaluation results, which the callback function could use to create a VP using the proof(s) using the supplied credentials
    */
-  evaluationResults: EvaluationResults;
+  evaluationResults: PresentationEvaluationResults;
 }
 
 export enum KeyEncoding {

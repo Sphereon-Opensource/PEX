@@ -1,0 +1,86 @@
+{
+  "presentation_definition": {
+    "id": "31e2f0f1-6b70-411d-b239-56aed5321884",
+    "purpose": "To sell you a drink we need to know that you are an adult.",
+    "input_descriptors": [
+      {
+        "id": "867bfe7a-5b91-46b2-9ba4-70028b8d9cc8",
+        "group": ["A"],
+        "constraints": {
+          "fields": [
+            {
+              "path": ["$.credentialSubject.lprCategory"],
+              "filter": {
+                "type": "string",
+                "const": "C09"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "f09f7000-6bf2-4239-8e8d-13014e681eba",
+        "group": ["A"],
+        "constraints": {
+          "fields": [
+            {
+              "path": ["$.credentialSubject.driversLicenseType"],
+              "filter": {
+                "type": "string",
+                "const": "B"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "ddc4a62f-73d4-4410-a3d7-b20720a113ed",
+        "group": ["A"],
+        "constraints": {
+          "fields": [
+            {
+              "path": ["$.vct"],
+              "filter": {
+                "type": "string",
+                "const": "https://high-assurance.com/StateBusinessLicense"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "e0556bbf-d1c0-48d8-8564-09f6e07bac9b",
+        "group": ["A"],
+        "constraints": {
+          "fields": [
+            {
+              "path": ["$.vc.credentialSubject.degree.type"],
+              "filter": {
+                "type": "string",
+                "const": "BachelorDegree"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "submission_requirements": [
+      {
+        "rule": "all",
+        "from_nested": [
+          {
+            "rule": "all",
+            "from": "A"
+          },
+          {
+            "rule": "pick",
+            "from": "A",
+            "min": 4,
+            "max": 4,
+            "count": 4
+          }
+        ]
+      }
+    ]
+  }
+}

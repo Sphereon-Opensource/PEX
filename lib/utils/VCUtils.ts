@@ -1,4 +1,4 @@
-import { AdditionalClaims, ICredential, ICredentialSubject, IIssuer } from '@sphereon/ssi-types';
+import { AdditionalClaims, CredentialMapper, ICredential, ICredentialSubject, IIssuer, SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { DiscoveredVersion, IPresentationDefinition, PEVersion } from '../types';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -11,12 +11,21 @@ import validatePDv2 from '../validation/validatePDv2.js';
 import { ObjectUtils } from './ObjectUtils';
 import { JsonPathUtils } from './jsonPathUtils';
 
-export function getSubjectIdsAsString(vc: ICredential): string[] {
+export function getSubjectIdsAsString(vc: ICredential | SdJwtDecodedVerifiableCredential): string[] {
+  if (CredentialMapper.isSdJwtDecodedCredential(vc)) {
+    // TODO: should we also handle `cnf` claim?
+    return vc.signedPayload.sub ? [vc.signedPayload.sub] : [];
+  }
+
   const subjects: (ICredentialSubject & AdditionalClaims)[] = Array.isArray(vc.credentialSubject) ? vc.credentialSubject : [vc.credentialSubject];
   return subjects.filter((s) => !!s.id).map((value) => value.id) as string[];
 }
 
-export function getIssuerString(vc: ICredential): string {
+export function getIssuerString(vc: ICredential | SdJwtDecodedVerifiableCredential): string {
+  if (CredentialMapper.isSdJwtDecodedCredential(vc)) {
+    return vc.signedPayload.iss;
+  }
+
   return ObjectUtils.isString(vc.issuer) ? (vc.issuer as string) : (vc.issuer as IIssuer).id;
 }
 

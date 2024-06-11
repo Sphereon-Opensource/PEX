@@ -15,6 +15,7 @@ export interface IInternalPresentationDefinition {
   name?: string;
   purpose?: string;
   submission_requirements?: Array<SubmissionRequirement>;
+  input_descriptors: Array<{ id: string; group?: string[] }>;
 
   getVersion(): PEVersion;
 }
@@ -103,3 +104,5 @@ export enum PEVersion {
   v1 = 'v1',
   v2 = 'v2',
 }
+
+export type OrArray<T> = T | Array<T>;
