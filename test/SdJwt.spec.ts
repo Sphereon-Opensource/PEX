@@ -233,6 +233,7 @@ describe('evaluate', () => {
     const presentationDefinition = getPresentationDefinitionV2();
     const selectResults = pex.selectFrom(presentationDefinition, [decodedSdJwtVc]);
     let kbJwt: string | undefined = undefined;
+    selectResults.verifiableCredential;
     const presentationResult = await pex.verifiablePresentationFrom(
       presentationDefinition,
       selectResults.verifiableCredential!,

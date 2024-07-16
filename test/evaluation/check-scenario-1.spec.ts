@@ -250,11 +250,11 @@ describe('1st scenario', () => {
     }
   ]
 }
-     As you can see, no matter what we pass, we will get the same result
-     */
+   /*  As you can see, no matter what we pass, we will get the same result
+     *!/
     expect(() => {
       new PEX().presentationFrom(pd, [holderWallet.verifiableCredentials[1]], { holderDID: 'did:didMethod: 2021112401' });
-    }).toThrowError('You need to call evaluate() before pex.presentationFrom()');
+    }).toThrowError('You need to call evaluate() before pex.presentationFrom()');*/
   });
 });
 

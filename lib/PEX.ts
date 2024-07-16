@@ -488,7 +488,7 @@ export class PEX {
       }),
     });
     if (!evaluationResults.value && selectedCredentials.length === 0) {
-      evaluationResults.value = presentationResult.presentationSubmission
+      evaluationResults.value = presentationResult.presentationSubmission;
     }
     if (!evaluationResults.value) {
       throw new Error('Could not get evaluation results from presentationResult');
