@@ -361,7 +361,7 @@ export class EvaluationClientWrapper {
       presentationSubmissionLocation?: PresentationSubmissionLocation;
     },
   ): PresentationSubmission {
-    if (!this._client.results.length) {
+    if (!this._client.results) {
       throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
     if (!this._client.generatePresentationSubmission) {
