@@ -1,5 +1,13 @@
 # Release Notes
 
+## v4.0.0 - 2024-07-23
+
+- Added:
+  - Allow to work without input descriptors. EBSI is using this (not spec compliant!)
+- Updated:
+  - use `sd_hash` instead of `_sd_hash`, reflecting the change in the SD-JWT spec
+
+
 ## v3.3.3 - 2024-04-25
 
 - Fixed: 
