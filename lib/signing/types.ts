@@ -90,7 +90,7 @@ export interface SdJwtKbJwtInput {
   };
   payload: {
     iat: number;
-    _sd_hash: string;
+    sd_hash: string;
     nonce?: string;
   };
 }

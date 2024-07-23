@@ -337,7 +337,7 @@ export class PEX {
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
-          _sd_hash: sdHash,
+          sd_hash: sdHash,
         },
       } satisfies SdJwtKbJwtInput;
 
@@ -526,7 +526,7 @@ export class PEX {
         payload: {
           iat: new Date().getTime(),
           nonce: proofOptions?.nonce,
-          _sd_hash: sdHash,
+          sd_hash: sdHash,
         },
       } satisfies SdJwtKbJwtInput;
 
