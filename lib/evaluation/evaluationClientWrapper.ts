@@ -847,7 +847,10 @@ export class EvaluationClientWrapper {
     if (nestedCredentialPath) {
       newDescriptor.path_nested = {
         ...descriptor,
-        path: vcIndex !== undefined ? `${nestedCredentialPath}[${vcIndex}]` : descriptor.path.replace('$.', nestedCredentialPath),
+        path:
+          vcIndex !== undefined
+            ? `${nestedCredentialPath}[${vcIndex}]`
+            : descriptor.path.replace('$.verifiableCredential', nestedCredentialPath).replace('$[', `${nestedCredentialPath}[`),
       };
     }
 
