@@ -1,5 +1,11 @@
 # Release Notes
 
+## v4.0.1 - 2024-07-24
+
+- Fixed:
+    - nested_path updates sometimes ended up with wrong replacements
+    - const filter allows booleans now
+
 ## v4.0.0 - 2024-07-23
 
 - Added:
