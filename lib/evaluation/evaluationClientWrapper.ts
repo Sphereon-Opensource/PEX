@@ -1064,7 +1064,11 @@ export class EvaluationClientWrapper {
   private updateSubmissionRequirementMatchPathToAlias(submissionRequirementMatch: SubmissionRequirementMatch, alias: string) {
     const vc_path: string[] = [];
     submissionRequirementMatch.vc_path.forEach((m) => {
-      vc_path.push(m.replace('$', '$.' + alias));
+      if (m.startsWith(`$.${alias}`)) {
+        vc_path.push(m);
+      } else {
+        vc_path.push(m.replace('$', `$.${alias}`));
+      }
     });
     submissionRequirementMatch.vc_path = vc_path;
     if (submissionRequirementMatch.from_nested) {
