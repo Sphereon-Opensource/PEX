@@ -124,7 +124,57 @@ describe('evaluate', () => {
     const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
     pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
     const pex: PEX = new PEX();
-    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
+    expect(evaluationResults!.errors!.length).toEqual(0);
+  });
+
+  it('Evaluate case without any error passing submission and presentation submission location', () => {
+    const pdSchema: PresentationDefinitionV1 = getFileAsJson(
+      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
+    ).presentation_definition;
+    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
+    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+    const pex: PEX = new PEX();
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: {
+        id: 'accd5adf-1dbf-4ed9-9ba2-d687476126cb',
+        definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+        descriptor_map: [
+          {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'ldp_vp',
+            path: '$.verifiableCredential[0]',
+          },
+        ],
+      },
+      presentationSubmissionLocation: PresentationSubmissionLocation.PRESENTATION,
+    });
+    expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
+    expect(evaluationResults!.errors!.length).toEqual(0);
+  });
+
+  it('Evaluate case without any error passing submission and presentation submission location presentation W3C JWT vc', () => {
+    const pdSchema: PresentationDefinitionV1 = getFileAsJson('./test/dif_pe_examples/pdV1/pd-simple-schema-jwt-degree.json').presentation_definition;
+    const pex: PEX = new PEX();
+    const evaluationResults = pex.evaluatePresentation(pdSchema, getFile('./test/dif_pe_examples/vp/vp_universityDegree.jwt'), {
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+      presentationSubmission: {
+        id: 'accd5adf-1dbf-4ed9-9ba2-d687476126cb',
+        definition_id: '31e2f0f1-6b70-411d-b239-56aed5321884',
+        descriptor_map: [
+          {
+            id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+            format: 'jwt_vc',
+            path: '$.vp.verifiableCredential[0]',
+          },
+        ],
+      },
+      presentationSubmissionLocation: PresentationSubmissionLocation.PRESENTATION,
+    });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
