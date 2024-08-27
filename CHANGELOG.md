@@ -1,5 +1,11 @@
 # Release Notes
 
+## v4.1.0 - 2024-08-27
+
+- Feat:
+    - Add mso_mdoc and intent_to_retain types. No interpretation is done yet, as the kmp-mdl-mdoc handles PE itself. We
+      will add support soon in PEX as well.
+
 ## v4.0.1 - 2024-07-24
 
 - Fixed:
@@ -9,15 +15,14 @@
 ## v4.0.0 - 2024-07-23
 
 - Added:
-  - Allow to work without input descriptors. EBSI is using this (not spec compliant!)
+    - Allow to work without input descriptors. EBSI is using this (not spec compliant!)
 - Updated:
-  - use `sd_hash` instead of `_sd_hash`, reflecting the change in the SD-JWT spec
-
+    - use `sd_hash` instead of `_sd_hash`, reflecting the change in the SD-JWT spec
 
 ## v3.3.3 - 2024-04-25
 
-- Fixed: 
-  - const boolean value was missing in schema file
+- Fixed:
+    - const boolean value was missing in schema file
 
 ## v3.3.2 - 2024-04-24
 
