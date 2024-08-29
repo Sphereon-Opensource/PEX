@@ -1,7 +1,11 @@
 import { CredentialMapper, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../../ConstraintUtils';
-import { IInternalPresentationDefinition, InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from '../../types';
+import {
+  IInternalPresentationDefinition,
+  InternalPresentationDefinitionV1,
+  InternalPresentationDefinitionV2
+} from '../../types';
 import PexMessages from '../../types/Messages';
 import { isRestrictedDID } from '../../utils';
 import { HandlerCheckResult } from '../core';
@@ -43,10 +47,10 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
       return typeof wrappedVc.credential.issuer === 'object' ? wrappedVc.credential.issuer.id : wrappedVc.credential.issuer;
     } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.credential)) {
       return wrappedVc.credential.decodedPayload.iss;
-    } else if (CredentialMapper.isMsoMdocOid4VPEncoded(wrappedVc.credential) && typeof(wrappedVc.decoded) === 'object') {
-      return wrappedVc.decoded.iss ?? '' 
+    } else if (CredentialMapper.isMsoMdocOid4VPEncoded(wrappedVc.credential) && typeof (wrappedVc.decoded) === 'object') {
+      return wrappedVc.decoded.iss ?? '';
     }
-    return '' // FIXME Funke
+    return ''; // FIXME Funke
     // throw new Error('Unsupported credential type');
   }
 
@@ -58,8 +62,8 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
       message: PexMessages.FORMAT_RESTRICTION_DIDNT_PASS,
       verifiable_credential_path: vcPath,
       payload: {
-        format: wvc.format,
-      },
+        format: wvc.format
+      }
     };
   }
 
@@ -71,8 +75,8 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
       message: message ?? PexMessages.FORMAT_RESTRICTION_PASSED,
       verifiable_credential_path: vcPath,
       payload: {
-        format: wvc.format,
-      },
+        format: wvc.format
+      }
     };
   }
 }

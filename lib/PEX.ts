@@ -1,4 +1,9 @@
-import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
+import {
+  Format,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
+  PresentationSubmission
+} from '@sphereon/pex-models';
 import {
   CompactSdJwtVc,
   CredentialMapper,
@@ -13,7 +18,7 @@ import {
   W3CVerifiableCredential,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
+  WrappedVerifiablePresentation
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
@@ -27,11 +32,24 @@ import {
   SdJwtDecodedVerifiableCredentialWithKbJwtInput,
   SdJwtKbJwtInput,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult,
+  VerifiablePresentationResult
 } from './signing';
-import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, OrArray, PEVersion, SSITypesBuilder } from './types';
+import {
+  DiscoveredVersion,
+  IInternalPresentationDefinition,
+  IPresentationDefinition,
+  OrArray,
+  PEVersion,
+  SSITypesBuilder
+} from './types';
 import { calculateSdHash, definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
-import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import {
+  PresentationDefinitionV1VB,
+  PresentationDefinitionV2VB,
+  PresentationSubmissionVB,
+  Validated,
+  ValidationEngine
+} from './validation';
 
 export interface PEXOptions {
   /**
@@ -85,7 +103,7 @@ export class PEX {
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
       generatePresentationSubmission?: boolean;
-    },
+    }
   ): PresentationEvaluationResults {
     // We map it to an array for now to make processing on the presentations easier, but before checking against the submission
     // we will transform it to the original structure (array vs single) so the references in the submission stay correct
@@ -100,7 +118,7 @@ export class PEX {
     const presentationsCopy: OriginalVerifiablePresentation[] = JSON.parse(JSON.stringify(presentationsArray));
 
     const wrappedPresentations: WrappedVerifiablePresentation[] = presentationsCopy.map((p) =>
-      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(p, this.options?.hasher),
+      SSITypesBuilder.mapExternalVerifiablePresentationToWrappedVP(p, this.options?.hasher)
     );
 
     let presentationSubmission = opts?.presentationSubmission;
@@ -108,7 +126,7 @@ export class PEX {
     // When only one presentation, we also allow it to be present in the VP
     if (!presentationSubmission && presentationsArray.length === 1 && !generatePresentationSubmission) {
       const decoded = wrappedPresentations[0].decoded;
-      if('presentation_submission' in decoded) {
+      if ('presentation_submission' in decoded) {
         presentationSubmission = decoded.presentation_submission;
       }
       if (!presentationSubmission) {
@@ -131,14 +149,14 @@ export class PEX {
       ...opts,
       holderDIDs,
       presentationSubmission,
-      generatePresentationSubmission,
+      generatePresentationSubmission
     };
 
     const allWvcs = wrappedPresentations.reduce((all, wvp) => [...all, ...wvp.vcs], [] as WrappedVerifiableCredential[]);
     const result = this._evaluationClientWrapper.evaluatePresentations(
       pd,
       Array.isArray(presentations) ? wrappedPresentations : wrappedPresentations[0],
-      updatedOpts,
+      updatedOpts
     );
 
     if (result.areRequiredCredentialsPresent !== Status.ERROR) {
@@ -171,11 +189,11 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    },
+    }
   ): EvaluationResults {
     const wrappedVerifiableCredentials: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(
       verifiableCredentials,
-      this.options?.hasher,
+      this.options?.hasher
     );
 
     // TODO:  So we have state in the form of this property which is set in the constructor, but we are overwriting it here. We need to retrhink how to instantiate PEX
@@ -212,7 +230,7 @@ export class PEX {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
       restrictToDIDMethods?: string[];
-    },
+    }
   ): SelectResults {
     const verifiableCredentialCopy = JSON.parse(JSON.stringify(verifiableCredentials));
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
@@ -221,7 +239,7 @@ export class PEX {
     return this._evaluationClientWrapper.selectFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(verifiableCredentialCopy, this.options?.hasher),
-      opts,
+      opts
     );
   }
 
@@ -236,13 +254,13 @@ export class PEX {
        * or Presentation, which means it will become part of the VP
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
-    },
+    }
   ): PresentationSubmission {
     const pd: IInternalPresentationDefinition = SSITypesBuilder.toInternalPresentationDefinition(presentationDefinition);
     return this._evaluationClientWrapper.submissionFrom(
       pd,
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(selectedCredentials, this.options?.hasher),
-      opts,
+      opts
     );
   }
 
@@ -260,7 +278,7 @@ export class PEX {
   public presentationFrom(
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
-    opts?: PresentationFromOpts,
+    opts?: PresentationFromOpts
   ): PresentationResult {
     const presentationSubmission = this.presentationSubmissionFrom(presentationDefinition, selectedCredentials, opts);
     const hasSdJwtCredentials = selectedCredentials.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c));
@@ -278,13 +296,13 @@ export class PEX {
       ...opts,
       // We only pass in the submission in case it needs to be included in the presentation
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
-      hasher: this.options?.hasher,
+      hasher: this.options?.hasher
     });
 
     return {
       presentation,
       presentationSubmissionLocation,
-      presentationSubmission,
+      presentationSubmission
     };
   }
 
@@ -298,7 +316,7 @@ export class PEX {
        * Hasher to use when decoding an SD-JWT credential.
        */
       hasher?: Hasher;
-    },
+    }
   ): IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput {
     const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
@@ -338,19 +356,19 @@ export class PEX {
       const kbJwt = {
         // alg MUST be set by the signer
         header: {
-          typ: 'kb+jwt',
+          typ: 'kb+jwt'
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
-          sd_hash: sdHash,
-        },
+          sd_hash: sdHash
+        }
       } satisfies SdJwtKbJwtInput;
 
       // @ts-expect-error FIXME Funke
       return {
         ...decoded,
-        kbJwt,
+        kbJwt
       };
     } else {
       if (!selectedCredentials) {
@@ -361,7 +379,7 @@ export class PEX {
       const holders = Array.from(new Set(wVCs.flatMap((wvc) => getSubjectIdsAsString(wvc.credential as ICredential))));
       if (holders.length !== 1 && !opts?.holderDID) {
         console.log(
-          `We deduced ${holders.length} subject from ${wVCs.length} Verifiable Credentials, and no holder property was given. This might lead to undesired results`,
+          `We deduced ${holders.length} subject from ${wVCs.length} Verifiable Credentials, and no holder property was given. This might lead to undesired results`
         );
       }
       const holder = opts?.holderDID ?? (holders.length === 1 ? holders[0] : undefined);
@@ -398,7 +416,7 @@ export class PEX {
         type,
         holder,
         ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
-        verifiableCredential,
+        verifiableCredential
       };
     }
   }
@@ -418,13 +436,13 @@ export class PEX {
     const validators = [];
     result.version === PEVersion.v1
       ? validators.push({
-          bundler: new PresentationDefinitionV1VB('root'),
-          target: SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition as PresentationDefinitionV1),
-        })
+        bundler: new PresentationDefinitionV1VB('root'),
+        target: SSITypesBuilder.modelEntityToInternalPresentationDefinitionV1(presentationDefinition as PresentationDefinitionV1)
+      })
       : validators.push({
-          bundler: new PresentationDefinitionV2VB('root'),
-          target: SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition as PresentationDefinitionV2),
-        });
+        bundler: new PresentationDefinitionV2VB('root'),
+        target: SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(presentationDefinition as PresentationDefinitionV2)
+      });
     return new ValidationEngine().validate(validators);
   }
 
@@ -439,8 +457,8 @@ export class PEX {
     return new ValidationEngine().validate([
       {
         bundler: new PresentationSubmissionVB('root'),
-        target: presentationSubmission,
-      },
+        target: presentationSubmission
+      }
     ]);
   }
 
@@ -465,7 +483,7 @@ export class PEX {
     presentationDefinition: IPresentationDefinition,
     selectedCredentials: OriginalVerifiableCredential[],
     signingCallBack: (callBackParams: PresentationSignCallBackParams) => OrPromise<W3CVerifiablePresentation | CompactSdJwtVc>,
-    opts: VerifiablePresentationFromOpts,
+    opts: VerifiablePresentationFromOpts
   ): Promise<VerifiablePresentationResult> {
     const { holderDID, signatureOptions, proofOptions } = opts;
 
@@ -484,15 +502,15 @@ export class PEX {
     const limitDisclosureSignatureSuites = limitedDisclosureSuites();
     const evaluationResult = this.evaluateCredentials(presentationDefinition, selectedCredentials, {
       holderDIDs,
-      limitDisclosureSignatureSuites,
+      limitDisclosureSignatureSuites
     });
 
     const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, opts);
     const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
       limitDisclosureSignatureSuites,
       ...(presentationResult.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
-        presentationSubmission: presentationResult.presentationSubmission,
-      }),
+        presentationSubmission: presentationResult.presentationSubmission
+      })
     });
     if (!evaluationResults.value && selectedCredentials.length === 0) {
       evaluationResults.value = presentationResult.presentationSubmission;
@@ -510,7 +528,7 @@ export class PEX {
       jws: signatureOptions?.jws,
       challenge: proofOptions?.challenge,
       nonce: proofOptions?.nonce,
-      domain: proofOptions?.domain,
+      domain: proofOptions?.domain
     };
 
     let presentation = presentationResult.presentation;
@@ -527,41 +545,41 @@ export class PEX {
       const kbJwt = {
         // alg MUST be set by the signer
         header: {
-          typ: 'kb+jwt',
+          typ: 'kb+jwt'
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
           nonce: proofOptions?.nonce,
-          sd_hash: sdHash,
-        },
+          sd_hash: sdHash
+        }
       } satisfies SdJwtKbJwtInput;
 
       // @ts-expect-error FIXME Funke
       presentation = {
         ...presentation,
-        kbJwt,
+        kbJwt
       };
     }
 
     const callBackParams: PresentationSignCallBackParams = {
       options: {
         ...opts,
-        presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
+        presentationSubmissionLocation: presentationResult.presentationSubmissionLocation
       },
       presentation,
       presentationDefinition,
       selectedCredentials,
       proof,
       presentationSubmission: evaluationResults.value,
-      evaluationResults,
+      evaluationResults
     };
     const verifiablePresentation = await signingCallBack(callBackParams);
 
     return {
       verifiablePresentation,
       presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
-      presentationSubmission: evaluationResults.value,
+      presentationSubmission: evaluationResults.value
     };
   }
 
