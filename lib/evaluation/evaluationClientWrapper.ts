@@ -970,7 +970,7 @@ export class EvaluationClientWrapper {
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
-        selectResults.vcIndexes?.push(foundIndex);
+        selectResults.vcIndexes ? selectResults.vcIndexes?.push(foundIndex) : (selectResults.vcIndexes = [foundIndex]);
       });
     }
   }
