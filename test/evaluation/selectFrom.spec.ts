@@ -114,6 +114,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
@@ -203,6 +204,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
@@ -292,6 +294,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
@@ -406,6 +409,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
@@ -521,6 +525,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
@@ -636,6 +641,7 @@ describe('selectFrom tests', () => {
         },
       ],
       warnings: [],
+      vcIndexes: [0, 2],
     });
   });
 
