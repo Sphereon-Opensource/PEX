@@ -80,8 +80,8 @@ export class PEX {
       presentationSubmission?: PresentationSubmission;
       /**
        * The location of the presentation submission. By default {@link PresentationSubmissionLocation.PRESENTATION}
-       * is used when one presentation is passed (not as array), while {@link PresentationSubmissionLocation.EXTERNAL} is
-       * used when an array is passed
+       * is used when one W3C presentation is passed (not as array) , while {@link PresentationSubmissionLocation.EXTERNAL} is
+       * used when an array is passed or the presentation is not a W3C presentation
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
       generatePresentationSubmission?: boolean;
@@ -104,12 +104,28 @@ export class PEX {
     );
 
     let presentationSubmission = opts?.presentationSubmission;
+    let presentationSubmissionLocation =
+      opts?.presentationSubmissionLocation ??
+      (Array.isArray(presentations) || !CredentialMapper.isW3cPresentation(wrappedPresentations[0].presentation)
+        ? PresentationSubmissionLocation.EXTERNAL
+        : PresentationSubmissionLocation.PRESENTATION);
 
     // When only one presentation, we also allow it to be present in the VP
-    if (!presentationSubmission && presentationsArray.length === 1 && !generatePresentationSubmission) {
+    if (
+      !presentationSubmission &&
+      presentationsArray.length === 1 &&
+      CredentialMapper.isW3cPresentation(wrappedPresentations[0].presentation) &&
+      !generatePresentationSubmission
+    ) {
       presentationSubmission = wrappedPresentations[0].decoded.presentation_submission;
       if (!presentationSubmission) {
         throw Error(`Either a presentation submission as part of the VP or provided in options was expected`);
+      }
+      presentationSubmissionLocation = PresentationSubmissionLocation.PRESENTATION;
+      if (opts?.presentationSubmissionLocation && opts.presentationSubmissionLocation !== PresentationSubmissionLocation.PRESENTATION) {
+        throw new Error(
+          `unexpected presentationSubmissionLocation ${opts.presentationSubmissionLocation} was provided. Expected ${PresentationSubmissionLocation.PRESENTATION} when no presentationSubmission passed and first verifiable presentation contains a presentation_submission and generatePresentationSubmission is false`,
+        );
       }
     } else if (!presentationSubmission && !generatePresentationSubmission) {
       throw new Error('Presentation submission in options was expected.');
@@ -125,6 +141,7 @@ export class PEX {
       ...opts,
       holderDIDs,
       presentationSubmission,
+      presentationSubmissionLocation,
       generatePresentationSubmission,
     };
 
