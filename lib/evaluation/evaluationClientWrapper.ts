@@ -536,6 +536,7 @@ export class EvaluationClientWrapper {
 
       // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
       // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
+      // @ts-ignore FIXME Funke - Add DeviceResponseCbor support
       const holderDIDs = CredentialMapper.isW3cPresentation(vp.presentation) && vp.presentation.holder ? [vp.presentation.holder] : [];
 
       // Get the presentation definition only for this descriptor, so we can evaluate it separately

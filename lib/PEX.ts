@@ -107,7 +107,10 @@ export class PEX {
 
     // When only one presentation, we also allow it to be present in the VP
     if (!presentationSubmission && presentationsArray.length === 1 && !generatePresentationSubmission) {
-      presentationSubmission = wrappedPresentations[0].decoded.presentation_submission;
+      const decoded = wrappedPresentations[0].decoded;
+      if('presentation_submission' in decoded) {
+        presentationSubmission = decoded.presentation_submission;
+      }
       if (!presentationSubmission) {
         throw Error(`Either a presentation submission as part of the VP or provided in options was expected`);
       }
@@ -118,7 +121,10 @@ export class PEX {
     // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
     // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
     const holderDIDs = wrappedPresentations
-      .map((p) => (CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined))
+      .map((p) => {
+        // @ts-ignore FIXME Funke - Add DeviceResponseCbor support
+        return (CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined);
+      })
       .filter((d): d is string => d !== undefined);
 
     const updatedOpts = {
@@ -341,6 +347,7 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
+      // @ts-ignore FIXME Funke
       return {
         ...decoded,
         kbJwt,
@@ -530,6 +537,7 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
+      // @ts-ignore FIXME Funke
       presentation = {
         ...presentation,
         kbJwt,

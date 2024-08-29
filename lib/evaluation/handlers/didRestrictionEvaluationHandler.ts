@@ -44,7 +44,7 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
     } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.credential)) {
       return wrappedVc.credential.decodedPayload.iss;
     } else if (CredentialMapper.isMsoMdocOid4VPEncoded(wrappedVc.credential) && typeof(wrappedVc.decoded) === 'object') {
-      return wrappedVc.decoded.iss 
+      return wrappedVc.decoded.iss ?? '' 
     }
     return '' // FIXME Funke
     // throw new Error('Unsupported credential type');
