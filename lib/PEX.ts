@@ -122,7 +122,7 @@ export class PEX {
     // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
     const holderDIDs = wrappedPresentations
       .map((p) => {
-        // @ts-ignore FIXME Funke - Add DeviceResponseCbor support
+        // @ts-expect-error FIXME Funke - Add DeviceResponseCbor support
         return (CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined);
       })
       .filter((d): d is string => d !== undefined);
@@ -347,7 +347,7 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
-      // @ts-ignore FIXME Funke
+      // @ts-expect-error FIXME Funke
       return {
         ...decoded,
         kbJwt,
@@ -537,7 +537,7 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
-      // @ts-ignore FIXME Funke
+      // @ts-expect-error FIXME Funke
       presentation = {
         ...presentation,
         kbJwt,
