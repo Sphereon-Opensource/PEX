@@ -582,21 +582,21 @@ describe('evaluate JGiter tests', () => {
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[0]'],
         id: 'identity_input',
-        type: SubmissionRequirementMatchType.InputDescriptor
+        type: SubmissionRequirementMatchType.InputDescriptor,
       },
       {
         name: 'Subject name input',
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[0]'],
         id: 'name_input',
-        type: SubmissionRequirementMatchType.InputDescriptor
+        type: SubmissionRequirementMatchType.InputDescriptor,
       },
       {
         name: 'Admin role input',
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[1]'],
         id: 'role_input',
-        type: SubmissionRequirementMatchType.InputDescriptor
+        type: SubmissionRequirementMatchType.InputDescriptor,
       },
     ]);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(2);

@@ -134,28 +134,26 @@ describe('evaluate animo tests', () => {
     const pex: PEX = new PEX();
     const result = pex.selectFrom(pd, vcs);
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
-    expect(result.matches).toEqual([{
-      count: 1,
-      from: "A",
-      id: 0,
-      name: undefined,
-      rule: "pick",
-      type: SubmissionRequirementMatchType.SubmissionRequirement,
-      vc_path: [
-        "$.verifiableCredential[0]",
-      ],
-    },
-    {
-      count: 1,
-      from: "B",
-      id: 1,
-      name: undefined,
-      rule: "pick",
-      type: SubmissionRequirementMatchType.SubmissionRequirement,
-      vc_path: [
-        "$.verifiableCredential[1]",
-      ],
-    },])
+    expect(result.matches).toEqual([
+      {
+        count: 1,
+        from: 'A',
+        id: 0,
+        name: undefined,
+        rule: 'pick',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        vc_path: ['$.verifiableCredential[0]'],
+      },
+      {
+        count: 1,
+        from: 'B',
+        id: 1,
+        name: undefined,
+        rule: 'pick',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        vc_path: ['$.verifiableCredential[1]'],
+      },
+    ]);
   });
 
   const vcs: W3CVerifiableCredential[] = [

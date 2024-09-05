@@ -11,7 +11,7 @@ describe('submissionRequirementMatch', () => {
       vc_path: ['$.verifiableCredential[1]'],
       from: 'A',
       id: 0,
-      type: SubmissionRequirementMatchType.SubmissionRequirement
+      type: SubmissionRequirementMatchType.SubmissionRequirement,
     };
     expect(submissionRequirementMatch.from).toContain('A');
     expect(submissionRequirementMatch.rule).toBe(Rules.All);

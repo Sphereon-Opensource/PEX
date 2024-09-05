@@ -5,9 +5,9 @@ import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ss
 
 import { Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import { InternalPresentationDefinitionV1, SSITypesBuilder } from '../../lib/types';
 import PexMessages from '../../lib/types/Messages';
-import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
@@ -41,7 +41,7 @@ describe('selectFrom tests', () => {
           name: 'Submission of educational transcripts',
           rule: 'all',
           id: 0,
-          type: SubmissionRequirementMatchType.SubmissionRequirement
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -455,7 +455,6 @@ describe('selectFrom tests', () => {
               // submission requirement from_nested has no name
               name: undefined,
               type: SubmissionRequirementMatchType.SubmissionRequirement,
-
             },
             {
               count: 2,
@@ -783,7 +782,7 @@ describe('selectFrom tests', () => {
         rule: 'pick',
         id: 0,
         type: SubmissionRequirementMatchType.SubmissionRequirement,
-        name: 'Eligibility to Work Proof'
+        name: 'Eligibility to Work Proof',
       },
     ]);
   });
@@ -811,7 +810,7 @@ describe('selectFrom tests', () => {
         rule: 'pick',
         type: SubmissionRequirementMatchType.SubmissionRequirement,
         name: 'Eligibility to Work Proof',
-        id: 0
+        id: 0,
       },
     ]);
     expect(result.errors?.length).toEqual(16);
@@ -955,7 +954,7 @@ describe('selectFrom tests', () => {
         rule: 'pick',
         max: 1,
         type: SubmissionRequirementMatchType.SubmissionRequirement,
-        id: 0
+        id: 0,
       },
     ]);
     expect(result.errors?.length).toEqual(16);

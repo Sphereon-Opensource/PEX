@@ -22,7 +22,14 @@ import {
 import { JsonPathUtils, ObjectUtils } from '../utils';
 import { getVpFormatForVcFormat } from '../utils/formatMap';
 
-import { EvaluationResults, HandlerCheckResult, PresentationEvaluationResults, SelectResults, SubmissionRequirementMatch, SubmissionRequirementMatchType } from './core';
+import {
+  EvaluationResults,
+  HandlerCheckResult,
+  PresentationEvaluationResults,
+  SelectResults,
+  SubmissionRequirementMatch,
+  SubmissionRequirementMatchType,
+} from './core';
 import { EvaluationClient } from './evaluationClient';
 
 interface SubmissionSatisfiesSubmissionRequirementResult {
@@ -260,7 +267,7 @@ export class EvaluationClientWrapper {
 
         name: sr.name,
         type: SubmissionRequirementMatchType.SubmissionRequirement,
-        id: Number(srIndex)
+        id: Number(srIndex),
       };
 
       if (sr.from) {
@@ -301,14 +308,14 @@ export class EvaluationClientWrapper {
       for (const vcPath of sameIdVcs) {
         const inputDescriptorResults = JsonPathUtils.extractInputField<InputDescriptorV1 | InputDescriptorV2>(pd, [idPath]);
         if (inputDescriptorResults.length) {
-          const inputDescriptor = inputDescriptorResults[0].value
+          const inputDescriptor = inputDescriptorResults[0].value;
           submissionRequirementMatches.push({
             name: inputDescriptor.name || inputDescriptor.id,
             rule: Rules.All,
             vc_path: [vcPath],
 
             type: SubmissionRequirementMatchType.InputDescriptor,
-            id: inputDescriptor.id
+            id: inputDescriptor.id,
           });
         }
       }
@@ -321,9 +328,9 @@ export class EvaluationClientWrapper {
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[],
   ): string[] {
-    const vcPaths = new Set<string>()
+    const vcPaths = new Set<string>();
 
-    if (!sr.from) return Array.from(vcPaths)
+    if (!sr.from) return Array.from(vcPaths);
 
     for (const m of marked) {
       const inputDescriptor: InputDescriptorV2 = jp.query(pd, m.input_descriptor_path)[0];
@@ -335,7 +342,7 @@ export class EvaluationClientWrapper {
       }
     }
 
-    return Array.from(vcPaths)
+    return Array.from(vcPaths);
   }
 
   public evaluate(

@@ -2,9 +2,9 @@ import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { PEX, PEXv1, Status } from '../../lib';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
 import { GatacaSelectedCredentials } from '../test_data/gataca/gatacaSelectedCredentials';
-import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -30,7 +30,7 @@ describe('evaluate gataca tests', () => {
         from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
         id: 0,
-        name: "Mandatory data",
+        name: 'Mandatory data',
         type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
       {
@@ -38,7 +38,7 @@ describe('evaluate gataca tests', () => {
         from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
         id: 1,
-        name: "Optional data",
+        name: 'Optional data',
         type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
     ]);
@@ -108,7 +108,7 @@ describe('evaluate gataca tests', () => {
         from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
         id: 0,
-        name: "Mandatory data",
+        name: 'Mandatory data',
         type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
       {
@@ -116,7 +116,7 @@ describe('evaluate gataca tests', () => {
         from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
         id: 1,
-        name: "Optional data",
+        name: 'Optional data',
         type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
     ]);
