@@ -4,6 +4,7 @@ import { IPresentation, IVerifiableCredential } from '@sphereon/ssi-types';
 import { PEX } from '../../lib';
 
 import { Wallet } from './core/Wallet';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
 
@@ -203,8 +204,8 @@ describe('1st scenario', () => {
     });
     expect(selectFromResult.matches?.length).toEqual(2);
     expect(selectFromResult.matches).toEqual([
-      { rule: 'all', vc_path: ['$.verifiableCredential[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
-      { rule: 'all', vc_path: ['$.verifiableCredential[0]'], name: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8' },
+      { rule: 'all', vc_path: ['$.verifiableCredential[0]'], name: 'e73646de-43e2-4d72-ba4f-090d01c11eac', type: SubmissionRequirementMatchType.InputDescriptor, id: 'e73646de-43e2-4d72-ba4f-090d01c11eac' },
+      { rule: 'all', vc_path: ['$.verifiableCredential[0]'], name: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8', type: SubmissionRequirementMatchType.InputDescriptor, id: '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8' },
     ]);
     expect(selectFromResult.verifiableCredential?.length).toEqual(1);
 

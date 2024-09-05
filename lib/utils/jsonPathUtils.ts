@@ -48,7 +48,7 @@ export class JsonPathUtils {
       }
    result: [ { value: 19, path: [ '$', 'details', 'information', 0, 'age' ] } ]
    */
-  public static extractInputField(obj: InputFieldType, paths: string[]): { value: unknown; path: PathComponent[] }[] {
+  public static extractInputField<PathValue extends unknown = unknown>(obj: InputFieldType, paths: string[]): { value: PathValue; path: PathComponent[] }[] {
     let result: { value: unknown; path: PathComponent[] }[] = [];
     if (paths) {
       for (const path of paths) {
@@ -58,7 +58,7 @@ export class JsonPathUtils {
         }
       }
     }
-    return result;
+    return result as { value: PathValue; path: PathComponent[] }[];
   }
 
   public static changePropertyNameRecursively(

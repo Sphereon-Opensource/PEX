@@ -312,7 +312,7 @@ describe('evaluate', () => {
     });
     expect(result!.errors!.length).toEqual(0);
     expect(JSON.stringify(result!.matches)).toBe(
-      JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]),
+      JSON.stringify([{ name: 'Verify Valid License', rule: 'all', vc_path: ['$.verifiableCredential[0]'], "type": "InputDescriptor", "id": "drivers_license_information" }]),
     );
     expect(result!.areRequiredCredentialsPresent).toBe('info');
   });

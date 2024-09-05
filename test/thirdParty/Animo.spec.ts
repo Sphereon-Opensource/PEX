@@ -2,6 +2,7 @@ import { Rules } from '@sphereon/pex-models';
 import { W3CVerifiableCredential } from '@sphereon/ssi-types';
 
 import { IPresentationDefinition, PEX, Status } from '../../lib';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 describe('evaluate animo tests', () => {
   it('should pass with 2 VCs and 2 IDs', () => {
@@ -133,10 +134,28 @@ describe('evaluate animo tests', () => {
     const pex: PEX = new PEX();
     const result = pex.selectFrom(pd, vcs);
     expect(result.areRequiredCredentialsPresent).toEqual(Status.INFO);
-    expect(result.matches?.length).toEqual(2);
-    expect(new Set(result.matches?.map((value) => value.name)).size).toEqual(2);
-    expect(result.matches?.map((value) => value.name).indexOf('c2834d0e-3c95-4721-b21a-40e3d7ea2549')).toBeGreaterThanOrEqual(0);
-    expect(result.matches?.map((value) => value.name).indexOf('c2834d0e-3c95-4721-b21a-40e3d7ea25434')).toBeGreaterThanOrEqual(0);
+    expect(result.matches).toEqual([{
+      count: 1,
+      from: "A",
+      id: 0,
+      name: undefined,
+      rule: "pick",
+      type: SubmissionRequirementMatchType.SubmissionRequirement,
+      vc_path: [
+        "$.verifiableCredential[0]",
+      ],
+    },
+    {
+      count: 1,
+      from: "B",
+      id: 1,
+      name: undefined,
+      rule: "pick",
+      type: SubmissionRequirementMatchType.SubmissionRequirement,
+      vc_path: [
+        "$.verifiableCredential[1]",
+      ],
+    },])
   });
 
   const vcs: W3CVerifiableCredential[] = [

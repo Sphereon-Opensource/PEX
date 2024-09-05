@@ -3,6 +3,7 @@ import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-
 
 import { EvaluationResults, PEX, Status } from '../../lib';
 import { PresentationEvaluationResults } from '../../lib/evaluation';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = [IProofType.BbsBlsSignatureProof2020];
 
@@ -580,16 +581,22 @@ describe('evaluate JGiter tests', () => {
         name: 'Subject identity input',
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[0]'],
+        id: 'identity_input',
+        type: SubmissionRequirementMatchType.InputDescriptor
       },
       {
         name: 'Subject name input',
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[0]'],
+        id: 'name_input',
+        type: SubmissionRequirementMatchType.InputDescriptor
       },
       {
         name: 'Admin role input',
         rule: Rules.All,
         vc_path: ['$.verifiableCredential[1]'],
+        id: 'role_input',
+        type: SubmissionRequirementMatchType.InputDescriptor
       },
     ]);
     expect(resultSelectFrom.verifiableCredential?.length).toEqual(2);

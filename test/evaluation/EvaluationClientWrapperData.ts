@@ -3,6 +3,7 @@ import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { HandlerCheckResult, SelectResults, Status } from '../../lib';
 import PexMessages from '../../lib/types/Messages';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 
 export class EvaluationClientWrapperData {
   public getHolderDID(): string[] {
@@ -197,6 +198,8 @@ export class EvaluationClientWrapperData {
           name: 'test',
           rule: Rules.All,
           vc_path: ['$.verifiableCredential[0]'],
+          id: 'Educational transcripts',
+          type: SubmissionRequirementMatchType.InputDescriptor
         },
       ],
     };
