@@ -279,7 +279,7 @@ export class EvaluationClientWrapper {
       sr.count ? (srm.count = sr.count) : undefined;
 
       if (sr.from) {
-        const matchingVcPaths = this.getMatchingVcPatchsForSubmissionRequirement(pd, sr, marked);
+        const matchingVcPaths = this.getMatchingVcPathsForSubmissionRequirement(pd, sr, marked);
         srm.vc_path.push(...matchingVcPaths);
         submissionRequirementMatches.push(srm);
       } else if (sr.from_nested) {
@@ -323,7 +323,7 @@ export class EvaluationClientWrapper {
     return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
   }
 
-  private getMatchingVcPatchsForSubmissionRequirement(
+  private getMatchingVcPathsForSubmissionRequirement(
     pd: IInternalPresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[],
