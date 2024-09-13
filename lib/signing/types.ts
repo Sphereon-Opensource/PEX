@@ -95,7 +95,7 @@ export interface SdJwtKbJwtInput {
   };
 }
 
-export type SdJwtDecodedVerifiableCredentialWithKbJwtInput = SdJwtDecodedVerifiableCredential & { kbJwt: SdJwtKbJwtInput };
+export type SdJwtDecodedVerifiableCredentialWithKbJwtInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'> & { kbJwt: SdJwtKbJwtInput };
 
 /**
  * The result object containing the presentation and presentation submission

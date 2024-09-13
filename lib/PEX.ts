@@ -18,7 +18,7 @@ import {
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationEvaluationResults } from './evaluation/core';
+import { PresentationEvaluationResults } from './evaluation';
 import {
   PresentationFromOpts,
   PresentationResult,
@@ -72,7 +72,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentations: OrArray<OriginalVerifiablePresentation | IPresentation>,
+    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput>,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
@@ -122,7 +122,6 @@ export class PEX {
     // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
     const holderDIDs = wrappedPresentations
       .map((p) => {
-        // @ts-expect-error FIXME Funke - Add DeviceResponseCbor support
         return CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined;
       })
       .filter((d): d is string => d !== undefined);
@@ -325,7 +324,7 @@ export class PEX {
       // that a valid assumption? It seems to be this way for BBS SD as well
       const decoded = (
         CredentialMapper.isSdJwtEncoded(credentials[0]) ? CredentialMapper.decodeVerifiableCredential(credentials[0], opts?.hasher) : credentials[0]
-      ) as SdJwtDecodedVerifiableCredential;
+      ) as Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'>;
 
       if (!opts?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
@@ -347,7 +346,6 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
-      // @ts-expect-error FIXME Funke
       return {
         ...decoded,
         kbJwt,
@@ -515,7 +513,7 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation)) {
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as unknown as SdJwtDecodedVerifiableCredential)) { // FIXME? SdJwtDecodedVerifiableCredentialWithKbJwtInput is local type and is not supported in ssi-sdk
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
@@ -537,7 +535,6 @@ export class PEX {
         },
       } satisfies SdJwtKbJwtInput;
 
-      // @ts-expect-error FIXME Funke
       presentation = {
         ...presentation,
         kbJwt,
