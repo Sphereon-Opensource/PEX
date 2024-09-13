@@ -44,8 +44,8 @@ export class DIDRestrictionEvaluationHandler extends AbstractEvaluationHandler {
     } else if (CredentialMapper.isSdJwtDecodedCredential(wrappedVc.credential)) {
       return wrappedVc.credential.decodedPayload.iss;
     } else if (CredentialMapper.isWrappedMdocCredential(wrappedVc)) {
-      if(typeof wrappedVc.decoded === 'object' && wrappedVc.decoded.iss !== undefined) {
-        return wrappedVc.decoded.iss
+      if (typeof wrappedVc.decoded === 'object' && wrappedVc.decoded.iss !== undefined) {
+        return wrappedVc.decoded.iss;
       }
       throw new Error('cannot get issuer from the supplied mdoc credential');
     }

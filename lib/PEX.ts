@@ -513,7 +513,8 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as unknown as SdJwtDecodedVerifiableCredential)) { // FIXME? SdJwtDecodedVerifiableCredentialWithKbJwtInput is local type and is not supported in ssi-sdk
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as unknown as SdJwtDecodedVerifiableCredential)) {
+      // FIXME? SdJwtDecodedVerifiableCredentialWithKbJwtInput is local type and is not supported in ssi-sdk
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
