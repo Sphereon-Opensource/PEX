@@ -21,8 +21,8 @@ dependencies:
     specifier: ^2.3.1
     version: 2.3.1
   '@sphereon/ssi-types':
-    specifier: 0.29.1-unstable.200
-    version: 0.29.1-unstable.200
+    specifier: 0.29.1-unstable.237
+    version: 0.29.1-unstable.237
   ajv:
     specifier: ^8.12.0
     version: 8.12.0
@@ -893,8 +893,8 @@ packages:
     resolution: {integrity: sha512-SByU4cJ0XYA6VZQ/L6lsSiRcFtBPHbFioCeQ4GP7/W/jQ+PSBD7uK2oTnKQ9/0iEiMK/6JYqhKgLs4a9UX3UTQ==}
     dev: false
 
-  /@sphereon/ssi-types@0.29.1-unstable.200:
-    resolution: {integrity: sha512-TTLiagJJa+GAMw7Cu0nxWRtDlinuJ+DVnVIKkx3bmHAUf7kuN/gLi5j8Ff1TyTWVo7yMyrG9oxihBjaIIr8btw==}
+  /@sphereon/ssi-types@0.29.1-unstable.237:
+    resolution: {integrity: sha512-H9vqaFbCwbZpPUk5x84Cn1GeIFvwi7EZAsLN4h6EkXDwm55yOT76dvcSVUnL6obC2AzGr+Bjyv4R2cZSwKkguw==}
     dependencies:
       '@sd-jwt/decode': 0.6.1
       '@sphereon/kmp-mdl-mdoc': 0.2.0-SNAPSHOT.22
