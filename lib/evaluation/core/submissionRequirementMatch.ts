@@ -18,7 +18,7 @@ export enum SubmissionRequirementMatchType {
   /**
    * Match for an input_descriptors entry in the presentation definition. This type will be used
    * if no submission_requirements are present in the presentation definition. If the match type
-   * is `InputDescriptor` the {@link SubmissionRequirementMatch.id} property referes to the `id`
+   * is `InputDescriptor` the {@link SubmissionRequirementMatch.id} property refers to the `id`
    * of the `input_descriptors` entry in the presentation definition.
    */
   InputDescriptor = 'InputDescriptor',
