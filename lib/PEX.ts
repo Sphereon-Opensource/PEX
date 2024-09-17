@@ -20,12 +20,12 @@ import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
 import { PresentationEvaluationResults } from './evaluation';
 import {
+  PartialSdJwtDecodedVerifiableCredential,
+  PartialSdJwtKbJwt,
   PresentationFromOpts,
   PresentationResult,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
-  PartialSdJwtDecodedVerifiableCredential,
-  PartialSdJwtKbJwt,
   VerifiablePresentationFromOpts,
   VerifiablePresentationResult,
 } from './signing';
