@@ -8,7 +8,7 @@ export enum SubmissionRequirementMatchType {
    *
    * If the match is a nested match result, this match type refers to the nested index. E.g. a presentation
    * definition has three `submission_requirements` entries where the second submission requirement (index 1)
-   * has two `from_nested` `submission_requirements` entries and this match referes to the second (index 1) of
+   * has two `from_nested` `submission_requirements` entries and this match refers to the second (index 1) of
    * this from nested, the {@link SubmissionRequirementMatch.id} property of the outer match refers to the outer index
    * in the `submission_requirements` entries, and the nested {@link SubmissionRequirementMatch.id} refers to index of the
    * `from_nested` entries. This can go multiple layers deep.
