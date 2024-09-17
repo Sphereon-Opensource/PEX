@@ -6,9 +6,10 @@ import {
   IProofPurpose,
   IProofType,
   OriginalVerifiableCredential,
-  SdJwtDecodedVerifiableCredential,
-  W3CVerifiablePresentation,
+  SdJwtDecodedVerifiableCredential, SdJwtVcKbJwtPayload,
+  W3CVerifiablePresentation
 } from '@sphereon/ssi-types';
+import { SdJwtVcKbJwtHeader } from '@sphereon/ssi-types/src/types/sd-jwt-vc';
 
 import { PresentationEvaluationResults } from '../evaluation';
 
@@ -84,18 +85,13 @@ export enum PresentationSubmissionLocation {
   PRESENTATION, // Part of the VP itself
 }
 
-export interface SdJwtKbJwtInput {
-  header: {
-    typ: 'kb+jwt';
-  };
-  payload: {
-    iat: number;
-    sd_hash: string;
-    nonce?: string;
-  };
+export type SdJwtKbJwtInput = {
+  header: SdJwtVcKbJwtHeader
+  payload: Partial<SdJwtVcKbJwtPayload>
 }
 
-export type SdJwtDecodedVerifiableCredentialWithKbJwtInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'> & { kbJwt: SdJwtKbJwtInput };
+export type SdJwtDecodedVerifiableCredentialInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'>
+  & { kbJwt: SdJwtKbJwtInput }
 
 /**
  * The result object containing the presentation and presentation submission
@@ -104,7 +100,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput
 
   /**
    * The resulting location of the presentation submission.
@@ -193,7 +189,7 @@ export interface PresentationSignCallBackParams {
    * and only the optional KB-JWT should be appended to the `compactSdJwt` property. If no KB-JWT is needed on the presentation, the `compactSdJwt` property
    * from the decoded SD-JWT can be returned as-is.
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput;
 
   /**
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already

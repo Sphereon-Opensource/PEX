@@ -47,7 +47,7 @@
     "@sd-jwt/present": "^0.6.1",
     "@sd-jwt/types": "^0.6.1",
     "@sphereon/pex-models": "^2.3.1",
-    "@sphereon/ssi-types": "0.29.1-unstable.113",
+    "@sphereon/ssi-types": "0.29.1-unstable.120",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "jwt-decode": "^3.1.2",

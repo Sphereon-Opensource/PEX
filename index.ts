@@ -15,7 +15,6 @@ import {
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
   ProofOptions,
-  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
   SelectResults,
   SignatureOptions,
   Status,
@@ -57,5 +56,4 @@ export {
   PresentationResult,
   PresentationFromOpts,
   PresentationSubmissionLocation,
-  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
 };

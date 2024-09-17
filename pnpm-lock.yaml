@@ -21,8 +21,8 @@ dependencies:
     specifier: ^2.3.1
     version: 2.3.1
   '@sphereon/ssi-types':
-    specifier: 0.29.1-unstable.113
-    version: 0.29.1-unstable.113(ts-node@10.9.2)
+    specifier: 0.29.1-unstable.120
+    version: 0.29.1-unstable.120(ts-node@10.9.2)
   ajv:
     specifier: ^8.12.0
     version: 8.12.0
@@ -1298,8 +1298,8 @@ packages:
       - supports-color
     dev: false
 
-  /@sphereon/ssi-types@0.29.1-unstable.113(ts-node@10.9.2):
-    resolution: {integrity: sha512-uXkVhCYdp9Ucgr23S4T3qaJTHCf0kChmWYN67cXxyCndm18271mPi3AmaNWDnpB7N7zrznFxau9AOalwOou3lg==}
+  /@sphereon/ssi-types@0.29.1-unstable.120(ts-node@10.9.2):
+    resolution: {integrity: sha512-l3tQj1H7N6+lsmho4Myu1L1NDpJx6kAq8rJOmUQOX1UwGmVgDH78Cs3km+DfenOm1OxnEBrEQCmHELTenu7hzg==}
     dependencies:
       '@sd-jwt/decode': 0.6.1
       '@sphereon/kmp-mdl-mdoc': 0.2.0-SNAPSHOT.22
@@ -1733,7 +1733,7 @@ packages:
     dependencies:
       credential-status: 2.0.6
       debug: 4.3.6
-      did-jwt-vc: 3.1.3
+      did-jwt-vc: 3.2.15
       did-resolver: 4.1.0
       events: 3.3.0
       z-schema: 5.0.5
@@ -2547,14 +2547,6 @@ packages:
     resolution: {integrity: sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==}
     engines: {node: '>=8'}
     dev: true
-
-  /did-jwt-vc@3.1.3:
-    resolution: {integrity: sha512-qB1FiQ0sT/FUR5+mQ//P5lS0Gllrtes2OxC3WVMOt8ND0LolF92ohozv50ukyOvB2zBzgfm5durcIPqQcoI+LA==}
-    engines: {node: '>=14'}
-    dependencies:
-      did-jwt: 6.11.6
-      did-resolver: 4.1.0
-    dev: false
 
   /did-jwt-vc@3.2.15:
     resolution: {integrity: sha512-M/WPiL34CQUiN4bvWnZ0OFHJ3usPtstfQfbNbHAWHvwjeCGi7nAdv62VXHgy2xIhJMc790hH7PsMN3i6SCGEyg==}

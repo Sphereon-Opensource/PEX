@@ -9,11 +9,11 @@ import {
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   OrPromise,
-  SdJwtDecodedVerifiableCredential,
+  SdJwtDecodedVerifiableCredential, SdJwtVcKbJwtHeader,
   W3CVerifiableCredential,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
+  WrappedVerifiablePresentation
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
@@ -24,10 +24,10 @@ import {
   PresentationResult,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
-  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
+  SdJwtDecodedVerifiableCredentialInput,
   SdJwtKbJwtInput,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult,
+  VerifiablePresentationResult
 } from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, OrArray, PEVersion, SSITypesBuilder } from './types';
 import { calculateSdHash, definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
@@ -72,7 +72,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput>,
+    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | SdJwtDecodedVerifiableCredentialInput>,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
@@ -315,7 +315,7 @@ export class PEX {
        */
       hasher?: Hasher;
     },
-  ): IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput {
+  ): IPresentation | SdJwtDecodedVerifiableCredentialInput {
     const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
     // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
@@ -341,7 +341,7 @@ export class PEX {
       // that a valid assumption? It seems to be this way for BBS SD as well
       const decoded = (
         CredentialMapper.isSdJwtEncoded(credentials[0]) ? CredentialMapper.decodeVerifiableCredential(credentials[0], opts?.hasher) : credentials[0]
-      ) as Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'>;
+      ) as SdJwtDecodedVerifiableCredential
 
       if (!opts?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
@@ -355,18 +355,20 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
-        },
+          alg: hashAlg,
+        } satisfies SdJwtVcKbJwtHeader,
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
           sd_hash: sdHash,
-        },
-      } satisfies SdJwtKbJwtInput;
+        }
+      } satisfies SdJwtKbJwtInput
 
-      return {
+      const sdJwtDecodedPresentation:SdJwtDecodedVerifiableCredentialInput = {
         ...decoded,
         kbJwt,
       };
+      return sdJwtDecodedPresentation
     } else {
       if (!selectedCredentials) {
         throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
@@ -530,8 +532,9 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as unknown as SdJwtDecodedVerifiableCredential)) {
-      // FIXME? SdJwtDecodedVerifiableCredentialWithKbJwtInput is local type and is not supported in ssi-sdk
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) { // Select type without kbJwt as isSdJwtDecodedCredential won't need it
+      const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential 
+      // FIXME? SdJwtDecodedVerifiableCredential is local type and is not supported in ssi-sdk
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
@@ -544,19 +547,20 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
+          alg: hashAlg
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
           nonce: proofOptions?.nonce,
           sd_hash: sdHash,
-        },
-      } satisfies SdJwtKbJwtInput;
+        } 
+      } satisfies SdJwtKbJwtInput
 
       presentation = {
-        ...presentation,
+        ...sdJwtPresentation,
         kbJwt,
-      };
+      } satisfies SdJwtDecodedVerifiableCredentialInput;
     }
 
     const callBackParams: PresentationSignCallBackParams = {
