@@ -6,8 +6,9 @@ import {
   IProofPurpose,
   IProofType,
   OriginalVerifiableCredential,
-  SdJwtDecodedVerifiableCredential, SdJwtVcKbJwtPayload,
-  W3CVerifiablePresentation
+  SdJwtDecodedVerifiableCredential,
+  SdJwtVcKbJwtPayload,
+  W3CVerifiablePresentation,
 } from '@sphereon/ssi-types';
 import { SdJwtVcKbJwtHeader } from '@sphereon/ssi-types/src/types/sd-jwt-vc';
 
@@ -86,12 +87,11 @@ export enum PresentationSubmissionLocation {
 }
 
 export type SdJwtKbJwtInput = {
-  header: SdJwtVcKbJwtHeader
-  payload: Partial<SdJwtVcKbJwtPayload>
-}
+  header: SdJwtVcKbJwtHeader;
+  payload: Partial<SdJwtVcKbJwtPayload>;
+};
 
-export type SdJwtDecodedVerifiableCredentialInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'>
-  & { kbJwt: SdJwtKbJwtInput }
+export type SdJwtDecodedVerifiableCredentialInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'> & { kbJwt: SdJwtKbJwtInput };
 
 /**
  * The result object containing the presentation and presentation submission
@@ -100,7 +100,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput
+  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput;
 
   /**
    * The resulting location of the presentation submission.

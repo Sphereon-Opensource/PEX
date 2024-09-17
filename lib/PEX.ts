@@ -9,11 +9,12 @@ import {
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   OrPromise,
-  SdJwtDecodedVerifiableCredential, SdJwtVcKbJwtHeader,
+  SdJwtDecodedVerifiableCredential,
+  SdJwtVcKbJwtHeader,
   W3CVerifiableCredential,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation
+  WrappedVerifiablePresentation,
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
@@ -27,7 +28,7 @@ import {
   SdJwtDecodedVerifiableCredentialInput,
   SdJwtKbJwtInput,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult
+  VerifiablePresentationResult,
 } from './signing';
 import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, OrArray, PEVersion, SSITypesBuilder } from './types';
 import { calculateSdHash, definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
@@ -341,7 +342,7 @@ export class PEX {
       // that a valid assumption? It seems to be this way for BBS SD as well
       const decoded = (
         CredentialMapper.isSdJwtEncoded(credentials[0]) ? CredentialMapper.decodeVerifiableCredential(credentials[0], opts?.hasher) : credentials[0]
-      ) as SdJwtDecodedVerifiableCredential
+      ) as SdJwtDecodedVerifiableCredential;
 
       if (!opts?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
@@ -361,14 +362,14 @@ export class PEX {
         payload: {
           iat: new Date().getTime(),
           sd_hash: sdHash,
-        }
-      } satisfies SdJwtKbJwtInput
+        },
+      } satisfies SdJwtKbJwtInput;
 
-      const sdJwtDecodedPresentation:SdJwtDecodedVerifiableCredentialInput = {
+      const sdJwtDecodedPresentation: SdJwtDecodedVerifiableCredentialInput = {
         ...decoded,
         kbJwt,
       };
-      return sdJwtDecodedPresentation
+      return sdJwtDecodedPresentation;
     } else {
       if (!selectedCredentials) {
         throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
@@ -532,8 +533,9 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) { // Select type without kbJwt as isSdJwtDecodedCredential won't need it
-      const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential 
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) {
+      // Select type without kbJwt as isSdJwtDecodedCredential won't need it
+      const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential;
       // FIXME? SdJwtDecodedVerifiableCredential is local type and is not supported in ssi-sdk
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
@@ -547,15 +549,15 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
-          alg: hashAlg
+          alg: hashAlg,
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
           nonce: proofOptions?.nonce,
           sd_hash: sdHash,
-        } 
-      } satisfies SdJwtKbJwtInput
+        },
+      } satisfies SdJwtKbJwtInput;
 
       presentation = {
         ...sdJwtPresentation,
