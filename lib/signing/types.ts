@@ -87,7 +87,7 @@ export enum PresentationSubmissionLocation {
 }
 
 export type SdJwtKbJwtInput = {
-  header: SdJwtVcKbJwtHeader;
+  header: Partial<SdJwtVcKbJwtHeader>;
   payload: Partial<SdJwtVcKbJwtPayload>;
 };
 
