@@ -22,7 +22,14 @@ import {
 import { JsonPathUtils, ObjectUtils } from '../utils';
 import { getVpFormatForVcFormat } from '../utils/formatMap';
 
-import { EvaluationResults, HandlerCheckResult, PresentationEvaluationResults, SelectResults, SubmissionRequirementMatch } from './core';
+import {
+  EvaluationResults,
+  HandlerCheckResult,
+  PresentationEvaluationResults,
+  SelectResults,
+  SubmissionRequirementMatch,
+  SubmissionRequirementMatchType,
+} from './core';
 import { EvaluationClient } from './evaluationClient';
 
 interface SubmissionSatisfiesSubmissionRequirementResult {
@@ -252,13 +259,17 @@ export class EvaluationClientWrapper {
     marked: HandlerCheckResult[],
   ): SubmissionRequirementMatch[] {
     const submissionRequirementMatches: SubmissionRequirementMatch[] = [];
-    for (const sr of submissionRequirements) {
+    for (const [srIndex, sr] of Object.entries(submissionRequirements)) {
       // Create a default SubmissionRequirementMatch object
       const srm: SubmissionRequirementMatch = {
-        name: pd.name || pd.id,
         rule: sr.rule,
         vc_path: [],
+
+        name: sr.name,
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        id: Number(srIndex),
       };
+
       if (sr.from) {
         srm.from = sr.from;
       }
@@ -268,12 +279,9 @@ export class EvaluationClientWrapper {
       sr.count ? (srm.count = sr.count) : undefined;
 
       if (sr.from) {
-        const matchingDescriptors = this.mapMatchingDescriptors(pd, sr, marked);
-        if (matchingDescriptors) {
-          srm.vc_path.push(...matchingDescriptors.vc_path);
-          srm.name = matchingDescriptors.name;
-          submissionRequirementMatches.push(srm);
-        }
+        const matchingVcPaths = this.getMatchingVcPathsForSubmissionRequirement(pd, sr, marked);
+        srm.vc_path.push(...matchingVcPaths);
+        submissionRequirementMatches.push(srm);
       } else if (sr.from_nested) {
         // Recursive call to matchSubmissionRequirements for nested requirements
         try {
@@ -298,12 +306,16 @@ export class EvaluationClientWrapper {
         continue;
       }
       for (const vcPath of sameIdVcs) {
-        const idRes = JsonPathUtils.extractInputField(pd, [idPath]);
-        if (idRes.length) {
+        const inputDescriptorResults = JsonPathUtils.extractInputField<InputDescriptorV1 | InputDescriptorV2>(pd, [idPath]);
+        if (inputDescriptorResults.length) {
+          const inputDescriptor = inputDescriptorResults[0].value;
           submissionRequirementMatches.push({
-            name: (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).name || (idRes[0].value as InputDescriptorV1 | InputDescriptorV2).id,
+            name: inputDescriptor.name || inputDescriptor.id,
             rule: Rules.All,
             vc_path: [vcPath],
+
+            type: SubmissionRequirementMatchType.InputDescriptor,
+            id: inputDescriptor.id,
           });
         }
       }
@@ -311,29 +323,26 @@ export class EvaluationClientWrapper {
     return this.removeDuplicateSubmissionRequirementMatches(submissionRequirementMatches);
   }
 
-  private mapMatchingDescriptors(
+  private getMatchingVcPathsForSubmissionRequirement(
     pd: IInternalPresentationDefinition,
     sr: SubmissionRequirement,
     marked: HandlerCheckResult[],
-  ): SubmissionRequirementMatch {
-    const srm: Partial<SubmissionRequirementMatch> = { rule: sr.rule, vc_path: [] };
-    if (sr?.from) {
-      srm.from = sr.from;
-      // updating the srm.name everytime and since we have only one, we're sending the last one
-      for (const m of marked) {
-        const inDesc: InputDescriptorV2 = jp.query(pd, m.input_descriptor_path)[0];
-        if (inDesc.group && inDesc.group.indexOf(sr.from) === -1) {
-          continue;
-        }
-        srm.name = inDesc.name || inDesc.id;
-        if (m.payload.group.includes(sr.from)) {
-          if (srm.vc_path?.indexOf(m.verifiable_credential_path) === -1) {
-            srm.vc_path.push(m.verifiable_credential_path);
-          }
-        }
+  ): string[] {
+    const vcPaths = new Set<string>();
+
+    if (!sr.from) return Array.from(vcPaths);
+
+    for (const m of marked) {
+      const inputDescriptor: InputDescriptorV2 = jp.query(pd, m.input_descriptor_path)[0];
+      if (inputDescriptor.group && inputDescriptor.group.indexOf(sr.from) === -1) {
+        continue;
+      }
+      if (m.payload.group.includes(sr.from)) {
+        vcPaths.add(m.verifiable_credential_path);
       }
     }
-    return srm as SubmissionRequirementMatch;
+
+    return Array.from(vcPaths);
   }
 
   public evaluate(

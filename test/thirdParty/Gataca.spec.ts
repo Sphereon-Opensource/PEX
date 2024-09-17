@@ -2,6 +2,7 @@ import { PresentationDefinitionV1 } from '@sphereon/pex-models';
 import { IPresentation, IProofType, IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { PEX, PEXv1, Status } from '../../lib';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import { GatacaPresentationDefinition } from '../test_data/gataca/gatacaPresentationDefinition';
 import { GatacaSelectedCredentials } from '../test_data/gataca/gatacaSelectedCredentials';
 
@@ -28,13 +29,17 @@ describe('evaluate gataca tests', () => {
         rule: 'all',
         from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
-        name: 'emailCredential',
+        id: 0,
+        name: 'Mandatory data',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
       {
         rule: 'pick',
         from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
-        name: 'transcriptOfRecordsCredential',
+        id: 1,
+        name: 'Optional data',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
     ]);
     expect(result.verifiableCredential?.length).toEqual(2);
@@ -102,13 +107,17 @@ describe('evaluate gataca tests', () => {
         rule: 'all',
         from: 'mandatory',
         vc_path: ['$.verifiableCredential[0]'],
-        name: 'emailCredential',
+        id: 0,
+        name: 'Mandatory data',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
       {
         rule: 'pick',
         from: 'optional',
         vc_path: ['$.verifiableCredential[1]'],
-        name: 'transcriptOfRecordsCredential',
+        id: 1,
+        name: 'Optional data',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
       },
     ]);
     expect(result.verifiableCredential?.length).toEqual(2);

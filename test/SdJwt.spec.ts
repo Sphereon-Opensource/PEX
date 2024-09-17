@@ -4,6 +4,7 @@ import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 import { SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { PEX, PresentationSubmissionLocation, SdJwtDecodedVerifiableCredentialWithKbJwtInput, Status, Validated } from '../lib';
+import { SubmissionRequirementMatchType } from '../lib/evaluation/core';
 import { calculateSdHash } from '../lib/utils';
 
 export const hasher = (data: string) => createHash('sha256').update(data).digest();
@@ -178,7 +179,15 @@ describe('evaluate', () => {
   it('selectFrom with vc+sd-jwt format compact', () => {
     const result = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc.compactSdJwtVc]);
     expect(result.errors?.length).toEqual(0);
-    expect(result.matches).toEqual([{ name: 'Washington State Business License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]);
+    expect(result.matches).toEqual([
+      {
+        name: 'Washington State Business License',
+        rule: 'all',
+        vc_path: ['$.verifiableCredential[0]'],
+        type: SubmissionRequirementMatchType.InputDescriptor,
+        id: 'wa_driver_license',
+      },
+    ]);
     expect(result.areRequiredCredentialsPresent).toBe('info');
 
     // Should have already applied selective disclosure on the SD-JWT
@@ -188,7 +197,15 @@ describe('evaluate', () => {
   it('selectFrom with vc+sd-jwt format already decoded', () => {
     const result = pex.selectFrom(getPresentationDefinitionV2(), [decodedSdJwtVc]);
     expect(result.errors?.length).toEqual(0);
-    expect(result.matches).toEqual([{ name: 'Washington State Business License', rule: 'all', vc_path: ['$.verifiableCredential[0]'] }]);
+    expect(result.matches).toEqual([
+      {
+        name: 'Washington State Business License',
+        rule: 'all',
+        vc_path: ['$.verifiableCredential[0]'],
+        type: SubmissionRequirementMatchType.InputDescriptor,
+        id: 'wa_driver_license',
+      },
+    ]);
     expect(result.areRequiredCredentialsPresent).toBe('info');
 
     // Should have already applied selective disclosure on the SD-JWT
