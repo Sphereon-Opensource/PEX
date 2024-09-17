@@ -1,6 +1,7 @@
+import { createHash } from 'crypto';
+
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 import { SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
-import { createHash } from 'crypto';
 
 import { PEX, PresentationSubmissionLocation, Status, Validated } from '../lib';
 import { SubmissionRequirementMatchType } from '../lib/evaluation/core';
