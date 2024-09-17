@@ -381,8 +381,8 @@ export class EvaluationClientWrapper {
       generatePresentationSubmission?: boolean;
       /**
        * The location of the presentation submission. By default {@link PresentationSubmissionLocation.PRESENTATION}
-       * is used when one presentation is passed (not as array), while {@link PresentationSubmissionLocation.EXTERNAL} is
-       * used when an array is passed
+       * is used when one W3C presentation is passed (not as array) , while {@link PresentationSubmissionLocation.EXTERNAL} is
+       * used when an array is passed or the presentation is not a W3C presentation
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
     },
@@ -444,6 +444,48 @@ export class EvaluationClientWrapper {
     return result;
   }
 
+  private extractWrappedVcFromWrappedVp(
+    descriptor: Descriptor,
+    descriptorIndex: string,
+    wvp: WrappedVerifiablePresentation,
+  ): { error: Checked; wvc: undefined } | { wvc: WrappedVerifiableCredential; error: undefined } {
+    // Decoded won't work for sd-jwt or jwt?!?!
+    const [vcResult] = JsonPathUtils.extractInputField(wvp.decoded, [descriptor.path]) as Array<{
+      value: string | IVerifiableCredential;
+    }>;
+
+    if (!vcResult) {
+      return {
+        error: {
+          status: Status.ERROR,
+          tag: 'SubmissionPathNotFound',
+          message: `Unable to extract path ${descriptor.path} for submission.descriptor_path[${descriptorIndex}] from verifiable presentation`,
+        },
+        wvc: undefined,
+      };
+    }
+
+    // Find the wrapped VC based on the original VC
+    const originalVc = vcResult.value;
+    const wvc = wvp.vcs.find((wvc) => CredentialMapper.areOriginalVerifiableCredentialsEqual(wvc.original, originalVc));
+
+    if (!wvc) {
+      return {
+        error: {
+          status: Status.ERROR,
+          tag: 'SubmissionPathNotFound',
+          message: `Unable to find wrapped vc`,
+        },
+        wvc: undefined,
+      };
+    }
+
+    return {
+      wvc,
+      error: undefined,
+    };
+  }
+
   private evaluatePresentationsAgainstSubmission(
     pd: IInternalPresentationDefinition,
     wvps: OrArray<WrappedVerifiablePresentation>,
@@ -452,6 +494,7 @@ export class EvaluationClientWrapper {
       holderDIDs?: string[];
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
+      presentationSubmissionLocation?: PresentationSubmissionLocation;
     },
   ): PresentationEvaluationResults {
     const result: PresentationEvaluationResults = {
@@ -462,76 +505,80 @@ export class EvaluationClientWrapper {
       value: submission,
     };
 
+    // If only a single VP is passed that is not w3c and no presentationSubmissionLocation, we set the default location to presentation. Otherwise we assume it's external
+    const presentationSubmissionLocation =
+      opts?.presentationSubmissionLocation ??
+      (Array.isArray(wvps) || !CredentialMapper.isW3cPresentation(wvps.presentation)
+        ? PresentationSubmissionLocation.EXTERNAL
+        : PresentationSubmissionLocation.PRESENTATION);
+
     // We loop over all the descriptors in the submission
     for (const descriptorIndex in submission.descriptor_map) {
       const descriptor = submission.descriptor_map[descriptorIndex];
 
-      // Extract the VP from the wrapped VPs
-      const [vpResult] = JsonPathUtils.extractInputField(wvps, [descriptor.path]) as Array<{ value: WrappedVerifiablePresentation }>;
-      if (!vpResult) {
-        result.areRequiredCredentialsPresent = Status.ERROR;
-        result.errors?.push({
-          status: Status.ERROR,
-          tag: 'SubmissionPathNotFound',
-          message: `Unable to extract path ${descriptor.path} for submission.descriptor_path[${descriptorIndex}] from presentation(s)`,
-        });
-        continue;
-      }
-      const vp = vpResult.value;
-      let vcPath = `presentation ${descriptor.path}`;
-
-      if (vp.format !== descriptor.format) {
-        result.areRequiredCredentialsPresent = Status.ERROR;
-        result.errors?.push({
-          status: Status.ERROR,
-          tag: 'SubmissionFormatNoMatch',
-          message: `VP at path ${descriptor.path} has format ${vp.format}, while submission.descriptor_path[${descriptorIndex}] has format ${descriptor.format}`,
-        });
-        continue;
-      }
-
+      let vp: WrappedVerifiablePresentation;
       let vc: WrappedVerifiableCredential;
-      if (descriptor.path_nested) {
-        const [vcResult] = JsonPathUtils.extractInputField(vp.decoded, [descriptor.path_nested.path]) as Array<{
-          value: string | IVerifiableCredential;
-        }>;
+      let vcPath: string;
 
-        if (!vcResult) {
+      if (presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
+        // Extract the VP from the wrapped VPs
+        const [vpResult] = JsonPathUtils.extractInputField(wvps, [descriptor.path]) as Array<{ value: WrappedVerifiablePresentation }>;
+        if (!vpResult) {
           result.areRequiredCredentialsPresent = Status.ERROR;
           result.errors?.push({
             status: Status.ERROR,
             tag: 'SubmissionPathNotFound',
-            message: `Unable to extract path_nested.path ${descriptor.path_nested.path} for submission.descriptor_path[${descriptorIndex}] from verifiable presentation`,
+            message: `Unable to extract path ${descriptor.path} for submission.descriptor_path[${descriptorIndex}] from presentation(s)`,
           });
           continue;
         }
+        vp = vpResult.value;
+        vcPath = `presentation ${descriptor.path}`;
 
-        // Find the wrapped VC based on the orignial VC
-        const originalVc = vcResult.value;
-        const wvc = vp.vcs.find((wvc) => CredentialMapper.areOriginalVerifiableCredentialsEqual(wvc.original, originalVc));
-
-        if (!wvc) {
+        if (vp.format !== descriptor.format) {
           result.areRequiredCredentialsPresent = Status.ERROR;
           result.errors?.push({
             status: Status.ERROR,
-            tag: 'SubmissionPathNotFound',
-            message: `Unable to find wrapped vc`,
+            tag: 'SubmissionFormatNoMatch',
+            message: `VP at path ${descriptor.path} has format ${vp.format}, while submission.descriptor_path[${descriptorIndex}] has format ${descriptor.format}`,
           });
           continue;
         }
 
-        vc = wvc;
-        vcPath += ` with nested credential ${descriptor.path_nested.path}`;
-      } else if (descriptor.format === 'vc+sd-jwt') {
-        vc = vp.vcs[0];
+        if (descriptor.path_nested) {
+          const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor.path_nested, descriptorIndex, vp);
+          if (extractionResult.error) {
+            result.areRequiredCredentialsPresent = Status.ERROR;
+            result.errors?.push(extractionResult.error);
+            continue;
+          }
+
+          vc = extractionResult.wvc;
+          vcPath += ` with nested credential ${descriptor.path_nested.path}`;
+        } else if (descriptor.format === 'vc+sd-jwt') {
+          vc = vp.vcs[0];
+        } else {
+          result.areRequiredCredentialsPresent = Status.ERROR;
+          result.errors?.push({
+            status: Status.ERROR,
+            tag: 'UnsupportedFormat',
+            message: `VP format ${vp.format} is not supported`,
+          });
+          continue;
+        }
       } else {
-        result.areRequiredCredentialsPresent = Status.ERROR;
-        result.errors?.push({
-          status: Status.ERROR,
-          tag: 'UnsupportedFormat',
-          message: `VP format ${vp.format} is not supported`,
-        });
-        continue;
+        // TODO: check that not longer than 0
+        vp = Array.isArray(wvps) ? wvps[0] : wvps;
+        vcPath = `credential ${descriptor.path}`;
+
+        const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor, descriptorIndex, vp);
+        if (extractionResult.error) {
+          result.areRequiredCredentialsPresent = Status.ERROR;
+          result.errors?.push(extractionResult.error);
+          continue;
+        }
+
+        vc = extractionResult.wvc;
       }
 
       // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
@@ -970,7 +1017,9 @@ export class EvaluationClientWrapper {
         if (foundIndex === -1) {
           throw new Error('index is not right');
         }
-        selectResults.vcIndexes?.push(foundIndex);
+        selectResults.vcIndexes
+          ? !selectResults.vcIndexes.includes(foundIndex) && selectResults.vcIndexes.push(foundIndex)
+          : (selectResults.vcIndexes = [foundIndex]);
       });
     }
   }
