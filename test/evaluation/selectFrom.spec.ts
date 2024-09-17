@@ -5,6 +5,7 @@ import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ss
 
 import { Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import { InternalPresentationDefinitionV1, SSITypesBuilder } from '../../lib/types';
 import PexMessages from '../../lib/types/Messages';
 
@@ -39,6 +40,8 @@ describe('selectFrom tests', () => {
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
           name: 'Submission of educational transcripts',
           rule: 'all',
+          id: 0,
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -158,8 +161,10 @@ describe('selectFrom tests', () => {
           from: 'B',
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           min: 2,
-          name: 'Submission of educational transcripts',
+          name: 'Eligibility to Work Proof',
           rule: 'pick',
+          id: 0,
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -248,8 +253,10 @@ describe('selectFrom tests', () => {
           from: 'B',
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
           max: 2,
-          name: 'Submission of educational transcripts',
           rule: 'pick',
+          id: 0,
+          name: 'Eligibility to Work Proof',
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -320,20 +327,28 @@ describe('selectFrom tests', () => {
             {
               from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'all',
+              id: 0,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
             {
               count: 2,
               from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'pick',
+              id: 1,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
           ],
           vc_path: [],
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'all',
+          id: 0,
+          name: 'Confirm banking relationship or employment and residence proofs',
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -435,21 +450,29 @@ describe('selectFrom tests', () => {
             {
               from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'all',
+              id: 0,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
             {
               count: 2,
               from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'pick',
+              id: 1,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
           ],
           vc_path: [],
           min: 1,
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
+          id: 0,
+          name: 'Confirm banking relationship or employment and residence proofs',
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -551,21 +574,29 @@ describe('selectFrom tests', () => {
             {
               from: 'A',
               vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'all',
+              id: 0,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
             {
               count: 2,
               from: 'B',
               vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-              name: 'Submission of educational transcripts',
               rule: 'pick',
+              id: 1,
+              // submission requirement from_nested has no name
+              name: undefined,
+              type: SubmissionRequirementMatchType.SubmissionRequirement,
             },
           ],
           vc_path: [],
           max: 2,
-          name: '32f54163-7166-48f1-93d8-ff217bdb0653',
           rule: 'pick',
+          id: 0,
+          name: 'Confirm banking relationship or employment and residence proofs',
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       verifiableCredential: [
@@ -748,8 +779,10 @@ describe('selectFrom tests', () => {
         from: 'B',
         vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
         min: 3,
-        name: 'Submission of educational transcripts',
         rule: 'pick',
+        id: 0,
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        name: 'Eligibility to Work Proof',
       },
     ]);
   });
@@ -774,8 +807,10 @@ describe('selectFrom tests', () => {
         from: 'B',
         vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]'],
         max: 1,
-        name: 'Submission of educational transcripts',
         rule: 'pick',
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        name: 'Eligibility to Work Proof',
+        id: 0,
       },
     ]);
     expect(result.errors?.length).toEqual(16);
@@ -847,22 +882,30 @@ describe('selectFrom tests', () => {
       from_nested: [
         {
           from: 'A',
-          name: 'Submission of educational transcripts',
           rule: Rules.All,
           vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+          id: 0,
+          // submission requirement from_nested has no name
+          name: undefined,
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
         {
           count: 2,
           from: 'B',
-          name: 'Submission of educational transcripts',
           rule: Rules.Pick,
           vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
+          id: 1,
+          // submission requirement from_nested has no name
+          name: undefined,
+          type: SubmissionRequirementMatchType.SubmissionRequirement,
         },
       ],
       min: 1,
-      name: '32f54163-7166-48f1-93d8-ff217bdb0653',
+      name: 'Confirm banking relationship or employment and residence proofs',
       rule: Rules.Pick,
       vc_path: [],
+      id: 0,
+      type: SubmissionRequirementMatchType.SubmissionRequirement,
     });
   });
 
@@ -888,21 +931,30 @@ describe('selectFrom tests', () => {
           {
             from: 'A',
             vc_path: ['$.verifiableCredential[0]', '$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-            name: 'Submission of educational transcripts',
             rule: 'all',
+            id: 0,
+            // submission requirement from_nested has no name
+            name: undefined,
+            type: SubmissionRequirementMatchType.SubmissionRequirement,
           },
           {
             count: 2,
             from: 'B',
             vc_path: ['$.verifiableCredential[1]', '$.verifiableCredential[2]'],
-            name: 'Submission of educational transcripts',
             rule: 'pick',
+            id: 1,
+            // submission requirement from_nested has no name
+            name: undefined,
+            type: SubmissionRequirementMatchType.SubmissionRequirement,
           },
         ],
         vc_path: [],
-        name: '32f54163-7166-48f1-93d8-ff217bdb0653',
+        // submission requirement name
+        name: 'Confirm banking relationship or employment and residence proofs',
         rule: 'pick',
         max: 1,
+        type: SubmissionRequirementMatchType.SubmissionRequirement,
+        id: 0,
       },
     ]);
     expect(result.errors?.length).toEqual(16);
@@ -922,6 +974,8 @@ describe('selectFrom tests', () => {
     expect(result!.matches![0]!.name).toEqual("EU Driver's License");
     expect(result!.matches![0]).toEqual({
       name: "EU Driver's License",
+      id: 'citizenship_input_1',
+      type: SubmissionRequirementMatchType.InputDescriptor,
       rule: 'all',
       vc_path: ['$.verifiableCredential[0]'],
     });
@@ -939,6 +993,6 @@ describe('selectFrom tests', () => {
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
     expect(result!.errors!.length).toEqual(0);
-    expect(result!.matches![0]!.name).toEqual("EU Driver's License");
+    expect(result!.matches![0]!.name).toEqual("Name on driver's license");
   });
 });
