@@ -24,8 +24,8 @@ import {
   PresentationResult,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
-  SdJwtDecodedVerifiableCredentialInput,
-  SdJwtKbJwtInput,
+  PartialSdJwtDecodedVerifiableCredential,
+  PartialSdJwtKbJwt,
   VerifiablePresentationFromOpts,
   VerifiablePresentationResult,
 } from './signing';
@@ -72,7 +72,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | SdJwtDecodedVerifiableCredentialInput>,
+    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | PartialSdJwtDecodedVerifiableCredential>,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
@@ -315,7 +315,7 @@ export class PEX {
        */
       hasher?: Hasher;
     },
-  ): IPresentation | SdJwtDecodedVerifiableCredentialInput {
+  ): IPresentation | PartialSdJwtDecodedVerifiableCredential {
     const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
     // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
@@ -361,9 +361,9 @@ export class PEX {
           iat: new Date().getTime(),
           sd_hash: sdHash,
         },
-      } satisfies SdJwtKbJwtInput;
+      } satisfies PartialSdJwtKbJwt;
 
-      const sdJwtDecodedPresentation: SdJwtDecodedVerifiableCredentialInput = {
+      const sdJwtDecodedPresentation: PartialSdJwtDecodedVerifiableCredential = {
         ...decoded,
         kbJwt,
       };
@@ -555,12 +555,12 @@ export class PEX {
           nonce: proofOptions?.nonce,
           sd_hash: sdHash,
         },
-      } satisfies SdJwtKbJwtInput;
+      } satisfies PartialSdJwtKbJwt;
 
       presentation = {
         ...sdJwtPresentation,
         kbJwt,
-      } satisfies SdJwtDecodedVerifiableCredentialInput;
+      } satisfies PartialSdJwtDecodedVerifiableCredential;
     }
 
     const callBackParams: PresentationSignCallBackParams = {

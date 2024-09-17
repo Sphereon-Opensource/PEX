@@ -86,12 +86,12 @@ export enum PresentationSubmissionLocation {
   PRESENTATION, // Part of the VP itself
 }
 
-export type SdJwtKbJwtInput = {
+export type PartialSdJwtKbJwt = {
   header: Partial<SdJwtVcKbJwtHeader>;
   payload: Partial<SdJwtVcKbJwtPayload>;
 };
 
-export type SdJwtDecodedVerifiableCredentialInput = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'> & { kbJwt: SdJwtKbJwtInput };
+export type PartialSdJwtDecodedVerifiableCredential = Omit<SdJwtDecodedVerifiableCredential, 'kbJwt'> & { kbJwt: PartialSdJwtKbJwt };
 
 /**
  * The result object containing the presentation and presentation submission
@@ -100,7 +100,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredential | PartialSdJwtDecodedVerifiableCredential;
 
   /**
    * The resulting location of the presentation submission.
@@ -189,7 +189,7 @@ export interface PresentationSignCallBackParams {
    * and only the optional KB-JWT should be appended to the `compactSdJwt` property. If no KB-JWT is needed on the presentation, the `compactSdJwt` property
    * from the decoded SD-JWT can be returned as-is.
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredential | SdJwtDecodedVerifiableCredentialInput;
+  presentation: IPresentation | SdJwtDecodedVerifiableCredential | PartialSdJwtDecodedVerifiableCredential;
 
   /**
    * A partial proof value the callback can use to complete. If proofValue or JWS was supplied the proof could be complete already
