@@ -2,6 +2,7 @@ import { PresentationSubmission, Rules } from '@sphereon/pex-models';
 import { IVerifiableCredential } from '@sphereon/ssi-types';
 
 import { HandlerCheckResult, SelectResults, Status } from '../../lib';
+import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import PexMessages from '../../lib/types/Messages';
 
 export class EvaluationClientWrapperData {
@@ -197,6 +198,8 @@ export class EvaluationClientWrapperData {
           name: 'test',
           rule: Rules.All,
           vc_path: ['$.verifiableCredential[0]'],
+          id: 'Educational transcripts',
+          type: SubmissionRequirementMatchType.InputDescriptor,
         },
       ],
     };
