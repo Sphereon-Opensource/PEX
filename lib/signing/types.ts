@@ -9,7 +9,7 @@ import {
   SdJwtDecodedVerifiableCredential,
   SdJwtVcKbJwtPayload,
   W3CVerifiablePresentation,
-  SdJwtVcKbJwtHeader
+  SdJwtVcKbJwtHeader,
 } from '@sphereon/ssi-types';
 
 import { PresentationEvaluationResults } from '../evaluation';

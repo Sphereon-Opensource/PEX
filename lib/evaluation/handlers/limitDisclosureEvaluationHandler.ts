@@ -17,7 +17,7 @@ import { applySdJwtLimitDisclosure, JsonPathUtils } from '../../utils';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
-import { elligibleInputDescriptorsForWrappedVc } from './markForSubmissionEvaluationHandler';
+import { eligibleInputDescriptorsForWrappedVc } from './markForSubmissionEvaluationHandler';
 
 export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
@@ -33,7 +33,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private isLimitDisclosureSupported(
-    elligibleInputDescriptors: InputDescriptorWithIndex[],
+    eligibleInputDescriptors: InputDescriptorWithIndex[],
     wvc: WrappedVerifiableCredential,
     vcIndex: number,
   ): boolean {
@@ -42,7 +42,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
     const decoded = wvc.decoded as IVerifiableCredential;
     const proofs = Array.isArray(decoded.proof) ? decoded.proof : decoded.proof ? [decoded.proof] : undefined;
-    const requiredLimitDisclosureInputDescriptorIds = elligibleInputDescriptors
+    const requiredLimitDisclosureInputDescriptorIds = eligibleInputDescriptors
       .map(({ inputDescriptor: { constraints }, inputDescriptorIndex }) =>
         constraints?.limit_disclosure === Optionality.Required ? inputDescriptorIndex : undefined,
       )
@@ -52,7 +52,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
       // todo: Support/inspect array based proofs
       if (requiredLimitDisclosureInputDescriptorIds.length > 0) {
         this.createLimitDisclosureNotSupportedResult(
-          elligibleInputDescriptors.map((i) => i.inputDescriptorIndex),
+          eligibleInputDescriptors.map((i) => i.inputDescriptorIndex),
           vcIndex,
           'Multiple proofs on verifiable credential not supported for limit disclosure',
         );
@@ -78,27 +78,23 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private evaluateLimitDisclosure(inputDescriptors: Array<InputDescriptorV2 | InputDescriptorV1>, wrappedVcs: WrappedVerifiableCredential[]): void {
     wrappedVcs.forEach((wvc, vcIndex) => {
-      const elligibleInputDescriptors = elligibleInputDescriptorsForWrappedVc(inputDescriptors, vcIndex, this.getResults());
-      const includeLimitDisclosure = elligibleInputDescriptors.some(
+      const eligibleInputDescriptors = eligibleInputDescriptorsForWrappedVc(inputDescriptors, vcIndex, this.getResults());
+      const includeLimitDisclosure = eligibleInputDescriptors.some(
         ({ inputDescriptor: { constraints } }) =>
           constraints?.limit_disclosure === Optionality.Preferred || constraints?.limit_disclosure === Optionality.Required,
       );
 
-      if (
-        elligibleInputDescriptors.length > 0 &&
-        includeLimitDisclosure &&
-        this.isLimitDisclosureSupported(elligibleInputDescriptors, wvc, vcIndex)
-      ) {
-        this.enforceLimitDisclosure(wrappedVcs, elligibleInputDescriptors, vcIndex);
+      if (eligibleInputDescriptors.length > 0 && includeLimitDisclosure && this.isLimitDisclosureSupported(eligibleInputDescriptors, wvc, vcIndex)) {
+        this.enforceLimitDisclosure(wrappedVcs, eligibleInputDescriptors, vcIndex);
       }
     });
   }
 
-  private enforceLimitDisclosure(wrappedVcs: WrappedVerifiableCredential[], elligibleInputDescriptors: InputDescriptorWithIndex[], vcIndex: number) {
+  private enforceLimitDisclosure(wrappedVcs: WrappedVerifiableCredential[], eligibleInputDescriptors: InputDescriptorWithIndex[], vcIndex: number) {
     const wvc = wrappedVcs[vcIndex];
 
     if (CredentialMapper.isWrappedSdJwtVerifiableCredential(wvc)) {
-      const presentationFrame = this.createSdJwtPresentationFrame(elligibleInputDescriptors, wvc.credential, vcIndex);
+      const presentationFrame = this.createSdJwtPresentationFrame(eligibleInputDescriptors, wvc.credential, vcIndex);
 
       // We update the SD-JWT to it's presentation format (remove disclosures, update pretty payload, etc..), except
       // we don't create or include the (optional) KB-JWT yet, this is done when we create the presentation
@@ -109,18 +105,18 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
         // But we also want to keep the format of the original credential.
         wvc.original = CredentialMapper.isSdJwtDecodedCredential(wvc.original) ? wvc.credential : wvc.credential.compactSdJwtVc;
 
-        for (const { inputDescriptorIndex, inputDescriptor } of elligibleInputDescriptors) {
+        for (const { inputDescriptorIndex, inputDescriptor } of eligibleInputDescriptors) {
           this.createSuccessResult(inputDescriptorIndex, `$[${vcIndex}]`, inputDescriptor.constraints?.limit_disclosure);
         }
       }
     } else if (CredentialMapper.isW3cCredential(wvc.credential)) {
-      const internalCredentialToSend = this.createVcWithRequiredFields(elligibleInputDescriptors, wvc.credential, vcIndex);
+      const internalCredentialToSend = this.createVcWithRequiredFields(eligibleInputDescriptors, wvc.credential, vcIndex);
       /* When verifiableCredentialToSend is null/undefined an error is raised, the credential will
        * remain untouched and the verifiable credential won't be submitted.
        */
       if (internalCredentialToSend) {
         wvc.credential = internalCredentialToSend;
-        for (const { inputDescriptorIndex, inputDescriptor } of elligibleInputDescriptors) {
+        for (const { inputDescriptorIndex, inputDescriptor } of eligibleInputDescriptors) {
           this.createSuccessResult(inputDescriptorIndex, `$[${vcIndex}]`, inputDescriptor.constraints?.limit_disclosure);
         }
       }

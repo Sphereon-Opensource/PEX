@@ -10,7 +10,7 @@ import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
-export function elligibleInputDescriptorsForWrappedVc(
+export function eligibleInputDescriptorsForWrappedVc(
   inputDescriptors: Array<InputDescriptorV2 | InputDescriptorV1>,
   vcIndex: number,
   results: HandlerCheckResult[],
