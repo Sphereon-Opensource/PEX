@@ -531,7 +531,8 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) { // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
+    // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) {
       const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential;
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
