@@ -531,10 +531,8 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) {
-      // Select type without kbJwt as isSdJwtDecodedCredential won't need it
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) { // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
       const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential;
-      // FIXME? SdJwtDecodedVerifiableCredential is local type and is not supported in ssi-sdk
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
