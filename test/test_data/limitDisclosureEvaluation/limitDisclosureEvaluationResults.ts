@@ -73,7 +73,7 @@ export class LimitDisclosureEvaluationResults {
       {
         evaluator: 'LimitDisclosureEvaluation',
         input_descriptor_path: '$.input_descriptors[3]',
-        message: PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
+        message: `${PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED}. Signature suite 'EcdsaSecp256k1VerificationKey2019' is not present in limitDisclosureSignatureSuites [BbsBlsSignatureProof2020]`,
         payload: undefined,
         status: 'error',
         verifiable_credential_path: '$[3]',

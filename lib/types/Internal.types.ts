@@ -8,6 +8,11 @@ import {
 } from '@sphereon/pex-models';
 import { IVerifiableCredential, IVerifiablePresentation } from '@sphereon/ssi-types';
 
+export interface InputDescriptorWithIndex {
+  inputDescriptorIndex: number;
+  inputDescriptor: InputDescriptorV1 | InputDescriptorV2;
+}
+
 export type PathComponent = string | number;
 export interface IInternalPresentationDefinition {
   format?: Format;

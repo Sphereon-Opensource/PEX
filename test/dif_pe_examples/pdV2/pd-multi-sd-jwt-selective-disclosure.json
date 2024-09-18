@@ -1,0 +1,110 @@
+{
+  "presentation_definition": {
+    "id": "id",
+    "purpose": "purpose",
+    "input_descriptors": [
+      {
+        "id": "descriptor",
+        "constraints": {
+          "limit_disclosure": "preferred",
+          "fields": [
+            {
+              "path": [
+                "$.iss"
+              ],
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "did:web:127.0.0.1:9000:paradym-public-metadata:2731edc0-27bb-452f-ab1e-d3b73b7aadac",
+                  "did:web:127.0.0.1:9000:wrong"
+                ]
+              }
+            },
+            {
+              "path": [
+                "$.vct"
+              ],
+              "filter": {
+                "type": "string",
+                "const": "test-vct"
+              }
+            },
+            {
+              "path": [
+                "$.compliant"
+              ],
+              "filter": {
+                "type": "boolean",
+                "const": false
+              }
+            },
+            {
+              "path": [
+                "$.nonCompliant"
+              ],
+              "filter": {
+                "type": "boolean",
+                "const": true
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "descriptor-same-cred",
+        "constraints": {
+          "limit_disclosure": "preferred",
+          "fields": [
+            {
+              "path": [
+                "$.iss"
+              ],
+              "filter": {
+                "type": "string",
+                "enum": [
+                  "did:web:127.0.0.1:9000:paradym-public-metadata:2731edc0-27bb-452f-ab1e-d3b73b7aadac",
+                  "did:web:127.0.0.1:9000:wrong"
+                ]
+              }
+            },
+            {
+              "path": [
+                "$.vct"
+              ],
+              "filter": {
+                "type": "string",
+                "const": "test-vct"
+              }
+            },
+            {
+              "path": [
+                "$.nonCompliant"
+              ],
+              "filter": {
+                "type": "boolean",
+                "const": true
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "descriptor-2",
+        "constraints": {
+          "limit_disclosure": "required",
+          "fields": [
+            {
+              "path": [
+                "$.vct"
+              ],
+              "filter": {
+                "type": "string",
+                "const": "test-vct-2"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

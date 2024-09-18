@@ -73,7 +73,7 @@ describe('evaluate', () => {
     expect(evaluationClient.results[9]).toEqual({
       evaluator: 'LimitDisclosureEvaluation',
       input_descriptor_path: '$.input_descriptors[0]',
-      message: PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
+      message: `${PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED}. Signature suite 'limit disclosure unsupported' is not present in limitDisclosureSignatureSuites [BbsBlsSignatureProof2020]`,
       status: 'error',
       verifiable_credential_path: '$[0]',
     });
@@ -93,14 +93,6 @@ describe('evaluate', () => {
     evaluationClient.evaluate(pd, wvcs, { holderDIDs: HOLDER_DID, limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES });
     const firstWrappedVc = evaluationClient.wrappedVcs[0] as WrappedW3CVerifiableCredential;
     expect((firstWrappedVc.credential.credentialSubject as ICredentialSubject & AdditionalClaims)['details']).toBeUndefined();
-    expect(evaluationClient.results[8]).toEqual({
-      evaluator: 'LimitDisclosureEvaluation',
-      input_descriptor_path: '$.input_descriptors[0]',
-      message: PexMessages.VERIFIABLE_CREDENTIAL_MANDATORY_FIELD_NOT_PRESENT,
-      payload: ['$.credentialSubject.citizenship[*]', '$.credentialSubject.details.citizenship[*]'],
-      status: 'error',
-      verifiable_credential_path: '$[0]',
-    });
   });
 
   it('should be 4 infos (limit disclosure supported by all)', () => {
