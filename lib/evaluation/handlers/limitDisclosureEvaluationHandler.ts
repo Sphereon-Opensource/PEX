@@ -29,30 +29,46 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   public handle(pd: IInternalPresentationDefinition, wrappedVcs: WrappedVerifiableCredential[]): void {
-    this.evaluateLimitDisclosure(pd.input_descriptors as InputDescriptorV2[], wrappedVcs)
+    this.evaluateLimitDisclosure(pd.input_descriptors as InputDescriptorV2[], wrappedVcs);
   }
 
-  private isLimitDisclosureSupported(elligibleInputDescriptors: InputDescriptorWithIndex[], wvc: WrappedVerifiableCredential, vcIndex: number): boolean {
+  private isLimitDisclosureSupported(
+    elligibleInputDescriptors: InputDescriptorWithIndex[],
+    wvc: WrappedVerifiableCredential,
+    vcIndex: number,
+  ): boolean {
     if (wvc.format === 'vc+sd-jwt') return true;
 
     const limitDisclosureSignatures = this.client.limitDisclosureSignatureSuites;
-    const decoded = wvc.decoded as IVerifiableCredential
-    const proofs = Array.isArray(decoded.proof) ? decoded.proof : decoded.proof ? [decoded.proof] : undefined
-    const requiredLimitDisclosureInputDescriptorIds = elligibleInputDescriptors.map(({ inputDescriptor: { constraints }, inputDescriptorIndex }) => constraints?.limit_disclosure === Optionality.Required ? inputDescriptorIndex : undefined).filter((id): id is number => id !== undefined)
+    const decoded = wvc.decoded as IVerifiableCredential;
+    const proofs = Array.isArray(decoded.proof) ? decoded.proof : decoded.proof ? [decoded.proof] : undefined;
+    const requiredLimitDisclosureInputDescriptorIds = elligibleInputDescriptors
+      .map(({ inputDescriptor: { constraints }, inputDescriptorIndex }) =>
+        constraints?.limit_disclosure === Optionality.Required ? inputDescriptorIndex : undefined,
+      )
+      .filter((id): id is number => id !== undefined);
 
     if (!proofs || proofs.length === 0 || proofs.length > 1 || !proofs[0].type) {
       // todo: Support/inspect array based proofs
       if (requiredLimitDisclosureInputDescriptorIds.length > 0) {
-        this.createLimitDisclosureNotSupportedResult(elligibleInputDescriptors.map(i => i.inputDescriptorIndex), vcIndex, 'Multiple proofs on verifiable credential not supported for limit disclosure');
+        this.createLimitDisclosureNotSupportedResult(
+          elligibleInputDescriptors.map((i) => i.inputDescriptorIndex),
+          vcIndex,
+          'Multiple proofs on verifiable credential not supported for limit disclosure',
+        );
       }
       return false;
     }
 
-    const proof = proofs[0]
+    const proof = proofs[0];
     const signatureSuite = proof.cryptosuite ? `${proof.type}.${proof.cryptosuite}` : proof.type;
     if (!limitDisclosureSignatures?.includes(signatureSuite)) {
       if (requiredLimitDisclosureInputDescriptorIds.length > 0) {
-        this.createLimitDisclosureNotSupportedResult(requiredLimitDisclosureInputDescriptorIds, vcIndex, `Signature suite '${signatureSuite}' is not present in limitDisclosureSignatureSuites [${limitDisclosureSignatures.join(',')}]`);
+        this.createLimitDisclosureNotSupportedResult(
+          requiredLimitDisclosureInputDescriptorIds,
+          vcIndex,
+          `Signature suite '${signatureSuite}' is not present in limitDisclosureSignatureSuites [${limitDisclosureSignatures.join(',')}]`,
+        );
       }
       return false;
     }
@@ -62,21 +78,24 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
 
   private evaluateLimitDisclosure(inputDescriptors: Array<InputDescriptorV2 | InputDescriptorV1>, wrappedVcs: WrappedVerifiableCredential[]): void {
     wrappedVcs.forEach((wvc, vcIndex) => {
-      const elligibleInputDescriptors = elligibleInputDescriptorsForWrappedVc(inputDescriptors, vcIndex, this.getResults())
-      const includeLimitDisclosure = elligibleInputDescriptors.some(({ inputDescriptor: { constraints } }) => constraints?.limit_disclosure === Optionality.Preferred || constraints?.limit_disclosure === Optionality.Required)
+      const elligibleInputDescriptors = elligibleInputDescriptorsForWrappedVc(inputDescriptors, vcIndex, this.getResults());
+      const includeLimitDisclosure = elligibleInputDescriptors.some(
+        ({ inputDescriptor: { constraints } }) =>
+          constraints?.limit_disclosure === Optionality.Preferred || constraints?.limit_disclosure === Optionality.Required,
+      );
 
-      if (elligibleInputDescriptors.length > 0 && includeLimitDisclosure && this.isLimitDisclosureSupported(elligibleInputDescriptors, wvc, vcIndex)) {
+      if (
+        elligibleInputDescriptors.length > 0 &&
+        includeLimitDisclosure &&
+        this.isLimitDisclosureSupported(elligibleInputDescriptors, wvc, vcIndex)
+      ) {
         this.enforceLimitDisclosure(wrappedVcs, elligibleInputDescriptors, vcIndex);
       }
     });
   }
 
-  private enforceLimitDisclosure(
-    wrappedVcs: WrappedVerifiableCredential[],
-    elligibleInputDescriptors: InputDescriptorWithIndex[],
-    vcIndex: number,
-  ) {
-    const wvc = wrappedVcs[vcIndex]
+  private enforceLimitDisclosure(wrappedVcs: WrappedVerifiableCredential[], elligibleInputDescriptors: InputDescriptorWithIndex[], vcIndex: number) {
+    const wvc = wrappedVcs[vcIndex];
 
     if (CredentialMapper.isWrappedSdJwtVerifiableCredential(wvc)) {
       const presentationFrame = this.createSdJwtPresentationFrame(elligibleInputDescriptors, wvc.credential, vcIndex);
@@ -100,7 +119,7 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
        * remain untouched and the verifiable credential won't be submitted.
        */
       if (internalCredentialToSend) {
-        wvc.credential = internalCredentialToSend
+        wvc.credential = internalCredentialToSend;
         for (const { inputDescriptorIndex, inputDescriptor } of elligibleInputDescriptors) {
           this.createSuccessResult(inputDescriptorIndex, `$[${vcIndex}]`, inputDescriptor.constraints?.limit_disclosure);
         }
@@ -139,7 +158,11 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
     return presentationFrame;
   }
 
-  private createVcWithRequiredFields(inputDescriptors: InputDescriptorWithIndex[], vc: IVerifiableCredential, vcIndex: number): IVerifiableCredential | undefined {
+  private createVcWithRequiredFields(
+    inputDescriptors: InputDescriptorWithIndex[],
+    vc: IVerifiableCredential,
+    vcIndex: number,
+  ): IVerifiableCredential | undefined {
     let credentialToSend: IVerifiableCredential = {} as IVerifiableCredential;
     credentialToSend = Object.assign(credentialToSend, vc);
     credentialToSend.credentialSubject = {};
@@ -202,12 +225,14 @@ export class LimitDisclosureEvaluationHandler extends AbstractEvaluationHandler 
   }
 
   private createLimitDisclosureNotSupportedResult(idIdxs: number[], vcIdx: number, reason?: string) {
-    return this.getResults().push(...idIdxs.map((idIdx) => ({
-      input_descriptor_path: `$.input_descriptors[${idIdx}]`,
-      verifiable_credential_path: `$[${vcIdx}]`,
-      evaluator: this.getName(),
-      status: Status.ERROR,
-      message: reason ? `${PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED}. ${reason}` : PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
-    })));
+    return this.getResults().push(
+      ...idIdxs.map((idIdx) => ({
+        input_descriptor_path: `$.input_descriptors[${idIdx}]`,
+        verifiable_credential_path: `$[${vcIdx}]`,
+        evaluator: this.getName(),
+        status: Status.ERROR,
+        message: reason ? `${PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED}. ${reason}` : PexMessages.LIMIT_DISCLOSURE_NOT_SUPPORTED,
+      })),
+    );
   }
 }
