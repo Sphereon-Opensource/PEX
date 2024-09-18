@@ -546,7 +546,6 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
-          alg: hashAlg,
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
