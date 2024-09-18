@@ -18,14 +18,14 @@ import {
 
 import { Status } from './ConstraintUtils';
 import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationEvaluationResults } from './evaluation/core';
+import { PresentationEvaluationResults } from './evaluation';
 import {
+  PartialSdJwtDecodedVerifiableCredential,
+  PartialSdJwtKbJwt,
   PresentationFromOpts,
   PresentationResult,
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
-  SdJwtDecodedVerifiableCredentialWithKbJwtInput,
-  SdJwtKbJwtInput,
   VerifiablePresentationFromOpts,
   VerifiablePresentationResult,
 } from './signing';
@@ -72,7 +72,7 @@ export class PEX {
    */
   public evaluatePresentation(
     presentationDefinition: IPresentationDefinition,
-    presentations: OrArray<OriginalVerifiablePresentation | IPresentation>,
+    presentations: OrArray<OriginalVerifiablePresentation | IPresentation | PartialSdJwtDecodedVerifiableCredential>,
     opts?: {
       limitDisclosureSignatureSuites?: string[];
       restrictToFormats?: Format;
@@ -80,8 +80,8 @@ export class PEX {
       presentationSubmission?: PresentationSubmission;
       /**
        * The location of the presentation submission. By default {@link PresentationSubmissionLocation.PRESENTATION}
-       * is used when one W3C presentation is passed (not as array) , while {@link PresentationSubmissionLocation.EXTERNAL} is
-       * used when an array is passed or the presentation is not a W3C presentation
+       * is used when one presentation is passed (not as array), while {@link PresentationSubmissionLocation.EXTERNAL} is
+       * used when an array is passed
        */
       presentationSubmissionLocation?: PresentationSubmissionLocation;
       generatePresentationSubmission?: boolean;
@@ -117,7 +117,10 @@ export class PEX {
       CredentialMapper.isW3cPresentation(wrappedPresentations[0].presentation) &&
       !generatePresentationSubmission
     ) {
-      presentationSubmission = wrappedPresentations[0].decoded.presentation_submission;
+      const decoded = wrappedPresentations[0].decoded;
+      if ('presentation_submission' in decoded) {
+        presentationSubmission = decoded.presentation_submission;
+      }
       if (!presentationSubmission) {
         throw Error(`Either a presentation submission as part of the VP or provided in options was expected`);
       }
@@ -134,7 +137,9 @@ export class PEX {
     // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
     // `wrappedPresentation.original.compactKbJwt`, but as HAIP doesn't use dids, we'll leave it for now.
     const holderDIDs = wrappedPresentations
-      .map((p) => (CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined))
+      .map((p) => {
+        return CredentialMapper.isW3cPresentation(p.presentation) && p.presentation.holder ? p.presentation.holder : undefined;
+      })
       .filter((d): d is string => d !== undefined);
 
     const updatedOpts = {
@@ -310,7 +315,7 @@ export class PEX {
        */
       hasher?: Hasher;
     },
-  ): IPresentation | SdJwtDecodedVerifiableCredentialWithKbJwtInput {
+  ): IPresentation | PartialSdJwtDecodedVerifiableCredential {
     const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
 
     // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
@@ -350,18 +355,19 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
+          // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         },
-        // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
           iat: new Date().getTime(),
           sd_hash: sdHash,
         },
-      } satisfies SdJwtKbJwtInput;
+      } satisfies PartialSdJwtKbJwt;
 
-      return {
+      const sdJwtDecodedPresentation: PartialSdJwtDecodedVerifiableCredential = {
         ...decoded,
         kbJwt,
       };
+      return sdJwtDecodedPresentation;
     } else {
       if (!selectedCredentials) {
         throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
@@ -525,7 +531,9 @@ export class PEX {
 
     let presentation = presentationResult.presentation;
 
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation)) {
+    // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
+    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) {
+      const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential;
       if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
@@ -538,6 +546,7 @@ export class PEX {
         // alg MUST be set by the signer
         header: {
           typ: 'kb+jwt',
+          alg: hashAlg,
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
@@ -545,12 +554,12 @@ export class PEX {
           nonce: proofOptions?.nonce,
           sd_hash: sdHash,
         },
-      } satisfies SdJwtKbJwtInput;
+      } satisfies PartialSdJwtKbJwt;
 
       presentation = {
-        ...presentation,
+        ...sdJwtPresentation,
         kbJwt,
-      };
+      } satisfies PartialSdJwtDecodedVerifiableCredential;
     }
 
     const callBackParams: PresentationSignCallBackParams = {

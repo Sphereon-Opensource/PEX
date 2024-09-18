@@ -110,6 +110,7 @@ export class PresentationSubmissionVB extends ValidationBundler<PresentationSubm
         'di_vc',
         'di_vp',
         'vc+sd-jwt',
+        'mso_mdoc',
       ];
 
       for (let i = 0; i < descriptor_map.length; i++) {

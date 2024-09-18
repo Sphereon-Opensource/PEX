@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { PresentationDefinitionV2 } from '@sphereon/pex-models';
 import { SdJwtDecodedVerifiableCredential } from '@sphereon/ssi-types';
 
-import { PEX, PresentationSubmissionLocation, SdJwtDecodedVerifiableCredentialWithKbJwtInput, Status, Validated } from '../lib';
+import { PEX, PresentationSubmissionLocation, Status, Validated } from '../lib';
 import { SubmissionRequirementMatchType } from '../lib/evaluation/core';
 import { calculateSdHash } from '../lib/utils';
 
@@ -255,16 +255,16 @@ describe('evaluate', () => {
       presentationDefinition,
       selectResults.verifiableCredential!,
       async (options) => {
-        const presentation = options.presentation as SdJwtDecodedVerifiableCredentialWithKbJwtInput;
+        const presentation = options.presentation as SdJwtDecodedVerifiableCredential;
 
         kbJwt = `${Buffer.from(
           JSON.stringify({
-            ...presentation.kbJwt.header,
+            ...presentation.kbJwt?.header,
             alg: 'EdDSA',
           }),
         ).toString('base64url')}.${Buffer.from(
           JSON.stringify({
-            ...presentation.kbJwt.payload,
+            ...presentation.kbJwt?.payload,
             nonce: 'nonce-from-request',
             // verifier identifier url (not clear yet in HAIP what this should be, but it MUST be present)
             aud: 'did:web:something',
