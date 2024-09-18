@@ -1,0 +1,22 @@
+{
+  "id" : "KVKRegistration",
+  "name" : "KVK registratie",
+  "input_descriptors" : [ {
+    "id" : "KVKRegistration",
+    "format" : {
+      "jwt_vc_json" : {
+        "alg" : [ "EdDSA", "ES256" ]
+      }
+    },
+    "constraints" : {
+      "fields" : [ {
+        "path" : [ "$.type" ],
+        "filter" : {
+          "type" : "string",
+          "pattern" : "KVKRegistration"
+        }
+      } ]
+    }
+  } ],
+  "purpose" : "We need to ensure you have a KvK registration for your company"
+}

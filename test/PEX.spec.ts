@@ -119,15 +119,12 @@ describe('evaluate', () => {
   });
 
   it('Evaluate case without any error 1', () => {
-    const pdSchema: PresentationDefinitionV1 = getFileAsJson(
-      './test/dif_pe_examples/pdV1/pd-simple-schema-age-predicate.json',
-    ).presentation_definition;
-    const vpSimple: IVerifiablePresentation = getFileAsJson('./test/dif_pe_examples/vp/vp-simple-age-predicate.json');
-    pdSchema.input_descriptors[0].schema.push({ uri: 'https://www.w3.org/TR/vc-data-model/#types1' });
+    const pdSchema: PresentationDefinitionV2 = getFileAsJson(
+      'test/dif_pe_examples/pdV2/kvk.json',
+    );
+    const vpSimple: IVerifiablePresentation = getFileAsJson('test/dif_pe_examples/vp/vp-kvk.json');
     const pex: PEX = new PEX();
-    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, {
-      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
-    });
+    const evaluationResults = pex.evaluatePresentation(pdSchema, vpSimple, { });
     expect(evaluationResults!.value!.descriptor_map!.length).toEqual(1);
     expect(evaluationResults!.errors!.length).toEqual(0);
   });
