@@ -13,10 +13,11 @@ import {
 
 import { Status } from '../../lib';
 import { EvaluationClient, EvaluationClientWrapper } from '../../lib/evaluation';
-import { InternalPresentationDefinitionV1 } from '../../lib/types';
+import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2 } from '../../lib/types';
 import { SSITypesBuilder } from '../../lib/types';
 
 import { EvaluationClientWrapperData } from './EvaluationClientWrapperData';
+import { hasher } from '../SdJwt.spec';
 
 function getFile(path: string) {
   return fs.readFileSync(path, 'utf-8');
@@ -46,7 +47,7 @@ describe('evaluate', () => {
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult0());
-    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
+    expect(evaluationClient.results[6]).toEqual(evaluationClientWrapperData.getInputDescriptorsDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
@@ -89,7 +90,7 @@ describe('evaluate', () => {
       { holderDIDs: evaluationClientWrapperData.getHolderDID(), limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES },
     );
     expect(evaluationClient.results[0]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult0());
-    expect(evaluationClient.results[7]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
+    expect(evaluationClient.results[6]).toEqual(evaluationClientWrapperData.getUriInVerifiableCredentialDoesNotMatchResult3());
     expect(evaluationResults.errors).toEqual(evaluationClientWrapperData.getError().errors);
     expect(evaluationResults.warnings?.length).toEqual(0);
   });
@@ -724,5 +725,31 @@ describe('evaluate', () => {
       SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(resultSelectFrom.verifiableCredential as IVerifiableCredential[]),
     );
     expect(ps.descriptor_map.map((d) => d.path)).toEqual(['$.verifiableCredential[0]', '$.verifiableCredential[0]', '$.verifiableCredential[0]']);
+  });
+
+  it("only applies selective disclosure to a wrapped vc based on the constraints from matching input descriptors", function () {
+    const pdSchema: InternalPresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-sd-jwt-selective-disclosure.json',
+    ).presentation_definition;
+    const vcs: string[] = getFileAsJson('test/dif_pe_examples/vc/vc-2-sd-jwt.json').vcs;
+    const pd = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const evaluationResults = evaluationClientWrapper.evaluate(
+      pd,
+      SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vcs, hasher),
+    );
+    expect(evaluationResults).toMatchObject({
+      verifiableCredential: [
+        // It should keep two disclsures, but remove one. based on PD requirements.
+        // First disclosure comes from first input descriptor. Second form the second input descriptor
+        // the limit discloure logic recognizes that one credential can be used for both input decriptors, and 
+        // applies both input descriptors disclosure fields.
+        // If you only disclose it for one input descriptor, it does mean you reveal maybe some attributes that
+        // are not required, but this is the best way i think for now, without overly complicating the API (otherwise
+        // we need to have a separate disclosure credential per vc<->pd match).
+        "eyJ0eXAiOiJ2YytzZC1qd3QiLCJhbGciOiJFZERTQSIsImtpZCI6IiN6Nk1rZmhyQ2QxZmJoSmRlTEh2aTFYblpWUTlaNnBVSmFXbXdmVVNtQUxvMnc0OHcifQ.eyJ0ZXN0RmllbGQiOiJ0ZXN0VmFsdWUiLCJ2Y3QiOiJ0ZXN0LXZjdCIsImNuZiI6eyJraWQiOiJkaWQ6a2V5Ono2TWtlcHY0VXNQalBCNHFxS2Jpc3ZEUTlYdFkzVEIzQ1JiTm9QOXc3bTlSR0o2ZCN6Nk1rZXB2NFVzUGpQQjRxcUtiaXN2RFE5WHRZM1RCM0NSYk5vUDl3N205UkdKNmQifSwiaXNzIjoiZGlkOndlYjoxMjcuMC4wLjE6OTAwMDpwYXJhZHltLXB1YmxpYy1tZXRhZGF0YToyNzMxZWRjMC0yN2JiLTQ1MmYtYWIxZS1kM2I3M2I3YWFkYWMiLCJpYXQiOjE3MjY2NDk1OTEsIl9zZCI6WyI4bmhDRXVHVVNfSlpZY1hPMGY1Yzg4Q0lQdFluWm5vWVlYWVRkQjZGd05JIiwiRURqM1JoU3B0TlNIbEp5ZHJWRDZJeEt0ZG9iMHdUVzRiMnd6UjBjVUlkWSIsImpHSDJFYXl1cmw0bTFTOXNUSFdpWkVRYXpLT01jU1hlN2RtRlBqSnlibFUiXSwiX3NkX2FsZyI6InNoYS0yNTYifQ.F51KfZ6knRgxltGTNyISwyb2vXjV3x90Fp_UV4cJNfg9sDVrASs07f_hv1kbBjQhEEyJIw5rFwyXa958AjnTDA~WyI5MDIzNDA0MDI3NzI4OTU2OTg2NzQ5MDMiLCJjb21wbGlhbnQiLGZhbHNlXQ~WyI1MzYzNjM5MzQ2MDc1MzcyODgzNzU0OSIsIm5vbkNvbXBsaWFudCIsdHJ1ZV0~",
+        "eyJ0eXAiOiJ2YytzZC1qd3QiLCJhbGciOiJFZERTQSIsImtpZCI6IiN6Nk1rZmhyQ2QxZmJoSmRlTEh2aTFYblpWUTlaNnBVSmFXbXdmVVNtQUxvMnc0OHcifQ.eyJ2Y3QiOiJ0ZXN0LXZjdC0yIiwiY25mIjp7ImtpZCI6ImRpZDprZXk6ejZNa3ZONkhkNzlxS1dqdDhhcUxQanRHV0JYUlJSeHd5YjM3UDRvWEhUclhrdm5mI3o2TWt2TjZIZDc5cUtXanQ4YXFMUGp0R1dCWFJSUnh3eWIzN1A0b1hIVHJYa3ZuZiJ9LCJpc3MiOiJkaWQ6d2ViOjEyNy4wLjAuMTo5MDAwOnBhcmFkeW0tcHVibGljLW1ldGFkYXRhOjI3MzFlZGMwLTI3YmItNDUyZi1hYjFlLWQzYjczYjdhYWRhYyIsImlhdCI6MTcyNjY0OTU5MSwiX3NkX2FsZyI6InNoYS0yNTYifQ.-zEUcxH73-IcA9QZ71DcryjJ5WAhUarGIg3NjQ097ng0NIdd9V1Z-q_yZr-VVjThMWdu841UKakBuZQVCMTbDw~"
+      ],
+    })
   });
 });

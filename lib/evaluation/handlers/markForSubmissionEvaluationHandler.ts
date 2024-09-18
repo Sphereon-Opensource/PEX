@@ -1,4 +1,5 @@
 import { JSONPath as jp } from '@astronautlabs/jsonpath';
+import { InputDescriptorV1, InputDescriptorV2 } from '@sphereon/pex-models';
 import { WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
 import { Status } from '../../ConstraintUtils';
@@ -8,6 +9,25 @@ import { HandlerCheckResult } from '../core';
 import { EvaluationClient } from '../evaluationClient';
 
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
+
+export function elligibleInputDescriptorsForWrappedVc(inputDescriptors: Array<InputDescriptorV2 | InputDescriptorV1>, vcIndex: number, results: HandlerCheckResult[]) {
+  return inputDescriptors.map((inputDescriptor, inputDescriptorIndex) => {
+
+    const matchingResults = results.filter(({ verifiable_credential_path, input_descriptor_path }) => verifiable_credential_path === `$[${vcIndex}]` && input_descriptor_path === `$.input_descriptors[${inputDescriptorIndex}]`)
+
+    const hasError = matchingResults.some(result => result.status === Status.ERROR)
+    const hasInfo = matchingResults.some(result => result.status === Status.INFO)
+
+    if (hasInfo && !hasError) {
+      return {
+        inputDescriptor,
+        inputDescriptorIndex
+      }
+    }
+
+    return undefined
+  }).filter((value): value is Exclude<typeof value, undefined> => value !== undefined)
+}
 
 export class MarkForSubmissionEvaluationHandler extends AbstractEvaluationHandler {
   constructor(client: EvaluationClient) {
