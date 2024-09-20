@@ -112,6 +112,32 @@ describe('1st scenario', () => {
       '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
       'e73646de-43e2-4d72-ba4f-090d01c11eac',
     ]);
+    
+    const evaluationResultArray = pex.evaluatePresentation(
+      pd,
+      [
+        {
+          '@context': [],
+          holder: holderWallet.holder,
+          type: [],
+          verifiableCredential: holderWallet.verifiableCredentials,
+        },
+        {
+          '@context': [],
+          holder: holderWallet.holder,
+          type: [],
+          verifiableCredential: holderWallet.verifiableCredentials,
+        }
+      ],
+      { limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES, generatePresentationSubmission: true },
+    );
+    expect(evaluationResultArray.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
+    expect(evaluationResultArray.value?.descriptor_map.length).toEqual(2);
+    expect(evaluationResultArray.value?.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
+    expect(evaluationResultArray.value?.descriptor_map.map((dm) => dm.id).sort()).toEqual([
+      '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',
+      'e73646de-43e2-4d72-ba4f-090d01c11eac',
+    ]);
     /**
      * selectFrom will result is this object. which is pointing Alice to the right VC to send. By processing it,
      * Alice will understand that she needs to send only one object, and that object is in fact index 2 of the verifiableCredential list

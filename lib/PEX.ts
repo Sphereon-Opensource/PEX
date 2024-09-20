@@ -153,7 +153,7 @@ export class PEX {
     const allWvcs = wrappedPresentations.reduce((all, wvp) => [...all, ...wvp.vcs], [] as WrappedVerifiableCredential[]);
     const result = this._evaluationClientWrapper.evaluatePresentations(
       pd,
-      Array.isArray(presentations) ? wrappedPresentations : wrappedPresentations[0],
+      wrappedPresentations,
       updatedOpts,
     );
 
