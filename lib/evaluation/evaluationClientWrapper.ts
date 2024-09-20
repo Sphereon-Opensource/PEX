@@ -525,8 +525,8 @@ export class EvaluationClientWrapper {
     for (const descriptorIndex in submission.descriptor_map) {
       const descriptor = submission.descriptor_map[descriptorIndex];
 
-      let vp: WrappedVerifiablePresentation;
-      let vc: WrappedVerifiableCredential;
+      let vps: Array<WrappedVerifiablePresentation>;
+      const vcs: Array<WrappedVerifiableCredential> = [];
       let vcPath: string;
 
       if (presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
@@ -541,17 +541,18 @@ export class EvaluationClientWrapper {
           });
           continue;
         }
-        vp = vpResult.value;
+        vps = Array.isArray(vpResult.value) ? vpResult.value : vpResult.value ? [vpResult.value] : []
         vcPath = `presentation ${descriptor.path}`;
-
-        if (vp.format !== descriptor.format) {
-          result.areRequiredCredentialsPresent = Status.ERROR;
-          result.errors?.push({
-            status: Status.ERROR,
-            tag: 'SubmissionFormatNoMatch',
-            message: `VP at path ${descriptor.path} has format ${vp.format}, while submission.descriptor_path[${descriptorIndex}] has format ${descriptor.format}`,
-          });
-          continue;
+        for(const vp of vps) {
+          if (vp.format !== descriptor.format) {
+            result.areRequiredCredentialsPresent = Status.ERROR;
+            result.errors?.push({
+              status: Status.ERROR,
+              tag: 'SubmissionFormatNoMatch',
+              message: `VP at path ${descriptor.path} has format ${vp.format}, while submission.descriptor_path[${descriptorIndex}] has format ${descriptor.format}`
+            });
+            continue; // FIXME
+          }
         }
 
         if (descriptor.path_nested) {
@@ -562,32 +563,36 @@ export class EvaluationClientWrapper {
             continue;
           }
 
-          vc = extractionResult.wvc;
+          vcs.push(extractionResult.wvc);
           vcPath += ` with nested credential ${descriptor.path_nested.path}`;
         } else if (descriptor.format === 'vc+sd-jwt') {
-          vc = vp.vcs[0];
+          for(const vp of vps) {
+            vcs.push(vp.vcs[0])
+          }
         } else {
-          result.areRequiredCredentialsPresent = Status.ERROR;
-          result.errors?.push({
-            status: Status.ERROR,
-            tag: 'UnsupportedFormat',
-            message: `VP format ${vp.format} is not supported`,
-          });
+          for(const vp of vps) {
+            result.areRequiredCredentialsPresent = Status.ERROR;
+            result.errors?.push({
+              status: Status.ERROR,
+              tag: 'UnsupportedFormat',
+              message: `VP format ${vp.format} is not supported`,
+            });
+          }
           continue;
         }
       } else {
-        // TODO: check that not longer than 0
-        vp = Array.isArray(wvps) ? wvps[0] : wvps;
+        vps = Array.isArray(wvps) ? wvps : [wvps];
         vcPath = `credential ${descriptor.path}`;
 
-        const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor, descriptorIndex, vp);
-        if (extractionResult.error) {
-          result.areRequiredCredentialsPresent = Status.ERROR;
-          result.errors?.push(extractionResult.error);
-          continue;
+        for(const vp of vps) {
+          const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor, descriptorIndex, vp);
+          if (extractionResult.error) {
+            result.areRequiredCredentialsPresent = Status.ERROR;
+            result.errors?.push(extractionResult.error);
+            continue;
+          }
+          vcs.push(extractionResult.wvc);
         }
-
-        vc = extractionResult.wvc;
       }
 
       // TODO: we should probably add support for holder dids in the kb-jwt of an SD-JWT. We can extract this from the
