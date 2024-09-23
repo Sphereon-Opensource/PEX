@@ -485,7 +485,7 @@ export class EvaluationClientWrapper {
     const isCredential = CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential);
     if (
       !vcResult.value ||
-      !isCredential ||
+      (typeof vcResult.value === 'string' && !isCredential) ||
       (typeof vcResult.value !== 'string' && !isCredential && !('verifiableCredential' in vcResult.value || 'vp' in vcResult.value))
     ) {
       return {
