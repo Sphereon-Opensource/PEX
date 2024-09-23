@@ -479,7 +479,9 @@ export class EvaluationClientWrapper {
     if (
       !vcResult.value ||
       typeof vcResult.value === 'string' ||
-      (!('verifiableCredential' in vcResult.value) && !CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential)) // FIXME
+      (!('verifiableCredential' in vcResult.value) &&
+        !('vp' in vcResult.value) &&
+        !CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential)) // FIXME
     ) {
       return {
         error: {
@@ -491,12 +493,16 @@ export class EvaluationClientWrapper {
       };
     }
 
-    // When result is an array, extract the first Verifiable Credential from the array
+    // When result is an array, extract the first Verifiable Credential from the array FIXME figure out proper types, can't see that in debug mode...
     let originalVc;
     if (CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential)) {
       originalVc = vcResult.value;
     } else if ('verifiableCredential' in vcResult.value) {
       originalVc = Array.isArray(vcResult.value.verifiableCredential) ? vcResult.value.verifiableCredential[0] : vcResult.value.verifiableCredential;
+    } else if ('vp' in vcResult.value) {
+      originalVc = Array.isArray(vcResult.value.vp.verifiableCredential)
+        ? vcResult.value.vp.verifiableCredential[0]
+        : vcResult.value.vp.verifiableCredential;
     } else {
       throw Error('Could not deduced original VC from evaluation result');
     }
