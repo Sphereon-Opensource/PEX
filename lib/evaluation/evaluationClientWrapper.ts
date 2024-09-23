@@ -97,7 +97,11 @@ export class EvaluationClientWrapper {
           marked,
         );
       } catch (e) {
-        const matchingError: Checked = { status: Status.ERROR, message: JSON.stringify(e), tag: 'matchSubmissionRequirements' };
+        const matchingError: Checked = {
+          status: Status.ERROR,
+          message: JSON.stringify(e),
+          tag: 'matchSubmissionRequirements',
+        };
         return {
           errors: errors ? [...errors, matchingError] : [matchingError],
           warnings: warnings,
@@ -430,7 +434,9 @@ export class EvaluationClientWrapper {
     if (this._client.generatePresentationSubmission && result.value && useExternalSubmission) {
       // we map the descriptors of the generated submisison to take into account the nexted values
       result.value.descriptor_map = result.value.descriptor_map.map((descriptor) => {
-        const [wvcResult] = JsonPathUtils.extractInputField(allWvcs, [descriptor.path]) as Array<{ value: WrappedVerifiableCredential }>;
+        const [wvcResult] = JsonPathUtils.extractInputField(allWvcs, [descriptor.path]) as Array<{
+          value: WrappedVerifiableCredential;
+        }>;
         if (!wvcResult) {
           throw new Error(`Could not find descriptor path ${descriptor.path} in wrapped verifiable credentials`);
         }
@@ -475,13 +481,12 @@ export class EvaluationClientWrapper {
       };
     }
 
-    // Check if vcResult.value contains the 'verifiableCredential' array
+    // FIXME figure out possible types, can't see that in debug mode...
+    const isCredential = CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential);
     if (
       !vcResult.value ||
-      typeof vcResult.value === 'string' ||
-      (!('verifiableCredential' in vcResult.value) &&
-        !('vp' in vcResult.value) &&
-        !CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential)) // FIXME
+      !isCredential ||
+      (typeof vcResult.value !== 'string' && !isCredential && !('verifiableCredential' in vcResult.value || 'vp' in vcResult.value))
     ) {
       return {
         error: {
@@ -495,14 +500,20 @@ export class EvaluationClientWrapper {
 
     // When result is an array, extract the first Verifiable Credential from the array FIXME figure out proper types, can't see that in debug mode...
     let originalVc;
-    if (CredentialMapper.isCredential(vcResult.value as OriginalVerifiableCredential)) {
+    if (isCredential) {
       originalVc = vcResult.value;
-    } else if ('verifiableCredential' in vcResult.value) {
-      originalVc = Array.isArray(vcResult.value.verifiableCredential) ? vcResult.value.verifiableCredential[0] : vcResult.value.verifiableCredential;
-    } else if ('vp' in vcResult.value) {
-      originalVc = Array.isArray(vcResult.value.vp.verifiableCredential)
-        ? vcResult.value.vp.verifiableCredential[0]
-        : vcResult.value.vp.verifiableCredential;
+    } else if (typeof vcResult.value !== 'string') {
+      if ('verifiableCredential' in vcResult.value) {
+        originalVc = Array.isArray(vcResult.value.verifiableCredential)
+          ? vcResult.value.verifiableCredential[0]
+          : vcResult.value.verifiableCredential;
+      } else if ('vp' in vcResult.value) {
+        originalVc = Array.isArray(vcResult.value.vp.verifiableCredential)
+          ? vcResult.value.vp.verifiableCredential[0]
+          : vcResult.value.vp.verifiableCredential;
+      } else {
+        throw Error('Could not deduced original VC from evaluation result');
+      }
     } else {
       throw Error('Could not deduced original VC from evaluation result');
     }
@@ -559,7 +570,9 @@ export class EvaluationClientWrapper {
 
       if (presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
         // Extract VPs matching the descriptor path
-        const vpResults = JsonPathUtils.extractInputField(wvps, [descriptor.path]) as Array<{ value: WrappedVerifiablePresentation[] }>;
+        const vpResults = JsonPathUtils.extractInputField(wvps, [descriptor.path]) as Array<{
+          value: WrappedVerifiablePresentation[];
+        }>;
 
         if (!vpResults.length) {
           result.areRequiredCredentialsPresent = Status.ERROR;
