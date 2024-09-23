@@ -7,9 +7,9 @@ import {
   IProofType,
   OriginalVerifiableCredential,
   SdJwtDecodedVerifiableCredential,
+  SdJwtVcKbJwtHeader,
   SdJwtVcKbJwtPayload,
   W3CVerifiablePresentation,
-  SdJwtVcKbJwtHeader
 } from '@sphereon/ssi-types';
 
 import { PresentationEvaluationResults } from '../evaluation';
