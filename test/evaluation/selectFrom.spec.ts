@@ -6,11 +6,15 @@ import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ss
 import { Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
 import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
-import { InternalPresentationDefinitionV1, SSITypesBuilder } from '../../lib/types';
+import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2, SSITypesBuilder } from '../../lib/types';
 import PexMessages from '../../lib/types/Messages';
 
 function getFile(path: string) {
   return JSON.parse(fs.readFileSync(path, 'utf-8'));
+}
+
+function getFileAsJson(path: string) {
+  return JSON.parse(getFile(path));
 }
 
 const dids = ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
@@ -994,5 +998,24 @@ describe('selectFrom tests', () => {
     });
     expect(result!.errors!.length).toEqual(0);
     expect(result!.matches![0]!.name).toEqual("Name on driver's license");
+  });
+
+
+  it('iata test1', function () {
+    const pdSchema: InternalPresentationDefinitionV2 = getFileAsJson(
+      './test/dif_pe_examples/pdV2/pd-multi-sd-jwt-vp.json',
+    ).presentation_definition;
+    const vcs: string[] = []
+    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-order-sd.jwt').replace('\r\n', ''))
+    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-epassport-sd.jwt').replace('\r\n', ''))
+    const pd = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
+    const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
+    const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vcs);
+    const result = evaluationClientWrapper.selectFrom(pd, wvcs, {
+      holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
+      limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
+    });
+    // TODO expects
+    expect(result).toBeDefined()
   });
 });

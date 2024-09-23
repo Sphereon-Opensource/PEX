@@ -1,0 +1,122 @@
+{
+  "presentation_definition": {
+    "id": "Order and ePassport",
+    "name": "IATA Order / ePassport SD-JWT",
+    "purpose": "Multi-presentation test for order & ePassport SD-JWT",
+    "submission_requirements": [
+      {
+        "name": "Order and epass",
+        "rule": "all",
+        "count": 2,
+        "from": "A"
+      }
+    ],
+    "input_descriptors": [
+      {
+        "id": "order",
+        "group": [
+          "A"
+        ],
+        "format": {
+          "vc+sd-jwt": {
+            "sd-jwt_alg_values": [
+              "ES256",
+              "ES384",
+              "ES512",
+              "EdDSA"
+            ]
+          }
+        },
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.vct"
+              ],
+              "filter": {
+                "type": "string",
+                "pattern": "Order"
+              }
+            },
+            {
+              "path": [
+                "$.paxSegments.operatingCarrierFlightNumber"
+              ]
+            },
+            {
+              "path": [
+                "$.paxSegments.scheduledArrivalTime"
+              ]
+            },
+            {
+              "path": [
+                "$.paxSegments.scheduledDepartureTime"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "passport credential",
+        "group": [
+          "A"
+        ],
+        "format": {
+          "jwt_vc_json": {
+            "alg": [
+              "RS256"
+            ]
+          }
+        },
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.vct"
+              ],
+              "filter": {
+                "type": "string",
+                "pattern": "ePassport"
+              }
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.holdersName"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.sexCode"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.birthdate"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.natlCode"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.passportNumberIdentifier"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.issuerCode"
+              ]
+            },
+            {
+              "path": [
+                "$.electronicPassport.dataGroup1.expiryDate"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
