@@ -507,6 +507,7 @@ export class EvaluationClientWrapper {
         originalVc = Array.isArray(vcResult.value.verifiableCredential)
           ? vcResult.value.verifiableCredential[0]
           : vcResult.value.verifiableCredential;
+        // FIXME this may be too lenient
       } else if ('vp' in vcResult.value) {
         originalVc = Array.isArray(vcResult.value.vp.verifiableCredential)
           ? vcResult.value.vp.verifiableCredential[0]
