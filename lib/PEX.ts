@@ -358,7 +358,7 @@ export class PEX {
           // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         },
         payload: {
-          iat: new Date().getTime(),
+          iat: Math.floor(new Date().getTime() / 1000),
           sd_hash: sdHash,
         },
       } satisfies PartialSdJwtKbJwt;
@@ -549,7 +549,7 @@ export class PEX {
         },
         // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
         payload: {
-          iat: new Date().getTime(),
+          iat: Math.floor(new Date().getTime() / 1000),
           nonce: proofOptions?.nonce,
           sd_hash: sdHash,
         },
