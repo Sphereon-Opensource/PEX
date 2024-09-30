@@ -62,10 +62,8 @@
           "A"
         ],
         "format": {
-          "jwt_vc_json": {
-            "alg": [
-              "RS256"
-            ]
+          "vc+sd-jwt": {
+            "sd-jwt_alg_values": ["ES256", "ES384", "ES512", "EdDSA"]
           }
         },
         "constraints": {
