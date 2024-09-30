@@ -621,7 +621,7 @@ export class EvaluationClientWrapper {
 
       if (presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL) {
         if (descriptor.path_nested) {
-          const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor, descriptorIndex.toString(), vp);
+          const extractionResult = this.extractWrappedVcFromWrappedVp(descriptor.path_nested, descriptorIndex.toString(), vp);
           if (extractionResult.error) {
             result.areRequiredCredentialsPresent = Status.ERROR;
             result.errors?.push(extractionResult.error);
