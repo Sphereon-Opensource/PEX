@@ -126,7 +126,12 @@ export class InputDescriptorFilterEvaluationHandler extends AbstractEvaluationHa
       evalResult = InputDescriptorFilterEvaluationHandler.FILTER_CACHE.get(successCacheKey)?.value;
       if (evalResult === undefined) {
         InputDescriptorFilterEvaluationHandler.keepCacheSizeInCheck();
-        evalResult = AJV_FIELD_FILTER.validate(field.filter, result.value);
+        if(Array.isArray(result.value)) {
+          const filter = field.filter
+          evalResult = result.value.some(value => AJV_FIELD_FILTER.validate(filter, value));
+        } else {
+          evalResult = AJV_FIELD_FILTER.validate(field.filter, result.value);
+        }
         InputDescriptorFilterEvaluationHandler.FILTER_CACHE.set(successCacheKey, {
           value: evalResult,
           ts: now + InputDescriptorFilterEvaluationHandler.DEFAULT_FILTER_CACHE_TTL,
