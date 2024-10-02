@@ -411,7 +411,7 @@ export class EvaluationClientWrapper {
 
     const result: PresentationEvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
-      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : [wvps.original],
       errors: [],
       warnings: [],
     };
@@ -552,7 +552,7 @@ export class EvaluationClientWrapper {
   ): PresentationEvaluationResults {
     const result: PresentationEvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
-      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : [wvps.original],
       errors: [],
       warnings: [],
       value: submission,

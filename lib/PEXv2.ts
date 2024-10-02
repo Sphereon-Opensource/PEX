@@ -15,7 +15,7 @@ export class PEXv2 extends PEX {
    * The evaluatePresentationV2 compares what is expected from a presentation with a presentationDefinitionV2.
    *
    * @param presentationDefinition the definition of what is expected in the presentation.
-   * @param presentation the presentation which has to be evaluated in comparison of the definition.
+   * @param presentations the presentation which has to be evaluated in comparison of the definition.
    * @param opts - limitDisclosureSignatureSuites the credential signature suites that support limit disclosure
    *
    * @return the evaluation results specify what was expected and was fulfilled and also specifies which requirements described in the input descriptors
