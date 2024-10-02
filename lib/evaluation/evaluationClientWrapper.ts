@@ -940,7 +940,7 @@ export class EvaluationClientWrapper {
 
   private updatePresentationSubmissionToExternal(presentationSubmission?: PresentationSubmission): PresentationSubmission {
     const descriptors = presentationSubmission?.descriptor_map ?? this._client.presentationSubmission.descriptor_map;
-    const updatedDescriptors = descriptors.map((d) => this.updateDescriptorToExternal(d));
+    const updatedDescriptors = descriptors.map((d,index) => this.updateDescriptorToExternal(d,{vpIndex: index}));
 
     if (presentationSubmission) {
       return {
