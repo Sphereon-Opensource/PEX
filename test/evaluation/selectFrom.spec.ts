@@ -1020,6 +1020,6 @@ describe('selectFrom tests', () => {
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
     // TODO expects
-    expect(result).toBeDefined();
+    expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
   });
 });
