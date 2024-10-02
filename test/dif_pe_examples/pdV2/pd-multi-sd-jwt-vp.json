@@ -40,17 +40,17 @@
             },
             {
               "path": [
-                "$.paxSegments.operatingCarrierFlightNumber"
+                "$.paxSegments[*].operatingCarrierFlightNumber"
               ]
             },
             {
               "path": [
-                "$.paxSegments.scheduledArrivalTime"
+                "$.paxSegments[*].scheduledArrivalTime"
               ]
             },
             {
               "path": [
-                "$.paxSegments.scheduledDepartureTime"
+                "$.paxSegments[*].scheduledDepartureTime"
               ]
             }
           ]
