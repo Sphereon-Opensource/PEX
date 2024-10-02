@@ -1010,8 +1010,8 @@ describe('selectFrom tests', () => {
   it('iata test1', function () {
     const pdSchema: InternalPresentationDefinitionV2 = getFileAsJson('./test/dif_pe_examples/pdV2/pd-multi-sd-jwt-vp.json').presentation_definition;
     const vcs: string[] = [];
-    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-order-sd.jwt').replace('\r\n', ''));
-    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-epassport-sd.jwt').replace('\r\n', ''));
+    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-order-sd.jwt').replace(/(\r\n|\n|\r)/gm, ''));
+    vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-epassport-sd.jwt').replace(/(\r\n|\n|\r)/gm, ''));
     const pd = SSITypesBuilder.modelEntityInternalPresentationDefinitionV2(pdSchema);
     const evaluationClientWrapper: EvaluationClientWrapper = new EvaluationClientWrapper();
     const wvcs: WrappedVerifiableCredential[] = SSITypesBuilder.mapExternalVerifiableCredentialsToWrappedVcs(vcs, hasher);
