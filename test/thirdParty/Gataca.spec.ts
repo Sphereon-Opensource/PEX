@@ -60,7 +60,7 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined,
     );
-    const presentation = presentationFromResult.presentation as IPresentation;
+    const presentation = presentationFromResult.presentations[0] as IPresentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',
@@ -136,7 +136,7 @@ describe('evaluate gataca tests', () => {
       selectFromResult.verifiableCredential as IVerifiableCredential[],
       undefined,
     );
-    const presentation = presentationFromResult.presentation as IPresentation;
+    const presentation = presentationFromResult.presentations[0] as IPresentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         format: 'ldp_vc',

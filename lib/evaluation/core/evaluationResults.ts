@@ -5,7 +5,7 @@ import { Checked, Status } from '../../ConstraintUtils';
 import { OrArray } from '../../types';
 
 export interface PresentationEvaluationResults extends Omit<EvaluationResults, 'verifiableCredential'> {
-  presentation: OrArray<OriginalVerifiablePresentation | IPresentation>;
+  presentations: OrArray<OriginalVerifiablePresentation | IPresentation>;
 }
 
 export interface EvaluationResults {

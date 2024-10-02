@@ -223,7 +223,7 @@ describe('evaluate', () => {
         {
           format: 'vc+sd-jwt',
           id: 'wa_driver_license',
-          path: '$',
+          path: '$[0]',
         },
       ],
       id: expect.any(String),
@@ -231,7 +231,7 @@ describe('evaluate', () => {
 
     // Must be external for SD-JWT
     expect(presentationResult.presentationSubmissionLocation).toEqual(PresentationSubmissionLocation.EXTERNAL);
-    expect(presentationResult.presentation).toEqual({
+    expect(presentationResult.presentations[0]).toEqual({
       ...decodedSdJwtVcWithDisclosuresRemoved,
       kbJwt: {
         header: {
@@ -255,22 +255,22 @@ describe('evaluate', () => {
       presentationDefinition,
       selectResults.verifiableCredential!,
       async (options) => {
-        const presentation = options.presentation as SdJwtDecodedVerifiableCredential;
+        const sdJwtCredential = options.presentation as SdJwtDecodedVerifiableCredential;
 
         kbJwt = `${Buffer.from(
           JSON.stringify({
-            ...presentation.kbJwt?.header,
+            ...sdJwtCredential.kbJwt?.header,
             alg: 'EdDSA',
           }),
         ).toString('base64url')}.${Buffer.from(
           JSON.stringify({
-            ...presentation.kbJwt?.payload,
+            ...sdJwtCredential.kbJwt?.payload,
             nonce: 'nonce-from-request',
             // verifier identifier url (not clear yet in HAIP what this should be, but it MUST be present)
             aud: 'did:web:something',
           }),
         ).toString('base64url')}.signature`;
-        return `${presentation.compactSdJwtVc}${kbJwt}`;
+        return `${sdJwtCredential.compactSdJwtVc}${kbJwt}`;
       },
       {
         presentationSubmissionLocation: PresentationSubmissionLocation.EXTERNAL,
@@ -294,15 +294,15 @@ describe('evaluate', () => {
     // Must be external for SD-JWT
     expect(presentationResult.presentationSubmissionLocation).toEqual(PresentationSubmissionLocation.EXTERNAL);
     // Expect the KB-JWT to be appended
-    expect(presentationResult.verifiablePresentation).toEqual(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt);
+    expect(presentationResult.verifiablePresentations[0]).toEqual(decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt);
 
-    const evaluateResults = pex.evaluatePresentation(presentationDefinition, presentationResult.verifiablePresentation, {
+    const evaluateResults = pex.evaluatePresentation(presentationDefinition, presentationResult.verifiablePresentations, {
       presentationSubmission: presentationResult.presentationSubmission,
     });
 
     expect(evaluateResults).toEqual({
       // Do we want to return the compact variant here? Or the decoded/pretty variant?
-      presentation: decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt,
+      presentations: [decodedSdJwtVcWithDisclosuresRemoved.compactSdJwtVc + kbJwt],
       areRequiredCredentialsPresent: Status.INFO,
       warnings: [],
       errors: [],

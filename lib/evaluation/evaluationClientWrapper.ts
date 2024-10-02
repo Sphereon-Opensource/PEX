@@ -411,7 +411,7 @@ export class EvaluationClientWrapper {
 
     const result: PresentationEvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
-      presentation: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
       errors: [],
       warnings: [],
     };
@@ -552,7 +552,7 @@ export class EvaluationClientWrapper {
   ): PresentationEvaluationResults {
     const result: PresentationEvaluationResults = {
       areRequiredCredentialsPresent: Status.INFO,
-      presentation: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
+      presentations: Array.isArray(wvps) ? wvps.map((wvp) => wvp.original) : wvps.original,
       errors: [],
       warnings: [],
       value: submission,
@@ -874,7 +874,7 @@ export class EvaluationClientWrapper {
       presentationSubmissionLocation?: PresentationSubmissionLocation;
     },
   ): PresentationSubmission {
-    if (!this._client.results) {
+    if (!this._client.results || this._client.results.length === 0) {
       throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
     if (!this._client.generatePresentationSubmission) {
@@ -1232,7 +1232,7 @@ export class EvaluationClientWrapper {
       // See https://github.com/decentralized-identity/presentation-exchange/issues/462
       // Also see: https://github.com/openid/OpenID4VP/issues/69
       if (d.format === 'vc+sd-jwt') {
-        d.path = '$';
+        //d.path = '$'; we do return multiple presentations now
       } else {
         this.replacePathWithAlias(d, 'verifiableCredential');
       }

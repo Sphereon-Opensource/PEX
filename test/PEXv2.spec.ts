@@ -278,7 +278,7 @@ describe('evaluate', () => {
       signatureOptions: getSingatureOptionsMock(),
       holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
     });
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -651,7 +651,7 @@ describe('evaluate', () => {
     });
     expect(vpr.presentationSubmission.descriptor_map).toHaveLength(1);
     expect(vpr.presentationSubmission.descriptor_map[0].format).toEqual('di_vc');
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');

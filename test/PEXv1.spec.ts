@@ -72,7 +72,7 @@ describe('evaluate', () => {
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
     const result = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
-    const presentation = result.presentation as IPresentation;
+    const presentation = result.presentations[0] as IPresentation;
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -120,7 +120,7 @@ describe('evaluate', () => {
       signatureOptions: getSingatureOptionsMock(),
       holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
     });
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');

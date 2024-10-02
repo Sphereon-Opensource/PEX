@@ -100,7 +100,7 @@ export interface PresentationResult {
   /**
    * The resulting presentation, can have an embedded submission data depending on the location parameter
    */
-  presentation: IPresentation | SdJwtDecodedVerifiableCredential | PartialSdJwtDecodedVerifiableCredential;
+  presentations: Array<IPresentation | SdJwtDecodedVerifiableCredential | PartialSdJwtDecodedVerifiableCredential>;
 
   /**
    * The resulting location of the presentation submission.
@@ -122,7 +122,7 @@ export interface VerifiablePresentationResult {
   /**
    * The resulting VP, can have an embedded submission data depending on the location parameter
    */
-  verifiablePresentation: W3CVerifiablePresentation | CompactSdJwtVc;
+  verifiablePresentations: Array<W3CVerifiablePresentation | CompactSdJwtVc>;
 
   /**
    * The resulting location of the presentation submission.

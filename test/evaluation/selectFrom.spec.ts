@@ -4,7 +4,7 @@ import fs from 'fs';
 import { Rules } from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
-import { Status } from '../../lib';
+import { PEX, Status } from '../../lib';
 import { EvaluationClientWrapper } from '../../lib/evaluation';
 import { SubmissionRequirementMatchType } from '../../lib/evaluation/core';
 import { InternalPresentationDefinitionV1, InternalPresentationDefinitionV2, SSITypesBuilder } from '../../lib/types';
@@ -23,6 +23,10 @@ function getFileAsJson(path: string) {
 const dids = ['did:example:ebfeb1f712ebc6f1c276e12ec21'];
 
 const LIMIT_DISCLOSURE_SIGNATURE_SUITES = ['BbsBlsSignatureProof2020'];
+
+const pex = new PEX({
+  hasher,
+});
 
 describe('selectFrom tests', () => {
   it('Evaluate submission requirements all from group A', () => {
@@ -1019,7 +1023,10 @@ describe('selectFrom tests', () => {
       holderDIDs: ['FAsYneKJhWBP2n5E21ZzdY'],
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
-    // TODO expects
     expect(result.areRequiredCredentialsPresent).toBe(Status.INFO);
+
+    pex.evaluateCredentials(pd, result.verifiableCredential!);
+    const presentationResult = pex.presentationFrom(pd, result.verifiableCredential!);
+    expect(presentationResult).toBeDefined();
   });
 });
