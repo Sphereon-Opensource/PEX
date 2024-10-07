@@ -940,7 +940,7 @@ export class EvaluationClientWrapper {
 
   private updatePresentationSubmissionToExternal(presentationSubmission?: PresentationSubmission): PresentationSubmission {
     const descriptors = presentationSubmission?.descriptor_map ?? this._client.presentationSubmission.descriptor_map;
-    const updatedDescriptors = descriptors.map((d, index) => this.updateDescriptorToExternal(d, { vpIndex: index }));
+    const updatedDescriptors = descriptors.map((d) => this.updateDescriptorToExternal(d));
 
     if (presentationSubmission) {
       return {
@@ -1232,7 +1232,7 @@ export class EvaluationClientWrapper {
       // See https://github.com/decentralized-identity/presentation-exchange/issues/462
       // Also see: https://github.com/openid/OpenID4VP/issues/69
       if (d.format === 'vc+sd-jwt') {
-        //d.path = '$'; we do return multiple presentations now
+        d.path = '$';
       } else {
         this.replacePathWithAlias(d, 'verifiableCredential');
       }

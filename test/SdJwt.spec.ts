@@ -223,7 +223,7 @@ describe('evaluate', () => {
         {
           format: 'vc+sd-jwt',
           id: 'wa_driver_license',
-          path: '$[0]',
+          path: '$',
         },
       ],
       id: expect.any(String),
@@ -246,7 +246,7 @@ describe('evaluate', () => {
     });
   });
 
-  it('verifiablePresentationFrom and evalutePresentation with vc+sd-jwt format', async () => {
+  it('verifiablePresentationFrom and evaluatePresentation with vc+sd-jwt format', async () => {
     const presentationDefinition = getPresentationDefinitionV2();
     const selectResults = pex.selectFrom(presentationDefinition, [decodedSdJwtVc]);
     let kbJwt: string | undefined = undefined;
