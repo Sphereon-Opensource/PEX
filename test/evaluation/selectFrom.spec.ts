@@ -1,7 +1,7 @@
-import {  SDJwt } from '@sd-jwt/core'
 import { createHash } from 'crypto';
 import fs from 'fs';
 
+import { SDJwt } from '@sd-jwt/core';
 import { Rules } from '@sphereon/pex-models';
 import { IVerifiableCredential, WrappedVerifiableCredential } from '@sphereon/ssi-types';
 
@@ -1028,9 +1028,9 @@ describe('selectFrom tests', () => {
 
     pex.evaluateCredentials(pd, result.verifiableCredential!);
     const presentationResult = pex.presentationFrom(pd, result.verifiableCredential!);
-    const cred = await SDJwt.fromEncode(presentationResult.presentations[1].compactSdJwtVc, hasher)
-    const claims = await cred.getClaims(hasher)
-    console.log(claims)
+    const cred = await SDJwt.fromEncode(presentationResult.presentations[1].compactSdJwtVc, hasher);
+    const claims = await cred.getClaims(hasher);
+    console.log(claims);
     expect(presentationResult).toBeDefined();
     // TODO finish test
   });
