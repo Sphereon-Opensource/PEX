@@ -1,3 +1,4 @@
+import {  SDJwt } from '@sd-jwt/core'
 import { createHash } from 'crypto';
 import fs from 'fs';
 
@@ -1011,7 +1012,7 @@ describe('selectFrom tests', () => {
     expect(result!.matches![0]!.name).toEqual("Name on driver's license");
   });
 
-  it('iata test1', function () {
+  it('iata test1', async function () {
     const pdSchema: InternalPresentationDefinitionV2 = getFileAsJson('./test/dif_pe_examples/pdV2/pd-multi-sd-jwt-vp.json').presentation_definition;
     const vcs: string[] = [];
     vcs.push(getFile('test/dif_pe_examples/vc/vc-iata-order-sd.jwt').replace(/(\r\n|\n|\r)/gm, ''));
@@ -1027,6 +1028,10 @@ describe('selectFrom tests', () => {
 
     pex.evaluateCredentials(pd, result.verifiableCredential!);
     const presentationResult = pex.presentationFrom(pd, result.verifiableCredential!);
+    const cred = await SDJwt.fromEncode(presentationResult.presentations[1].compactSdJwtVc, hasher)
+    const claims = await cred.getClaims(hasher)
+    console.log(claims)
     expect(presentationResult).toBeDefined();
+    // TODO finish test
   });
 });

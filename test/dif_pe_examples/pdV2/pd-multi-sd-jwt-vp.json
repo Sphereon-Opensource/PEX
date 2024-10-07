@@ -7,7 +7,6 @@
       {
         "name": "Order and epass",
         "rule": "all",
-        "count": 2,
         "from": "A"
       }
     ],
@@ -36,7 +35,7 @@
               ],
               "filter": {
                 "type": "string",
-                "pattern": "Order"
+              "pattern": "order_id_vc"
               }
             },
             {
@@ -76,7 +75,7 @@
               ],
               "filter": {
                 "type": "string",
-                "pattern": "ePassport"
+              "pattern": "epassport_copy_vc"
               }
             },
             {
