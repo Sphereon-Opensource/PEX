@@ -1,6 +1,6 @@
 {
   "name": "@sphereon/pex",
-  "version": "5.0.0-unstable.16",
+  "version": "5.0.0-unstable.17",
   "description": "A Typescript implementation of the v1 and v2 DIF Presentation Exchange specification",
   "main": "dist/main/index.js",
   "module": "dist/module/index.js",
@@ -52,8 +52,7 @@
     "ajv-formats": "^2.1.1",
     "jwt-decode": "^3.1.2",
     "uint8arrays": "^3.1.1",
-    "nanoid": "^3.3.7",
-    "string.prototype.matchall": "^4.0.10"
+    "nanoid": "^3.3.7"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
