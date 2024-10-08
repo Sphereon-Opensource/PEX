@@ -19,8 +19,6 @@ import { EvaluationClient } from '../evaluationClient';
 import { AbstractEvaluationHandler } from './abstractEvaluationHandler';
 
 export class UriEvaluationHandler extends AbstractEvaluationHandler {
-  static matchAll = require('string.prototype.matchall');
-
   constructor(client: EvaluationClient) {
     super(client);
   }
@@ -220,8 +218,8 @@ export class UriEvaluationHandler extends AbstractEvaluationHandler {
 
   private static containsHashlink(url: string): boolean {
     return !(
-      this.matchAll(url, UriEvaluationHandler.HASHLINK_QUERY_URL_REGEX).next().done &&
-      this.matchAll(url, UriEvaluationHandler.HASHLINK_URL_ENCODED_REGEX).next().done
+      url.matchAll(UriEvaluationHandler.HASHLINK_QUERY_URL_REGEX).next().done &&
+      url.matchAll(UriEvaluationHandler.HASHLINK_URL_ENCODED_REGEX).next().done
     );
   }
 }
