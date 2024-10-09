@@ -6,6 +6,7 @@ import {
   ICredential,
   IPresentation,
   IProof,
+  JwtDecodedVerifiableCredential,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   OrPromise,
@@ -17,8 +18,7 @@ import {
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationEvaluationResults } from './evaluation';
+import { EvaluationClientWrapper, EvaluationResults, PresentationEvaluationResults, SelectResults } from './evaluation';
 import {
   PartialSdJwtDecodedVerifiableCredential,
   PartialSdJwtKbJwt,
@@ -106,7 +106,7 @@ export class PEX {
     let presentationSubmission = opts?.presentationSubmission;
     let presentationSubmissionLocation =
       opts?.presentationSubmissionLocation ??
-      (Array.isArray(presentations) || !CredentialMapper.isW3cPresentation(wrappedPresentations[0].presentation)
+      ((Array.isArray(presentations) && presentations.length > 1) || !CredentialMapper.isW3cPresentation(wrappedPresentations[0].presentation)
         ? PresentationSubmissionLocation.EXTERNAL
         : PresentationSubmissionLocation.PRESENTATION);
 
@@ -290,21 +290,21 @@ export class PEX {
       opts?.presentationSubmissionLocation ??
       (hasSdJwtCredentials ? PresentationSubmissionLocation.EXTERNAL : PresentationSubmissionLocation.PRESENTATION);
 
-    const presentation = PEX.constructPresentation(selectedCredentials, {
+    const presentations = this.constructPresentations(selectedCredentials, {
       ...opts,
       // We only pass in the submission in case it needs to be included in the presentation
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
       hasher: this.options?.hasher,
     });
-
+    this.updateSdJwtCredentials(presentations);
     return {
-      presentation,
+      presentations,
       presentationSubmissionLocation,
       presentationSubmission,
     };
   }
 
-  public static constructPresentation(
+  public constructPresentations(
     selectedCredentials: OriginalVerifiableCredential | OriginalVerifiableCredential[],
     opts?: {
       presentationSubmission?: PresentationSubmission;
@@ -315,108 +315,123 @@ export class PEX {
        */
       hasher?: Hasher;
     },
-  ): IPresentation | PartialSdJwtDecodedVerifiableCredential {
-    const credentials = Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials];
-
-    // for SD-JWT we want to return the SD-JWT with only the needed disclosures (so filter disclosures array, and update the compactSdJwt)
-    // in addition we want to create the KB-JWT payload as well.
-    // FIXME: include the KB-JWT payload?
-    if (credentials.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c))) {
-      if (credentials.length > 1) {
-        // Until there's some consensus around the following issue, we'll only support a single
-        // SD-JWT credential in a presentation
-        // https://github.com/decentralized-identity/presentation-exchange/issues/462
-        throw new Error('Only a single credential is supported when creating a presentation with an SD-JWT VC');
-      }
-
-      if (opts?.presentationSubmission) {
-        throw new Error('Presentation submission cannot be included in the presentation when creating a presentation with an SD-JWT VC');
-      }
-
-      if (opts?.basePresentationPayload) {
-        throw new Error('Base presentation payload cannot be when creating a presentation from an SD-JWT VC');
-      }
-
-      // NOTE: we assume the credential already has selective disclosure applied, even if it is encoded. Is
-      // that a valid assumption? It seems to be this way for BBS SD as well
-      const decoded = (
-        CredentialMapper.isSdJwtEncoded(credentials[0]) ? CredentialMapper.decodeVerifiableCredential(credentials[0], opts?.hasher) : credentials[0]
-      ) as SdJwtDecodedVerifiableCredential;
-
-      if (!opts?.hasher) {
+  ): Array<IPresentation | PartialSdJwtDecodedVerifiableCredential> {
+    if (!selectedCredentials) {
+      throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
+    }
+    const verifiableCredential = (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[];
+    if (verifiableCredential.some((c) => CredentialMapper.isSdJwtDecodedCredential(c) || CredentialMapper.isSdJwtEncoded(c))) {
+      if (!this.options?.hasher) {
         throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
       }
+    }
 
-      // extract sd_alg or default to sha-256
-      const hashAlg = decoded.signedPayload._sd_alg ?? 'sha-256';
-      const sdHash = calculateSdHash(decoded.compactSdJwtVc, hashAlg, opts.hasher);
+    const wVCs = verifiableCredential.map((vc) => CredentialMapper.toWrappedVerifiableCredential(vc, { hasher: this.options?.hasher }));
+    const holders = Array.from(new Set(wVCs.flatMap((wvc) => getSubjectIdsAsString(wvc.credential as ICredential))));
+    if (holders.length !== 1 && !opts?.holderDID) {
+      console.log(
+        `We deduced ${holders.length} subject from ${wVCs.length} Verifiable Credentials, and no holder property was given. This might lead to undesired results`,
+      );
+    }
+    const holder = opts?.holderDID ?? (holders.length === 1 ? holders[0] : undefined);
 
-      const kbJwt = {
-        // alg MUST be set by the signer
-        header: {
-          typ: 'kb+jwt',
-          // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
-        },
-        payload: {
-          iat: new Date().getTime(),
-          sd_hash: sdHash,
-        },
-      } satisfies PartialSdJwtKbJwt;
+    const type = opts?.basePresentationPayload?.type
+      ? Array.isArray(opts.basePresentationPayload.type)
+        ? opts.basePresentationPayload.type
+        : [opts.basePresentationPayload.type]
+      : [];
+    if (!type.includes('VerifiablePresentation')) {
+      type.push('VerifiablePresentation');
+    }
 
-      const sdJwtDecodedPresentation: PartialSdJwtDecodedVerifiableCredential = {
-        ...decoded,
-        kbJwt,
-      };
-      return sdJwtDecodedPresentation;
-    } else {
-      if (!selectedCredentials) {
-        throw Error(`At least a verifiable credential needs to be passed in to create a presentation`);
+    const context = opts?.basePresentationPayload?.['@context']
+      ? Array.isArray(opts.basePresentationPayload['@context'])
+        ? opts.basePresentationPayload['@context']
+        : [opts.basePresentationPayload['@context']]
+      : [];
+    if (!context.includes('https://www.w3.org/2018/credentials/v1')) {
+      context.push('https://www.w3.org/2018/credentials/v1');
+    }
+
+    if (opts?.presentationSubmission) {
+      if (!type.includes('PresentationSubmission')) {
+        type.push('PresentationSubmission');
       }
-      const verifiableCredential = (Array.isArray(selectedCredentials) ? selectedCredentials : [selectedCredentials]) as W3CVerifiableCredential[];
-      const wVCs = verifiableCredential.map((vc) => CredentialMapper.toWrappedVerifiableCredential(vc));
-      const holders = Array.from(new Set(wVCs.flatMap((wvc) => getSubjectIdsAsString(wvc.credential as ICredential))));
-      if (holders.length !== 1 && !opts?.holderDID) {
-        console.log(
-          `We deduced ${holders.length} subject from ${wVCs.length} Verifiable Credentials, and no holder property was given. This might lead to undesired results`,
-        );
+      if (!context.includes('https://identity.foundation/presentation-exchange/submission/v1')) {
+        context.push('https://identity.foundation/presentation-exchange/submission/v1');
       }
-      const holder = opts?.holderDID ?? (holders.length === 1 ? holders[0] : undefined);
-
-      const type = opts?.basePresentationPayload?.type
-        ? Array.isArray(opts.basePresentationPayload.type)
-          ? opts.basePresentationPayload.type
-          : [opts.basePresentationPayload.type]
-        : [];
-      if (!type.includes('VerifiablePresentation')) {
-        type.push('VerifiablePresentation');
-      }
-
-      const context = opts?.basePresentationPayload?.['@context']
-        ? Array.isArray(opts.basePresentationPayload['@context'])
-          ? opts.basePresentationPayload['@context']
-          : [opts.basePresentationPayload['@context']]
-        : [];
-      if (!context.includes('https://www.w3.org/2018/credentials/v1')) {
-        context.push('https://www.w3.org/2018/credentials/v1');
-      }
-
-      if (opts?.presentationSubmission) {
-        if (!type.includes('PresentationSubmission')) {
-          type.push('PresentationSubmission');
-        }
-        if (!context.includes('https://identity.foundation/presentation-exchange/submission/v1')) {
-          context.push('https://identity.foundation/presentation-exchange/submission/v1');
-        }
-      }
-      return {
+    }
+    const result: Array<IPresentation | PartialSdJwtDecodedVerifiableCredential> = [];
+    if (PEX.allowMultipleVCsPerPresentation(verifiableCredential)) {
+      result.push({
         ...opts?.basePresentationPayload,
         '@context': context,
         type,
         holder,
         ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
         verifiableCredential,
-      };
+      });
+    } else {
+      verifiableCredential.forEach((vc) => {
+        if (CredentialMapper.isSdJwtDecodedCredential(vc)) {
+          result.push(vc as PartialSdJwtDecodedVerifiableCredential);
+        } else if (CredentialMapper.isSdJwtEncoded(vc)) {
+          const decoded = CredentialMapper.decodeVerifiableCredential(vc, opts?.hasher);
+          result.push(decoded as PartialSdJwtDecodedVerifiableCredential);
+        } else {
+          // This should be jwt or json-ld
+          result.push({
+            ...opts?.basePresentationPayload,
+            '@context': context,
+            type,
+            holder,
+            ...(!!opts?.presentationSubmission && { presentation_submission: opts.presentationSubmission }),
+            verifiableCredential: [vc],
+          });
+        }
+      });
     }
+    return result;
+  }
+
+  /*
+    TODO SDK-37 refinement needed
+   */
+  private static allowMultipleVCsPerPresentation(verifiableCredentials: Array<OriginalVerifiableCredential>): boolean {
+    const jwtCredentials = verifiableCredentials.filter((c) => CredentialMapper.isJwtEncoded(c) || CredentialMapper.isJwtDecodedCredential(c));
+
+    if (jwtCredentials.length > 0) {
+      const subjects = new Set<string>();
+      const verificationMethods = new Set<string>();
+
+      for (const credential of jwtCredentials) {
+        const decodedCredential = CredentialMapper.isJwtEncoded(credential)
+          ? (CredentialMapper.decodeVerifiableCredential(credential) as JwtDecodedVerifiableCredential)
+          : (credential as JwtDecodedVerifiableCredential);
+
+        const subject =
+          decodedCredential.sub ||
+          (decodedCredential.vc && 'id' in decodedCredential.vc.credentialSubject && decodedCredential.vc.credentialSubject.id);
+        if (subject) {
+          subjects.add(subject);
+        }
+
+        const vcProof = decodedCredential.proof ?? decodedCredential.vc.proof;
+        const proofs = Array.isArray(vcProof) ? vcProof : [vcProof];
+        proofs.filter((proof: IProof) => proof.verificationMethod).forEach((proof: IProof) => verificationMethods.add(proof.verificationMethod));
+      }
+
+      // If there's more than one unique subject or verification method, we can't allow multiple VCs in a single presentation
+      if (subjects.size > 1 || verificationMethods.size > 1) {
+        return false;
+      }
+    }
+
+    if (verifiableCredentials.some((c) => CredentialMapper.isSdJwtEncoded(c) || CredentialMapper.isSdJwtDecodedCredential(c))) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -504,7 +519,8 @@ export class PEX {
     });
 
     const presentationResult = this.presentationFrom(presentationDefinition, evaluationResult.verifiableCredential, opts);
-    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentationResult.presentation, {
+    const presentations = presentationResult.presentations;
+    const evaluationResults = this.evaluatePresentation(presentationDefinition, presentations, {
       limitDisclosureSignatureSuites,
       ...(presentationResult.presentationSubmissionLocation === PresentationSubmissionLocation.EXTERNAL && {
         presentationSubmission: presentationResult.presentationSubmission,
@@ -529,57 +545,66 @@ export class PEX {
       domain: proofOptions?.domain,
     };
 
-    let presentation = presentationResult.presentation;
+    this.updateSdJwtCredentials(presentations, proofOptions?.nonce);
 
-    // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
-    if (CredentialMapper.isSdJwtDecodedCredential(presentationResult.presentation as SdJwtDecodedVerifiableCredential)) {
-      const sdJwtPresentation = presentation as SdJwtDecodedVerifiableCredential;
-      if (!this.options?.hasher) {
-        throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
-      }
-
-      // extract sd_alg or default to sha-256
-      const hashAlg = presentationResult.presentation.signedPayload._sd_alg ?? 'sha-256';
-      const sdHash = calculateSdHash(presentationResult.presentation.compactSdJwtVc, hashAlg, this.options.hasher);
-
-      const kbJwt = {
-        // alg MUST be set by the signer
-        header: {
-          typ: 'kb+jwt',
+    const verifiablePresentations: Array<W3CVerifiablePresentation | CompactSdJwtVc> = [];
+    for (const presentation of presentations) {
+      const callBackParams: PresentationSignCallBackParams = {
+        options: {
+          ...opts,
+          presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
         },
-        // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
-        payload: {
-          iat: new Date().getTime(),
-          nonce: proofOptions?.nonce,
-          sd_hash: sdHash,
-        },
-      } satisfies PartialSdJwtKbJwt;
-
-      presentation = {
-        ...sdJwtPresentation,
-        kbJwt,
-      } satisfies PartialSdJwtDecodedVerifiableCredential;
+        presentation,
+        presentationDefinition,
+        selectedCredentials,
+        proof,
+        presentationSubmission: evaluationResults.value,
+        evaluationResults,
+      };
+      verifiablePresentations.push(await signingCallBack(callBackParams));
     }
-
-    const callBackParams: PresentationSignCallBackParams = {
-      options: {
-        ...opts,
-        presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
-      },
-      presentation,
-      presentationDefinition,
-      selectedCredentials,
-      proof,
-      presentationSubmission: evaluationResults.value,
-      evaluationResults,
-    };
-    const verifiablePresentation = await signingCallBack(callBackParams);
-
     return {
-      verifiablePresentation,
+      verifiablePresentations,
       presentationSubmissionLocation: presentationResult.presentationSubmissionLocation,
       presentationSubmission: evaluationResults.value,
     };
+  }
+
+  private updateSdJwtCredentials(
+    presentations: Array<IPresentation | SdJwtDecodedVerifiableCredential | PartialSdJwtDecodedVerifiableCredential>,
+    nonce?: string,
+  ) {
+    presentations.forEach((presentation, index) => {
+      // Select type without kbJwt as isSdJwtDecodedCredential and won't accept the partial sdvc type
+      if (CredentialMapper.isSdJwtDecodedCredential(presentation as SdJwtDecodedVerifiableCredential)) {
+        const sdJwtCredential = presentation as SdJwtDecodedVerifiableCredential;
+        if (!this.options?.hasher) {
+          throw new Error('Hasher must be provided when creating a presentation with an SD-JWT VC');
+        }
+
+        // extract sd_alg or default to sha-256
+        const hashAlg = sdJwtCredential.signedPayload._sd_alg ?? 'sha-256';
+        const sdHash = calculateSdHash(sdJwtCredential.compactSdJwtVc, hashAlg, this.options.hasher);
+
+        const kbJwt = {
+          // alg MUST be set by the signer
+          header: {
+            typ: 'kb+jwt',
+          },
+          // aud MUST be set by the signer or provided by e.g. SIOP/OpenID4VP lib
+          payload: {
+            iat: Math.floor(new Date().getTime() / 1000),
+            nonce: nonce,
+            sd_hash: sdHash,
+          },
+        } satisfies PartialSdJwtKbJwt;
+
+        presentations[index] = {
+          ...sdJwtCredential,
+          kbJwt,
+        } satisfies PartialSdJwtDecodedVerifiableCredential;
+      }
+    });
   }
 
   public static definitionVersionDiscovery(presentationDefinition: IPresentationDefinition): DiscoveredVersion {

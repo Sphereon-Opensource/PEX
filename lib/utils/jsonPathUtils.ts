@@ -4,7 +4,6 @@ import { PresentationDefinitionV1, PresentationDefinitionV2 } from '@sphereon/pe
 import { InputFieldType, IPresentationDefinition, PathComponent } from '../types';
 
 export class JsonPathUtils {
-  static matchAll = require('string.prototype.matchall');
   static REGEX_PATH = /@\w+/g;
   /**
    * @param obj: any object can be found in verifiablePresentation.verifiableCredential[i]
@@ -121,7 +120,7 @@ export class JsonPathUtils {
   }
 
   private static modifyPathWithSpecialCharacter(path: string): string {
-    const matches = this.matchAll(path, this.REGEX_PATH);
+    const matches = path.matchAll(JsonPathUtils.REGEX_PATH);
     path = this.modifyPathRecursive(matches, path);
     return path;
   }
@@ -139,7 +138,7 @@ export class JsonPathUtils {
         if (path.substring(atIdx - 2, atIdx) === '..') {
           path = path.substring(0, atIdx - 2) + "..['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);
           indexChanged = true;
-          const matches = this.matchAll(path, this.REGEX_PATH);
+          const matches = path.matchAll(JsonPathUtils.REGEX_PATH);
           this.modifyPathRecursive(matches, path);
         } else if (path.charAt(atIdx - 1) === '.') {
           path = path.substring(0, atIdx - 1) + "['" + next.value[0] + "']" + path.substring(atIdx + next.value[0].length);

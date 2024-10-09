@@ -244,7 +244,7 @@ describe('1st scenario', () => {
      which is wrong in the case of our example, because the index of our verifiableCredential is no longer #2, but it's "1"
      */
     const presentationResult = pex.presentationFrom(pd, [holderWallet.verifiableCredentials[2]], { holderDID: 'did:didMethod:2021112400' });
-    const presentation = presentationResult.presentation as IPresentation;
+    const presentation = presentationResult.presentations[0] as IPresentation;
     expect(presentation!.presentation_submission!.definition_id).toEqual('31e2f0f1-6b70-411d-b239-56aed5321884');
     expect(presentation!.presentation_submission!.descriptor_map.map((dm) => dm.id).sort()).toEqual([
       '867bfe7a-5b91-46b2-9ba4-70028b8d9cc8',

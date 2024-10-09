@@ -504,7 +504,7 @@ describe('evaluate JGiter tests', () => {
     expect(selectFrom.matches![1]?.from).toEqual('B');
     expect(selectFrom.matches![1]?.vc_path).toEqual(['$.verifiableCredential[1]']);
     const presentationResult = pex.presentationFrom(pdSchema, selectFrom.verifiableCredential as IVerifiableCredential[]);
-    const presentation = presentationResult.presentation as IPresentation;
+    const presentation = presentationResult.presentations[0] as IPresentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',
@@ -544,7 +544,7 @@ describe('evaluate JGiter tests', () => {
     expect(resultEvaluation.errors?.length).toEqual(0);
     expect(resultEvaluation.areRequiredCredentialsPresent).toEqual(Status.INFO);
     const presentationResult = pex.presentationFrom(pdSchema, [resultEvaluation.verifiableCredential[0]]);
-    const presentation = presentationResult.presentation as IPresentation;
+    const presentation = presentationResult.presentations[0] as IPresentation;
     expect(presentation.presentation_submission?.descriptor_map).toEqual([
       {
         id: 'identity_input',

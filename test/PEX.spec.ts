@@ -208,7 +208,7 @@ describe('evaluate', () => {
     // Should correctly generate the presentation submission with nested values
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      presentation: vps,
+      presentations: vps,
       errors: [],
       warnings: [],
       value: {
@@ -325,7 +325,7 @@ describe('evaluate', () => {
 
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      presentation: vps,
+      presentations: vps,
       errors: [],
       warnings: [],
       // Should return the same presentation submission if provided
@@ -366,7 +366,7 @@ describe('evaluate', () => {
 
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.INFO,
-      presentation: vps,
+      presentations: vps,
       errors: [],
       warnings: [],
       // Should return the same presentation submission if provided
@@ -510,7 +510,7 @@ describe('evaluate', () => {
 
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
-      presentation: vps,
+      presentations: vps,
       errors: [
         {
           message:
@@ -606,7 +606,7 @@ describe('evaluate', () => {
 
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
-      presentation: vps,
+      presentations: vps,
       errors: [
         {
           message: 'Expected all input descriptors (4) to be satisfifed in submission, but found 3. Missing ddc4a62f-73d4-4410-a3d7-b20720a113ed',
@@ -684,7 +684,7 @@ describe('evaluate', () => {
 
     expect(evaluationResults).toEqual({
       areRequiredCredentialsPresent: Status.ERROR,
-      presentation: vps,
+      presentations: vps,
       errors: [
         {
           message: 'Expected all submission requirements (1) to be satisfifed in submission, but found 0.',
@@ -742,7 +742,7 @@ describe('evaluate', () => {
       limitDisclosureSignatureSuites: LIMIT_DISCLOSURE_SIGNATURE_SUITES,
     });
     const result = pex.presentationFrom(pdSchema, vpSimple.verifiableCredential!, { holderDID: HOLDER_DID });
-    const presentation = result.presentation as IPresentation;
+    const presentation = result.presentations[0] as IPresentation;
     expect(presentation.presentation_submission).toEqual(
       expect.objectContaining({
         definition_id: '32f54163-7166-48f1-93d8-ff217bdb0653',
@@ -827,7 +827,7 @@ describe('evaluate', () => {
         holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
       },
     );
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -844,7 +844,7 @@ describe('evaluate', () => {
       signatureOptions: getSingatureOptionsMock(),
       holderDID: 'did:ethr:0x8D0E24509b79AfaB3A74Be1700ebF9769796B489',
     });
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     const proof = Array.isArray(vp.proof) ? vp.proof[0] : vp.proof;
     expect(proof.created).toEqual('2021-12-01T20:10:45.000Z');
     expect(proof.proofValue).toEqual('fake');
@@ -1052,7 +1052,7 @@ describe('evaluate', () => {
     });
   });
 
-  it('when array of presentations is passed, submission is always constructed as external', function () {
+  it('when array > 1 of presentations is passed, submission is always constructed as external', function () {
     const pdSchema: PresentationDefinitionV2 = {
       id: '49768857',
       input_descriptors: [
@@ -1076,7 +1076,7 @@ describe('evaluate', () => {
     };
     const pex: PEX = new PEX();
     const jwtEncodedVp = getFile('./test/dif_pe_examples/vp/vp_permanentResidentCard.jwt');
-    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, [jwtEncodedVp]);
+    const evalResult: PresentationEvaluationResults = pex.evaluatePresentation(pdSchema, [jwtEncodedVp, jwtEncodedVp]);
     expect(evalResult.errors).toEqual([]);
     expect(evalResult.value?.descriptor_map[0]).toEqual({
       id: 'prc_type',
@@ -1225,7 +1225,7 @@ describe('evaluate', () => {
       proofOptions: getProofOptionsMock(),
       signatureOptions: getSingatureOptionsMock(),
     });
-    const vp = vpr.verifiablePresentation as IVerifiablePresentation;
+    const vp = vpr.verifiablePresentations[0] as IVerifiablePresentation;
     expect(vp.verifiableCredential?.length).toEqual(1);
     expect(vp.presentation_submission?.descriptor_map).toEqual([
       {
