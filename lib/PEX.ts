@@ -1,4 +1,9 @@
-import { Format, PresentationDefinitionV1, PresentationDefinitionV2, PresentationSubmission } from '@sphereon/pex-models';
+import {
+  Format,
+  PresentationDefinitionV1,
+  PresentationDefinitionV2,
+  PresentationSubmission
+} from '@sphereon/pex-models';
 import {
   CompactSdJwtVc,
   CredentialMapper,
@@ -6,6 +11,7 @@ import {
   ICredential,
   IPresentation,
   IProof,
+  JwtDecodedVerifiableCredential,
   OriginalVerifiableCredential,
   OriginalVerifiablePresentation,
   OrPromise,
@@ -13,12 +19,11 @@ import {
   W3CVerifiableCredential,
   W3CVerifiablePresentation,
   WrappedVerifiableCredential,
-  WrappedVerifiablePresentation,
+  WrappedVerifiablePresentation
 } from '@sphereon/ssi-types';
 
 import { Status } from './ConstraintUtils';
-import { EvaluationClientWrapper, EvaluationResults, SelectResults } from './evaluation';
-import { PresentationEvaluationResults } from './evaluation';
+import { EvaluationClientWrapper, EvaluationResults, PresentationEvaluationResults, SelectResults } from './evaluation';
 import {
   PartialSdJwtDecodedVerifiableCredential,
   PartialSdJwtKbJwt,
@@ -27,11 +32,24 @@ import {
   PresentationSignCallBackParams,
   PresentationSubmissionLocation,
   VerifiablePresentationFromOpts,
-  VerifiablePresentationResult,
+  VerifiablePresentationResult
 } from './signing';
-import { DiscoveredVersion, IInternalPresentationDefinition, IPresentationDefinition, OrArray, PEVersion, SSITypesBuilder } from './types';
+import {
+  DiscoveredVersion,
+  IInternalPresentationDefinition,
+  IPresentationDefinition,
+  OrArray,
+  PEVersion,
+  SSITypesBuilder
+} from './types';
 import { calculateSdHash, definitionVersionDiscovery, getSubjectIdsAsString } from './utils';
-import { PresentationDefinitionV1VB, PresentationDefinitionV2VB, PresentationSubmissionVB, Validated, ValidationEngine } from './validation';
+import {
+  PresentationDefinitionV1VB,
+  PresentationDefinitionV2VB,
+  PresentationSubmissionVB,
+  Validated,
+  ValidationEngine
+} from './validation';
 
 export interface PEXOptions {
   /**
@@ -379,7 +397,7 @@ export class PEX {
           const decoded = CredentialMapper.decodeVerifiableCredential(vc, opts?.hasher);
           result.push(decoded as PartialSdJwtDecodedVerifiableCredential);
         } else {
-          // This should be plain jwt only
+          // This should be jwt or json-ld
           result.push({
             ...opts?.basePresentationPayload,
             '@context': context,
@@ -394,12 +412,47 @@ export class PEX {
     return result;
   }
 
-  private static allowMultipleVCsPerPresentation(verifiableCredential: Array<OriginalVerifiableCredential>) {
-    return !verifiableCredential.some(
-      (c) => CredentialMapper.isJwtEncoded(c) || CredentialMapper.isSdJwtEncoded(c) || CredentialMapper.isSdJwtDecodedCredential(c),
-    );
-  }
+  private static allowMultipleVCsPerPresentation(verifiableCredentials: Array<OriginalVerifiableCredential>): boolean {
+    const jwtCredentials = verifiableCredentials.filter(
+      (c) => CredentialMapper.isJwtEncoded(c) || CredentialMapper.isJwtDecodedCredential(c)
+    )
 
+    if (jwtCredentials.length > 0) {
+      const subjects = new Set<string>()
+      const verificationMethods = new Set<string>()
+
+      for (const credential of jwtCredentials) {
+        const decodedCredential = CredentialMapper.isJwtEncoded(credential) 
+          ? CredentialMapper.decodeVerifiableCredential(credential) as JwtDecodedVerifiableCredential
+          : credential as JwtDecodedVerifiableCredential
+
+        const subject = decodedCredential.sub || (decodedCredential.vc && 'id' in decodedCredential.vc.credentialSubject && decodedCredential.vc.credentialSubject.id);
+        if (subject) {
+          subjects.add(subject);
+        }
+
+        const vcProof = decodedCredential.proof ?? decodedCredential.vc.proof;
+        const proofs = Array.isArray(vcProof) ? vcProof : [vcProof];
+        proofs.filter((proof: IProof) => proof.verificationMethod)
+          .forEach((proof: IProof) => verificationMethods.add(proof.verificationMethod));
+      }
+
+      // If there's more than one unique subject or verification method, we can't allow multiple VCs in a single presentation
+      if (subjects.size > 1 || verificationMethods.size > 1) {
+        return false
+      }
+    }
+
+    if (verifiableCredentials.some(
+      (c) => CredentialMapper.isSdJwtEncoded(c) || CredentialMapper.isSdJwtDecodedCredential(c)
+    )) {
+      return false;
+    }
+
+    return true
+  }
+  
+  
   /**
    * This method validates whether an object is usable as a presentation definition or not.
    *

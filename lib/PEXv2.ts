@@ -120,13 +120,13 @@ export class PEXv2 extends PEX {
       opts?.presentationSubmissionLocation ??
       (hasSdJwtCredentials ? PresentationSubmissionLocation.EXTERNAL : PresentationSubmissionLocation.PRESENTATION);
 
-    const presentation = this.constructPresentations(selectedCredentials, {
+    const presentations = this.constructPresentations(selectedCredentials, {
       ...opts,
       presentationSubmission: presentationSubmissionLocation === PresentationSubmissionLocation.PRESENTATION ? presentationSubmission : undefined,
     });
 
     return {
-      presentations: presentation,
+      presentations,
       presentationSubmissionLocation,
       presentationSubmission,
     };

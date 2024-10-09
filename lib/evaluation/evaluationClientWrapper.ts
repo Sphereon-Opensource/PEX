@@ -507,11 +507,6 @@ export class EvaluationClientWrapper {
         originalVc = Array.isArray(vcResult.value.verifiableCredential)
           ? vcResult.value.verifiableCredential[0]
           : vcResult.value.verifiableCredential;
-        // FIXME this may be too lenient
-      } else if ('vp' in vcResult.value) {
-        originalVc = Array.isArray(vcResult.value.vp.verifiableCredential)
-          ? vcResult.value.vp.verifiableCredential[0]
-          : vcResult.value.vp.verifiableCredential;
       } else {
         throw Error('Could not deduce original VC from evaluation result');
       }
@@ -672,7 +667,7 @@ export class EvaluationClientWrapper {
       // Get the presentation definition specific to the current descriptor
       const pdForDescriptor = this.internalPresentationDefinitionForDescriptor(pd, descriptor.id);
 
-      // Reset and configure the evaluation client
+      // Reset and configure the evaluation client on each iteration
       this._client = new EvaluationClient();
       this._client.evaluate(pdForDescriptor, [vc], {
         ...opts,
@@ -690,7 +685,7 @@ export class EvaluationClientWrapper {
       }
     }
 
-    // Validate if the submission satisfies the presentation definition
+    // Output submission is same as input presentation submission, it's just that if it doesn't match, we return Error.
     const submissionAgainstDefinitionResult = this.validateIfSubmissionSatisfiesDefinition(pd, submission);
     if (!submissionAgainstDefinitionResult.doesSubmissionSatisfyDefinition) {
       result.errors?.push({
