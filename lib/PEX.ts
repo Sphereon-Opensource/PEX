@@ -394,6 +394,9 @@ export class PEX {
     return result;
   }
 
+  /*
+    TODO SDK-37 refinement needed
+   */
   private static allowMultipleVCsPerPresentation(verifiableCredentials: Array<OriginalVerifiableCredential>): boolean {
     const jwtCredentials = verifiableCredentials.filter((c) => CredentialMapper.isJwtEncoded(c) || CredentialMapper.isJwtDecodedCredential(c));
 
