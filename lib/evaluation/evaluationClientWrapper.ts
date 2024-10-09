@@ -870,6 +870,9 @@ export class EvaluationClientWrapper {
     },
   ): PresentationSubmission {
     if (!this._client.results || this._client.results.length === 0) {
+      if(vcs.length === 0) {
+        throw Error('The WrappedVerifiableCredentials input array is empty');
+      }
       throw Error('You need to call evaluate() before pex.presentationFrom()');
     }
     if (!this._client.generatePresentationSubmission) {
