@@ -35,7 +35,7 @@
     "test": "run-s test:*",
     "test:lint": "eslint . --ext .ts",
     "test:prettier": "prettier \"{lib,test}/**/*.ts\" --list-different",
-    "test:cov": "jest --ci --coverage && codecov",
+    "test:cov": "jest --ci --coverage",
     "test:unit": "jest"
   },
   "engines": {
@@ -61,7 +61,6 @@
     "@typescript-eslint/parser": "^7.3.1",
     "@sd-jwt/core": "^0.7.2",
     "ajv-cli": "^5.0.0",
-    "codecov": "^3.8.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
