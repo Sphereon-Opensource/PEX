@@ -513,10 +513,10 @@ export class EvaluationClientWrapper {
           ? vcResult.value.vp.verifiableCredential[0]
           : vcResult.value.vp.verifiableCredential;
       } else {
-        throw Error('Could not deduced original VC from evaluation result');
+        throw Error('Could not deduce original VC from evaluation result');
       }
     } else {
-      throw Error('Could not deduced original VC from evaluation result');
+      throw Error('Could not deduce original VC from evaluation result');
     }
 
     // Find the corresponding Wrapped Verifiable Credential (wvc) based on the original VC
