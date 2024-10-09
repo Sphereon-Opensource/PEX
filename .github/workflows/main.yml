@@ -34,7 +34,7 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-        name: codecove-umbrella # optional
+        name: codecove # optional
         flags: unittest
         fail_ci_if_error: true # optional (default = false)
         #directory: ./coverage/reports/
