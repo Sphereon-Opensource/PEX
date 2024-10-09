@@ -31,10 +31,10 @@ jobs:
     - name: pnpm test
       run: pnpm test
     - name: codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-        name: codecove # optional
+        name: codecove-umbrella # optional
         flags: unittest
         fail_ci_if_error: true # optional (default = false)
         #directory: ./coverage/reports/
